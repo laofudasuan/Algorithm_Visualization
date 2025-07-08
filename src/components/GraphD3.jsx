@@ -168,6 +168,7 @@ export default function GraphD3({ nodes, edges, directed, highlightIndex, width 
 
     // Draw labels
     svg.append('g')
+      .attr('class', 'node-id-labels')
       .selectAll('text')
       .data(nodeObjs)
       .join('text')
@@ -180,6 +181,7 @@ export default function GraphD3({ nodes, edges, directed, highlightIndex, width 
 
     // Draw node labels (自定义label)
     svg.append('g')
+      .attr('class', 'node-custom-labels')
       .selectAll('text')
       .data(nodeObjs)
       .join('text')
@@ -223,7 +225,14 @@ export default function GraphD3({ nodes, edges, directed, highlightIndex, width 
       node
         .attr('cx', d => limit(d.x, nodeRadius + 8, width - nodeRadius - 8))
         .attr('cy', d => limit(d.y, nodeRadius + 8, height - nodeRadius - 8));
-      svg.selectAll('g > text')
+      
+      // 更新节点ID标签位置
+      svg.selectAll('g.node-id-labels text')
+        .attr('x', d => limit(d.x, nodeRadius + 8, width - nodeRadius - 8))
+        .attr('y', d => limit(d.y, nodeRadius + 8, height - nodeRadius - 8));
+      
+      // 更新自定义标签位置
+      svg.selectAll('g.node-custom-labels text')
         .attr('x', d => limit(d.x, nodeRadius + 8, width - nodeRadius - 8))
         .attr('y', d => limit(d.y, nodeRadius + 8, height - nodeRadius - 8));
       
@@ -259,48 +268,93 @@ export default function GraphD3({ nodes, edges, directed, highlightIndex, width 
     }
 
     return () => simulation.stop();
-  }, [width, height, nodeRadius, arrowSize, nodes.length, nodes.map(n => n.id).join(',')]); // 只在节点数量或ID变化时重建，移除edges依赖
+  }, [width, height, nodeRadius, arrowSize, nodes.length]); // 只在节点数量变化时重建，移除ID和edges依赖
 
-  // 专门处理节点固定状态和标签变化，不重建整个图形
+  // 专门处理节点ID、固定状态和标签变化，不重建整个图形
   useEffect(() => {
     if (simulationRef.current && nodeObjsRef.current.length > 0) {
       const svg = d3.select(ref.current);
       
-      // 更新现有节点的固定状态和标签
-      nodeObjsRef.current.forEach(nodeObj => {
-        const currentNode = nodes.find(n => n.id === nodeObj.id);
-        if (currentNode) {
-          // 更新固定状态
-          if (currentNode.fixed && !nodeObj.fixed) {
-            // 从非固定变为固定
-            nodeObj.fx = nodeObj.x;
-            nodeObj.fy = nodeObj.y;
-            nodeObj.fixed = true;
-          } else if (!currentNode.fixed && nodeObj.fixed) {
-            // 从固定变为非固定
-            nodeObj.fx = null;
-            nodeObj.fy = null;
-            nodeObj.fixed = false;
-            // 重启仿真以便节点可以重新移动
-            simulationRef.current.alpha(0.3).restart();
-          }
-          
-          // 更新标签
-          nodeObj.label = currentNode.label;
-        }
-      });
+      // 首先检查是否有节点ID变化
+      const currentIds = nodes.map(n => n.id);
+      const existingIds = nodeObjsRef.current.map(n => n.id);
+      const hasIdChanges = currentIds.some((id, i) => id !== existingIds[i]);
       
-      // 更新DOM中的标签文本
-      svg.selectAll('g:last-child text')
-        .data(nodeObjsRef.current)
-        .text(d => d.label || '');
+      if (hasIdChanges) {
+        // 更新节点ID和相关数据
+        nodeObjsRef.current.forEach((nodeObj, i) => {
+          if (nodes[i]) {
+            nodeObj.id = nodes[i].id;
+            nodeObj.fixed = nodes[i].fixed;
+            nodeObj.label = nodes[i].label;
+            
+            // 如果节点变为固定状态，设置固定位置
+            if (nodes[i].fixed) {
+              nodeObj.fx = nodeObj.x;
+              nodeObj.fy = nodeObj.y;
+            } else {
+              nodeObj.fx = null;
+              nodeObj.fy = null;
+            }
+          }
+        });
+        
+        // 更新D3仿真中的节点数据
+        if (simulationRef.current) {
+          simulationRef.current.nodes(nodeObjsRef.current);
+          // 重新设置链接力的ID访问器，确保边能正确找到更新后的节点
+          if (simulationRef.current.force('link')) {
+            simulationRef.current.force('link').id(d => d.id);
+          }
+          simulationRef.current.alpha(0.3).restart();
+        }
+        
+        // 更新DOM中的节点ID标签
+        svg.selectAll('g.node-id-labels text') // 节点ID标签
+          .data(nodeObjsRef.current)
+          .text(d => d.id);
+        
+        // 更新DOM中的自定义标签
+        svg.selectAll('g.node-custom-labels text') // 自定义标签
+          .data(nodeObjsRef.current)
+          .text(d => d.label || '');
+      } else {
+        // 如果没有ID变化，只更新固定状态和标签
+        nodeObjsRef.current.forEach(nodeObj => {
+          const currentNode = nodes.find(n => n.id === nodeObj.id);
+          if (currentNode) {
+            // 更新固定状态
+            if (currentNode.fixed && !nodeObj.fixed) {
+              // 从非固定变为固定
+              nodeObj.fx = nodeObj.x;
+              nodeObj.fy = nodeObj.y;
+              nodeObj.fixed = true;
+            } else if (!currentNode.fixed && nodeObj.fixed) {
+              // 从固定变为非固定
+              nodeObj.fx = null;
+              nodeObj.fy = null;
+              nodeObj.fixed = false;
+              // 重启仿真以便节点可以重新移动
+              simulationRef.current.alpha(0.3).restart();
+            }
+            
+            // 更新标签
+            nodeObj.label = currentNode.label;
+          }
+        });
+        
+        // 只更新DOM中的自定义标签
+        svg.selectAll('g.node-custom-labels text')
+          .data(nodeObjsRef.current)
+          .text(d => d.label || '');
+      }
       
       // 更新节点边框样式：固定节点用黑色粗边框
       svg.selectAll('circle')
         .attr('stroke', d => d.fixed ? '#000' : '#fff')
         .attr('stroke-width', d => d.fixed ? 3 : 1.5);
     }
-  }, [nodes.map(n => `${n.id}:${n.fixed}:${n.label || ''}`).join(',')]); // 在固定状态或标签变化时触发
+  }, [nodes.map(n => `${n.id}:${n.fixed}:${n.label || ''}`).join(',')]); // 在ID、固定状态或标签变化时触发
 
   // 专门处理边变化，不重建整个图形
   useEffect(() => {
@@ -378,7 +432,7 @@ export default function GraphD3({ nodes, edges, directed, highlightIndex, width 
       // 保存当前边数据以供后续比较
       edgesRef.current = newEdgesForD3;
     }
-  }, [edges.map(e => `${e.from}-${e.to}-${e.label || ''}`).join(','), directed]); // 在边或方向性变化时触发
+  }, [edges.map(e => `${e.from}-${e.to}-${e.label || ''}`).join(','), directed, nodes.map(n => n.id).join(',')]); // 在边、方向性或节点ID变化时触发
 
   // 只在高亮变化时刷新颜色
   useEffect(() => {
