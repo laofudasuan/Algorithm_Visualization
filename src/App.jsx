@@ -5,11 +5,12 @@ import './App.css';
 
 function App() {
   // 节点结构改为对象，支持 fixed 属性
+  // 1. 新增label属性
   const [nodes, setNodes] = useState([
-    { id: 'A', fixed: false },
-    { id: 'B', fixed: false },
-    { id: 'C', fixed: false },
-    { id: 'D', fixed: false }
+    { id: 'A', fixed: false, label: '' },
+    { id: 'B', fixed: false, label: '' },
+    { id: 'C', fixed: false, label: '' },
+    { id: 'D', fixed: false, label: '' }
   ]);
   // 边结构增加 label 字段
   const [edges, setEdges] = useState([
@@ -32,6 +33,7 @@ function App() {
   const [dfsStart, setDfsStart] = useState(nodes[0]?.id || '');
   const [dfsAnimating, setDfsAnimating] = useState(false);
   const [dfsStack, setDfsStack] = useState([]);
+  const [dfsAnimatingSpeed, setDfsAnimatingSpeed] = useState(1000);
 
   // Animation: highlight nodes in order
   const playAnimation = async () => {
@@ -49,6 +51,13 @@ function App() {
   // 辅助函数：设置某个点的 fixed
   const setNodeFixed = (idx, fixed) => {
     setNodes(nodes => nodes.map((n, i) => i === idx ? { ...n, fixed } : n));
+  };
+
+  // 通过点击切换节点固定状态
+  const toggleNodeFixed = (nodeId) => {
+    setNodes(nodes => nodes.map(n => 
+      n.id === nodeId ? { ...n, fixed: !n.fixed } : n
+    ));
   };
 
   // DFS
@@ -71,13 +80,13 @@ function App() {
         visited.add(u);
         setDfsStack(stack.concat(u));
         setHighlightIndex(nodes.findIndex(n => n.id === u));
-        await new Promise(res => setTimeout(res, 800));
+        await new Promise(res => setTimeout(res, dfsAnimatingSpeed));
         for (const v of (edgeMap[u] || [])) {
           if (!visited.has(v)) {
             await dfs(v, stack.concat(u));
           }
           setHighlightIndex(nodes.findIndex(n => n.id === u));
-          await new Promise(res => setTimeout(res, 800));
+          await new Promise(res => setTimeout(res, dfsAnimatingSpeed));
         }
         setDfsStack(stack); // 回溯时弹栈
       }
@@ -106,10 +115,8 @@ function App() {
         directed={directed}
         setDirected={setDirected}
       />
-      <button style={{ margin: '16px 0' }} onClick={() => setShowGraph(true)}>
-        一键生成
-      </button>
-      {showGraph && (
+      
+      
         <>
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: 32 }}>
       <div style={{ margin: '24px 0' }}>
@@ -122,6 +129,7 @@ function App() {
           height={canvasHeight}
           nodeRadius={nodeRadius}
           arrowSize={arrowSize}
+          onNodeClick={toggleNodeFixed}
         />
       </div>
       {/* DFS递归栈可视化 */}
@@ -189,18 +197,30 @@ function App() {
           {ordAnimating ? '播放中...' : '播放点亮动画'}
         </button>
         <div style={{ marginTop: 16 }}>
-         <label>DFS起点: </label>
-         <select value={dfsStart} onChange={e => setDfsStart(e.target.value)} disabled={dfsAnimating || animating}>
-          {nodes.map(n => (
-            <option key={n.id} value={n.id}>{n.id}</option>
-          ))}
+          <label>DFS起点: </label>
+          <select value={dfsStart} onChange={e => setDfsStart(e.target.value)} disabled={dfsAnimating || animating}>
+            {nodes.map(n => (
+              <option key={n.id} value={n.id}>{n.id}</option>
+            ))}
           </select>
           <button onClick={playDFS} disabled={dfsAnimating || animating || !dfsStart} style={{ marginLeft: 8 }}>
             {dfsAnimating ? 'DFS中...' : '播放DFS'}
           </button>
+          <label style={{ marginLeft: 12 }}>
+            每步播放时长（秒）:
+            <input
+              type="number"
+              min={0.1}
+              max={10}
+              step={0.1}
+              value={dfsAnimatingSpeed / 1000}
+              onChange={e => setDfsAnimatingSpeed(Number(e.target.value) * 1000)}
+              disabled={dfsAnimating || animating}
+              style={{ width: 50, marginLeft: 4 }}
+            />
+          </label>
         </div>
       </>
-      )}
     </div>
   );
 }

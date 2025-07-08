@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 
 export default function GraphInput({ nodes, setNodes, setNodeFixed, edges, setEdges, directed, setDirected }) {
   // Add node
-  const addNode = () => setNodes([...nodes, '']);
+  const addNode = () => setNodes([...nodes, { id: '', fixed: false, label: '' }]);
   // Remove node
   const removeNode = (idx) => setNodes(nodes.filter((_, i) => i !== idx));
-  // Update node
-  const updateNode = (idx, value) => setNodes(nodes.map((n, i) => (i === idx ? { ...n, id: value } : n)));
+  // Update node 增加label
+  const updateNode = (idx, key, value) => setNodes(nodes.map((n, i) => i === idx ? { ...n, [key]: value } : n));
 
   // Add edge
   const addEdge = () => setEdges([...edges, { from: '', to: '', label: '' }]);
@@ -37,7 +37,7 @@ export default function GraphInput({ nodes, setNodes, setNodeFixed, edges, setEd
   };
 
   return (
-    <div className="graph-input" style={{ display: 'flex', gap: 32, alignItems: 'flex-start', width: 900, maxWidth: '100%', margin: '0 auto', position: 'relative', flexDirection: 'column' }}>
+    <div className="graph-input" style={{ display: 'flex', gap: 32, alignItems: 'flex-start', width: 1000, maxWidth: '100%', margin: '0 auto', position: 'relative', flexDirection: 'column' }}>
       <div style={{ width: '100%' }}>
         <h2>批量输入（每行一个点或一条边，边格式：起点 终点 [标签]，支持#注释）</h2>
         <textarea
@@ -52,13 +52,14 @@ export default function GraphInput({ nodes, setNodes, setNodeFixed, edges, setEd
       </div>
       <div style={{ display: 'flex', gap: 32, width: '100%' }}>
         {/* 左侧：点列表 */}
-        <div style={{ flex: 1, minWidth: 300, maxWidth: 400, textAlign: 'left' }}>
+        <div style={{ flex: 1, minWidth: 300, textAlign: 'left' }}>
           <h2>点列表</h2>
           {nodes.map((node, idx) => (
             <div key={idx} style={{ marginBottom: 4, display: 'flex', alignItems: 'center' }}>
-              <input style={{ width: 120 }} value={node.id} onChange={e => updateNode(idx, e.target.value)} placeholder={`点${idx+1}`} />
+              <input style={{ width: 120 }} value={node.id} onChange={e => updateNode(idx, 'id', e.target.value)} placeholder={`点${idx+1}`} />
+              <input style={{ width: 80, marginLeft: 8 }} value={node.label || ''} onChange={e => updateNode(idx, 'label', e.target.value)} placeholder="标签" />
               <button onClick={() => removeNode(idx)} disabled={nodes.length <= 1} style={{ marginLeft: 8, minWidth: 70 }}>删除</button>
-              <label style={{ marginLeft: 8 }}>
+              <label style={{ width: 80, marginLeft: 8 }}>
                 <input
                   type="checkbox"
                   checked={!!node.fixed}
@@ -71,7 +72,7 @@ export default function GraphInput({ nodes, setNodes, setNodeFixed, edges, setEd
           <button onClick={addNode}>添加点</button>
         </div>
         {/* 右侧：边列表 */}
-        <div style={{ flex: 1, minWidth: 400, maxWidth: 400, textAlign: 'left' }}>
+        <div style={{ flex: 1, minWidth: 400, textAlign: 'left' }}>
           <h2>边列表</h2>
           {edges.map((edge, idx) => (
             <div key={idx} style={{ marginBottom: 4, display: 'flex', alignItems: 'center' }}>
