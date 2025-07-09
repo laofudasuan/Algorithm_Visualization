@@ -268,7 +268,7 @@ export default function GraphD3({ nodes, edges, directed, highlightIndex, width 
     }
 
     return () => simulation.stop();
-  }, [width, height, nodeRadius, arrowSize, nodes.length]); // 只在节点数量变化时重建，移除ID和edges依赖
+  }, [width, height, nodeRadius, arrowSize, nodes.length]); // 在画布大小、点半径、箭头大小或节点数量变化时重建图形
 
   // 专门处理节点ID、固定状态和标签变化，不重建整个图形
   useEffect(() => {
