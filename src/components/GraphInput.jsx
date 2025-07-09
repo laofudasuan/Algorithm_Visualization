@@ -17,6 +17,7 @@ export default function GraphInput({ nodes, setNodes, setNodeFixed, edges, setEd
 
   const [inputMode, setInputMode] = useState('form'); // 'form' or 'text'
   const [bulkText, setBulkText] = useState('');
+  const [showList, setShowList] = useState('nodes'); // 'nodes' or 'edges'
 
   const parseBulkText = () => {
     const lines = bulkText.split(/\r?\n/).map(l => l.trim()).filter(l => l && !l.startsWith('#'));
@@ -37,28 +38,40 @@ export default function GraphInput({ nodes, setNodes, setNodeFixed, edges, setEd
   };
 
   return (
-    <div className="graph-input" style={{ display: 'flex', gap: 32, alignItems: 'flex-start', width: 1000, maxWidth: '100%', margin: '0 auto', position: 'relative', flexDirection: 'column' }}>
-      <div style={{ width: '100%' }}>
-        <h2>批量输入（每行一个点或一条边，边格式：起点 终点 [标签]，支持#注释）</h2>
-        <textarea
-          style={{ width: '100%', minHeight: 120, fontFamily: 'monospace', fontSize: 15 }}
-          value={bulkText}
-          onChange={e => setBulkText(e.target.value)}
-          placeholder={`A\nB\nC\nA B\nB C label1\n# 注释`}
-        />
-        <div style={{ marginTop: 8 }}>
-        <button onClick={parseBulkText}>解析</button>
+    <div className="graph-input" style={{ display: 'flex', gap: 10, alignItems: 'flex-start', width: 500, maxWidth: '100%', margin: '0 auto', position: 'relative', flexDirection: 'column' }}>
+      <div style={{ display: 'flex', flexDirection: 'row', gap: 32 }}>
+        <h2>批量输入</h2>
+        <div style={{ display: 'flex', flexDirection: 'column'}}>
+          <div>每行一个点或一条边</div>
+          <div>边格式：起点 终点 [标签]</div>
+          <div>支持#注释</div>
         </div>
+      </div>
+      <textarea
+        style={{ width: '100%', minHeight: 120, fontFamily: 'monospace', fontSize: 15 }}
+        value={bulkText}
+        onChange={e => setBulkText(e.target.value)}
+        placeholder={`A\nB\nC\nA B\nB C label1\n# 注释`}
+      />
+        <div style={{ marginTop: 8 }}>
+          <button onClick={parseBulkText}>解析</button>
+        </div>
+      <div style={{ marginBottom: 0 }}>
+        <label>
+          <input type="radio" name="show-list" value="nodes" checked={showList === 'nodes'} onChange={() => setShowList('nodes')} /> 点列表
+        </label>
+        <label style={{ marginLeft: 16 }}>
+          <input type="radio" name="show-list" value="edges" checked={showList === 'edges'} onChange={() => setShowList('edges')} /> 边列表
+        </label>
       </div>
       <div style={{ display: 'flex', gap: 32, width: '100%' }}>
         {/* 左侧：点列表 */}
+        {showList === 'nodes' && (
         <div style={{ flex: 1, minWidth: 300, textAlign: 'left' }}>
-          <h2>点列表</h2>
           {nodes.map((node, idx) => (
             <div key={idx} style={{ marginBottom: 4, display: 'flex', alignItems: 'center' }}>
-              <input style={{ width: 120 }} value={node.id} onChange={e => updateNode(idx, 'id', e.target.value)} placeholder={`点${idx+1}`} />
-              <input style={{ width: 80, marginLeft: 8 }} value={node.label || ''} onChange={e => updateNode(idx, 'label', e.target.value)} placeholder="标签" />
-              <button onClick={() => removeNode(idx)} disabled={nodes.length <= 1} style={{ marginLeft: 8, minWidth: 70 }}>删除</button>
+              <input style={{ width: 20 }} value={node.id} onChange={e => updateNode(idx, 'id', e.target.value)} placeholder={`点${idx+1}`} />
+              <input style={{ width: 40, marginLeft: 8 }} value={node.label || ''} onChange={e => updateNode(idx, 'label', e.target.value)} placeholder="标签" />
               <label style={{ width: 80, marginLeft: 8 }}>
                 <input
                   type="checkbox"
@@ -67,46 +80,28 @@ export default function GraphInput({ nodes, setNodes, setNodeFixed, edges, setEd
                 />
                 固定
               </label>
+              <button onClick={() => removeNode(idx)} disabled={nodes.length <= 1} style={{ marginLeft: 8, minWidth: 32, width: 32, height: 32, fontSize: 22, fontWeight: 700, lineHeight: '28px', padding: 0, borderRadius: '50%', background: '#f5f5f5', border: '1px solid #ccc', color: '#d32f2f', cursor: nodes.length <= 1 ? 'not-allowed' : 'pointer' }} title="删除">×</button>
             </div>
           ))}
           <button onClick={addNode}>添加点</button>
         </div>
+        )}
         {/* 右侧：边列表 */}
+        {showList === 'edges' && (
         <div style={{ flex: 1, minWidth: 400, textAlign: 'left' }}>
-          <h2>边列表</h2>
           {edges.map((edge, idx) => (
             <div key={idx} style={{ marginBottom: 4, display: 'flex', alignItems: 'center' }}>
-              <input style={{ width: 80 }} value={edge.from} onChange={e => updateEdge(idx, 'from', e.target.value)} placeholder="起点" />
+              <input style={{ width: 20 }} value={edge.from} onChange={e => updateEdge(idx, 'from', e.target.value)} placeholder="起点" />
               <span style={{ margin: '0 8px' }}>→</span>
-              <input style={{ width: 80 }} value={edge.to} onChange={e => updateEdge(idx, 'to', e.target.value)} placeholder="终点" />
+              <input style={{ width: 20 }} value={edge.to} onChange={e => updateEdge(idx, 'to', e.target.value)} placeholder="终点" />
               {/* 新增 label 输入框 */}
-              <input style={{ width: 80, marginLeft: 8 }} value={edge.label || ''} onChange={e => updateEdge(idx, 'label', e.target.value)} placeholder="标签" />
-              <button onClick={() => removeEdge(idx)} disabled={edges.length <= 1} style={{ marginLeft: 8, minWidth: 70 }}>删除</button>
+              <input style={{ width: 40, marginLeft: 8 }} value={edge.label || ''} onChange={e => updateEdge(idx, 'label', e.target.value)} placeholder="标签" />
+              <button onClick={() => removeEdge(idx)} disabled={edges.length <= 1} style={{ marginLeft: 8, minWidth: 32, width: 32, height: 32, fontSize: 22, fontWeight: 700, lineHeight: '28px', padding: 0, borderRadius: '50%', background: '#f5f5f5', border: '1px solid #ccc', color: '#d32f2f', cursor: edges.length <= 1 ? 'not-allowed' : 'pointer' }} title="删除">×</button>
             </div>
           ))}
           <button onClick={addEdge}>添加边</button>
         </div>
-      </div>
-      {/* 图类型选项放在下方，左对齐 */}
-      <div style={{ marginTop: 24, textAlign: 'center', width: '100%' }}>
-        <label>
-          <input
-            type="radio"
-            name="graph-type"
-            checked={directed}
-            onChange={() => setDirected(true)}
-          />
-          有向图
-        </label>
-        <label style={{ marginLeft: 16 }}>
-          <input
-            type="radio"
-            name="graph-type"
-            checked={!directed}
-            onChange={() => setDirected(false)}
-          />
-          无向图
-        </label>
+        )}
       </div>
     </div>
   );
