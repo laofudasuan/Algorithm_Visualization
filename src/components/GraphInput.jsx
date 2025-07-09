@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 
-export default function GraphInput({ nodes, setNodes, setNodeFixed, edges, setEdges, directed, setDirected }) {
+export default function GraphInput({ nodes, setNodes, setNodeFixed, edges, setEdges, directed, setDirected, getNextNodeId }) {
   // Add node
-  const addNode = () => setNodes([...nodes, { id: '', fixed: false, label: '' }]);
+  const addNode = () => setNodes([...nodes, { id: getNextNodeId ? getNextNodeId() : '', fixed: false, label: '' }]);
   // Remove node
   const removeNode = (idx) => setNodes(nodes.filter((_, i) => i !== idx));
   // Update node 增加label

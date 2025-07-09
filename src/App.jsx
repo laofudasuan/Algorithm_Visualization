@@ -7,18 +7,18 @@ function App() {
   // 节点结构改为对象，支持 fixed 属性
   // 1. 新增label属性
   const [nodes, setNodes] = useState([
-    { id: 'A', fixed: false, label: '' },
-    { id: 'B', fixed: false, label: '' },
-    { id: 'C', fixed: false, label: '' },
-    { id: 'D', fixed: false, label: '' }
+    { id: '1', fixed: false, label: '' },
+    { id: '2', fixed: false, label: '' },
+    { id: '3', fixed: false, label: '' },
+    { id: '4', fixed: false, label: '' }
   ]);
   // 边结构增加 label 字段
   const [edges, setEdges] = useState([
-    { from: 'A', to: 'B', label: '1' },
-    { from: 'B', to: 'C', label: '2' },
-    { from: 'C', to: 'D', label: '3' },
-    { from: 'D', to: 'A', label: '4' },
-    { from: 'A', to: 'A', label: '5' }
+    { from: '1', to: '2', label: '5' },
+    { from: '2', to: '3', label: '-1' },
+    { from: '3', to: '4', label: '9' },
+    { from: '4', to: '1', label: '8' },
+    { from: '1', to: '1', label: '12' }
   ]);
   const [directed, setDirected] = useState(true);
   const [showGraph, setShowGraph] = useState(false);
@@ -97,6 +97,14 @@ function App() {
       setDfsStack([]);
     };
 
+  // 获取最小未用数字id
+  const getNextNodeId = () => {
+    const used = new Set(nodes.map(n => Number(n.id)).filter(n => !isNaN(n)));
+    let i = 0;
+    while (used.has(i)) i++;
+    return String(i);
+  };
+
   return (
     <div className="App">
       <h1>图结构可视化与动画</h1>
@@ -114,6 +122,7 @@ function App() {
         setEdges={setEdges}
         directed={directed}
         setDirected={setDirected}
+        getNextNodeId={getNextNodeId}
       />
       
       
