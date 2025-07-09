@@ -32,7 +32,7 @@ export default function GraphInput({ nodes, setNodes, setNodeFixed, edges, setEd
         edgeList.push({ from: parts[0], to: parts[1], label: parts[2] ? parts.slice(2).join(' ') : '' });
       }
     });
-    setNodes(Array.from(nodeSet).map(id => ({ id, fixed: false })));
+    setNodes(Array.from(nodeSet).map(id => ({ id, fixed: false, label: ''})));
     setEdges(edgeList.length > 0 ? edgeList : [{ from: '', to: '', label: '' }]);
   };
 
