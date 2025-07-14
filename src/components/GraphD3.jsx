@@ -268,9 +268,9 @@ export default function GraphD3({ nodes, edges, directed, highlightIndex, width 
     }
 
     return () => simulation.stop();
-  }, [width, height, nodeRadius, arrowSize, nodes.length]); // 在画布大小、点半径、箭头大小或节点数量变化时重建图形
+  }, [width, height, nodes.length]); // 在画布大小或节点数量变化时重建图形
 
-  // 专门处理节点ID、固定状态和标签变化，不重建整个图形
+  // 专门处理节点ID、固定状态、标签和nodeRadius变化，不重建整个图形
   useEffect(() => {
     if (simulationRef.current && nodeObjsRef.current.length > 0) {
       const svg = d3.select(ref.current);
@@ -352,51 +352,83 @@ export default function GraphD3({ nodes, edges, directed, highlightIndex, width 
       // 更新节点边框样式：固定节点用黑色粗边框
       svg.selectAll('circle')
         .attr('stroke', d => d.fixed ? '#000' : '#fff')
-        .attr('stroke-width', d => d.fixed ? 3 : 1.5);
+        .attr('stroke-width', d => d.fixed ? 3 : 1.5)
+        .attr('r', nodeRadius); // 动态更新节点半径
+      
+      // 更新节点ID标签字体大小
+      svg.selectAll('g.node-id-labels text')
+        .attr('font-size', Math.max(12, nodeRadius));
+      
+      // 更新自定义标签位置和字体大小
+      svg.selectAll('g.node-custom-labels text')
+        .attr('dx', nodeRadius + 8)
+        .attr('font-size', Math.max(12, nodeRadius - 2));
+      
+      // 更新仿真的力配置
+      if (simulationRef.current.force('link')) {
+        simulationRef.current.force('link').distance(nodeRadius * 5);
+      }
+      if (simulationRef.current.force('collide')) {
+        simulationRef.current.force('collide').radius(nodeRadius + 8);
+      }
+      
+      // 重启仿真以应用新的力配置
+      simulationRef.current.alpha(0.3).restart();
     }
-  }, [nodes.map(n => `${n.id}:${n.fixed}:${n.label || ''}`).join(',')]); // 在ID、固定状态或标签变化时触发
+  }, [nodes.map(n => `${n.id}:${n.fixed}:${n.label || ''}`).join(','), nodeRadius]); // 在ID、固定状态、标签或nodeRadius变化时触发
 
   // 专门处理边变化，不重建整个图形
   useEffect(() => {
     if (simulationRef.current && nodeObjsRef.current.length > 0) {
       const svg = d3.select(ref.current);
       const nodeIdSet = new Set(nodeObjsRef.current.map(n => n.id));
-      
+
       // 处理边数据
       const newEdgesForD3 = edges
         .map(e => ({ source: e.from.trim(), target: e.to.trim(), label: e.label }))
         .filter(e => e.source && e.target && nodeIdSet.has(e.source) && nodeIdSet.has(e.target));
-      
+
       const normalEdges = newEdgesForD3.filter(e => e.source !== e.target);
       const selfEdges = newEdgesForD3.filter(e => e.source === e.target);
-      
+
       // 更新普通边
       if (linkRef.current) {
         linkRef.current = linkRef.current
           .data(normalEdges, d => `${d.source}-${d.target}`)
           .join('line');
-        
-        // 重新应用箭头标记
-        const markerId = svg.select('defs marker').attr('id');
-        if (markerId && directed) {
+
+        // 重新应用箭头标记和大小
+        const marker = svg.select('defs marker');
+        if (marker.size() > 0 && directed) {
+          // 动态更新箭头大小
+          marker
+            .attr('markerWidth', arrowSize)
+            .attr('markerHeight', arrowSize)
+            .attr('refX', nodeRadius + arrowSize + 2);
+          const markerId = marker.attr('id');
           linkRef.current.attr('marker-end', `url(#${markerId})`);
         }
       }
-      
+
       // 更新自环
       if (selfLoopRef.current) {
         selfLoopRef.current = selfLoopRef.current
           .data(selfEdges, d => `${d.source}-${d.target}`)
           .join('path')
           .attr('fill', 'none');
-        
-        // 重新应用箭头标记
-        const markerId = svg.select('defs marker').attr('id');
-        if (markerId && directed) {
+
+        // 重新应用箭头标记和大小
+        const marker = svg.select('defs marker');
+        if (marker.size() > 0 && directed) {
+          marker
+            .attr('markerWidth', arrowSize)
+            .attr('markerHeight', arrowSize)
+            .attr('refX', nodeRadius + arrowSize + 2);
+          const markerId = marker.attr('id');
           selfLoopRef.current.attr('marker-end', `url(#${markerId})`);
         }
       }
-      
+
       // 更新边标签
       if (linkLabelRef.current) {
         linkLabelRef.current = linkLabelRef.current
@@ -409,7 +441,7 @@ export default function GraphD3({ nodes, edges, directed, highlightIndex, width 
           .style('user-select', 'none')
           .text(d => d.label || '');
       }
-      
+
       // 更新自环标签
       if (selfLoopLabelRef.current) {
         selfLoopLabelRef.current = selfLoopLabelRef.current
@@ -422,17 +454,22 @@ export default function GraphD3({ nodes, edges, directed, highlightIndex, width 
           .style('user-select', 'none')
           .text(d => d.label || '');
       }
-      
+
       // 更新仿真的边数据
       if (simulationRef.current.force('link')) {
         simulationRef.current.force('link').links(newEdgesForD3);
         simulationRef.current.alpha(0.3).restart();
       }
-      
+
       // 保存当前边数据以供后续比较
       edgesRef.current = newEdgesForD3;
     }
-  }, [edges.map(e => `${e.from}-${e.to}-${e.label || ''}`).join(','), directed, nodes.map(n => n.id).join(',')]); // 在边、方向性或节点ID变化时触发
+  }, [
+    edges.map(e => `${e.from}-${e.to}-${e.label || ''}`).join(','),
+    directed,
+    arrowSize,
+    nodes.map(n => n.id).join(',')
+  ]); // 在边、方向性、节点ID、arrowSize变化时触发
 
   // 只在高亮变化时刷新颜色
   useEffect(() => {

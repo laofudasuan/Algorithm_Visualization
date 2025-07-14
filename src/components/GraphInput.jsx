@@ -71,7 +71,7 @@ export default function GraphInput({ nodes, setNodes, setNodeFixed, edges, setEd
           {nodes.map((node, idx) => (
             <div key={idx} style={{ marginBottom: 4, display: 'flex', alignItems: 'center' }}>
               <input style={{ width: 20 }} value={node.id} onChange={e => updateNode(idx, 'id', e.target.value)} placeholder={`点${idx+1}`} />
-              <input style={{ width: 40, marginLeft: 8 }} value={node.label || ''} onChange={e => updateNode(idx, 'label', e.target.value)} placeholder="标签" />
+              <input style={{ width: 60, marginLeft: 8 }} value={node.label || ''} onChange={e => updateNode(idx, 'label', e.target.value)} placeholder="标签" />
               <label style={{ width: 80, marginLeft: 8 }}>
                 <input
                   type="checkbox"
@@ -80,7 +80,7 @@ export default function GraphInput({ nodes, setNodes, setNodeFixed, edges, setEd
                 />
                 固定
               </label>
-              <button onClick={() => removeNode(idx)} disabled={nodes.length <= 1} style={{ marginLeft: 8, minWidth: 32, width: 32, height: 32, fontSize: 22, fontWeight: 700, lineHeight: '28px', padding: 0, borderRadius: '50%', background: '#f5f5f5', border: '1px solid #ccc', color: '#d32f2f', cursor: nodes.length <= 1 ? 'not-allowed' : 'pointer' }} title="删除">×</button>
+              <button onClick={() => removeNode(idx)} disabled={nodes.length <= 1} style={{ marginLeft: 0, minWidth: 32, width: 32, height: 32, fontSize: 22, fontWeight: 700, lineHeight: '28px', padding: 0, borderRadius: '50%', background: '#f5f5f5', border: '1px solid #ccc', color: '#d32f2f', cursor: nodes.length <= 1 ? 'not-allowed' : 'pointer' }} title="删除">×</button>
             </div>
           ))}
           <button onClick={addNode}>添加点</button>
@@ -91,11 +91,11 @@ export default function GraphInput({ nodes, setNodes, setNodeFixed, edges, setEd
         <div style={{ flex: 1, minWidth: 400, textAlign: 'left' }}>
           {edges.map((edge, idx) => (
             <div key={idx} style={{ marginBottom: 4, display: 'flex', alignItems: 'center' }}>
-              <input style={{ width: 20 }} value={edge.from} onChange={e => updateEdge(idx, 'from', e.target.value)} placeholder="起点" />
+              <input style={{ width: 30 }} value={edge.from} onChange={e => updateEdge(idx, 'from', e.target.value)} placeholder="起点" />
               <span style={{ margin: '0 8px' }}>→</span>
-              <input style={{ width: 20 }} value={edge.to} onChange={e => updateEdge(idx, 'to', e.target.value)} placeholder="终点" />
+              <input style={{ width: 30 }} value={edge.to} onChange={e => updateEdge(idx, 'to', e.target.value)} placeholder="终点" />
               {/* 新增 label 输入框 */}
-              <input style={{ width: 40, marginLeft: 8 }} value={edge.label || ''} onChange={e => updateEdge(idx, 'label', e.target.value)} placeholder="标签" />
+              <input style={{ width: 60, marginLeft: 8 }} value={edge.label || ''} onChange={e => updateEdge(idx, 'label', e.target.value)} placeholder="标签" />
               <button onClick={() => removeEdge(idx)} disabled={edges.length <= 1} style={{ marginLeft: 8, minWidth: 32, width: 32, height: 32, fontSize: 22, fontWeight: 700, lineHeight: '28px', padding: 0, borderRadius: '50%', background: '#f5f5f5', border: '1px solid #ccc', color: '#d32f2f', cursor: edges.length <= 1 ? 'not-allowed' : 'pointer' }} title="删除">×</button>
             </div>
           ))}
