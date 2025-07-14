@@ -1,8 +1,19 @@
 import React, { useState } from 'react';
 
-export default function GraphInput({ nodes, setNodes, setNodeFixed, edges, setEdges, directed, setDirected, getNextNodeId }) {
+export default function GraphInput({
+  nodes,
+  setNodes,
+  setNodeFixed,
+  edges,
+  setEdges,
+  directed,
+  setDirected,
+  getNextNodeId,
+  nodeColorOptions = ["#69b3a2", "#1976d2", "#ff9800", "#e91e63", "#FFB6C1", "#ffff00"],
+  edgeColorOptions = ["#000000", "#1976d2", "#ff9800", "#e91e63", "#69b3a2", "#ffff00"]
+}) {
   // Add node
-  const addNode = () => setNodes([...nodes, { id: getNextNodeId ? getNextNodeId() : '', fixed: false, label: '' }]);
+  const addNode = () => setNodes([...nodes, { id: getNextNodeId ? getNextNodeId() : '', fixed: false, label: '', color: '#69b3a2' }]);
   // Remove node
   const removeNode = (idx) => setNodes(nodes.filter((_, i) => i !== idx));
   // Update node 增加label
@@ -33,7 +44,7 @@ export default function GraphInput({ nodes, setNodes, setNodeFixed, edges, setEd
         edgeList.push({ from: parts[0], to: parts[1], label: parts[2] ? parts.slice(2).join(' ') : '' });
       }
     });
-    setNodes(Array.from(nodeSet).map(id => ({ id, fixed: false })));
+    setNodes(Array.from(nodeSet).map(id => ({ id, fixed: false, label: '', color: '#69b3a2' })));
     setEdges(edgeList.length > 0 ? edgeList : [{ from: '', to: '', label: '' }]);
   };
 
@@ -72,6 +83,12 @@ export default function GraphInput({ nodes, setNodes, setNodeFixed, edges, setEd
             <div key={idx} style={{ marginBottom: 4, display: 'flex', alignItems: 'center' }}>
               <input style={{ width: 20 }} value={node.id} onChange={e => updateNode(idx, 'id', e.target.value)} placeholder={`点${idx+1}`} />
               <input style={{ width: 60, marginLeft: 8 }} value={node.label || ''} onChange={e => updateNode(idx, 'label', e.target.value)} placeholder="标签" />
+              {/* 颜色选择器 */}
+              <select style={{ width: 60, marginLeft: 8 }} value={node.color} onChange={e => updateNode(idx, 'color', e.target.value)}>
+                {nodeColorOptions.map(opt => (
+                  <option key={opt} value={opt} style={{ background: opt, color: '#333' }}>{opt}</option>
+                ))}
+              </select>
               <label style={{ width: 80, marginLeft: 8 }}>
                 <input
                   type="checkbox"
@@ -95,7 +112,13 @@ export default function GraphInput({ nodes, setNodes, setNodeFixed, edges, setEd
               <span style={{ margin: '0 8px' }}>→</span>
               <input style={{ width: 30 }} value={edge.to} onChange={e => updateEdge(idx, 'to', e.target.value)} placeholder="终点" />
               {/* 新增 label 输入框 */}
-              <input style={{ width: 60, marginLeft: 8 }} value={edge.label || ''} onChange={e => updateEdge(idx, 'label', e.target.value)} placeholder="标签" />
+              <input style={{ width: 50, marginLeft: 8 }} value={edge.label || ''} onChange={e => updateEdge(idx, 'label', e.target.value)} placeholder="标签" />
+              {/* 颜色选择器 */}
+              <select style={{ width: 60, marginLeft: 8 }} value={edge.color} onChange={e => updateEdge(idx, 'color', e.target.value)}>
+                {edgeColorOptions.map(opt => (
+                  <option key={opt} value={opt} style={{ background: opt, color: '#333' }}>{opt}</option>
+                ))}
+              </select>
               <button onClick={() => removeEdge(idx)} disabled={edges.length <= 1} style={{ marginLeft: 8, minWidth: 32, width: 32, height: 32, fontSize: 22, fontWeight: 700, lineHeight: '28px', padding: 0, borderRadius: '50%', background: '#f5f5f5', border: '1px solid #ccc', color: '#d32f2f', cursor: edges.length <= 1 ? 'not-allowed' : 'pointer' }} title="删除">×</button>
             </div>
           ))}

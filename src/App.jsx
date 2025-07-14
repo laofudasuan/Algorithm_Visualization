@@ -7,28 +7,28 @@ function App() {
   // 节点结构改为对象，支持 fixed 属性
   // 1. 新增label属性
   const [nodes, setNodes] = useState([
-    { id: '1', fixed: false, label: '' },
-    { id: '2', fixed: false, label: '' },
-    { id: '3', fixed: false, label: '' },
-    { id: '4', fixed: false, label: '' }
+    { id: '1', fixed: false, label: '', color: '#69b3a2' },
+    { id: '2', fixed: false, label: '', color: '#69b3a2' },
+    { id: '3', fixed: false, label: '', color: '#69b3a2' },
+    { id: '4', fixed: false, label: '', color: '#69b3a2' }
   ]);
   // 边结构增加 label 字段
   const [edges, setEdges] = useState([
-    { from: '1', to: '2', label: '5' },
-    { from: '2', to: '3', label: '-1' },
-    { from: '3', to: '4', label: '9' },
-    { from: '4', to: '1', label: '8' },
-    { from: '1', to: '1', label: '12' }
+    { from: '1', to: '2', label: '5', color: '#000000' },
+    { from: '2', to: '3', label: '-1', color: '#000000' },
+    { from: '3', to: '4', label: '9', color: '#000000' },
+    { from: '4', to: '1', label: '8', color: '#000000' },
+    { from: '1', to: '1', label: '12', color: '#000000' }
   ]);
   const [directed, setDirected] = useState(true);
   const [showGraph, setShowGraph] = useState(false);
-  const [highlightIndex, setHighlightIndex] = useState(-1);
   const [animating, setAnimating] = useState(false);
   // 新增参数
   const [canvasWidth, setCanvasWidth] = useState(500);
   const [canvasHeight, setCanvasHeight] = useState(500);
   const [nodeRadius, setNodeRadius] = useState(20);
   const [arrowSize, setArrowSize] = useState(10);
+  const [edgeWidth, setEdgeWidth] = useState(1);
   const [ordAnimating, setordAnimating] = useState(false);
   const [dfsStart, setDfsStart] = useState(nodes[0]?.id || '');
   const [dfsAnimating, setDfsAnimating] = useState(false);
@@ -45,11 +45,22 @@ function App() {
   const playAnimation = async () => {
     setordAnimating(true);
     setAnimating(true);
+    
+    // 备份原始颜色
+    const originalColors = {};
+    nodes.forEach(n => {
+      originalColors[n.id] = n.color;
+    });
+    
     for (let i = 0; i < nodes.length; i++) {
-      setHighlightIndex(i);
+      setNodes(nodes => nodes.map((n, idx) => 
+        idx === i ? { ...n, color: '#ffff00' } : { ...n, color: '#69b3a2' }
+      ));
       await new Promise(res => setTimeout(res, 1000));
     }
-    setHighlightIndex(-1);
+    
+    // 还原原始颜色
+    setNodes(nodes => nodes.map(n => ({ ...n, color: originalColors[n.id] || '#69b3a2' })));
     setAnimating(false);
     setordAnimating(false);
   };
@@ -69,39 +80,55 @@ function App() {
   // DFS
   const playDFS = async () => {
     if (!dfsStart) return;
-      setDfsAnimating(true);
-      setAnimating(true);
-      setDfsStack([]);
-      const visited = new Set();
-      const edgeMap = {};
-      edges.forEach(e => {
-        if (!edgeMap[e.from]) edgeMap[e.from] = [];
-        edgeMap[e.from].push(e.to);
-        if (!directed) {
-          if (!edgeMap[e.to]) edgeMap[e.to] = [];
-          edgeMap[e.to].push(e.from);
-        }
+    setDfsAnimating(true);
+    setAnimating(true);
+    setDfsStack([]);
+    
+    // 备份原始颜色
+    const originalColors = {};
+    setNodes(currentNodes => {
+      currentNodes.forEach(n => {
+        originalColors[n.id] = n.color;
       });
-      async function dfs(u, stack) {
-        visited.add(u);
-        setDfsStack(stack.concat(u));
-        setHighlightIndex(nodes.findIndex(n => n.id === u));
-        await new Promise(res => setTimeout(res, dfsAnimatingSpeed));
-        for (const v of (edgeMap[u] || [])) {
-          if (!visited.has(v)) {
-            await dfs(v, stack.concat(u));
-          }
-          setHighlightIndex(nodes.findIndex(n => n.id === u));
-          await new Promise(res => setTimeout(res, dfsAnimatingSpeed));
-        }
-        setDfsStack(stack); // 回溯时弹栈
+      return currentNodes.map(n => ({ ...n, color: '#69b3a2' }));
+    });
+    
+    const visited = new Set();
+    const edgeMap = {};
+    edges.forEach(e => {
+      if (!edgeMap[e.from]) edgeMap[e.from] = [];
+      edgeMap[e.from].push(e.to);
+      if (!directed) {
+        if (!edgeMap[e.to]) edgeMap[e.to] = [];
+        edgeMap[e.to].push(e.from);
       }
-      await dfs(dfsStart, []);
-      setHighlightIndex(-1);
-      setDfsAnimating(false);
-      setAnimating(false);
-      setDfsStack([]);
-    };
+    });
+    async function dfs(u, stack) {
+      visited.add(u);
+      setDfsStack(stack.concat(u));
+      setNodes(nodes => nodes.map(n => 
+        n.id === u ? { ...n, color: '#ff0' } : { ...n, color: '#69b3a2' }
+      ));
+      await new Promise(res => setTimeout(res, dfsAnimatingSpeed));
+      for (const v of (edgeMap[u] || [])) {
+        if (!visited.has(v)) {
+          await dfs(v, stack.concat(u));
+        }
+        setNodes(nodes => nodes.map(n => 
+          n.id === u ? { ...n, color: '#ff0' } : { ...n, color: '#69b3a2' }
+        ));
+        await new Promise(res => setTimeout(res, dfsAnimatingSpeed));
+      }
+      setDfsStack(stack); // 回溯时弹栈
+    }
+    await dfs(dfsStart, []);
+    
+    // 还原原始颜色
+    setNodes(nodes => nodes.map(n => ({ ...n, color: originalColors[n.id] || '#69b3a2' })));
+    setDfsAnimating(false);
+    setAnimating(false);
+    setDfsStack([]);
+  };
 
   // BFS 动画
   const playBFS = async () => {
@@ -109,6 +136,16 @@ function App() {
     setBfsAnimating(true);
     setAnimating(true);
     setBfsQueue([]);
+    
+    // 备份原始颜色
+    const originalColors = {};
+    setNodes(currentNodes => {
+      currentNodes.forEach(n => {
+        originalColors[n.id] = n.color;
+      });
+      return currentNodes.map(n => ({ ...n, color: '#69b3a2' }));
+    });
+    
     const visited = new Set();
     const edgeMap = {};
     edges.forEach(e => {
@@ -127,7 +164,9 @@ function App() {
       const u = queue[i];
       setBfsQueuefront(u);
       i++;
-      setHighlightIndex(nodes.findIndex(n => n.id === u));
+      setNodes(nodes => nodes.map(n => 
+        n.id === u ? { ...n, color: '#ff0' } : { ...n, color: '#69b3a2' }
+      ));
       await new Promise(res => setTimeout(res, bfsAnimatingSpeed));
       for (const v of (edgeMap[u] || [])) {
         if (!visited.has(v)) {
@@ -138,7 +177,9 @@ function App() {
         }
       }
     }
-    setHighlightIndex(-1);
+    
+    // 还原原始颜色
+    setNodes(nodes => nodes.map(n => ({ ...n, color: originalColors[n.id] || '#69b3a2' })));
     setBfsQueue([]);
     setBfsAnimating(false);
     setAnimating(false);
@@ -166,6 +207,9 @@ function App() {
             directed={directed}
             setDirected={setDirected}
             getNextNodeId={getNextNodeId}
+            // 新增颜色选项
+            nodeColorOptions={["#69b3a2", "#1976d2", "#ff9800", "#e91e63", "#FFB6C1", "#ffff00"]}
+            edgeColorOptions={["#000000", "#1976d2", "#ff9800", "#e91e63", "#69b3a2", "#ffff00"]}
           />
         </div>
         {/* 中列：图 */}
@@ -174,11 +218,11 @@ function App() {
             nodes={nodes}
             edges={edges}
             directed={directed}
-            highlightIndex={highlightIndex}
             width={canvasWidth}
             height={canvasHeight}
             nodeRadius={nodeRadius}
             arrowSize={arrowSize}
+            edgeWidth={edgeWidth}
             onNodeClick={toggleNodeFixed}
           />
           {/* BFS队列可视化 */}
@@ -223,6 +267,7 @@ function App() {
               <label style={{ marginBottom: 8 }}>画布高度: <input type="number" min={200} max={1000} value={canvasHeight} onChange={e => setCanvasHeight(Number(e.target.value))} style={{ width: 60 }} /></label>
               <label style={{ marginBottom: 8 }}>点半径: <input type="number" min={8} max={100} value={nodeRadius} onChange={e => setNodeRadius(Number(e.target.value))} style={{ width: 40 }} /></label>
               <label style={{ marginBottom: 8 }}>箭头大小: <input type="number" min={2} max={30} value={arrowSize} onChange={e => setArrowSize(Number(e.target.value))} style={{ width: 40 }} /></label>
+              <label style={{ marginBottom: 8 }}>边的粗细: <input type="number" min={1} max={20} value={edgeWidth} onChange={e => setEdgeWidth(Number(e.target.value))} style={{ width: 40 }} /></label>
               <div style={{ marginTop: 0, textAlign: 'left', width: '100%' }}>
                 <label>
                   <input

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 
-export default function GraphD3({ nodes, edges, directed, highlightIndex, width = 500, height = 400, nodeRadius = 20, arrowSize = 6, onNodeClick }) {
+export default function GraphD3({ nodes, edges, directed, width = 500, height = 400, nodeRadius = 20, arrowSize = 6, edgeWidth = 2, onNodeClick }) {
   const ref = useRef();
   const simulationRef = useRef();
   const nodeObjsRef = useRef([]);
@@ -10,6 +10,7 @@ export default function GraphD3({ nodes, edges, directed, highlightIndex, width 
   const selfLoopRef = useRef(null);
   const linkLabelRef = useRef(null);
   const selfLoopLabelRef = useRef(null);
+  const nodeRef = useRef(null);
 
   // 只在结构变化时重建 simulation（不包含点fixed和label状态变化）
   useEffect(() => {
@@ -28,9 +29,9 @@ export default function GraphD3({ nodes, edges, directed, highlightIndex, width 
       }));
     nodeObjsRef.current = nodeObjs;
     const nodeIdSet = new Set(nodeObjs.map(n => n.id));
-    // 边结构带 label
+    // 边结构带 label 和 color
     const edgesForD3 = edges
-      .map(e => ({ source: e.from.trim(), target: e.to.trim(), label: e.label }))
+      .map(e => ({ source: e.from.trim(), target: e.to.trim(), label: e.label, color: e.color }))
       .filter(e => e.source && e.target && nodeIdSet.has(e.source) && nodeIdSet.has(e.target));
     edgesRef.current = edgesForD3;
 
@@ -62,6 +63,7 @@ export default function GraphD3({ nodes, edges, directed, highlightIndex, width 
     const link = svg.append('g')
       .attr('stroke', '#999')
       .attr('stroke-opacity', 0.6)
+      .attr('stroke-width', edgeWidth)
       .selectAll('line')
       .data(normalEdges)
       .join('line');
@@ -71,10 +73,10 @@ export default function GraphD3({ nodes, edges, directed, highlightIndex, width 
     const selfLoop = svg.append('g')
       .attr('stroke', '#999')
       .attr('stroke-opacity', 0.6)
+      .attr('stroke-width', edgeWidth)
       .selectAll('path')
       .data(selfEdges)
-      .join('path')
-      .attr('fill', 'none');
+      .join('path');
     selfLoopRef.current = selfLoop;
 
     // 边 label
@@ -133,7 +135,7 @@ export default function GraphD3({ nodes, edges, directed, highlightIndex, width 
       .data(nodeObjs)
       .join('circle')
       .attr('r', nodeRadius)
-      .attr('fill', (d, i) => highlightIndex === i ? '#ff0' : '#69b3a2')
+      .attr('fill', d => d.color || '#69b3a2')
       .style('cursor', 'pointer')
       .style('user-select', 'none')
       .on('click', (event, d) => {
@@ -165,6 +167,7 @@ export default function GraphD3({ nodes, edges, directed, highlightIndex, width 
           }
         })
       );
+    nodeRef.current = node;
 
     // Draw labels
     svg.append('g')
@@ -350,10 +353,12 @@ export default function GraphD3({ nodes, edges, directed, highlightIndex, width 
       }
       
       // 更新节点边框样式：固定节点用黑色粗边框
-      svg.selectAll('circle')
-        .attr('stroke', d => d.fixed ? '#000' : '#fff')
-        .attr('stroke-width', d => d.fixed ? 3 : 1.5)
-        .attr('r', nodeRadius); // 动态更新节点半径
+      if (nodeRef.current) {
+        nodeRef.current
+          .attr('stroke', d => d.fixed ? '#000' : '#fff')
+          .attr('stroke-width', d => d.fixed ? 3 : 1.5)
+          .attr('r', nodeRadius); // 动态更新节点半径
+      }
       
       // 更新节点ID标签字体大小
       svg.selectAll('g.node-id-labels text')
@@ -395,7 +400,8 @@ export default function GraphD3({ nodes, edges, directed, highlightIndex, width 
       if (linkRef.current) {
         linkRef.current = linkRef.current
           .data(normalEdges, d => `${d.source}-${d.target}`)
-          .join('line');
+          .join('line')
+          .attr('stroke-width', edgeWidth);
 
         // 重新应用箭头标记和大小
         const marker = svg.select('defs marker');
@@ -415,7 +421,8 @@ export default function GraphD3({ nodes, edges, directed, highlightIndex, width 
         selfLoopRef.current = selfLoopRef.current
           .data(selfEdges, d => `${d.source}-${d.target}`)
           .join('path')
-          .attr('fill', 'none');
+          .attr('fill', 'none')
+          .attr('stroke-width', edgeWidth);
 
         // 重新应用箭头标记和大小
         const marker = svg.select('defs marker');
@@ -468,15 +475,57 @@ export default function GraphD3({ nodes, edges, directed, highlightIndex, width 
     edges.map(e => `${e.from}-${e.to}-${e.label || ''}`).join(','),
     directed,
     arrowSize,
+    edgeWidth,
     nodes.map(n => n.id).join(',')
-  ]); // 在边、方向性、节点ID、arrowSize变化时触发
+  ]); // 在边、方向性、节点ID、arrowSize、edgeWidth变化时触发
 
-  // 只在高亮变化时刷新颜色
+  // 响应节点颜色变化时刷新颜色
   useEffect(() => {
     const svg = d3.select(ref.current);
-    svg.selectAll('circle')
-      .attr('fill', (d, i) => highlightIndex === i ? '#ff0' : '#69b3a2');
-  }, [highlightIndex]);
+    const nodeObjs = nodeObjsRef.current;
+    
+    // 首先更新 nodeObjsRef 中的颜色数据
+    nodeObjs.forEach(nodeObj => {
+      const currentNode = nodes.find(n => n.id === nodeObj.id);
+      if (currentNode && currentNode.color) {
+        nodeObj.color = currentNode.color;
+      }
+    });
+    
+    // 然后更新 DOM 中的颜色 - 使用ref保持一致性
+    if (nodeRef.current) {
+      nodeRef.current.attr('fill', d => d.color || '#69b3a2');
+    }
+
+    const selfLoop = selfLoopRef.current;
+    const linkLabel = linkLabelRef.current;
+
+    // 更新普通边的颜色
+    if (linkRef.current) {
+      linkRef.current
+        .attr('stroke', d => {
+          const edgeData = edges.find(e => 
+            e.from.trim() === (typeof d.source === 'string' ? d.source : d.source.id) && 
+            e.to.trim() === (typeof d.target === 'string' ? d.target : d.target.id)
+          );
+          return edgeData?.color || '#999';
+        })
+        .attr('stroke-width', edgeWidth);
+    }
+
+    // 更新自环的颜色
+    if (selfLoopRef.current) {
+      selfLoopRef.current
+        .attr('stroke', d => {
+          const edgeData = edges.find(e => 
+            e.from.trim() === (typeof d.source === 'string' ? d.source : d.source.id) && 
+            e.to.trim() === (typeof d.target === 'string' ? d.target : d.target.id)
+          );
+          return edgeData?.color || '#999';
+        })
+        .attr('stroke-width', edgeWidth);
+    }
+  }, [nodes.map(n => `${n.id}:${n.color}`).join(','), edges.map(e => `${e.from}-${e.to}:${e.color || ''}`).join(','), edgeWidth]);
 
   return <svg ref={ref} style={{ border: '1px solid #ccc', margin: '16px 0', userSelect: 'none', WebkitUserSelect: 'none', MozUserSelect: 'none', msUserSelect: 'none' }}></svg>;
 }
