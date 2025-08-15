@@ -85,7 +85,24 @@ function Navigation() {
               }
             }}
           >
-            算法可视化
+            排序可视化
+          </Link>
+          
+          <Link 
+            to="/search" 
+            style={location.pathname === '/search' ? activeLinkStyle : linkStyle}
+            onMouseEnter={(e) => {
+              if (location.pathname !== '/search') {
+                e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (location.pathname !== '/search') {
+                e.target.style.backgroundColor = 'transparent';
+              }
+            }}
+          >
+            搜索可视化
           </Link>
         </div>
       </div>

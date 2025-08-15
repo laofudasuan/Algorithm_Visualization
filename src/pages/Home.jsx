@@ -109,10 +109,29 @@ function Home() {
           }}
         >
           <span style={{...cardIconStyle, color: '#ff9800'}}>⚡</span>
-          <h3 style={cardTitleStyle}>算法可视化</h3>
+          <h3 style={cardTitleStyle}>排序可视化</h3>
           <p style={cardDescriptionStyle}>
-            学习经典算法如排序和搜索。通过动画演示理解算法的执行步骤，
+            学习经典排序算法如冒泡排序、选择排序、快速排序等。通过动画演示理解算法的执行步骤，
             包含时间复杂度和空间复杂度分析。
+          </p>
+        </Link>
+
+        <Link 
+          to="/search" 
+          style={cardStyle}
+          onMouseEnter={(e) => {
+            Object.assign(e.currentTarget.style, cardHoverStyle);
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+          }}
+        >
+          <span style={{...cardIconStyle, color: '#e91e63'}}>🔍</span>
+          <h3 style={cardTitleStyle}>搜索可视化</h3>
+          <p style={cardDescriptionStyle}>
+            在网格中可视化路径搜索算法，包括BFS、DFS和A*算法。
+            通过交互式网格理解不同搜索策略的特点。
           </p>
         </Link>
       </div>

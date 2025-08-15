@@ -162,7 +162,7 @@ function AlgorithmVisualization() {
   return (
     <div style={{ height: '100vh', padding: '20px' }}>
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20 }}>
-        <h1 style={{ margin: 0, color: '#1976d2' }}>算法可视化</h1>
+        <h1 style={{ margin: 0, color: '#1976d2' }}>排序可视化</h1>
         
         {/* 控制面板 */}
         <div style={{ 

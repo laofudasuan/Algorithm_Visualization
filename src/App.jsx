@@ -3,6 +3,7 @@ import Navigation from './components/navigation/Navigation';
 import Home from './pages/Home';
 import GraphVisualization from './pages/GraphVisualization';
 import AlgorithmVisualization from './pages/AlgorithmVisualization';
+import SearchVisualization from './pages/SearchVisualization';
 import './App.css';
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/graph" element={<GraphVisualization />} />
           <Route path="/algorithm" element={<AlgorithmVisualization />} />
+          <Route path="/search" element={<SearchVisualization />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
