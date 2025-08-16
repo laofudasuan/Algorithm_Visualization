@@ -104,6 +104,57 @@ function Navigation() {
           >
             搜索可视化
           </Link>
+          
+          <Link 
+            to="/dp" 
+            style={location.pathname === '/dp' ? activeLinkStyle : linkStyle}
+            onMouseEnter={(e) => {
+              if (location.pathname !== '/dp') {
+                e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (location.pathname !== '/dp') {
+                e.target.style.backgroundColor = 'transparent';
+              }
+            }}
+          >
+            动态规划可视化
+          </Link>
+          
+          <Link 
+            to="/linkedlist" 
+            style={location.pathname === '/linkedlist' ? activeLinkStyle : linkStyle}
+            onMouseEnter={(e) => {
+              if (location.pathname !== '/linkedlist') {
+                e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (location.pathname !== '/linkedlist') {
+                e.target.style.backgroundColor = 'transparent';
+              }
+            }}
+          >
+            链表可视化
+          </Link>
+          
+          <Link 
+            to="/priorityqueue" 
+            style={location.pathname === '/priorityqueue' ? activeLinkStyle : linkStyle}
+            onMouseEnter={(e) => {
+              if (location.pathname !== '/priorityqueue') {
+                e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (location.pathname !== '/priorityqueue') {
+                e.target.style.backgroundColor = 'transparent';
+              }
+            }}
+          >
+            优先队列可视化
+          </Link>
         </div>
       </div>
     </nav>

@@ -4,6 +4,9 @@ import Home from './pages/Home';
 import GraphVisualization from './pages/GraphVisualization';
 import AlgorithmVisualization from './pages/AlgorithmVisualization';
 import SearchVisualization from './pages/SearchVisualization';
+import DynamicProgrammingVisualization from './pages/DynamicProgrammingVisualization';
+import LinkedListVisualization from './pages/LinkedListVisualization';
+import PriorityQueueVisualization from './pages/PriorityQueueVisualization';
 import './App.css';
 
 function App() {
@@ -16,6 +19,9 @@ function App() {
           <Route path="/graph" element={<GraphVisualization />} />
           <Route path="/algorithm" element={<AlgorithmVisualization />} />
           <Route path="/search" element={<SearchVisualization />} />
+          <Route path="/dp" element={<DynamicProgrammingVisualization />} />
+          <Route path="/linkedlist" element={<LinkedListVisualization />} />
+          <Route path="/priorityqueue" element={<PriorityQueueVisualization />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>

@@ -134,6 +134,63 @@ function Home() {
             通过交互式网格理解不同搜索策略的特点。
           </p>
         </Link>
+
+        <Link 
+          to="/dp" 
+          style={cardStyle}
+          onMouseEnter={(e) => {
+            Object.assign(e.currentTarget.style, cardHoverStyle);
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+          }}
+        >
+          <span style={{...cardIconStyle, color: '#9c27b0'}}>💎</span>
+          <h3 style={cardTitleStyle}>动态规划可视化</h3>
+          <p style={cardDescriptionStyle}>
+            学习动态规划算法，包括斐波那契数列、最长公共子序列、背包问题等。
+            通过表格可视化理解状态转移过程。
+          </p>
+        </Link>
+
+        <Link 
+          to="/linkedlist" 
+          style={cardStyle}
+          onMouseEnter={(e) => {
+            Object.assign(e.currentTarget.style, cardHoverStyle);
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+          }}
+        >
+          <span style={{...cardIconStyle, color: '#607d8b'}}>🔗</span>
+          <h3 style={cardTitleStyle}>链表可视化</h3>
+          <p style={cardDescriptionStyle}>
+            学习链表数据结构，包括节点插入、删除、搜索、遍历和反转操作。
+            通过动画演示理解指针操作和内存管理。
+          </p>
+        </Link>
+
+        <Link 
+          to="/priorityqueue" 
+          style={cardStyle}
+          onMouseEnter={(e) => {
+            Object.assign(e.currentTarget.style, cardHoverStyle);
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+          }}
+        >
+          <span style={{...cardIconStyle, color: '#00bcd4'}}>⛰️</span>
+          <h3 style={cardTitleStyle}>优先队列可视化</h3>
+          <p style={cardDescriptionStyle}>
+            学习优先队列（堆）数据结构，包括插入、删除、堆化操作。
+            可视化最大堆和最小堆的构建过程和性质。
+          </p>
+        </Link>
       </div>
 
       <div style={{ marginTop: '60px', padding: '40px', backgroundColor: '#f8f9fa', borderRadius: '12px' }}>
