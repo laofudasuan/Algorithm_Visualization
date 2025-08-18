@@ -7,6 +7,8 @@ import SearchVisualization from './pages/SearchVisualization';
 import DynamicProgrammingVisualization from './pages/DynamicProgrammingVisualization';
 import LinkedListVisualization from './pages/LinkedListVisualization';
 import PriorityQueueVisualization from './pages/PriorityQueueVisualization';
+import SegmentTreeVisualization from './pages/SegmentTreeVisualization';
+import BalancedTreeVisualization from './pages/BalancedTreeVisualization';
 import './App.css';
 
 function App() {
@@ -22,6 +24,8 @@ function App() {
           <Route path="/dp" element={<DynamicProgrammingVisualization />} />
           <Route path="/linkedlist" element={<LinkedListVisualization />} />
           <Route path="/priorityqueue" element={<PriorityQueueVisualization />} />
+          <Route path="/segmenttree" element={<SegmentTreeVisualization />} />
+          <Route path="/balancedtree" element={<BalancedTreeVisualization />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>

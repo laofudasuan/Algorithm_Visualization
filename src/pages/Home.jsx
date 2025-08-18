@@ -72,7 +72,7 @@ function Home() {
       <div style={heroStyle}>
         <h1 style={titleStyle}>算法可视化学习平台</h1>
         <p style={subtitleStyle}>
-          通过交互式可视化学习图论算法和经典算法<br/>
+          通过交互式可视化学习经典算法和数据结构<br/>
           让复杂的算法概念变得直观易懂
         </p>
       </div>
@@ -175,7 +175,7 @@ function Home() {
 
         <Link 
           to="/priorityqueue" 
-          style={cardStyle}
+          style={cardStyle} 
           onMouseEnter={(e) => {
             Object.assign(e.currentTarget.style, cardHoverStyle);
           }}
@@ -191,9 +191,45 @@ function Home() {
             可视化最大堆和最小堆的构建过程和性质。
           </p>
         </Link>
-      </div>
 
-      <div style={{ marginTop: '60px', padding: '40px', backgroundColor: '#f8f9fa', borderRadius: '12px' }}>
+        <Link 
+          to="/segmenttree" 
+          style={cardStyle} 
+          onMouseEnter={(e) => {
+            Object.assign(e.currentTarget.style, cardHoverStyle);
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+          }}
+        >
+          <span style={{...cardIconStyle, color: '#795548'}}>🌳</span>
+          <h3 style={cardTitleStyle}>线段树可视化</h3>
+          <p style={cardDescriptionStyle}>
+            学习线段树这一强大的数据结构，支持区间查询和单点更新。
+            可视化区间求和、最值查询等操作的执行过程。
+          </p>
+        </Link>
+
+        <Link 
+          to="/balancedtree" 
+          style={cardStyle} 
+          onMouseEnter={(e) => {
+            Object.assign(e.currentTarget.style, cardHoverStyle);
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+          }}
+        >
+          <span style={{...cardIconStyle, color: '#9c27b0'}}>⚖️</span>
+          <h3 style={cardTitleStyle}>平衡树可视化</h3>
+          <p style={cardDescriptionStyle}>
+            学习AVL、Treap和Splay平衡树的自平衡机制，包括插入、删除和旋转操作。
+            可视化树的平衡过程和各种旋转调整。
+          </p>
+        </Link>
+      </div>      <div style={{ marginTop: '60px', padding: '40px', backgroundColor: '#f8f9fa', borderRadius: '12px' }}>
         <h2 style={{ color: '#1976d2', marginBottom: '20px' }}>平台特色</h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px', textAlign: 'left' }}>
           <div>

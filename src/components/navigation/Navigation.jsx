@@ -155,6 +155,40 @@ function Navigation() {
           >
             优先队列可视化
           </Link>
+          
+          <Link 
+            to="/segmenttree" 
+            style={location.pathname === '/segmenttree' ? activeLinkStyle : linkStyle}
+            onMouseEnter={(e) => {
+              if (location.pathname !== '/segmenttree') {
+                e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (location.pathname !== '/segmenttree') {
+                e.target.style.backgroundColor = 'transparent';
+              }
+            }}
+          >
+            线段树可视化
+          </Link>
+          
+          <Link 
+            to="/balancedtree" 
+            style={location.pathname === '/balancedtree' ? activeLinkStyle : linkStyle}
+            onMouseEnter={(e) => {
+              if (location.pathname !== '/balancedtree') {
+                e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (location.pathname !== '/balancedtree') {
+                e.target.style.backgroundColor = 'transparent';
+              }
+            }}
+          >
+            平衡树可视化
+          </Link>
         </div>
       </div>
     </nav>
