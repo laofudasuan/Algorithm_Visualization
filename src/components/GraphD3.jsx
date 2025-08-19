@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 
-export default function GraphD3({ nodes, edges, directed, width = 500, height = 400, nodeRadius = 20, arrowSize = 6, edgeWidth = 2, onNodeClick }) {
+export default function GraphD3({ nodes, edges, directed, width = 500, height = 400, nodeRadius = 20, arrowSize = 6, edgeWidth = 2, chargeStrength = -300, onNodeClick }) {
   const ref = useRef();
   const simulationRef = useRef();
   const nodeObjsRef = useRef([]);
@@ -40,7 +40,7 @@ export default function GraphD3({ nodes, edges, directed, width = 500, height = 
       .force('link', d3.forceLink(edgesForD3)
         .id(d => d.id)
         .distance(nodeRadius * 5))
-      .force('charge', d3.forceManyBody().strength(-300))
+      .force('charge', d3.forceManyBody().strength(chargeStrength))
       .force('center', d3.forceCenter(width / 2, height / 2))
       .force('collide', d3.forceCollide(nodeRadius + 8));
     simulationRef.current = simulation;
@@ -76,7 +76,8 @@ export default function GraphD3({ nodes, edges, directed, width = 500, height = 
       .attr('stroke-width', edgeWidth)
       .selectAll('path')
       .data(selfEdges)
-      .join('path');
+      .join('path')
+      .attr('fill', 'none');
     selfLoopRef.current = selfLoop;
 
     // 边 label
@@ -125,7 +126,7 @@ export default function GraphD3({ nodes, edges, directed, width = 500, height = 
     // 每次都刷新 marker-end，使用唯一 id
     const markerUrl = directed ? `url(#${markerId})` : null;
     link.attr('marker-end', markerUrl);
-    selfLoop.attr('marker-end', markerUrl);
+    //selfLoop.attr('marker-end', markerUrl);
 
     // Draw nodes
     const node = svg.append('g')
@@ -271,7 +272,7 @@ export default function GraphD3({ nodes, edges, directed, width = 500, height = 
     }
 
     return () => simulation.stop();
-  }, [width, height, nodes.length]); // 在画布大小或节点数量变化时重建图形
+  }, [width, height, nodes.length, chargeStrength]); // 在画布大小、节点数量或斥力强度变化时重建图形
 
   // 专门处理节点ID、固定状态、标签和nodeRadius变化，不重建整个图形
   useEffect(() => {
@@ -425,15 +426,15 @@ export default function GraphD3({ nodes, edges, directed, width = 500, height = 
           .attr('stroke-width', edgeWidth);
 
         // 重新应用箭头标记和大小
-        const marker = svg.select('defs marker');
-        if (marker.size() > 0 && directed) {
-          marker
-            .attr('markerWidth', arrowSize)
-            .attr('markerHeight', arrowSize)
-            .attr('refX', nodeRadius + arrowSize + 2);
-          const markerId = marker.attr('id');
-          selfLoopRef.current.attr('marker-end', `url(#${markerId})`);
-        }
+        // const marker = svg.select('defs marker');
+        // if (marker.size() > 0 && directed) {
+        //   marker
+        //     .attr('markerWidth', arrowSize)
+        //     .attr('markerHeight', arrowSize)
+        //     .attr('refX', nodeRadius + arrowSize + 2);
+        //   const markerId = marker.attr('id');
+        //   selfLoopRef.current.attr('marker-end', `url(#${markerId})`);
+        // }
       }
 
       // 更新边标签

@@ -28,6 +28,7 @@ function GraphVisualization() {
   const [nodeRadius, setNodeRadius] = useState(20);
   const [arrowSize, setArrowSize] = useState(10);
   const [edgeWidth, setEdgeWidth] = useState(2);
+  const [chargeStrength, setChargeStrength] = useState(-300);
   const [ordAnimating, setordAnimating] = useState(false);
   const [dfsStart, setDfsStart] = useState(nodes[0]?.id || '');
   const [dfsAnimating, setDfsAnimating] = useState(false);
@@ -222,6 +223,7 @@ function GraphVisualization() {
             nodeRadius={nodeRadius}
             arrowSize={arrowSize}
             edgeWidth={edgeWidth}
+            chargeStrength={chargeStrength}
             onNodeClick={toggleNodeFixed}
           />
           {/* BFS队列可视化 */}
@@ -267,6 +269,7 @@ function GraphVisualization() {
               <label style={{ marginBottom: 8 }}>点半径: <input type="number" min={8} max={100} value={nodeRadius} onChange={e => setNodeRadius(Number(e.target.value))} style={{ width: 40 }} /></label>
               <label style={{ marginBottom: 8 }}>箭头大小: <input type="number" min={2} max={30} value={arrowSize} onChange={e => setArrowSize(Number(e.target.value))} style={{ width: 40 }} /></label>
               <label style={{ marginBottom: 8 }}>边的粗细: <input type="number" min={1} max={20} value={edgeWidth} onChange={e => setEdgeWidth(Number(e.target.value))} style={{ width: 40 }} /></label>
+              <label style={{ marginBottom: 8 }}>斥力强度: <input type="number" min={-1000} max={-10} step={10} value={chargeStrength} onChange={e => setChargeStrength(Number(e.target.value))} style={{ width: 60 }} /></label>
               <div style={{ marginTop: 0, textAlign: 'left', width: '100%' }}>
                 <label>
                   <input
