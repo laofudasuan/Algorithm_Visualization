@@ -193,8 +193,102 @@ function GraphVisualization() {
     return String(i);
   };
 
+  // 随机生成图
+  const randomGenerate = () => {
+    // 弹出配置对话框
+    const nodeCountInput = prompt('请输入节点数量 (3-20):', '6');
+    if (nodeCountInput === null) return;
+    
+    const nodeCount = parseInt(nodeCountInput);
+    if (isNaN(nodeCount) || nodeCount < 3 || nodeCount > 20) {
+      alert('节点数量必须在 3-20 之间');
+      return;
+    }
+
+    const edgeDensityInput = prompt('请输入边密度 (0.1-1.0，0.3表示30%的可能边):', '0.3');
+    if (edgeDensityInput === null) return;
+    
+    const edgeDensity = parseFloat(edgeDensityInput);
+    if (isNaN(edgeDensity) || edgeDensity < 0.1 || edgeDensity > 1.0) {
+      alert('边密度必须在 0.1-1.0 之间');
+      return;
+    }
+
+    // 生成随机节点
+    const newNodes = [];
+    for (let i = 0; i < nodeCount; i++) {
+      newNodes.push({
+        id: String(i),
+        fixed: false,
+        label: '',
+        color: '#69b3a2'
+      });
+    }
+
+    // 生成随机边
+    const newEdges = [];
+    const maxEdges = directed ? nodeCount * (nodeCount - 1) : nodeCount * (nodeCount - 1) / 2;
+    const targetEdgeCount = Math.floor(maxEdges * edgeDensity);
+    
+    // 确保图连通 - 先生成一个生成树
+    const connectedEdges = [];
+    const visited = new Set([0]);
+    const unvisited = new Set();
+    for (let i = 1; i < nodeCount; i++) {
+      unvisited.add(i);
+    }
+    
+    while (unvisited.size > 0) {
+      const fromNode = Array.from(visited)[Math.floor(Math.random() * visited.size)];
+      const toNode = Array.from(unvisited)[Math.floor(Math.random() * unvisited.size)];
+      
+      connectedEdges.push({
+        from: String(fromNode),
+        to: String(toNode),
+        label: Math.floor(Math.random() * 20 - 5).toString(), // -5 到 14 的随机权重
+        color: '#000000'
+      });
+      
+      visited.add(toNode);
+      unvisited.delete(toNode);
+    }
+
+    // 添加额外的随机边
+    const edgeSet = new Set(connectedEdges.map(e => `${e.from}-${e.to}`));
+    while (newEdges.length + connectedEdges.length < targetEdgeCount) {
+      const from = Math.floor(Math.random() * nodeCount);
+      const to = Math.floor(Math.random() * nodeCount);
+      
+      // 避免自环和重复边
+      if (from === to) continue;
+      
+      const edgeKey1 = `${from}-${to}`;
+      const edgeKey2 = `${to}-${from}`;
+      
+      if (directed) {
+        if (edgeSet.has(edgeKey1)) continue;
+        edgeSet.add(edgeKey1);
+      } else {
+        if (edgeSet.has(edgeKey1) || edgeSet.has(edgeKey2)) continue;
+        edgeSet.add(edgeKey1);
+        edgeSet.add(edgeKey2);
+      }
+      
+      newEdges.push({
+        from: String(from),
+        to: String(to),
+        label: Math.floor(Math.random() * 20 - 5).toString(),
+        color: '#000000'
+      });
+    }
+
+    // 更新状态
+    setNodes(newNodes);
+    setEdges([...connectedEdges, ...newEdges]);
+  };
+
   // 层次布局函数
-  const arrangeAsTree = () => {
+  const arrangeAsTree = async () => {
     if (nodes.length === 0) return;
     
     // 构建邻接表
@@ -212,46 +306,196 @@ function GraphVisualization() {
       }
     });
     
-    // 找到入度为0的节点作为默认根节点候选
-    const inDegree = {};
-    nodes.forEach(node => {
-      inDegree[node.id] = 0;
-    });
+    // 默认根节点为0
+    let defaultRoot = nodes[0].id;
     
-    edges.forEach(edge => {
-      if (inDegree[edge.to] !== undefined) {
-        inDegree[edge.to]++;
+    if (directed) {
+      // 有向图找到入度为0的节点作为默认根节点候选
+      const inDegree = {};
+      nodes.forEach(node => {
+        inDegree[node.id] = 0;
+      });
+      
+      edges.forEach(edge => {
+        if (inDegree[edge.to] !== undefined) {
+          inDegree[edge.to]++;
+        }
+      });
+      
+      const zeroInDegreeNodes = nodes.filter(node => inDegree[node.id] === 0);
+      if (zeroInDegreeNodes.length > 0) {
+        defaultRoot = zeroInDegreeNodes[0].id;
       }
-    });
-    
-    const zeroInDegreeNodes = nodes.filter(node => inDegree[node.id] === 0);
-    const defaultRoot = zeroInDegreeNodes.length > 0 ? zeroInDegreeNodes[0].id : nodes[0].id;
+    } else {
+      // 无向图找到度为1的节点作为默认根节点候选
+      const Degree = {}
+      nodes.forEach(node => {
+        Degree[node.id] = 0;
+      });
+      edges.forEach(edge => {
+        if (Degree[edge.from] !== undefined) {
+          Degree[edge.from]++;
+        }
+        if (Degree[edge.to] !== undefined) {
+          Degree[edge.to]++;
+        }
+      });
+
+      const LeavfNodes = nodes.filter(node => Degree[node.id] === 1);
+      if (LeavfNodes.length > 1) {
+        defaultRoot = LeavfNodes[0].id;
+      }
+    }
     
     // 弹出选择框让用户选择根节点
-    const nodeOptions = nodes.map(node => node.id).join(', ');
-    const userInput = prompt(
-      `请选择根节点 (第一层的点):\n\n可选节点: ${nodeOptions}\n\n` +
-      `建议根节点 (入度为0): ${zeroInDegreeNodes.map(n => n.id).join(', ') || '无'}\n\n` +
-      `留空将使用默认根节点: ${defaultRoot}`,
-      ''
-    );
-    
+    const selectedRoot = await new Promise((resolve) => {
+      // 创建一个模态对话框
+      const modalContainer = document.createElement('div');
+      modalContainer.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+      `;
+
+      const modal = document.createElement('div');
+      modal.style.cssText = `
+        background: white;
+        border-radius: 8px;
+        padding: 24px;
+        min-width: 300px;
+        max-width: 400px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      `;
+
+      const title = document.createElement('h3');
+      title.textContent = '选择根节点 (第一层的点)';
+      title.style.cssText = `
+        margin: 0 0 16px 0;
+        color: #333;
+        font-size: 18px;
+      `;
+
+      const defaultInfo = document.createElement('p');
+      defaultInfo.textContent = `推荐默认根节点: ${defaultRoot}`;
+      defaultInfo.style.cssText = `
+        margin: 0 0 16px 0;
+        color: #666;
+        font-size: 14px;
+      `;
+
+      const nodeContainer = document.createElement('div');
+      nodeContainer.style.cssText = `
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 20px;
+        max-height: 200px;
+        overflow-y: auto;
+      `;
+
+      let selectedNodeId = defaultRoot;
+
+      // 为每个节点创建按钮
+      nodes.forEach(node => {
+        const nodeButton = document.createElement('button');
+        nodeButton.textContent = node.id;
+        nodeButton.style.cssText = `
+          padding: 8px 16px;
+          border: 2px solid #1976d2;
+          border-radius: 20px;
+          background: ${node.id === defaultRoot ? '#1976d2' : 'white'};
+          color: ${node.id === defaultRoot ? 'white' : '#1976d2'};
+          cursor: pointer;
+          font-size: 14px;
+          font-weight: 500;
+          transition: all 0.2s;
+        `;
+
+        nodeButton.addEventListener('click', () => {
+          // 重置所有按钮样式
+          nodeContainer.querySelectorAll('button').forEach(btn => {
+            btn.style.background = 'white';
+            btn.style.color = '#1976d2';
+          });
+          // 设置当前按钮为选中状态
+          nodeButton.style.background = '#1976d2';
+          nodeButton.style.color = 'white';
+          selectedNodeId = node.id;
+        });
+
+        nodeContainer.appendChild(nodeButton);
+      });
+
+      const buttonContainer = document.createElement('div');
+      buttonContainer.style.cssText = `
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+      `;
+
+      const cancelButton = document.createElement('button');
+      cancelButton.textContent = '取消';
+      cancelButton.style.cssText = `
+        padding: 8px 16px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background: white;
+        color: #666;
+        cursor: pointer;
+      `;
+      cancelButton.addEventListener('click', () => {
+        document.body.removeChild(modalContainer);
+        resolve(null);
+      });
+
+      const confirmButton = document.createElement('button');
+      confirmButton.textContent = '确认';
+      confirmButton.style.cssText = `
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        background: #4caf50;
+        color: white;
+        cursor: pointer;
+        font-weight: 500;
+      `;
+      confirmButton.addEventListener('click', () => {
+        document.body.removeChild(modalContainer);
+        resolve(selectedNodeId);
+      });
+
+      buttonContainer.appendChild(cancelButton);
+      buttonContainer.appendChild(confirmButton);
+
+      modal.appendChild(title);
+      modal.appendChild(defaultInfo);
+      modal.appendChild(nodeContainer);
+      modal.appendChild(buttonContainer);
+      modalContainer.appendChild(modal);
+      document.body.appendChild(modalContainer);
+
+      // 点击背景关闭
+      modalContainer.addEventListener('click', (e) => {
+        if (e.target === modalContainer) {
+          document.body.removeChild(modalContainer);
+          resolve(null);
+        }
+      });
+    });
+
     // 如果用户取消了操作
-    if (userInput === null) {
+    if (selectedRoot === null) {
       return;
     }
-    
-    // 确定最终的根节点
-    let rootId = defaultRoot;
-    if (userInput.trim() !== '') {
-      const inputNodeId = userInput.trim();
-      const nodeExists = nodes.some(node => node.id === inputNodeId);
-      if (nodeExists) {
-        rootId = inputNodeId;
-      } else {
-        alert(`节点 "${inputNodeId}" 不存在，将使用默认根节点: ${defaultRoot}`);
-      }
-    }
+
+    const rootId = selectedRoot;
     
     // BFS构建层级结构
     const levels = [];
@@ -291,34 +535,45 @@ function GraphVisualization() {
     // 计算位置并更新节点
     const levelHeight = canvasHeight / Math.max(1, levels.length);
     
-    setNodes(currentNodes => currentNodes.map(node => {
-      // 找到节点所在的层级
-      let nodeLevel = 0;
-      let nodeIndex = 0;
-      
-      for (let i = 0; i < levels.length; i++) {
-        const index = levels[i].indexOf(node.id);
-        if (index !== -1) {
-          nodeLevel = i;
-          nodeIndex = index;
-          break;
+    // 先取消所有节点的固定状态
+    setNodes(currentNodes => currentNodes.map(node => ({
+      ...node,
+      fixed: false,
+      fx: null,
+      fy: null
+    })));
+
+    // 使用 setTimeout 确保先取消固定状态的更新生效
+    setTimeout(() => {
+      setNodes(currentNodes => currentNodes.map(node => {
+        // 找到节点所在的层级
+        let nodeLevel = 0;
+        let nodeIndex = 0;
+        
+        for (let i = 0; i < levels.length; i++) {
+          const index = levels[i].indexOf(node.id);
+          if (index !== -1) {
+            nodeLevel = i;
+            nodeIndex = index;
+            break;
+          }
         }
-      }
-      
-      // 计算位置
-      const levelWidth = canvasWidth / Math.max(1, levels[nodeLevel].length);
-      const x = levelWidth * (nodeIndex + 0.5);
-      const y = levelHeight * (nodeLevel + 0.5);
-      
-      return {
-        ...node,
-        x: x,
-        y: y,
-        fixed: true,
-        fx: x,
-        fy: y
-      };
-    }));
+        
+        // 计算位置
+        const levelWidth = canvasWidth / Math.max(1, levels[nodeLevel].length);
+        const x = levelWidth * (nodeIndex + 0.5);
+        const y = levelHeight * (nodeLevel + 0.5);
+        
+        return {
+          ...node,
+          x: x,
+          y: y,
+          fixed: true,
+          fx: x,
+          fy: y
+        };
+      }));
+    }, 100); // 100ms 延迟
   };
 
   return (
@@ -335,6 +590,7 @@ function GraphVisualization() {
             directed={directed}
             setDirected={setDirected}
             getNextNodeId={getNextNodeId}
+            onRandomGenerate={randomGenerate}
             // 新增颜色选项
             nodeColorOptions={["#69b3a2", "#1976d2", "#ff9800", "#e91e63", "#FFB6C1", "#ffff00"]}
             edgeColorOptions={["#000000", "#1976d2", "#ff9800", "#e91e63", "#69b3a2", "#ffff00"]}

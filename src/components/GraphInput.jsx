@@ -10,7 +10,8 @@ export default function GraphInput({
   setDirected,
   getNextNodeId,
   nodeColorOptions = ["#69b3a2", "#1976d2", "#ff9800", "#e91e63", "#FFB6C1", "#ffff00"],
-  edgeColorOptions = ["#000000", "#1976d2", "#ff9800", "#e91e63", "#69b3a2", "#ffff00"]
+  edgeColorOptions = ["#000000", "#1976d2", "#ff9800", "#e91e63", "#69b3a2", "#ffff00"],
+  onRandomGenerate // 新增随机生成回调函数
 }) {
   // Add node
   const addNode = () => setNodes([...nodes, { id: getNextNodeId ? getNextNodeId() : '', fixed: false, label: '', color: '#69b3a2' }]);
@@ -37,6 +38,7 @@ export default function GraphInput({
   const [inputMode, setInputMode] = useState('form'); // 'form' or 'text'
   const [bulkText, setBulkText] = useState('');
   const [showList, setShowList] = useState('nodes'); // 'nodes' or 'edges'
+  const [showBulkModal, setShowBulkModal] = useState(false); // 控制批量输入弹窗
 
   const parseBulkText = () => {
     const lines = bulkText.split(/\r?\n/).map(l => l.trim()).filter(l => l && !l.startsWith('#'));
@@ -54,27 +56,137 @@ export default function GraphInput({
     });
     setNodes(Array.from(nodeSet).map(id => ({ id, fixed: false, label: '', color: '#69b3a2' })));
     setEdges(edgeList.length > 0 ? edgeList : [{ from: '', to: '', label: '' }]);
+    setShowBulkModal(false); // 解析完成后关闭弹窗
   };
 
   return (
     <div className="graph-input" style={{ display: 'flex', gap: 10, alignItems: 'flex-start', width: 500, maxWidth: '100%', margin: '0 auto', position: 'relative', flexDirection: 'column' }}>
-      <div style={{ display: 'flex', flexDirection: 'row', gap: 32 }}>
-        <h2>批量输入</h2>
-        <div style={{ display: 'flex', flexDirection: 'column'}}>
-          <div>每行一个点或一条边</div>
-          <div>边格式：起点 终点 [标签]</div>
-          <div>支持#注释</div>
-        </div>
+      {/* 批量输入和随机生成按钮 */}
+      <div style={{ marginBottom: 16, display: 'flex', gap: 12 }}>
+        <button 
+          onClick={() => setShowBulkModal(true)}
+          style={{
+            padding: '10px 20px',
+            background: '#1976d2',
+            color: 'white',
+            border: 'none',
+            borderRadius: '6px',
+            cursor: 'pointer',
+            fontSize: '16px',
+            fontWeight: '500'
+          }}
+        >
+          批量输入
+        </button>
+        <button 
+          onClick={onRandomGenerate}
+          style={{
+            padding: '10px 20px',
+            background: '#ff9800',
+            color: 'white',
+            border: 'none',
+            borderRadius: '6px',
+            cursor: 'pointer',
+            fontSize: '16px',
+            fontWeight: '500'
+          }}
+        >
+          随机生成
+        </button>
       </div>
-      <textarea
-        style={{ width: '100%', minHeight: 120, fontFamily: 'monospace', fontSize: 15 }}
-        value={bulkText}
-        onChange={e => setBulkText(e.target.value)}
-        placeholder={`A\nB\nC\nA B\nB C label1\n# 注释`}
-      />
-        <div style={{ marginTop: 8 }}>
-          <button onClick={parseBulkText}>解析</button>
+
+      {/* 批量输入弹窗 */}
+      {showBulkModal && (
+        <div 
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            background: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 10000
+          }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowBulkModal(false);
+            }
+          }}
+        >
+          <div 
+            style={{
+              background: 'white',
+              borderRadius: '8px',
+              padding: '24px',
+              minWidth: '500px',
+              maxWidth: '600px',
+              maxHeight: '80vh',
+              overflow: 'auto',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)'
+            }}
+          >
+            <div style={{ display: 'flex', flexDirection: 'row', gap: 32, marginBottom: 16 }}>
+              <h2 style={{ margin: 0 }}>批量输入</h2>
+              <div style={{ display: 'flex', flexDirection: 'column', fontSize: '14px', color: '#666' }}>
+                <div>每行一个点或一条边</div>
+                <div>边格式：起点 终点 [标签]</div>
+                <div>支持#注释</div>
+              </div>
+            </div>
+            
+            <textarea
+              style={{ 
+                width: '100%', 
+                minHeight: 200, 
+                fontFamily: 'monospace', 
+                fontSize: 15,
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+                padding: '8px',
+                marginBottom: 16,
+                resize: 'vertical'
+              }}
+              value={bulkText}
+              onChange={e => setBulkText(e.target.value)}
+              placeholder={`A\nB\nC\nA B\nB C label1\n# 注释`}
+            />
+            
+            <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
+              <button 
+                onClick={() => setShowBulkModal(false)}
+                style={{
+                  padding: '8px 16px',
+                  border: '1px solid #ccc',
+                  borderRadius: '4px',
+                  background: 'white',
+                  color: '#666',
+                  cursor: 'pointer'
+                }}
+              >
+                取消
+              </button>
+              <button 
+                onClick={parseBulkText}
+                style={{
+                  padding: '8px 16px',
+                  border: 'none',
+                  borderRadius: '4px',
+                  background: '#4caf50',
+                  color: 'white',
+                  cursor: 'pointer',
+                  fontWeight: '500'
+                }}
+              >
+                解析并应用
+              </button>
+            </div>
+          </div>
         </div>
+      )}
+
       <div style={{ marginBottom: 0 }}>
         <label>
           <input type="radio" name="show-list" value="nodes" checked={showList === 'nodes'} onChange={() => setShowList('nodes')} /> 点列表
