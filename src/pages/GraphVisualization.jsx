@@ -26,7 +26,7 @@ function GraphVisualization() {
   const [canvasWidth, setCanvasWidth] = useState(500);
   const [canvasHeight, setCanvasHeight] = useState(500);
   const [nodeRadius, setNodeRadius] = useState(20);
-  const [arrowSize, setArrowSize] = useState(10);
+  const [arrowSize, setArrowSize] = useState(5);
   const [edgeWidth, setEdgeWidth] = useState(2);
   const [chargeStrength, setChargeStrength] = useState(-300);
   const [ordAnimating, setordAnimating] = useState(false);
@@ -193,6 +193,134 @@ function GraphVisualization() {
     return String(i);
   };
 
+  // 层次布局函数
+  const arrangeAsTree = () => {
+    if (nodes.length === 0) return;
+    
+    // 构建邻接表
+    const adjList = {};
+    nodes.forEach(node => {
+      adjList[node.id] = [];
+    });
+    
+    edges.forEach(edge => {
+      if (adjList[edge.from]) {
+        adjList[edge.from].push(edge.to);
+      }
+      if (!directed && adjList[edge.to]) {
+        adjList[edge.to].push(edge.from);
+      }
+    });
+    
+    // 找到入度为0的节点作为默认根节点候选
+    const inDegree = {};
+    nodes.forEach(node => {
+      inDegree[node.id] = 0;
+    });
+    
+    edges.forEach(edge => {
+      if (inDegree[edge.to] !== undefined) {
+        inDegree[edge.to]++;
+      }
+    });
+    
+    const zeroInDegreeNodes = nodes.filter(node => inDegree[node.id] === 0);
+    const defaultRoot = zeroInDegreeNodes.length > 0 ? zeroInDegreeNodes[0].id : nodes[0].id;
+    
+    // 弹出选择框让用户选择根节点
+    const nodeOptions = nodes.map(node => node.id).join(', ');
+    const userInput = prompt(
+      `请选择根节点 (第一层的点):\n\n可选节点: ${nodeOptions}\n\n` +
+      `建议根节点 (入度为0): ${zeroInDegreeNodes.map(n => n.id).join(', ') || '无'}\n\n` +
+      `留空将使用默认根节点: ${defaultRoot}`,
+      ''
+    );
+    
+    // 如果用户取消了操作
+    if (userInput === null) {
+      return;
+    }
+    
+    // 确定最终的根节点
+    let rootId = defaultRoot;
+    if (userInput.trim() !== '') {
+      const inputNodeId = userInput.trim();
+      const nodeExists = nodes.some(node => node.id === inputNodeId);
+      if (nodeExists) {
+        rootId = inputNodeId;
+      } else {
+        alert(`节点 "${inputNodeId}" 不存在，将使用默认根节点: ${defaultRoot}`);
+      }
+    }
+    
+    // BFS构建层级结构
+    const levels = [];
+    const visited = new Set();
+    const queue = [{ id: rootId, level: 0 }];
+    visited.add(rootId);
+    
+    while (queue.length > 0) {
+      const { id, level } = queue.shift();
+      
+      if (!levels[level]) {
+        levels[level] = [];
+      }
+      levels[level].push(id);
+      
+      // 添加子节点到下一层
+      if (adjList[id]) {
+        adjList[id].forEach(childId => {
+          if (!visited.has(childId)) {
+            visited.add(childId);
+            queue.push({ id: childId, level: level + 1 });
+          }
+        });
+      }
+    }
+    
+    // 添加未访问的节点到最后一层
+    nodes.forEach(node => {
+      if (!visited.has(node.id)) {
+        if (levels.length === 0) {
+          levels.push([]);
+        }
+        levels[levels.length - 1].push(node.id);
+      }
+    });
+    
+    // 计算位置并更新节点
+    const levelHeight = canvasHeight / Math.max(1, levels.length);
+    
+    setNodes(currentNodes => currentNodes.map(node => {
+      // 找到节点所在的层级
+      let nodeLevel = 0;
+      let nodeIndex = 0;
+      
+      for (let i = 0; i < levels.length; i++) {
+        const index = levels[i].indexOf(node.id);
+        if (index !== -1) {
+          nodeLevel = i;
+          nodeIndex = index;
+          break;
+        }
+      }
+      
+      // 计算位置
+      const levelWidth = canvasWidth / Math.max(1, levels[nodeLevel].length);
+      const x = levelWidth * (nodeIndex + 0.5);
+      const y = levelHeight * (nodeLevel + 0.5);
+      
+      return {
+        ...node,
+        x: x,
+        y: y,
+        fixed: true,
+        fx: x,
+        fy: y
+      };
+    }));
+  };
+
   return (
     <div style={{ height: '100vh', minHeight: '100vh' }}>
       <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: 32, width: '100%', minHeight: canvasHeight + 48 }}>
@@ -269,7 +397,7 @@ function GraphVisualization() {
               <label style={{ marginBottom: 8 }}>点半径: <input type="number" min={8} max={100} value={nodeRadius} onChange={e => setNodeRadius(Number(e.target.value))} style={{ width: 40 }} /></label>
               <label style={{ marginBottom: 8 }}>箭头大小: <input type="number" min={2} max={30} value={arrowSize} onChange={e => setArrowSize(Number(e.target.value))} style={{ width: 40 }} /></label>
               <label style={{ marginBottom: 8 }}>边的粗细: <input type="number" min={1} max={20} value={edgeWidth} onChange={e => setEdgeWidth(Number(e.target.value))} style={{ width: 40 }} /></label>
-              <label style={{ marginBottom: 8 }}>斥力强度: <input type="number" min={-1000} max={-10} step={10} value={chargeStrength} onChange={e => setChargeStrength(Number(e.target.value))} style={{ width: 60 }} /></label>
+              <label style={{ marginBottom: 8 }}>斥力强度: <input type="number" min={-10000} max={10000} step={10} value={chargeStrength} onChange={e => setChargeStrength(Number(e.target.value))} style={{ width: 60 }} /></label>
               <div style={{ marginTop: 0, textAlign: 'left', width: '100%' }}>
                 <label>
                   <input
@@ -289,6 +417,25 @@ function GraphVisualization() {
                   />
                   无向图
                 </label>
+              </div>
+              <div style={{ marginTop: 16, width: '100%' }}>
+                <button 
+                  onClick={arrangeAsTree}
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    background: '#4caf50',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    fontWeight: '500'
+                  }}
+                  title="将所有节点按BFS层次结构排列并固定"
+                >
+                  层次布局
+                </button>
               </div>
             </div>
           )}

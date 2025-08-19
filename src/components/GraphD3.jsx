@@ -114,7 +114,7 @@ export default function GraphD3({ nodes, edges, directed, width = 500, height = 
       svg.append('defs').append('marker')
         .attr('id', markerId)
         .attr('viewBox', '0 -5 10 10')
-        .attr('refX', nodeRadius + arrowSize + 2)
+        .attr('refX', nodeRadius+15 - arrowSize)
         .attr('refY', 0)
         .attr('markerWidth', arrowSize)
         .attr('markerHeight', arrowSize)
@@ -126,7 +126,6 @@ export default function GraphD3({ nodes, edges, directed, width = 500, height = 
     // 每次都刷新 marker-end，使用唯一 id
     const markerUrl = directed ? `url(#${markerId})` : null;
     link.attr('marker-end', markerUrl);
-    //selfLoop.attr('marker-end', markerUrl);
 
     // Draw nodes
     const node = svg.append('g')
@@ -292,10 +291,18 @@ export default function GraphD3({ nodes, edges, directed, width = 500, height = 
             nodeObj.fixed = nodes[i].fixed;
             nodeObj.label = nodes[i].label;
             
+            // 如果外部传入了x,y坐标，使用它们
+            if (nodes[i].x !== undefined) {
+              nodeObj.x = nodes[i].x;
+            }
+            if (nodes[i].y !== undefined) {
+              nodeObj.y = nodes[i].y;
+            }
+            
             // 如果节点变为固定状态，设置固定位置
             if (nodes[i].fixed) {
-              nodeObj.fx = nodeObj.x;
-              nodeObj.fy = nodeObj.y;
+              nodeObj.fx = nodes[i].fx !== undefined ? nodes[i].fx : nodeObj.x;
+              nodeObj.fy = nodes[i].fy !== undefined ? nodes[i].fy : nodeObj.y;
             } else {
               nodeObj.fx = null;
               nodeObj.fy = null;
@@ -327,11 +334,19 @@ export default function GraphD3({ nodes, edges, directed, width = 500, height = 
         nodeObjsRef.current.forEach(nodeObj => {
           const currentNode = nodes.find(n => n.id === nodeObj.id);
           if (currentNode) {
+            // 如果外部传入了x,y坐标，使用它们
+            if (currentNode.x !== undefined) {
+              nodeObj.x = currentNode.x;
+            }
+            if (currentNode.y !== undefined) {
+              nodeObj.y = currentNode.y;
+            }
+            
             // 更新固定状态
             if (currentNode.fixed && !nodeObj.fixed) {
               // 从非固定变为固定
-              nodeObj.fx = nodeObj.x;
-              nodeObj.fy = nodeObj.y;
+              nodeObj.fx = currentNode.fx !== undefined ? currentNode.fx : nodeObj.x;
+              nodeObj.fy = currentNode.fy !== undefined ? currentNode.fy : nodeObj.y;
               nodeObj.fixed = true;
             } else if (!currentNode.fixed && nodeObj.fixed) {
               // 从固定变为非固定
@@ -340,6 +355,10 @@ export default function GraphD3({ nodes, edges, directed, width = 500, height = 
               nodeObj.fixed = false;
               // 重启仿真以便节点可以重新移动
               simulationRef.current.alpha(0.3).restart();
+            } else if (currentNode.fixed && nodeObj.fixed) {
+              // 已经是固定状态，但可能位置需要更新
+              nodeObj.fx = currentNode.fx !== undefined ? currentNode.fx : nodeObj.x;
+              nodeObj.fy = currentNode.fy !== undefined ? currentNode.fy : nodeObj.y;
             }
             
             // 更新标签
@@ -411,7 +430,7 @@ export default function GraphD3({ nodes, edges, directed, width = 500, height = 
           marker
             .attr('markerWidth', arrowSize)
             .attr('markerHeight', arrowSize)
-            .attr('refX', nodeRadius + arrowSize + 2);
+            .attr('refX', nodeRadius+15 - arrowSize);
           const markerId = marker.attr('id');
           linkRef.current.attr('marker-end', `url(#${markerId})`);
         }
@@ -424,17 +443,6 @@ export default function GraphD3({ nodes, edges, directed, width = 500, height = 
           .join('path')
           .attr('fill', 'none')
           .attr('stroke-width', edgeWidth);
-
-        // 重新应用箭头标记和大小
-        // const marker = svg.select('defs marker');
-        // if (marker.size() > 0 && directed) {
-        //   marker
-        //     .attr('markerWidth', arrowSize)
-        //     .attr('markerHeight', arrowSize)
-        //     .attr('refX', nodeRadius + arrowSize + 2);
-        //   const markerId = marker.attr('id');
-        //   selfLoopRef.current.attr('marker-end', `url(#${markerId})`);
-        // }
       }
 
       // 更新边标签
