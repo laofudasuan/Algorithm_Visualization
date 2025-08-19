@@ -19,6 +19,14 @@ export default function GraphInput({
   // Update node 增加label
   const updateNode = (idx, key, value) => setNodes(nodes.map((n, i) => i === idx ? { ...n, [key]: value } : n));
 
+  // 固定/取消固定所有点
+  const toggleAllNodesFixed = () => {
+    const allFixed = nodes.every(node => node.fixed);
+    nodes.forEach((_, idx) => {
+      setNodeFixed(idx, !allFixed);
+    });
+  };
+
   // Add edge
   const addEdge = () => setEdges([...edges, { from: '', to: '', label: '' }]);
   // Remove edge
@@ -100,7 +108,24 @@ export default function GraphInput({
               <button onClick={() => removeNode(idx)} disabled={nodes.length <= 1} style={{ marginLeft: 0, minWidth: 32, width: 32, height: 32, fontSize: 22, fontWeight: 700, lineHeight: '28px', padding: 0, borderRadius: '50%', background: '#f5f5f5', border: '1px solid #ccc', color: '#d32f2f', cursor: nodes.length <= 1 ? 'not-allowed' : 'pointer' }} title="删除">×</button>
             </div>
           ))}
-          <button onClick={addNode}>添加点</button>
+          <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+            <button onClick={addNode}>添加点</button>
+            <button 
+              onClick={toggleAllNodesFixed}
+              style={{
+                background: nodes.every(node => node.fixed) ? '#ff9800' : '#4caf50',
+                color: 'white',
+                border: 'none',
+                padding: '6px 12px',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '14px'
+              }}
+              title={nodes.every(node => node.fixed) ? '取消固定所有点' : '固定所有点'}
+            >
+              {nodes.every(node => node.fixed) ? '取消固定所有点' : '固定所有点'}
+            </button>
+          </div>
         </div>
         )}
         {/* 右侧：边列表 */}
