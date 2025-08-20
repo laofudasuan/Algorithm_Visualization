@@ -1145,7 +1145,7 @@ function GraphVisualization() {
             cursor: 'pointer'
           }}
           onClick={() => setLeftPanelCollapsed(!leftPanelCollapsed)}>
-            {!leftPanelCollapsed && <span style={{ fontWeight: '600', color: '#1976d2' }}>图形输入</span>}
+            {!leftPanelCollapsed && <span style={{ fontWeight: '600', color: '#1976d2' }}>点/边列表</span>}
             <span style={{ 
               color: '#1976d2', 
               fontSize: '18px',

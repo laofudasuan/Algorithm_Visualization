@@ -1,6 +1,203 @@
 import React, { useState } from 'react';
 import '../styles/modal.css';
 
+// 颜色选择器组件
+const ColorSelector = ({ value, onChange, basicColors }) => {
+  const [mode, setMode] = useState('basic'); // 'basic' 或 'palette'
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
+  const [tempColor, setTempColor] = useState(value); // 临时颜色，用于色盘模式
+
+  const handleColorSelect = (color) => {
+    onChange(color);
+    setShowDropdown(false);
+  };
+
+  const handlePaletteConfirm = () => {
+    onChange(tempColor);
+    setShowDropdown(false);
+  };
+
+  const handlePaletteCancel = () => {
+    setTempColor(value); // 恢复原始颜色
+    setShowDropdown(false);
+  };
+
+  const handleToggleDropdown = (event) => {
+    if (!showDropdown) {
+      const rect = event.currentTarget.getBoundingClientRect();
+      setDropdownPosition({
+        top: rect.bottom + window.scrollY + 4,
+        left: rect.left + window.scrollX
+      });
+      setTempColor(value); // 初始化临时颜色
+    }
+    setShowDropdown(!showDropdown);
+  };
+
+  return (
+    <div style={{ marginLeft: 8, position: 'relative' }}>
+      {/* 颜色预览方块 */}
+      <div 
+        style={{ 
+          width: 24, 
+          height: 24, 
+          backgroundColor: value, 
+          border: '2px solid #ccc', 
+          borderRadius: '4px', 
+          cursor: 'pointer',
+          display: 'inline-block'
+        }}
+        title={`当前颜色: ${value}`}
+        onClick={handleToggleDropdown}
+      ></div>
+      
+      {/* 下拉颜色选择面板 */}
+      {showDropdown && (
+        <div style={{
+          position: 'fixed',
+          top: dropdownPosition.top,
+          left: dropdownPosition.left,
+          background: 'white',
+          border: '1px solid #ccc',
+          borderRadius: '6px',
+          padding: '8px',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
+          zIndex: 10001,
+          minWidth: 200
+        }}>
+          {/* 模式切换 */}
+          <div style={{ marginBottom: 8, display: 'flex', gap: 4 }}>
+            <button
+              style={{
+                flex: 1,
+                padding: '4px 8px',
+                fontSize: '12px',
+                border: '1px solid #ddd',
+                borderRadius: '3px',
+                background: mode === 'basic' ? '#e3f2fd' : 'white',
+                color: mode === 'basic' ? '#1976d2' : '#666',
+                cursor: 'pointer'
+              }}
+              onClick={() => setMode('basic')}
+            >
+              基础颜色
+            </button>
+            <button
+              style={{
+                flex: 1,
+                padding: '4px 8px',
+                fontSize: '12px',
+                border: '1px solid #ddd',
+                borderRadius: '3px',
+                background: mode === 'palette' ? '#e3f2fd' : 'white',
+                color: mode === 'palette' ? '#1976d2' : '#666',
+                cursor: 'pointer'
+              }}
+              onClick={() => setMode('palette')}
+            >
+              色盘
+            </button>
+          </div>
+          
+          {/* 基础颜色模式 */}
+          {mode === 'basic' && (
+            <div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4, marginBottom: 8 }}>
+                {basicColors.map(color => (
+                  <div
+                    key={color}
+                    style={{
+                      width: 32,
+                      height: 32,
+                      backgroundColor: color,
+                      border: value === color ? '3px solid #1976d2' : '2px solid #ddd',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      transition: 'border-color 0.2s'
+                    }}
+                    title={color}
+                    onClick={() => handleColorSelect(color)}
+                  />
+                ))}
+              </div>
+              {/* 关闭按钮 */}
+              <div style={{ textAlign: 'right' }}>
+                <button
+                  style={{
+                    padding: '4px 8px',
+                    fontSize: '12px',
+                    border: '1px solid #ddd',
+                    borderRadius: '3px',
+                    background: 'white',
+                    cursor: 'pointer'
+                  }}
+                  onClick={() => setShowDropdown(false)}
+                >
+                  关闭
+                </button>
+              </div>
+            </div>
+          )}
+          
+          {/* 色盘模式 */}
+          {mode === 'palette' && (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <input
+                type="color"
+                value={tempColor}
+                onChange={(e) => setTempColor(e.target.value)}
+                style={{
+                  width: 120,
+                  height: 40,
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer'
+                }}
+              />
+              <div style={{ fontSize: '12px', color: '#666', marginTop: 4, marginBottom: 8 }}>
+                当前颜色: {tempColor}
+              </div>
+              {/* 确定/取消按钮 */}
+              <div style={{ display: 'flex', gap: 8, width: '100%' }}>
+                <button
+                  style={{
+                    flex: 1,
+                    padding: '6px 12px',
+                    fontSize: '12px',
+                    border: '1px solid #ddd',
+                    borderRadius: '3px',
+                    background: '#f5f5f5',
+                    cursor: 'pointer'
+                  }}
+                  onClick={handlePaletteCancel}
+                >
+                  取消
+                </button>
+                <button
+                  style={{
+                    flex: 1,
+                    padding: '6px 12px',
+                    fontSize: '12px',
+                    border: '1px solid #1976d2',
+                    borderRadius: '3px',
+                    background: '#1976d2',
+                    color: 'white',
+                    cursor: 'pointer'
+                  }}
+                  onClick={handlePaletteConfirm}
+                >
+                  确定
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
 export default function GraphInput({
   nodes,
   setNodes,
@@ -134,12 +331,12 @@ export default function GraphInput({
             <div key={idx} style={{ marginBottom: 4, display: 'flex', alignItems: 'center' }}>
               <input style={{ width: 20 }} value={node.id} onChange={e => updateNode(idx, 'id', e.target.value)} placeholder={`点${idx+1}`} />
               <input style={{ width: 60, marginLeft: 8 }} value={node.label || ''} onChange={e => updateNode(idx, 'label', e.target.value)} placeholder="标签" />
-              {/* 颜色选择器 */}
-              <select style={{ width: 60, marginLeft: 8 }} value={node.color} onChange={e => updateNode(idx, 'color', e.target.value)}>
-                {nodeColorOptions.map(opt => (
-                  <option key={opt} value={opt} style={{ background: opt, color: '#333' }}>{opt}</option>
-                ))}
-              </select>
+              {/* 颜色选择器 - 基础颜色和色盘选项 */}
+              <ColorSelector
+                value={node.color}
+                onChange={(color) => updateNode(idx, 'color', color)}
+                basicColors={nodeColorOptions}
+              />
               <label style={{ width: 80, marginLeft: 8 }}>
                 <input
                   type="checkbox"
@@ -177,16 +374,16 @@ export default function GraphInput({
           {edges.map((edge, idx) => (
             <div key={idx} style={{ marginBottom: 4, display: 'flex', alignItems: 'center' }}>
               <input style={{ width: 30 }} value={edge.from} onChange={e => updateEdge(idx, 'from', e.target.value)} placeholder="起点" />
-              <span style={{ margin: '0 8px' }}>→</span>
-              <input style={{ width: 30 }} value={edge.to} onChange={e => updateEdge(idx, 'to', e.target.value)} placeholder="终点" />
+              <span style={{ marginLeft:-6,width:20 }}>→</span>
+              <input style={{ marginLeft:-2,width: 30 }} value={edge.to} onChange={e => updateEdge(idx, 'to', e.target.value)} placeholder="终点" />
               {/* 新增 label 输入框 */}
               <input style={{ width: 50, marginLeft: 8 }} value={edge.label || ''} onChange={e => updateEdge(idx, 'label', e.target.value)} placeholder="标签" />
-              {/* 颜色选择器 */}
-              <select style={{ width: 60, marginLeft: 8 }} value={edge.color} onChange={e => updateEdge(idx, 'color', e.target.value)}>
-                {edgeColorOptions.map(opt => (
-                  <option key={opt} value={opt} style={{ background: opt, color: '#333' }}>{opt}</option>
-                ))}
-              </select>
+              {/* 颜色选择器 - 基础颜色和色盘选项 */}
+              <ColorSelector
+                value={edge.color}
+                onChange={(color) => updateEdge(idx, 'color', color)}
+                basicColors={edgeColorOptions}
+              />
               <button onClick={() => removeEdge(idx)} disabled={edges.length <= 1} style={{ marginLeft: 8, minWidth: 32, width: 32, height: 32, fontSize: 22, fontWeight: 700, lineHeight: '28px', padding: 0, borderRadius: '50%', background: '#f5f5f5', border: '1px solid #ccc', color: '#d32f2f', cursor: edges.length <= 1 ? 'not-allowed' : 'pointer' }} title="删除">×</button>
             </div>
           ))}
