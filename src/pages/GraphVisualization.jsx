@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import GraphInput from '../components/GraphInput';
 import GraphD3 from '../components/GraphD3';
+import '../styles/modal.css';
 
 function GraphVisualization() {
   // 节点结构改为对象，支持 fixed 属性
@@ -194,97 +195,692 @@ function GraphVisualization() {
   };
 
   // 随机生成图
-  const randomGenerate = () => {
-    // 弹出配置对话框
-    const nodeCountInput = prompt('请输入节点数量 (3-20):', '6');
-    if (nodeCountInput === null) return;
-    
-    const nodeCount = parseInt(nodeCountInput);
-    if (isNaN(nodeCount) || nodeCount < 3 || nodeCount > 20) {
-      alert('节点数量必须在 3-20 之间');
-      return;
-    }
+  const randomGenerate = async () => {
+    // 创建统一配置弹窗
+    const config = await new Promise((resolve) => {
+      const modalContainer = document.createElement('div');
+      modalContainer.className = 'modal-overlay';
 
-    const edgeDensityInput = prompt('请输入边密度 (0.1-1.0，0.3表示30%的可能边):', '0.3');
-    if (edgeDensityInput === null) return;
-    
-    const edgeDensity = parseFloat(edgeDensityInput);
-    if (isNaN(edgeDensity) || edgeDensity < 0.1 || edgeDensity > 1.0) {
-      alert('边密度必须在 0.1-1.0 之间');
-      return;
-    }
+      const modal = document.createElement('div');
+      modal.className = 'modal-container';
+
+      const title = document.createElement('h3');
+      title.textContent = '随机图生成配置';
+      title.className = 'modal-title';
+
+      // 节点数量配置
+      const nodeCountContainer = document.createElement('div');
+      nodeCountContainer.className = 'modal-section';
+      
+      const nodeCountLabel = document.createElement('label');
+      nodeCountLabel.textContent = '节点数量 (3-20):';
+      nodeCountLabel.className = 'modal-label';
+      
+      const nodeCountInput = document.createElement('input');
+      nodeCountInput.type = 'number';
+      nodeCountInput.min = '3';
+      nodeCountInput.max = '20';
+      nodeCountInput.value = '6';
+      nodeCountInput.className = 'modal-input';
+
+      // 图类型选择
+      const graphTypeContainer = document.createElement('div');
+      graphTypeContainer.className = 'modal-section';
+      
+      const graphTypeLabel = document.createElement('label');
+      graphTypeLabel.textContent = '生成类型:';
+      graphTypeLabel.className = 'modal-label';
+
+      const graphTypeOptions = document.createElement('div');
+      graphTypeOptions.className = 'modal-radio-group';
+
+      const treeRadio = document.createElement('input');
+      treeRadio.type = 'radio';
+      treeRadio.name = 'graphType';
+      treeRadio.value = 'tree';
+      treeRadio.checked = true;
+      treeRadio.id = 'tree';
+
+      const treeLabel = document.createElement('label');
+      treeLabel.htmlFor = 'tree';
+      treeLabel.textContent = '生成树';
+      treeLabel.className = 'modal-radio-label';
+
+      const graphRadio = document.createElement('input');
+      graphRadio.type = 'radio';
+      graphRadio.name = 'graphType';
+      graphRadio.value = 'graph';
+      graphRadio.id = 'graph';
+
+      const graphLabel = document.createElement('label');
+      graphLabel.htmlFor = 'graph';
+      graphLabel.textContent = '生成图';
+      graphLabel.className = 'modal-radio-label';
+
+      treeLabel.insertBefore(treeRadio, treeLabel.firstChild);
+      graphLabel.insertBefore(graphRadio, graphLabel.firstChild);
+      
+      graphTypeOptions.appendChild(treeLabel);
+      graphTypeOptions.appendChild(graphLabel);
+
+      // 树类型选择（默认显示）
+      const treeTypeContainer = document.createElement('div');
+      treeTypeContainer.className = 'modal-section';
+      treeTypeContainer.id = 'treeTypeContainer';
+      
+      const treeTypeLabel = document.createElement('label');
+      treeTypeLabel.textContent = '树类型:';
+      treeTypeLabel.className = 'modal-label';
+
+      const treeTypeSelect = document.createElement('select');
+      treeTypeSelect.className = 'modal-input';
+      treeTypeSelect.innerHTML = `
+        <option value="random">任意随机树</option>
+        <option value="binary">二叉树</option>
+        <option value="complete">完全二叉树</option>
+      `;
+
+      // 边数配置（默认隐藏）
+      const edgeCountContainer = document.createElement('div');
+      edgeCountContainer.className = 'modal-section';
+      edgeCountContainer.id = 'edgeCountContainer';
+      edgeCountContainer.style.display = 'none';
+      
+      const edgeCountLabel = document.createElement('label');
+      edgeCountLabel.textContent = '边数:';
+      edgeCountLabel.className = 'modal-label';
+      
+      const edgeCountInput = document.createElement('input');
+      edgeCountInput.type = 'number';
+      edgeCountInput.min = '0';
+      edgeCountInput.value = '8';
+      edgeCountInput.className = 'modal-input';
+
+      const edgeCountHint = document.createElement('div');
+      edgeCountHint.textContent = '将根据节点数动态计算最大边数和连通最小边数';
+      edgeCountHint.className = 'modal-hint';
+
+      // 动态更新最大边数提示
+      const updateEdgeHint = () => {
+        const nodeCount = parseInt(nodeCountInput.value) || 6;
+        const maxEdges = directed ? nodeCount * (nodeCount - 1) : nodeCount * (nodeCount - 1) / 2;
+        const minEdgesForConnected = nodeCount - 1;
+        edgeCountHint.textContent = `最大边数: ${maxEdges}，连通最少需要: ${minEdgesForConnected}`;
+        edgeCountInput.max = maxEdges.toString();
+      };
+
+      nodeCountInput.addEventListener('input', updateEdgeHint);
+      updateEdgeHint(); // 初始化
+
+      // 实时验证边数（当连通性选项改变时）
+      const validateEdgeCount = () => {
+        const nodeCount = parseInt(nodeCountInput.value) || 6;
+        const edgeCount = parseInt(edgeCountInput.value) || 0;
+        const requireConnected = document.querySelector('input[name="connectivity"]:checked')?.value === 'true';
+        const minEdgesForConnected = nodeCount - 1;
+        
+        if (requireConnected && edgeCount < minEdgesForConnected && edgeCount > 0) {
+          edgeCountInput.style.borderColor = '#ff5722';
+          edgeCountHint.style.color = '#ff5722';
+          edgeCountHint.textContent = `警告：连通图至少需要 ${minEdgesForConnected} 条边，当前 ${edgeCount} 条边无法保证连通`;
+        } else {
+          edgeCountInput.style.borderColor = '#ddd';
+          edgeCountHint.style.color = '#666';
+          updateEdgeHint();
+        }
+      };
+
+      edgeCountInput.addEventListener('input', validateEdgeCount);
+
+      // 点标签配置
+      const nodeLabelContainer = document.createElement('div');
+      nodeLabelContainer.className = 'modal-section';
+      
+      const nodeLabelCheckbox = document.createElement('input');
+      nodeLabelCheckbox.type = 'checkbox';
+      nodeLabelCheckbox.id = 'nodeLabels';
+      
+      const nodeLabelLabel = document.createElement('label');
+      nodeLabelLabel.htmlFor = 'nodeLabels';
+      nodeLabelLabel.textContent = '生成点标签';
+      nodeLabelLabel.className = 'modal-checkbox-label';
+      nodeLabelLabel.insertBefore(nodeLabelCheckbox, nodeLabelLabel.firstChild);
+
+      const nodeLabelRangeContainer = document.createElement('div');
+      nodeLabelRangeContainer.className = 'modal-subsection';
+      nodeLabelRangeContainer.style.display = 'none';
+      nodeLabelRangeContainer.style.marginLeft = '20px';
+      nodeLabelRangeContainer.style.marginTop = '8px';
+
+      const nodeLabelMinLabel = document.createElement('label');
+      nodeLabelMinLabel.textContent = '最小值:';
+      nodeLabelMinLabel.className = 'modal-label modal-label-inline';
+      
+      const nodeLabelMinInput = document.createElement('input');
+      nodeLabelMinInput.type = 'number';
+      nodeLabelMinInput.value = '1';
+      nodeLabelMinInput.className = 'modal-input modal-input-inline';
+      
+      const nodeLabelMaxLabel = document.createElement('label');
+      nodeLabelMaxLabel.textContent = '最大值:';
+      nodeLabelMaxLabel.className = 'modal-label modal-label-inline';
+      nodeLabelMaxLabel.style.marginLeft = '10px';
+      
+      const nodeLabelMaxInput = document.createElement('input');
+      nodeLabelMaxInput.type = 'number';
+      nodeLabelMaxInput.value = '100';
+      nodeLabelMaxInput.className = 'modal-input modal-input-inline';
+
+      nodeLabelRangeContainer.appendChild(nodeLabelMinLabel);
+      nodeLabelRangeContainer.appendChild(nodeLabelMinInput);
+      nodeLabelRangeContainer.appendChild(nodeLabelMaxLabel);
+      nodeLabelRangeContainer.appendChild(nodeLabelMaxInput);
+
+      // 边标签配置
+      const edgeLabelContainer = document.createElement('div');
+      edgeLabelContainer.className = 'modal-section';
+      
+      const edgeLabelCheckbox = document.createElement('input');
+      edgeLabelCheckbox.type = 'checkbox';
+      edgeLabelCheckbox.id = 'edgeLabels';
+      
+      const edgeLabelLabel = document.createElement('label');
+      edgeLabelLabel.htmlFor = 'edgeLabels';
+      edgeLabelLabel.textContent = '生成边标签';
+      edgeLabelLabel.className = 'modal-checkbox-label';
+      edgeLabelLabel.insertBefore(edgeLabelCheckbox, edgeLabelLabel.firstChild);
+
+      const edgeLabelRangeContainer = document.createElement('div');
+      edgeLabelRangeContainer.className = 'modal-subsection';
+      edgeLabelRangeContainer.style.display = 'none';
+      edgeLabelRangeContainer.style.marginLeft = '20px';
+      edgeLabelRangeContainer.style.marginTop = '8px';
+
+      const edgeLabelMinLabel = document.createElement('label');
+      edgeLabelMinLabel.textContent = '最小值:';
+      edgeLabelMinLabel.className = 'modal-label modal-label-inline';
+      
+      const edgeLabelMinInput = document.createElement('input');
+      edgeLabelMinInput.type = 'number';
+      edgeLabelMinInput.value = '1';
+      edgeLabelMinInput.className = 'modal-input modal-input-inline';
+      
+      const edgeLabelMaxLabel = document.createElement('label');
+      edgeLabelMaxLabel.textContent = '最大值:';
+      edgeLabelMaxLabel.className = 'modal-label modal-label-inline';
+      edgeLabelMaxLabel.style.marginLeft = '10px';
+      
+      const edgeLabelMaxInput = document.createElement('input');
+      edgeLabelMaxInput.type = 'number';
+      edgeLabelMaxInput.value = '100';
+      edgeLabelMaxInput.className = 'modal-input modal-input-inline';
+
+      edgeLabelRangeContainer.appendChild(edgeLabelMinLabel);
+      edgeLabelRangeContainer.appendChild(edgeLabelMinInput);
+      edgeLabelRangeContainer.appendChild(edgeLabelMaxLabel);
+      edgeLabelRangeContainer.appendChild(edgeLabelMaxInput);
+
+      // 标签范围显示/隐藏控制
+      nodeLabelCheckbox.addEventListener('change', () => {
+        nodeLabelRangeContainer.style.display = nodeLabelCheckbox.checked ? 'block' : 'none';
+      });
+
+      edgeLabelCheckbox.addEventListener('change', () => {
+        edgeLabelRangeContainer.style.display = edgeLabelCheckbox.checked ? 'block' : 'none';
+      });
+
+      // 连通性配置（仅图模式显示）
+      const connectivityContainer = document.createElement('div');
+      connectivityContainer.className = 'modal-section';
+      connectivityContainer.id = 'connectivityContainer';
+      connectivityContainer.style.display = 'none';
+      
+      const connectivityLabel = document.createElement('label');
+      connectivityLabel.textContent = '连通性要求:';
+      connectivityLabel.className = 'modal-label';
+
+      const connectivityOptions = document.createElement('div');
+      connectivityOptions.className = 'modal-radio-group';
+
+      const connectedRadio = document.createElement('input');
+      connectedRadio.type = 'radio';
+      connectedRadio.name = 'connectivity';
+      connectedRadio.value = 'true';
+      connectedRadio.checked = true;
+      connectedRadio.id = 'connected';
+
+      const connectedLabel = document.createElement('label');
+      connectedLabel.htmlFor = 'connected';
+      connectedLabel.textContent = '要求连通';
+      connectedLabel.className = 'modal-radio-label';
+
+      const disconnectedRadio = document.createElement('input');
+      disconnectedRadio.type = 'radio';
+      disconnectedRadio.name = 'connectivity';
+      disconnectedRadio.value = 'false';
+      disconnectedRadio.id = 'disconnected';
+
+      const disconnectedLabel = document.createElement('label');
+      disconnectedLabel.htmlFor = 'disconnected';
+      disconnectedLabel.textContent = '允许非连通';
+      disconnectedLabel.className = 'modal-radio-label';
+
+      connectedRadio.addEventListener('change', validateEdgeCount);
+      disconnectedRadio.addEventListener('change', validateEdgeCount);
+
+      connectedLabel.insertBefore(connectedRadio, connectedLabel.firstChild);
+      disconnectedLabel.insertBefore(disconnectedRadio, disconnectedLabel.firstChild);
+      
+      connectivityOptions.appendChild(connectedLabel);
+      connectivityOptions.appendChild(disconnectedLabel);
+
+      // 图类型切换事件
+      const toggleGraphType = () => {
+        const selectedType = document.querySelector('input[name="graphType"]:checked').value;
+        if (selectedType === 'tree') {
+          treeTypeContainer.style.display = 'block';
+          edgeCountContainer.style.display = 'none';
+          connectivityContainer.style.display = 'none';
+        } else {
+          treeTypeContainer.style.display = 'none';
+          edgeCountContainer.style.display = 'block';
+          connectivityContainer.style.display = 'block';
+          updateEdgeHint(); // 更新边数提示
+        }
+      };
+
+      treeRadio.addEventListener('change', toggleGraphType);
+      graphRadio.addEventListener('change', toggleGraphType);
+
+      // 按钮区域
+      const buttonContainer = document.createElement('div');
+      buttonContainer.className = 'modal-buttons';
+
+      const cancelButton = document.createElement('button');
+      cancelButton.textContent = '取消';
+      cancelButton.className = 'modal-button modal-button-cancel';
+      cancelButton.addEventListener('click', () => {
+        document.body.removeChild(modalContainer);
+        resolve(null);
+      });
+
+      const confirmButton = document.createElement('button');
+      confirmButton.textContent = '生成';
+      confirmButton.className = 'modal-button modal-button-confirm';
+      confirmButton.addEventListener('click', () => {
+        const nodeCount = parseInt(nodeCountInput.value);
+        const graphType = document.querySelector('input[name="graphType"]:checked').value;
+        
+        // 验证输入
+        if (isNaN(nodeCount) || nodeCount < 3 || nodeCount > 20) {
+          alert('节点数量必须在 3-20 之间');
+          return;
+        }
+
+        let config = { nodeCount, graphType };
+
+        // 收集标签配置
+        if (nodeLabelCheckbox.checked) {
+          const minVal = parseInt(nodeLabelMinInput.value);
+          const maxVal = parseInt(nodeLabelMaxInput.value);
+          if (isNaN(minVal) || isNaN(maxVal) || minVal > maxVal) {
+            alert('点标签范围输入有误，请检查最小值和最大值');
+            return;
+          }
+          config.nodeLabels = { min: minVal, max: maxVal };
+        }
+
+        if (edgeLabelCheckbox.checked) {
+          const minVal = parseInt(edgeLabelMinInput.value);
+          const maxVal = parseInt(edgeLabelMaxInput.value);
+          if (isNaN(minVal) || isNaN(maxVal) || minVal > maxVal) {
+            alert('边标签范围输入有误，请检查最小值和最大值');
+            return;
+          }
+          config.edgeLabels = { min: minVal, max: maxVal };
+        }
+
+        if (graphType === 'tree') {
+          config.treeType = treeTypeSelect.value;
+        } else {
+          const edgeCount = parseInt(edgeCountInput.value);
+          const maxEdges = directed ? nodeCount * (nodeCount - 1) : nodeCount * (nodeCount - 1) / 2;
+          const requireConnected = document.querySelector('input[name="connectivity"]:checked').value === 'true';
+          const minEdgesForConnected = nodeCount - 1;
+          
+          if (isNaN(edgeCount) || edgeCount < 0 || edgeCount > maxEdges) {
+            alert(`边数必须在 0-${maxEdges} 之间`);
+            return;
+          }
+          
+          if (requireConnected && edgeCount < minEdgesForConnected) {
+            alert(`要求连通的图至少需要 ${minEdgesForConnected} 条边（节点数-1），请重新输入边数`);
+            edgeCountInput.focus();
+            edgeCountInput.select();
+            return;
+          }
+          
+          config.edgeCount = edgeCount;
+          config.requireConnected = requireConnected;
+        }
+
+        document.body.removeChild(modalContainer);
+        resolve(config);
+      });
+
+      // 组装弹窗
+      nodeCountContainer.appendChild(nodeCountLabel);
+      nodeCountContainer.appendChild(nodeCountInput);
+      
+      graphTypeContainer.appendChild(graphTypeLabel);
+      graphTypeContainer.appendChild(graphTypeOptions);
+      
+      treeTypeContainer.appendChild(treeTypeLabel);
+      treeTypeContainer.appendChild(treeTypeSelect);
+      
+      edgeCountContainer.appendChild(edgeCountLabel);
+      edgeCountContainer.appendChild(edgeCountInput);
+      edgeCountContainer.appendChild(edgeCountHint);
+      
+      nodeCountContainer.appendChild(nodeCountLabel);
+      nodeCountContainer.appendChild(nodeCountInput);
+      
+      graphTypeContainer.appendChild(graphTypeLabel);
+      graphTypeContainer.appendChild(graphTypeOptions);
+      
+      treeTypeContainer.appendChild(treeTypeLabel);
+      treeTypeContainer.appendChild(treeTypeSelect);
+      
+      edgeCountContainer.appendChild(edgeCountLabel);
+      edgeCountContainer.appendChild(edgeCountInput);
+      edgeCountContainer.appendChild(edgeCountHint);
+      
+      nodeLabelContainer.appendChild(nodeLabelLabel);
+      nodeLabelContainer.appendChild(nodeLabelRangeContainer);
+      
+      edgeLabelContainer.appendChild(edgeLabelLabel);
+      edgeLabelContainer.appendChild(edgeLabelRangeContainer);
+      
+      connectivityContainer.appendChild(connectivityLabel);
+      connectivityContainer.appendChild(connectivityOptions);
+      
+      buttonContainer.appendChild(cancelButton);
+      buttonContainer.appendChild(confirmButton);
+
+      modal.appendChild(title);
+      modal.appendChild(nodeCountContainer);
+      modal.appendChild(graphTypeContainer);
+      modal.appendChild(treeTypeContainer);
+      modal.appendChild(edgeCountContainer);
+      modal.appendChild(nodeLabelContainer);
+      modal.appendChild(edgeLabelContainer);
+      modal.appendChild(connectivityContainer);
+      modal.appendChild(buttonContainer);
+      modalContainer.appendChild(modal);
+      document.body.appendChild(modalContainer);
+
+      // 回车确认
+      modal.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          confirmButton.click();
+        }
+      });
+    });
+
+    // 如果用户取消了操作
+    if (config === null) return;
+
+    const { nodeCount, graphType } = config;
 
     // 生成随机节点
     const newNodes = [];
     for (let i = 0; i < nodeCount; i++) {
+      let label = '';
+      if (config.nodeLabels) {
+        const min = config.nodeLabels.min;
+        const max = config.nodeLabels.max;
+        label = String(Math.floor(Math.random() * (max - min + 1)) + min);
+      }
+      
       newNodes.push({
         id: String(i),
         fixed: false,
-        label: '',
+        label: label,
         color: '#69b3a2'
       });
     }
 
-    // 生成随机边
-    const newEdges = [];
-    const maxEdges = directed ? nodeCount * (nodeCount - 1) : nodeCount * (nodeCount - 1) / 2;
-    const targetEdgeCount = Math.floor(maxEdges * edgeDensity);
-    
-    // 确保图连通 - 先生成一个生成树
-    const connectedEdges = [];
-    const visited = new Set([0]);
-    const unvisited = new Set();
-    for (let i = 1; i < nodeCount; i++) {
-      unvisited.add(i);
-    }
-    
-    while (unvisited.size > 0) {
-      const fromNode = Array.from(visited)[Math.floor(Math.random() * visited.size)];
-      const toNode = Array.from(unvisited)[Math.floor(Math.random() * unvisited.size)];
-      
-      connectedEdges.push({
-        from: String(fromNode),
-        to: String(toNode),
-        label: Math.floor(Math.random() * 20 - 5).toString(), // -5 到 14 的随机权重
-        color: '#000000'
-      });
-      
-      visited.add(toNode);
-      unvisited.delete(toNode);
-    }
+    let newEdges = [];
 
-    // 添加额外的随机边
-    const edgeSet = new Set(connectedEdges.map(e => `${e.from}-${e.to}`));
-    while (newEdges.length + connectedEdges.length < targetEdgeCount) {
-      const from = Math.floor(Math.random() * nodeCount);
-      const to = Math.floor(Math.random() * nodeCount);
-      
-      // 避免自环和重复边
-      if (from === to) continue;
-      
-      const edgeKey1 = `${from}-${to}`;
-      const edgeKey2 = `${to}-${from}`;
-      
-      if (directed) {
-        if (edgeSet.has(edgeKey1)) continue;
-        edgeSet.add(edgeKey1);
-      } else {
-        if (edgeSet.has(edgeKey1) || edgeSet.has(edgeKey2)) continue;
-        edgeSet.add(edgeKey1);
-        edgeSet.add(edgeKey2);
-      }
-      
-      newEdges.push({
-        from: String(from),
-        to: String(to),
-        label: Math.floor(Math.random() * 20 - 5).toString(),
-        color: '#000000'
-      });
+    if (graphType === 'tree') {
+      // 生成树
+      const { treeType } = config;
+      newEdges = generateTree(nodeCount, treeType, config.edgeLabels);
+    } else {
+      // 生成图
+      const { edgeCount, requireConnected } = config;
+      newEdges = generateGraph(nodeCount, edgeCount, requireConnected, config.edgeLabels);
     }
 
     // 更新状态
     setNodes(newNodes);
-    setEdges([...connectedEdges, ...newEdges]);
+    setEdges(newEdges);
+  };
+
+  // 生成树的函数
+  const generateTree = (nodeCount, treeType, edgeLabelConfig = null) => {
+    const edges = [];
+    
+    if (nodeCount <= 1) return edges;
+
+    // 辅助函数：生成边标签
+    const generateEdgeLabel = () => {
+      if (edgeLabelConfig) {
+        const min = edgeLabelConfig.min;
+        const max = edgeLabelConfig.max;
+        return String(Math.floor(Math.random() * (max - min + 1)) + min);
+      }
+      return '';
+    };
+
+    switch (treeType) {
+      case 'complete':
+        // 完全二叉树
+        for (let i = 0; i < Math.floor(nodeCount / 2); i++) {
+          const leftChild = 2 * i + 1;
+          const rightChild = 2 * i + 2;
+          
+          if (leftChild < nodeCount) {
+            edges.push({
+              from: String(i),
+              to: String(leftChild),
+              label: generateEdgeLabel(),
+              color: '#000000'
+            });
+          }
+          
+          if (rightChild < nodeCount) {
+            edges.push({
+              from: String(i),
+              to: String(rightChild),
+              label: generateEdgeLabel(),
+              color: '#000000'
+            });
+          }
+        }
+        break;
+        
+      case 'binary':
+        // 随机二叉树
+        const used = new Set([0]);
+        const available = [];
+        for (let i = 1; i < nodeCount; i++) {
+          available.push(i);
+        }
+        
+        // 随机打乱可用节点
+        for (let i = available.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [available[i], available[j]] = [available[j], available[i]];
+        }
+        
+        const nodeChildren = {}; // 记录每个节点的子节点数
+        for (let i = 0; i < nodeCount; i++) {
+          nodeChildren[i] = 0;
+        }
+        
+        for (const child of available) {
+          // 找到可以添加子节点的父节点（子节点数 < 2）
+          const eligibleParents = Array.from(used).filter(parent => nodeChildren[parent] < 2);
+          if (eligibleParents.length > 0) {
+            const parent = eligibleParents[Math.floor(Math.random() * eligibleParents.length)];
+            edges.push({
+              from: String(parent),
+              to: String(child),
+              label: generateEdgeLabel(),
+              color: '#000000'
+            });
+            nodeChildren[parent]++;
+            used.add(child);
+          }
+        }
+        break;
+        
+      case 'random':
+      default:
+        // 任意随机树
+        const visited = new Set([0]);
+        const unvisited = new Set();
+        for (let i = 1; i < nodeCount; i++) {
+          unvisited.add(i);
+        }
+        
+        while (unvisited.size > 0) {
+          const fromNode = Array.from(visited)[Math.floor(Math.random() * visited.size)];
+          const toNode = Array.from(unvisited)[Math.floor(Math.random() * unvisited.size)];
+          
+          edges.push({
+            from: String(fromNode),
+            to: String(toNode),
+            label: generateEdgeLabel(),
+            color: '#000000'
+          });
+          
+          visited.add(toNode);
+          unvisited.delete(toNode);
+        }
+        break;
+    }
+    
+    return edges;
+  };
+
+  // 生成图的函数
+  const generateGraph = (nodeCount, edgeCount, requireConnected, edgeLabelConfig = null) => {
+    const newEdges = [];
+    
+    // 辅助函数：生成边标签
+    const generateEdgeLabel = () => {
+      if (edgeLabelConfig) {
+        const min = edgeLabelConfig.min;
+        const max = edgeLabelConfig.max;
+        return String(Math.floor(Math.random() * (max - min + 1)) + min);
+      }
+      return '';
+    };
+    
+    if (requireConnected && nodeCount > 1) {
+      // 确保图连通 - 先生成一个生成树
+      const connectedEdges = [];
+      const visited = new Set([0]);
+      const unvisited = new Set();
+      for (let i = 1; i < nodeCount; i++) {
+        unvisited.add(i);
+      }
+      
+      while (unvisited.size > 0) {
+        const fromNode = Array.from(visited)[Math.floor(Math.random() * visited.size)];
+        const toNode = Array.from(unvisited)[Math.floor(Math.random() * unvisited.size)];
+        
+        connectedEdges.push({
+          from: String(fromNode),
+          to: String(toNode),
+          label: generateEdgeLabel(),
+          color: '#000000'
+        });
+        
+        visited.add(toNode);
+        unvisited.delete(toNode);
+      }
+
+      // 如果需要的边数少于连通所需的边数，只返回部分连通边
+      if (edgeCount < connectedEdges.length) {
+        return connectedEdges.slice(0, edgeCount);
+      }
+
+      // 添加额外的随机边
+      const edgeSet = new Set(connectedEdges.map(e => `${e.from}-${e.to}`));
+      while (newEdges.length + connectedEdges.length < edgeCount) {
+        const from = Math.floor(Math.random() * nodeCount);
+        const to = Math.floor(Math.random() * nodeCount);
+        
+        // 避免自环和重复边
+        if (from === to) continue;
+        
+        const edgeKey1 = `${from}-${to}`;
+        const edgeKey2 = `${to}-${from}`;
+        
+        if (directed) {
+          if (edgeSet.has(edgeKey1)) continue;
+          edgeSet.add(edgeKey1);
+        } else {
+          if (edgeSet.has(edgeKey1) || edgeSet.has(edgeKey2)) continue;
+          edgeSet.add(edgeKey1);
+          edgeSet.add(edgeKey2);
+        }
+        
+        newEdges.push({
+          from: String(from),
+          to: String(to),
+          label: generateEdgeLabel(),
+          color: '#000000'
+        });
+      }
+
+      return [...connectedEdges, ...newEdges];
+    } else {
+      // 生成可能非连通的随机图
+      const edgeSet = new Set();
+      
+      while (newEdges.length < edgeCount) {
+        const from = Math.floor(Math.random() * nodeCount);
+        const to = Math.floor(Math.random() * nodeCount);
+        
+        // 避免自环和重复边
+        if (from === to) continue;
+        
+        const edgeKey1 = `${from}-${to}`;
+        const edgeKey2 = `${to}-${from}`;
+        
+        if (directed) {
+          if (edgeSet.has(edgeKey1)) continue;
+          edgeSet.add(edgeKey1);
+        } else {
+          if (edgeSet.has(edgeKey1) || edgeSet.has(edgeKey2)) continue;
+          edgeSet.add(edgeKey1);
+          edgeSet.add(edgeKey2);
+        }
+        
+        newEdges.push({
+          from: String(from),
+          to: String(to),
+          label: generateEdgeLabel(),
+          color: '#000000'
+        });
+      }
+
+      return newEdges;
+    }
   };
 
   // 层次布局函数
@@ -348,108 +944,57 @@ function GraphVisualization() {
     }
     
     // 弹出选择框让用户选择根节点
-    const selectedRoot = await new Promise((resolve) => {
+    const selectedRoots = await new Promise((resolve) => {
       // 创建一个模态对话框
       const modalContainer = document.createElement('div');
-      modalContainer.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 10000;
-      `;
+      modalContainer.className = 'modal-overlay';
 
       const modal = document.createElement('div');
-      modal.style.cssText = `
-        background: white;
-        border-radius: 8px;
-        padding: 24px;
-        min-width: 300px;
-        max-width: 400px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-      `;
+      modal.className = 'modal-container';
 
       const title = document.createElement('h3');
-      title.textContent = '选择根节点 (第一层的点)';
-      title.style.cssText = `
-        margin: 0 0 16px 0;
-        color: #333;
-        font-size: 18px;
-      `;
+      title.textContent = '选择第一层节点（可多选）';
+      title.className = 'modal-title';
+
+      const instruction = document.createElement('p');
+      instruction.textContent = '点击节点可选择/取消选择，可以选择多个节点作为第一层';
+      instruction.className = 'modal-hint';
 
       const defaultInfo = document.createElement('p');
       defaultInfo.textContent = `推荐默认根节点: ${defaultRoot}`;
-      defaultInfo.style.cssText = `
-        margin: 0 0 16px 0;
-        color: #666;
-        font-size: 14px;
-      `;
+      defaultInfo.className = 'modal-hint';
 
       const nodeContainer = document.createElement('div');
-      nodeContainer.style.cssText = `
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        margin-bottom: 20px;
-        max-height: 200px;
-        overflow-y: auto;
-      `;
+      nodeContainer.className = 'node-selection-grid';
 
-      let selectedNodeId = defaultRoot;
+      const selectedNodeIds = new Set([defaultRoot]); // 使用Set存储多个选中的节点
 
       // 为每个节点创建按钮
       nodes.forEach(node => {
         const nodeButton = document.createElement('button');
         nodeButton.textContent = node.id;
-        nodeButton.style.cssText = `
-          padding: 8px 16px;
-          border: 2px solid #1976d2;
-          border-radius: 20px;
-          background: ${node.id === defaultRoot ? '#1976d2' : 'white'};
-          color: ${node.id === defaultRoot ? 'white' : '#1976d2'};
-          cursor: pointer;
-          font-size: 14px;
-          font-weight: 500;
-          transition: all 0.2s;
-        `;
+        nodeButton.className = `node-button ${node.id === defaultRoot ? 'selected' : ''}`;
 
         nodeButton.addEventListener('click', () => {
-          // 重置所有按钮样式
-          nodeContainer.querySelectorAll('button').forEach(btn => {
-            btn.style.background = 'white';
-            btn.style.color = '#1976d2';
-          });
-          // 设置当前按钮为选中状态
-          nodeButton.style.background = '#1976d2';
-          nodeButton.style.color = 'white';
-          selectedNodeId = node.id;
+          // 切换选中状态
+          if (selectedNodeIds.has(node.id)) {
+            selectedNodeIds.delete(node.id);
+            nodeButton.classList.remove('selected');
+          } else {
+            selectedNodeIds.add(node.id);
+            nodeButton.classList.add('selected');
+          }
         });
 
         nodeContainer.appendChild(nodeButton);
       });
 
       const buttonContainer = document.createElement('div');
-      buttonContainer.style.cssText = `
-        display: flex;
-        gap: 12px;
-        justify-content: flex-end;
-      `;
+      buttonContainer.className = 'modal-buttons';
 
       const cancelButton = document.createElement('button');
       cancelButton.textContent = '取消';
-      cancelButton.style.cssText = `
-        padding: 8px 16px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        background: white;
-        color: #666;
-        cursor: pointer;
-      `;
+      cancelButton.className = 'modal-button modal-button-cancel';
       cancelButton.addEventListener('click', () => {
         document.body.removeChild(modalContainer);
         resolve(null);
@@ -457,69 +1002,64 @@ function GraphVisualization() {
 
       const confirmButton = document.createElement('button');
       confirmButton.textContent = '确认';
-      confirmButton.style.cssText = `
-        padding: 8px 16px;
-        border: none;
-        border-radius: 4px;
-        background: #4caf50;
-        color: white;
-        cursor: pointer;
-        font-weight: 500;
-      `;
+      confirmButton.className = 'modal-button modal-button-success';
       confirmButton.addEventListener('click', () => {
+        if (selectedNodeIds.size === 0) {
+          alert('请至少选择一个节点作为第一层');
+          return;
+        }
         document.body.removeChild(modalContainer);
-        resolve(selectedNodeId);
+        resolve(Array.from(selectedNodeIds));
       });
 
       buttonContainer.appendChild(cancelButton);
       buttonContainer.appendChild(confirmButton);
 
       modal.appendChild(title);
+      modal.appendChild(instruction);
       modal.appendChild(defaultInfo);
       modal.appendChild(nodeContainer);
       modal.appendChild(buttonContainer);
       modalContainer.appendChild(modal);
       document.body.appendChild(modalContainer);
-
-      // 点击背景关闭
-      modalContainer.addEventListener('click', (e) => {
-        if (e.target === modalContainer) {
-          document.body.removeChild(modalContainer);
-          resolve(null);
-        }
-      });
     });
 
     // 如果用户取消了操作
-    if (selectedRoot === null) {
+    if (selectedRoots === null) {
       return;
     }
 
-    const rootId = selectedRoot;
+    const rootIds = selectedRoots;
     
-    // BFS构建层级结构
+    // BFS构建层级结构，支持多个根节点
     const levels = [];
     const visited = new Set();
-    const queue = [{ id: rootId, level: 0 }];
-    visited.add(rootId);
     
-    while (queue.length > 0) {
-      const { id, level } = queue.shift();
+    // 第一层：所有选中的根节点
+    levels[0] = [...rootIds];
+    rootIds.forEach(rootId => visited.add(rootId));
+    
+    // 从第一层开始BFS
+    let currentLevel = 0;
+    while (currentLevel < levels.length) {
+      const nextLevelNodes = [];
       
-      if (!levels[level]) {
-        levels[level] = [];
-      }
-      levels[level].push(id);
+      levels[currentLevel].forEach(nodeId => {
+        // 添加子节点到下一层
+        if (adjList[nodeId]) {
+          adjList[nodeId].forEach(childId => {
+            if (!visited.has(childId)) {
+              visited.add(childId);
+              nextLevelNodes.push(childId);
+            }
+          });
+        }
+      });
       
-      // 添加子节点到下一层
-      if (adjList[id]) {
-        adjList[id].forEach(childId => {
-          if (!visited.has(childId)) {
-            visited.add(childId);
-            queue.push({ id: childId, level: level + 1 });
-          }
-        });
+      if (nextLevelNodes.length > 0) {
+        levels[currentLevel + 1] = nextLevelNodes;
       }
+      currentLevel++;
     }
     
     // 添加未访问的节点到最后一层

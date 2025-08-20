@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import '../styles/modal.css';
 
 export default function GraphInput({
   nodes,
@@ -62,34 +63,16 @@ export default function GraphInput({
   return (
     <div className="graph-input" style={{ display: 'flex', gap: 10, alignItems: 'flex-start', width: 500, maxWidth: '100%', margin: '0 auto', position: 'relative', flexDirection: 'column' }}>
       {/* 批量输入和随机生成按钮 */}
-      <div style={{ marginBottom: 16, display: 'flex', gap: 12 }}>
+      <div className="button-group" style={{ marginBottom: 16 }}>
         <button 
           onClick={() => setShowBulkModal(true)}
-          style={{
-            padding: '10px 20px',
-            background: '#1976d2',
-            color: 'white',
-            border: 'none',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontSize: '16px',
-            fontWeight: '500'
-          }}
+          className="action-button action-button-primary"
         >
           批量输入
         </button>
         <button 
           onClick={onRandomGenerate}
-          style={{
-            padding: '10px 20px',
-            background: '#ff9800',
-            color: 'white',
-            border: 'none',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontSize: '16px',
-            fontWeight: '500'
-          }}
+          className="action-button action-button-warning"
         >
           随机生成
         </button>
@@ -98,36 +81,9 @@ export default function GraphInput({
       {/* 批量输入弹窗 */}
       {showBulkModal && (
         <div 
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            background: 'rgba(0, 0, 0, 0.5)',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            zIndex: 10000
-          }}
-          onClick={(e) => {
-            if (e.target === e.currentTarget) {
-              setShowBulkModal(false);
-            }
-          }}
+          className="modal-overlay"
         >
-          <div 
-            style={{
-              background: 'white',
-              borderRadius: '8px',
-              padding: '24px',
-              minWidth: '500px',
-              maxWidth: '600px',
-              maxHeight: '80vh',
-              overflow: 'auto',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)'
-            }}
-          >
+          <div className="modal-container">
             <div style={{ display: 'flex', flexDirection: 'row', gap: 32, marginBottom: 16 }}>
               <h2 style={{ margin: 0 }}>批量输入</h2>
               <div style={{ display: 'flex', flexDirection: 'column', fontSize: '14px', color: '#666' }}>
@@ -138,47 +94,22 @@ export default function GraphInput({
             </div>
             
             <textarea
-              style={{ 
-                width: '100%', 
-                minHeight: 200, 
-                fontFamily: 'monospace', 
-                fontSize: 15,
-                border: '1px solid #ccc',
-                borderRadius: '4px',
-                padding: '8px',
-                marginBottom: 16,
-                resize: 'vertical'
-              }}
+              className="bulk-input-textarea"
               value={bulkText}
               onChange={e => setBulkText(e.target.value)}
               placeholder={`A\nB\nC\nA B\nB C label1\n# 注释`}
             />
             
-            <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
+            <div className="modal-buttons">
               <button 
                 onClick={() => setShowBulkModal(false)}
-                style={{
-                  padding: '8px 16px',
-                  border: '1px solid #ccc',
-                  borderRadius: '4px',
-                  background: 'white',
-                  color: '#666',
-                  cursor: 'pointer'
-                }}
+                className="modal-button modal-button-cancel"
               >
                 取消
               </button>
               <button 
                 onClick={parseBulkText}
-                style={{
-                  padding: '8px 16px',
-                  border: 'none',
-                  borderRadius: '4px',
-                  background: '#4caf50',
-                  color: 'white',
-                  cursor: 'pointer',
-                  fontWeight: '500'
-                }}
+                className="modal-button modal-button-success"
               >
                 解析并应用
               </button>

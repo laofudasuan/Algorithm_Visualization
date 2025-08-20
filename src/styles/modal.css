@@ -1,0 +1,232 @@
+/* 模态弹窗样式 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+}
+
+.modal-container {
+  background: white;
+  border-radius: 8px;
+  padding: 24px;
+  min-width: 400px;
+  max-width: 500px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.modal-title {
+  margin: 0 0 20px 0;
+  color: #333;
+  font-size: 20px;
+  text-align: center;
+}
+
+.modal-section {
+  margin-bottom: 16px;
+}
+
+.modal-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #333;
+}
+
+.modal-label-inline {
+  display: inline-block;
+  margin-bottom: 0;
+  margin-right: 8px;
+  font-weight: 500;
+  color: #333;
+  vertical-align: middle;
+}
+
+.modal-checkbox-label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #333;
+  cursor: pointer;
+}
+
+.modal-checkbox-label input[type="checkbox"] {
+  margin-right: 8px;
+  width: auto;
+}
+
+.modal-input, .modal-select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.modal-input-inline {
+  width: 80px;
+  padding: 6px 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.modal-subsection {
+  padding: 8px 0;
+}
+
+.modal-select {
+  background: white;
+  cursor: pointer;
+}
+
+.modal-hint {
+  font-size: 12px;
+  color: #666;
+  margin-top: 4px;
+}
+
+.modal-radio-group {
+  display: flex;
+  gap: 16px;
+}
+
+.modal-radio-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.modal-button {
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  border: none;
+}
+
+.modal-button-cancel {
+  border: 1px solid #ccc;
+  background: white;
+  color: #666;
+}
+
+.modal-button-confirm {
+  background: #ff9800;
+  color: white;
+  font-weight: 500;
+}
+
+.modal-button-primary {
+  background: #1976d2;
+  color: white;
+  font-weight: 500;
+}
+
+.modal-button-success {
+  background: #4caf50;
+  color: white;
+  font-weight: 500;
+}
+
+/* 根节点选择弹窗特定样式 */
+.node-selection-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.node-button {
+  padding: 8px 16px;
+  border: 2px solid #1976d2;
+  border-radius: 20px;
+  background: white;
+  color: #1976d2;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.node-button.selected {
+  background: #1976d2;
+  color: white;
+}
+
+.node-button:hover {
+  background: #e3f2fd;
+}
+
+.node-button.selected:hover {
+  background: #1565c0;
+}
+
+/* 批量输入弹窗样式 */
+.bulk-input-textarea {
+  width: 100%;
+  min-height: 200px;
+  font-family: monospace;
+  font-size: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 8px;
+  margin-bottom: 16px;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+/* 按钮组样式 */
+.button-group {
+  display: flex;
+  gap: 12px;
+}
+
+.action-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.action-button-primary {
+  background: #1976d2;
+  color: white;
+}
+
+.action-button-warning {
+  background: #ff9800;
+  color: white;
+}
+
+.action-button:hover {
+  opacity: 0.9;
+}
+
+.action-button:active {
+  transform: translateY(1px);
+}
