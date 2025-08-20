@@ -9,6 +9,7 @@ import LinkedListVisualization from './pages/LinkedListVisualization';
 import PriorityQueueVisualization from './pages/PriorityQueueVisualization';
 import SegmentTreeVisualization from './pages/SegmentTreeVisualization';
 import BalancedTreeVisualization from './pages/BalancedTreeVisualization';
+import BinaryIndexedTreeVisualization from './pages/BinaryIndexedTreeVisualization';
 import './App.css';
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
           <Route path="/priorityqueue" element={<PriorityQueueVisualization />} />
           <Route path="/segmenttree" element={<SegmentTreeVisualization />} />
           <Route path="/balancedtree" element={<BalancedTreeVisualization />} />
+          <Route path="/binarytree" element={<BinaryIndexedTreeVisualization />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>

@@ -40,8 +40,8 @@ const ColorSelector = ({ value, onChange, basicColors }) => {
       {/* 颜色预览方块 */}
       <div 
         style={{ 
-          width: 24, 
-          height: 24, 
+          width: 20, 
+          height: 20, 
           backgroundColor: value, 
           border: '2px solid #ccc', 
           borderRadius: '4px', 

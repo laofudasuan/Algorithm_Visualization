@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import GraphInput from '../components/GraphInput';
 import GraphD3 from '../components/GraphD3';
 import '../styles/modal.css';
@@ -46,6 +46,10 @@ function GraphVisualization() {
   const [leftPanelCollapsed, setLeftPanelCollapsed] = useState(false);
   const [rightPanelCollapsed, setRightPanelCollapsed] = useState(false);
 
+  // 拖动调整大小相关状态
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0, width: 0, height: 0 });
+
   // Animation: highlight nodes in order
   const playAnimation = async () => {
     setordAnimating(true);
@@ -81,6 +85,57 @@ function GraphVisualization() {
       n.id === nodeId ? { ...n, fixed: !n.fixed } : n
     ));
   };
+
+  // 拖动调整大小的处理函数
+  const handleResizeMouseDown = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+    setDragStart({
+      x: e.clientX,
+      y: e.clientY,
+      width: canvasWidth,
+      height: canvasHeight
+    });
+  };
+
+  const handleResizeMouseMove = (e) => {
+    if (!isDragging) return;
+    
+    const deltaX = e.clientX - dragStart.x;
+    const deltaY = e.clientY - dragStart.y;
+    
+    const newWidth = Math.max(200, Math.min(1200, dragStart.width + deltaX));
+    const newHeight = Math.max(200, Math.min(1000, dragStart.height + deltaY));
+    
+    setCanvasWidth(newWidth);
+    setCanvasHeight(newHeight);
+  };
+
+  const handleResizeMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  // 添加全局鼠标事件监听
+  useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', handleResizeMouseMove);
+      document.addEventListener('mouseup', handleResizeMouseUp);
+      document.body.style.cursor = 'nw-resize';
+      document.body.style.userSelect = 'none';
+    } else {
+      document.removeEventListener('mousemove', handleResizeMouseMove);
+      document.removeEventListener('mouseup', handleResizeMouseUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    }
+    
+    return () => {
+      document.removeEventListener('mousemove', handleResizeMouseMove);
+      document.removeEventListener('mouseup', handleResizeMouseUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+  }, [isDragging, dragStart]);
 
   // DFS
   const playDFS = async () => {
@@ -1176,7 +1231,7 @@ function GraphVisualization() {
           )}
         </div>
         {/* 中列：图 */}
-        <div style={{ flex: '1 1 0', minWidth: 400, margin: '24px 0', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <div style={{ flex: '1 1 0', minWidth: 400, margin: '24px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative' }}>
           <GraphD3
             nodes={nodes}
             edges={edges}
@@ -1189,6 +1244,45 @@ function GraphVisualization() {
             chargeStrength={chargeStrength}
             onNodeClick={toggleNodeFixed}
           />
+          
+          {/* 右下角拖动调整大小控制 */}
+          <div 
+            style={{
+              position: 'absolute',
+              bottom: '0px',
+              right: '0px',
+              width: '20px',
+              height: '20px',
+              cursor: 'nw-resize',
+              backgroundColor: isDragging ? 'rgba(0, 123, 255, 0.3)' : 'rgba(200, 200, 200, 0.5)',
+              border: '2px solid',
+              borderColor: isDragging ? '#007bff' : '#999',
+              borderRadius: '0 0 8px 0',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: isDragging ? 'none' : 'all 0.2s'
+            }}
+            onMouseDown={handleResizeMouseDown}
+            title="拖动调整画布大小"
+          >
+            {/* 调整大小图标 */}
+            <div style={{
+              width: '12px',
+              height: '12px',
+              background: `linear-gradient(
+                45deg,
+                transparent 40%,
+                ${isDragging ? '#007bff' : '#666'} 40%,
+                ${isDragging ? '#007bff' : '#666'} 45%,
+                transparent 45%,
+                transparent 55%,
+                ${isDragging ? '#007bff' : '#666'} 55%,
+                ${isDragging ? '#007bff' : '#666'} 60%,
+                transparent 60%
+              )`
+            }} />
+          </div>
           {/* BFS队列可视化 */}
           {bfsAnimating && (
             <div style={{ marginTop: 24, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -1260,8 +1354,6 @@ function GraphVisualization() {
           {/* 基本配置 */}
           {rightTab === 'config' && (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', width: '100%' }}>
-              <label style={{ marginBottom: 8 }}>画布宽度: <input type="number" min={200} max={1200} value={canvasWidth} onChange={e => setCanvasWidth(Number(e.target.value))} style={{ width: 60 }} /></label>
-              <label style={{ marginBottom: 8 }}>画布高度: <input type="number" min={200} max={1000} value={canvasHeight} onChange={e => setCanvasHeight(Number(e.target.value))} style={{ width: 60 }} /></label>
               <label style={{ marginBottom: 8 }}>点半径: <input type="number" min={8} max={100} value={nodeRadius} onChange={e => setNodeRadius(Number(e.target.value))} style={{ width: 40 }} /></label>
               <label style={{ marginBottom: 8 }}>箭头大小: <input type="number" min={2} max={30} value={arrowSize} onChange={e => setArrowSize(Number(e.target.value))} style={{ width: 40 }} /></label>
               <label style={{ marginBottom: 8 }}>边的粗细: <input type="number" min={1} max={20} value={edgeWidth} onChange={e => setEdgeWidth(Number(e.target.value))} style={{ width: 40 }} /></label>
