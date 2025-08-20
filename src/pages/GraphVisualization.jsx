@@ -41,6 +41,10 @@ function GraphVisualization() {
   const [bfsAnimatingSpeed, setBfsAnimatingSpeed] = useState(1000);
   const [rightTab, setRightTab] = useState('config');
   const [bfsQueuefront, setBfsQueuefront] = useState(-1);
+  
+  // 折叠面板状态
+  const [leftPanelCollapsed, setLeftPanelCollapsed] = useState(false);
+  const [rightPanelCollapsed, setRightPanelCollapsed] = useState(false);
 
   // Animation: highlight nodes in order
   const playAnimation = async () => {
@@ -1118,23 +1122,58 @@ function GraphVisualization() {
 
   return (
     <div style={{ height: '100vh', minHeight: '100vh' }}>
-      <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: 32, width: '100%', minHeight: canvasHeight + 48 }}>
-        {/* 左列：输入 */}
-        <div style={{ flex: '0 0 340px', minWidth: 320, maxWidth: 400 }}>
-          <GraphInput
-            nodes={nodes}
-            setNodes={setNodes}
-            setNodeFixed={setNodeFixed}
-            edges={edges}
-            setEdges={setEdges}
-            directed={directed}
-            setDirected={setDirected}
-            getNextNodeId={getNextNodeId}
-            onRandomGenerate={randomGenerate}
-            // 新增颜色选项
-            nodeColorOptions={["#69b3a2", "#1976d2", "#ff9800", "#e91e63", "#FFB6C1", "#ffff00"]}
-            edgeColorOptions={["#000000", "#1976d2", "#ff9800", "#e91e63", "#69b3a2", "#ffff00"]}
-          />
+      <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: 16, width: '100%', minHeight: canvasHeight + 48 }}>
+        {/* 左列：可折叠的输入面板 */}
+        <div style={{ 
+          flex: leftPanelCollapsed ? '0 0 40px' : '0 0 340px', 
+          minWidth: leftPanelCollapsed ? 40 : 320, 
+          maxWidth: leftPanelCollapsed ? 40 : 400,
+          transition: 'all 0.3s ease-in-out',
+          background: '#f8f9fa',
+          borderRadius: '8px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+          overflow: 'hidden'
+        }}>
+          {/* 折叠/展开按钮 */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: leftPanelCollapsed ? 'center' : 'space-between',
+            padding: '12px 16px',
+            background: '#e3f2fd',
+            borderBottom: '1px solid #ddd',
+            cursor: 'pointer'
+          }}
+          onClick={() => setLeftPanelCollapsed(!leftPanelCollapsed)}>
+            {!leftPanelCollapsed && <span style={{ fontWeight: '600', color: '#1976d2' }}>图形输入</span>}
+            <span style={{ 
+              color: '#1976d2', 
+              fontSize: '18px',
+              transform: leftPanelCollapsed ? 'rotate(90deg)' : 'rotate(0deg)',
+              transition: 'transform 0.3s ease'
+            }}>
+              {leftPanelCollapsed ? '▶' : '◀'}
+            </span>
+          </div>
+          {/* 面板内容 */}
+          {!leftPanelCollapsed && (
+            <div style={{ padding: '16px' }}>
+              <GraphInput
+                nodes={nodes}
+                setNodes={setNodes}
+                setNodeFixed={setNodeFixed}
+                edges={edges}
+                setEdges={setEdges}
+                directed={directed}
+                setDirected={setDirected}
+                getNextNodeId={getNextNodeId}
+                onRandomGenerate={randomGenerate}
+                // 新增颜色选项
+                nodeColorOptions={["#69b3a2", "#1976d2", "#ff9800", "#e91e63", "#FFB6C1", "#ffff00"]}
+                edgeColorOptions={["#000000", "#1976d2", "#ff9800", "#e91e63", "#69b3a2", "#ffff00"]}
+              />
+            </div>
+          )}
         </div>
         {/* 中列：图 */}
         <div style={{ flex: '1 1 0', minWidth: 400, margin: '24px 0', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -1178,13 +1217,46 @@ function GraphVisualization() {
             </div>
           )}
         </div>
-        {/* 右列：配置/动画选项卡 */}
-        <div style={{ flex: '0 0 260px', minWidth: 220, maxWidth: 320, display: 'flex', flexDirection: 'column', alignItems: 'left', justifyContent: 'flex-start', gap: 10 }}>
-          {/* 选项卡切换 */}
-          <div style={{ display: 'flex', width: '100%', marginBottom: 0 }}>
-            <button onClick={() => setRightTab('config')} style={{ flex: 1, padding: 8, fontWeight: rightTab === 'config' ? 700 : 400, background: rightTab === 'config' ? '#e3f2fd' : '#f5f5f5', border: '1px solid #90caf9', borderBottom: rightTab === 'config' ? '2px solid #1976d2' : '1px solid #90caf9', color: '#1976d2', cursor: 'pointer' }}>基本配置</button>
-            <button onClick={() => setRightTab('anim')} style={{ flex: 1, padding: 8, fontWeight: rightTab === 'anim' ? 700 : 400, background: rightTab === 'anim' ? '#e3f2fd' : '#f5f5f5', border: '1px solid #90caf9', borderBottom: rightTab === 'anim' ? '2px solid #1976d2' : '1px solid #90caf9', color: '#1976d2', cursor: 'pointer' }}>播放动画</button>
+        {/* 右列：可折叠的配置/动画选项卡 */}
+        <div style={{ 
+          flex: rightPanelCollapsed ? '0 0 40px' : '0 0 260px', 
+          minWidth: rightPanelCollapsed ? 40 : 220, 
+          maxWidth: rightPanelCollapsed ? 40 : 320,
+          transition: 'all 0.3s ease-in-out',
+          background: '#f8f9fa',
+          borderRadius: '8px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+          overflow: 'hidden'
+        }}>
+          {/* 折叠/展开按钮 */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: rightPanelCollapsed ? 'center' : 'space-between',
+            padding: '12px 16px',
+            background: '#e8f5e8',
+            borderBottom: '1px solid #ddd',
+            cursor: 'pointer'
+          }}
+          onClick={() => setRightPanelCollapsed(!rightPanelCollapsed)}>
+            <span style={{ 
+              color: '#4caf50', 
+              fontSize: '18px',
+              transform: rightPanelCollapsed ? 'rotate(-90deg)' : 'rotate(0deg)',
+              transition: 'transform 0.3s ease'
+            }}>
+              {rightPanelCollapsed ? '◀' : '▶'}
+            </span>
+            {!rightPanelCollapsed && <span style={{ fontWeight: '600', color: '#4caf50' }}>配置&动画</span>}
           </div>
+          {/* 面板内容 */}
+          {!rightPanelCollapsed && (
+            <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', alignItems: 'left', justifyContent: 'flex-start', gap: 10 }}>
+              {/* 选项卡切换 */}
+              <div style={{ display: 'flex', width: '100%', marginBottom: 0 }}>
+                <button onClick={() => setRightTab('config')} style={{ flex: 1, padding: 8, fontWeight: rightTab === 'config' ? 700 : 400, background: rightTab === 'config' ? '#e3f2fd' : '#f5f5f5', border: '1px solid #90caf9', borderBottom: rightTab === 'config' ? '2px solid #1976d2' : '1px solid #90caf9', color: '#1976d2', cursor: 'pointer' }}>基本配置</button>
+                <button onClick={() => setRightTab('anim')} style={{ flex: 1, padding: 8, fontWeight: rightTab === 'anim' ? 700 : 400, background: rightTab === 'anim' ? '#e3f2fd' : '#f5f5f5', border: '1px solid #90caf9', borderBottom: rightTab === 'anim' ? '2px solid #1976d2' : '1px solid #90caf9', color: '#1976d2', cursor: 'pointer' }}>播放动画</button>
+              </div>
           {/* 基本配置 */}
           {rightTab === 'config' && (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', width: '100%' }}>
@@ -1343,6 +1415,8 @@ function GraphVisualization() {
                 </label>
               </div>
             </>
+          )}
+            </div>
           )}
         </div>
       </div>
