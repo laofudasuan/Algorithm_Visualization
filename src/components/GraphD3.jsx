@@ -12,8 +12,8 @@ export default function GraphD3({ nodes, edges, directed, width = 500, height = 
   const selfLoopLabelRef = useRef(null);
   const nodeRef = useRef(null);
 
-  // 只在结构变化时重建 simulation（不包含点fixed和label状态变化）
-  useEffect(() => {
+  // 重建图形的函数
+  const rebuildGraph = () => {
     const svg = d3.select(ref.current);
     svg.selectAll('*').remove();
     svg.attr('width', width).attr('height', height);
@@ -129,13 +129,13 @@ export default function GraphD3({ nodes, edges, directed, width = 500, height = 
 
     // Draw nodes
     const node = svg.append('g')
-      .attr('stroke', '#fff')
-      .attr('stroke-width', 1.5)
       .selectAll('circle')
       .data(nodeObjs)
       .join('circle')
       .attr('r', nodeRadius)
       .attr('fill', d => d.color || '#69b3a2')
+      .attr('stroke', d => d.fixed ? '#000' : '#fff')
+      .attr('stroke-width', d => d.fixed ? 3 : 1.5)
       .style('cursor', 'pointer')
       .style('user-select', 'none')
       .on('click', (event, d) => {
@@ -271,6 +271,12 @@ export default function GraphD3({ nodes, edges, directed, width = 500, height = 
     }
 
     return () => simulation.stop();
+  };
+
+  // 只在结构变化时重建 simulation（不包含点fixed和label状态变化）
+  useEffect(() => {
+    const cleanup = rebuildGraph();
+    return cleanup;
   }, [width, height, nodes.length, chargeStrength]); // 在画布大小、节点数量或斥力强度变化时重建图形
 
   // 专门处理节点ID、固定状态、标签和nodeRadius变化，不重建整个图形

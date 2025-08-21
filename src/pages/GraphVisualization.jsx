@@ -1026,13 +1026,15 @@ function GraphVisualization() {
       const nodeContainer = document.createElement('div');
       nodeContainer.className = 'node-selection-grid';
 
-      const selectedNodeIds = new Set([defaultRoot]); // 使用Set存储多个选中的节点
+      //const selectedNodeIds = new Set([defaultRoot]); // 使用Set存储多个选中的节点
+      const selectedNodeIds = new Set(); // 使用Set存储多个选中的节点
 
       // 为每个节点创建按钮
       nodes.forEach(node => {
         const nodeButton = document.createElement('button');
         nodeButton.textContent = node.id;
-        nodeButton.className = `node-button ${node.id === defaultRoot ? 'selected' : ''}`;
+        //nodeButton.className = `node-button ${node.id === defaultRoot ? 'selected' : ''}`;
+        nodeButton.className = `node-button ${''}`;
 
         nodeButton.addEventListener('click', () => {
           // 切换选中状态
