@@ -225,9 +225,12 @@ export default function GraphD3({ nodes, edges, directed, width = 500, height = 
             return `M${cx + loopR},${cy} A${loopR},${loopR} 0 1,1 ${cx + loopR - 0.01},${cy}`;
           });
       }
-      node
-        .attr('cx', d => limit(d.x, nodeRadius + 8, width - nodeRadius - 8))
-        .attr('cy', d => limit(d.y, nodeRadius + 8, height - nodeRadius - 8));
+      
+      if (nodeRef.current) {
+        nodeRef.current
+          .attr('cx', d => limit(d.x, nodeRadius + 8, width - nodeRadius - 8))
+          .attr('cy', d => limit(d.y, nodeRadius + 8, height - nodeRadius - 8));
+      }
       
       // 更新节点ID标签位置
       svg.selectAll('g.node-id-labels text')
