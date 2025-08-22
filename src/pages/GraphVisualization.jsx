@@ -1206,7 +1206,7 @@ function GraphVisualization() {
             <span style={{ 
               color: '#1976d2', 
               fontSize: '18px',
-              transform: leftPanelCollapsed ? 'rotate(90deg)' : 'rotate(0deg)',
+              transform: leftPanelCollapsed ? 'rotate(0deg)' : 'rotate(0deg)',
               transition: 'transform 0.3s ease'
             }}>
               {leftPanelCollapsed ? '▶' : '◀'}
@@ -1338,7 +1338,7 @@ function GraphVisualization() {
             <span style={{ 
               color: '#4caf50', 
               fontSize: '18px',
-              transform: rightPanelCollapsed ? 'rotate(-90deg)' : 'rotate(0deg)',
+              transform: rightPanelCollapsed ? 'rotate(0deg)' : 'rotate(0deg)',
               transition: 'transform 0.3s ease'
             }}>
               {rightPanelCollapsed ? '◀' : '▶'}

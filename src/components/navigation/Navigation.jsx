@@ -13,8 +13,8 @@ function Navigation() {
     maxWidth: '1200px',
     margin: '0 auto',
     display: 'flex',
+    justifyContent: 'center',
     alignItems: 'center',
-    gap: '40px',
     padding: '0 20px'
   };
 
@@ -49,10 +49,6 @@ function Navigation() {
   return (
     <nav style={navStyle}>
       <div style={containerStyle}>
-        <Link to="/" style={logoStyle}>
-          算法可视化平台
-        </Link>
-        
         <div style={navLinksStyle}>
           <Link 
             to="/graph" 
