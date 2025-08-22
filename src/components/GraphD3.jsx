@@ -1,6 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 
+function limit(val, min, max) {
+  return Math.max(min, Math.min(max, val));
+}
+
 export default function GraphD3({ nodes, edges, directed, width = 500, height = 400, nodeRadius = 20, arrowSize = 6, edgeWidth = 2, chargeStrength = -300, onNodeClick }) {
   const ref = useRef();
   const simulationRef = useRef();
@@ -197,15 +201,9 @@ export default function GraphD3({ nodes, edges, directed, width = 500, height = 
       .style('user-select', 'none')
       .text(d => d.label || '');
 
-    simulation.on('tick', () => {
-      // 使用ref中保存的边元素
-      if (linkRef.current) {
-        linkRef.current
-          .attr('x1', d => limit(d.source.x, nodeRadius + 8, width - nodeRadius - 8))
-          .attr('y1', d => limit(d.source.y, nodeRadius + 8, height - nodeRadius - 8))
-          .attr('x2', d => limit(d.target.x, nodeRadius + 8, width - nodeRadius - 8))
-          .attr('y2', d => limit(d.target.y, nodeRadius + 8, height - nodeRadius - 8));
-      }
+    // 创建一个更新自环元素的函数
+    const updateSelfLoops = () => {
+      const nodeObjs = nodeObjsRef.current;
       
       if (selfLoopRef.current) {
         selfLoopRef.current
@@ -225,6 +223,39 @@ export default function GraphD3({ nodes, edges, directed, width = 500, height = 
             return `M${cx + loopR},${cy} A${loopR},${loopR} 0 1,1 ${cx + loopR - 0.01},${cy}`;
           });
       }
+      
+      // 自环 label 位置
+      if (selfLoopLabelRef.current) {
+        selfLoopLabelRef.current
+          .attr('x', d => {
+            const n = nodeObjs.find(n => n.id === d.source.id || n.id === d.source);
+            if (!n) return 0;
+            const r = nodeRadius;
+            const x = limit(n.x, r + 8, width - r - 8);
+            return x + r * 0.7 + (r * 0.9 + 10);
+          })
+          .attr('y', d => {
+            const n = nodeObjs.find(n => n.id === d.source.id || n.id === d.source);
+            if (!n) return 0;
+            const r = nodeRadius;
+            const y = limit(n.y, r + 8, height - r - 8);
+            return y - r * 0.7 - (r * 0.9) + 10;
+          });
+      }
+    };
+
+    simulation.on('tick', () => {
+      // 使用ref中保存的边元素
+      if (linkRef.current) {
+        linkRef.current
+          .attr('x1', d => limit(d.source.x, nodeRadius + 8, width - nodeRadius - 8))
+          .attr('y1', d => limit(d.source.y, nodeRadius + 8, height - nodeRadius - 8))
+          .attr('x2', d => limit(d.target.x, nodeRadius + 8, width - nodeRadius - 8))
+          .attr('y2', d => limit(d.target.y, nodeRadius + 8, height - nodeRadius - 8));
+      }
+      
+      // 更新自环元素
+      updateSelfLoops();
       
       if (nodeRef.current) {
         nodeRef.current
@@ -248,30 +279,7 @@ export default function GraphD3({ nodes, edges, directed, width = 500, height = 
           .attr('x', d => (limit(d.source.x, nodeRadius + 8, width - nodeRadius - 8) + limit(d.target.x, nodeRadius + 8, width - nodeRadius - 8)) / 2)
           .attr('y', d => (limit(d.source.y, nodeRadius + 8, height - nodeRadius - 8) + limit(d.target.y, nodeRadius + 8, height - nodeRadius - 8)) / 2 - 6);
       }
-      
-      // 自环 label 位置
-      if (selfLoopLabelRef.current) {
-        selfLoopLabelRef.current
-          .attr('x', d => {
-            const n = nodeObjs.find(n => n.id === d.source.id || n.id === d.source);
-            if (!n) return 0;
-            const r = nodeRadius;
-            const x = limit(n.x, r + 8, width - r - 8);
-            return x + r * 0.7 + (r * 0.9 + 10);
-          })
-          .attr('y', d => {
-            const n = nodeObjs.find(n => n.id === d.source.id || n.id === d.source);
-            if (!n) return 0;
-            const r = nodeRadius;
-            const y = limit(n.y, r + 8, height - r - 8);
-            return y - r * 0.7 - (r * 0.9) + 10;
-          });
-      }
     });
-
-    function limit(val, min, max) {
-      return Math.max(min, Math.min(max, val));
-    }
 
     return () => simulation.stop();
   };
@@ -280,7 +288,196 @@ export default function GraphD3({ nodes, edges, directed, width = 500, height = 
   useEffect(() => {
     const cleanup = rebuildGraph();
     return cleanup;
-  }, [width, height, nodes.length, chargeStrength]); // 在画布大小、节点数量或斥力强度变化时重建图形
+  }, [width, height, chargeStrength]); // 移除 nodes.length，避免节点数量变化时重建图形
+
+  // 专门处理节点变化（添加、删除、ID、固定状态、标签等），使用 D3 的 join 更新
+  useEffect(() => {
+    if (simulationRef.current) {
+      const svg = d3.select(ref.current);
+      
+      // 获取当前节点对象，用于保持已存在节点的位置
+      const existingNodeMap = new Map();
+      nodeObjsRef.current.forEach(node => {
+        existingNodeMap.set(node.id, { ...node });
+      });
+      
+      // 构建新的节点对象数组
+      const newNodeObjs = nodes
+        .map((n, i) => ({ ...n, idx: i }))
+        .filter(n => n.id)
+        .map((n, i, arr) => {
+          // 如果节点已存在，保留其位置和固定状态
+          if (existingNodeMap.has(n.id)) {
+            const existingNode = existingNodeMap.get(n.id);
+            return {
+              ...n,
+              x: existingNode.x,
+              y: existingNode.y,
+              fx: n.fixed ? (n.x !== undefined ? n.x : existingNode.x) : existingNode.fx,
+              fy: n.fixed ? (n.y !== undefined ? n.y : existingNode.y) : existingNode.fy,
+              fixed: n.fixed
+            };
+          } else {
+            // 新节点，计算初始位置
+            return {
+              ...n,
+              x: n.x ?? width / 2 + (nodeRadius * 2 + 10) * Math.cos((2 * Math.PI * i) / Math.max(1, arr.length)),
+              y: n.y ?? height / 2 + (nodeRadius * 2 + 10) * Math.sin((2 * Math.PI * i) / Math.max(1, arr.length)),
+              fx: n.fixed ? n.x : null,
+              fy: n.fixed ? n.y : null
+            };
+          }
+        });
+      
+      const newNodeIdSet = new Set(newNodeObjs.map(n => n.id));
+      
+      // 更新节点对象引用
+      nodeObjsRef.current = newNodeObjs;
+      
+      // 更新力模拟中的节点数据
+      simulationRef.current.nodes(newNodeObjs);
+      
+      // 重新设置链接力的ID访问器
+      if (simulationRef.current.force('link')) {
+        simulationRef.current.force('link').id(d => d.id);
+      }
+      
+      // 更新边数据，过滤掉涉及已删除节点的边
+      const newEdgesForD3 = edges
+        .map(e => ({ source: e.from.trim(), target: e.to.trim(), label: e.label, color: e.color }))
+        .filter(e => e.source && e.target && newNodeIdSet.has(e.source) && newNodeIdSet.has(e.target));
+      
+      edgesRef.current = newEdgesForD3;
+      
+      // 更新力模拟中的边数据
+      if (simulationRef.current.force('link')) {
+        simulationRef.current.force('link').links(newEdgesForD3);
+      }
+      
+      // 更新普通边和自环边
+      const normalEdges = newEdgesForD3.filter(e => e.source !== e.target);
+      const selfEdges = newEdgesForD3.filter(e => e.source === e.target);
+      
+      // 更新普通边
+      if (linkRef.current) {
+        linkRef.current = linkRef.current
+          .data(normalEdges, d => `${d.source.id || d.source}-${d.target.id || d.target}`)
+          .join('line')
+          .attr('stroke-width', edgeWidth);
+      }
+      
+      // 更新自环边
+      if (selfLoopRef.current) {
+        selfLoopRef.current = selfLoopRef.current
+          .data(selfEdges, d => `${d.source.id || d.source}-${d.target.id || d.target}`)
+          .join('path')
+          .attr('fill', 'none')
+          .attr('stroke-width', edgeWidth);
+      }
+      
+      // 更新普通边标签
+      if (linkLabelRef.current) {
+        linkLabelRef.current = linkLabelRef.current
+          .data(normalEdges, d => `${d.source.id || d.source}-${d.target.id || d.target}`)
+          .join('text')
+          .attr('font-size', 14)
+          .attr('fill', '#333')
+          .attr('text-anchor', 'middle')
+          .style('pointer-events', 'none')
+          .style('user-select', 'none')
+          .text(d => d.label || '');
+      }
+      
+      // 更新自环标签
+      if (selfLoopLabelRef.current) {
+        selfLoopLabelRef.current = selfLoopLabelRef.current
+          .data(selfEdges, d => `${d.source.id || d.source}-${d.target.id || d.target}`)
+          .join('text')
+          .attr('font-size', 14)
+          .attr('fill', '#333')
+          .attr('text-anchor', 'middle')
+          .style('pointer-events', 'none')
+          .style('user-select', 'none')
+          .text(d => d.label || '');
+      }
+      
+      // 更新节点
+      if (nodeRef.current) {
+        nodeRef.current = nodeRef.current
+          .data(newNodeObjs, d => d.id)
+          .join('circle')
+          .attr('r', nodeRadius)
+          .attr('fill', d => d.color || '#69b3a2')
+          .attr('stroke', d => d.fixed ? '#000' : '#fff')
+          .attr('stroke-width', d => d.fixed ? 3 : 1.5)
+          .style('cursor', 'pointer')
+          .style('user-select', 'none')
+          .on('click', (event, d) => {
+            event.stopPropagation();
+            console.log('Node clicked:', d.id);
+            if (onNodeClick) {
+              onNodeClick(d.id);
+            }
+          })
+          .call(d3.drag()
+            .on('start', (event, d) => {
+              if (!event.active) simulationRef.current.alphaTarget(0.3).restart();
+              d.fx = d.x;
+              d.fy = d.y;
+            })
+            .on('drag', (event, d) => {
+              d.fx = event.x;
+              d.fy = event.y;
+            })
+            .on('end', (event, d) => {
+              if (!event.active) simulationRef.current.alphaTarget(0);
+              if (!d.fixed) {
+                d.fx = null;
+                d.fy = null;
+              }
+            })
+          );
+      }
+      
+      // 更新节点ID标签
+      svg.select('g.node-id-labels')
+        .selectAll('text')
+        .data(newNodeObjs, d => d.id)
+        .join('text')
+        .attr('text-anchor', 'middle')
+        .attr('dy', 5)
+        .attr('font-size', Math.max(12, nodeRadius))
+        .style('pointer-events', 'none')
+        .style('user-select', 'none')
+        .text(d => d.id);
+      
+      // 更新自定义标签
+      svg.select('g.node-custom-labels')
+        .selectAll('text')
+        .data(newNodeObjs, d => d.id)
+        .join('text')
+        .attr('text-anchor', 'start')
+        .attr('dx', nodeRadius + 8)
+        .attr('dy', 5)
+        .attr('font-size', Math.max(12, nodeRadius - 2))
+        .attr('fill', '#1976d2')
+        .style('pointer-events', 'none')
+        .style('user-select', 'none')
+        .text(d => d.label || '');
+      
+      // 重新应用箭头标记
+      const marker = svg.select('defs marker');
+      if (marker.size() > 0 && directed) {
+        const markerId = marker.attr('id');
+        if (linkRef.current) {
+          linkRef.current.attr('marker-end', `url(#${markerId})`);
+        }
+      }
+      
+      // 重启仿真
+      simulationRef.current.alpha(0.3).restart();
+    }
+  }, [nodes.map(n => `${n.id}`).join(',')]); // 当节点ID列表变化时触发
 
   // 专门处理节点ID、固定状态、标签和nodeRadius变化，不重建整个图形
   useEffect(() => {
