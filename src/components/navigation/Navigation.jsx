@@ -64,7 +64,7 @@ function Navigation() {
               }
             }}
           >
-            图的可视化
+            图
           </Link>
           
           <Link 
@@ -81,7 +81,7 @@ function Navigation() {
               }
             }}
           >
-            排序可视化
+            排序
           </Link>
           
           <Link 
@@ -98,7 +98,7 @@ function Navigation() {
               }
             }}
           >
-            搜索可视化
+            搜索
           </Link>
           
           <Link 
@@ -115,7 +115,7 @@ function Navigation() {
               }
             }}
           >
-            动态规划可视化
+            动态规划
           </Link>
           
           <Link 
@@ -132,7 +132,7 @@ function Navigation() {
               }
             }}
           >
-            链表可视化
+            链表
           </Link>
           
           <Link 
@@ -149,7 +149,7 @@ function Navigation() {
               }
             }}
           >
-            优先队列可视化
+            优先队列
           </Link>
           
           <Link 
@@ -166,7 +166,7 @@ function Navigation() {
               }
             }}
           >
-            线段树可视化
+            线段树
           </Link>
           
           <Link 
@@ -183,7 +183,7 @@ function Navigation() {
               }
             }}
           >
-            平衡树可视化
+            平衡树
           </Link>
         </div>
       </div>
