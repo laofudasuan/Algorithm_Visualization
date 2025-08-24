@@ -10,6 +10,8 @@ import PriorityQueueVisualization from './pages/PriorityQueueVisualization';
 import SegmentTreeVisualization from './pages/SegmentTreeVisualization';
 import BalancedTreeVisualization from './pages/BalancedTreeVisualization';
 import BinaryIndexedTreeVisualization from './pages/BinaryIndexedTreeVisualization';
+import LocalPythonEditor from './pages/LocalPythonEditor';
+import LocalJupyterNotebook from './pages/LocalJupyterNotebook';
 import QQImage from './assets/QQ.jpg';
 import './App.css';
 
@@ -100,6 +102,8 @@ function App() {
           <Route path="/segmenttree" element={<SegmentTreeVisualization />} />
           <Route path="/balancedtree" element={<BalancedTreeVisualization />} />
           <Route path="/binarytree" element={<BinaryIndexedTreeVisualization />} />
+          {/* <Route path="/local-python" element={<LocalPythonEditor />} /> */}
+          <Route path="/local-jupyter" element={<LocalJupyterNotebook />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
