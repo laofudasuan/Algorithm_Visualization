@@ -1190,7 +1190,8 @@ function GraphVisualization() {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'flex-start',
+        paddingTop: '20px'
       }}>
         <div style={{ position: 'relative' }}>
           <GraphD3
@@ -1390,7 +1391,19 @@ function GraphVisualization() {
                 <label style={{ marginBottom: 8 }}>点半径: <input type="number" min={8} max={100} value={nodeRadius} onChange={e => setNodeRadius(Number(e.target.value))} style={{ width: 40 }} /></label>
                 <label style={{ marginBottom: 8 }}>箭头大小: <input type="number" min={2} max={30} value={arrowSize} onChange={e => setArrowSize(Number(e.target.value))} style={{ width: 40 }} /></label>
                 <label style={{ marginBottom: 8 }}>边的粗细: <input type="number" min={1} max={20} value={edgeWidth} onChange={e => setEdgeWidth(Number(e.target.value))} style={{ width: 40 }} /></label>
-                <label style={{ marginBottom: 8 }}>斥力强度: <input type="number" min={-10000} max={10000} step={10} value={chargeStrength} onChange={e => setChargeStrength(Number(e.target.value))} style={{ width: 60 }} /></label>
+                <label style={{ marginBottom: 8 }}>
+                  斥力强度: 
+                  <select 
+                    value={chargeStrength} 
+                    onChange={e => setChargeStrength(Number(e.target.value))}
+                    style={{ width: 80, marginLeft: 8 }}
+                  >
+                    <option value={-3000}>特大</option>
+                    <option value={-1000}>大</option>
+                    <option value={-300}>中</option>
+                    <option value={300}>小</option>
+                  </select>
+                </label>
                 <div style={{ marginTop: 0, textAlign: 'left', width: '100%' }}>
                   <label>
                     <input
@@ -1411,7 +1424,11 @@ function GraphVisualization() {
                     有向图
                   </label>
                 </div>
-                <button onClick={arrangeNodesByLevels} style={{ marginTop: 8, padding: '6px 12px' }}>
+                <button 
+                  onClick={arrangeNodesByLevels} 
+                  className="action-button action-button-warning"
+                  style={{ marginTop: 8 }}
+                >
                   自动排列节点
                 </button>
               </div>

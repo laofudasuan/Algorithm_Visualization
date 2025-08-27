@@ -629,8 +629,31 @@ export default function GraphD3({ nodes, edges, directed, width = 500, height = 
           .join('line')
           .attr('stroke-width', edgeWidth);
 
-        // 重新应用箭头标记和大小
-        const marker = svg.select('defs marker');
+        // 更新箭头标记
+        let marker = svg.select('defs marker');
+        // 如果是 directed 模式但没有 marker，则创建一个
+        if (directed && marker.size() === 0) {
+          let markerId = `arrowhead-${Math.random().toString(36).slice(2, 10)}`;
+          svg.select('defs').remove(); // 清除旧的 defs
+          svg.append('defs').append('marker')
+            .attr('id', markerId)
+            .attr('viewBox', '0 -5 10 10')
+            .attr('refX', nodeRadius+15 - arrowSize)
+            .attr('refY', 0)
+            .attr('markerWidth', arrowSize)
+            .attr('markerHeight', arrowSize)
+            .attr('orient', 'auto')
+            .append('path')
+            .attr('d', 'M0,-5L10,0L0,5')
+            .attr('fill', '#999');
+          marker = svg.select('defs marker');
+        } 
+        // 如果不是 directed 模式但有 marker，则移除它
+        else if (!directed && marker.size() > 0) {
+          svg.select('defs').remove();
+        }
+
+        // 应用或移除箭头标记
         if (marker.size() > 0 && directed) {
           // 动态更新箭头大小
           marker
@@ -639,6 +662,8 @@ export default function GraphD3({ nodes, edges, directed, width = 500, height = 
             .attr('refX', nodeRadius+15 - arrowSize);
           const markerId = marker.attr('id');
           linkRef.current.attr('marker-end', `url(#${markerId})`);
+        } else {
+          linkRef.current.attr('marker-end', null);
         }
       }
 

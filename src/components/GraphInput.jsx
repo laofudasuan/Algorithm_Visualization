@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import '../styles/modal.css';
 
 // 颜色选择器组件
@@ -281,7 +282,7 @@ export default function GraphInput({
       <div className="button-group" style={{ marginBottom: 16 }}>
         <button 
           onClick={() => setShowBulkModal(true)}
-          className="action-button action-button-primary"
+          className="action-button action-button-warning"
         >
           批量输入
         </button>
@@ -294,14 +295,14 @@ export default function GraphInput({
       </div>
 
       {/* 批量输入弹窗 */}
-      {showBulkModal && (
+      {showBulkModal && createPortal(
         <div 
           className="modal-overlay"
         >
           <div className="modal-container">
-            <div style={{ display: 'flex', flexDirection: 'row', gap: 32, marginBottom: 16 }}>
-              <h2 style={{ margin: 0 }}>批量输入</h2>
-              <div style={{ display: 'flex', flexDirection: 'column', fontSize: '14px', color: '#666' }}>
+            <div style={{ marginBottom: 16 }}>
+              <h2 style={{ margin: 0, textAlign: 'center', color: '#333', fontSize: 18 }}>批量输入</h2>
+              <div style={{ display: 'flex', flexDirection: 'column', fontSize: '12px', color: '#666', marginTop: 6, textAlign: 'center' }}>
                 <div>每行一个点或一条边</div>
                 <div>边格式：起点 终点 [标签]</div>
                 <div>支持#注释</div>
@@ -313,6 +314,7 @@ export default function GraphInput({
               value={bulkText}
               onChange={e => setBulkText(e.target.value)}
               placeholder={`A\nB\nC\nA B\nB C label1\n# 注释`}
+              style={{ marginBottom: 16 }}
             />
             
             <div className="modal-buttons">
@@ -330,7 +332,8 @@ export default function GraphInput({
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       <div style={{ marginBottom: 0 }}>
@@ -347,7 +350,7 @@ export default function GraphInput({
         <div style={{ flex: 1, minWidth: 300, textAlign: 'left' }}>
           {nodes.map((node, idx) => (
             <div key={idx} style={{ marginBottom: 4, display: 'flex', alignItems: 'center' }}>
-              <input style={{ width: 20 }} value={node.id} onChange={e => updateNode(idx, 'id', e.target.value)} placeholder={`点${idx+1}`} />
+              <input style={{ width: 40 }} value={node.id} onChange={e => updateNode(idx, 'id', e.target.value)} placeholder={`点${idx+1}`} />
               <input style={{ width: 60, marginLeft: 8 }} value={node.label || ''} onChange={e => updateNode(idx, 'label', e.target.value)} placeholder="标签" />
               {/* 颜色选择器 - 基础颜色和色盘选项 */}
               <ColorSelector
@@ -355,15 +358,23 @@ export default function GraphInput({
                 onChange={(color) => updateNode(idx, 'color', color)}
                 basicColors={nodeColorOptions}
               />
-              <label style={{ width: 80, marginLeft: 8 }}>
-                <input
-                  type="checkbox"
-                  checked={!!node.fixed}
-                  onChange={e => setNodeFixed(idx, e.target.checked)}
-                />
-                固定
-              </label>
-              <button onClick={() => removeNode(idx)} disabled={nodes.length <= 1} style={{ marginLeft: 0, minWidth: 32, width: 32, height: 32, fontSize: 22, fontWeight: 700, lineHeight: '28px', padding: 0, borderRadius: '50%', background: '#f5f5f5', border: '1px solid #ccc', color: '#d32f2f', cursor: nodes.length <= 1 ? 'not-allowed' : 'pointer' }} title="删除">×</button>
+              <span 
+                onClick={() => setNodeFixed(idx, !node.fixed)}
+                style={{ 
+                  width: 20, 
+                  marginLeft: 8, 
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'flex-start',
+                  fontSize: '20px',
+                  userSelect: 'none'
+                }}
+                title={node.fixed ? '点击解锁' : '点击锁定'}
+              >
+                {node.fixed ? '🔒' : '🔓'}
+              </span>
+              <button onClick={() => removeNode(idx)} disabled={nodes.length <= 1} style={{ marginLeft: 12, background: 'none', border: 'none', color: '#d32f2f', fontSize: 24, fontWeight: 700, cursor: nodes.length <= 1 ? 'not-allowed' : 'pointer', padding: 0, minWidth: 'auto' }} title="删除">×</button>
             </div>
           ))}
           <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
@@ -391,9 +402,9 @@ export default function GraphInput({
         <div style={{ flex: 1, minWidth: 400, textAlign: 'left' }}>
           {edges.map((edge, idx) => (
             <div key={idx} style={{ marginBottom: 4, display: 'flex', alignItems: 'center' }}>
-              <input style={{ width: 30 }} value={edge.from} onChange={e => updateEdge(idx, 'from', e.target.value)} placeholder="起点" />
+              <input style={{ width: 40 }} value={edge.from} onChange={e => updateEdge(idx, 'from', e.target.value)} placeholder="起点" />
               <span style={{ marginLeft:-6,width:20 }}>→</span>
-              <input style={{ marginLeft:-2,width: 30 }} value={edge.to} onChange={e => updateEdge(idx, 'to', e.target.value)} placeholder="终点" />
+              <input style={{ marginLeft:-2,width: 40 }} value={edge.to} onChange={e => updateEdge(idx, 'to', e.target.value)} placeholder="终点" />
               {/* 新增 label 输入框 */}
               <input style={{ width: 50, marginLeft: 8 }} value={edge.label || ''} onChange={e => updateEdge(idx, 'label', e.target.value)} placeholder="标签" />
               {/* 颜色选择器 - 基础颜色和色盘选项 */}
@@ -402,7 +413,7 @@ export default function GraphInput({
                 onChange={(color) => updateEdge(idx, 'color', color)}
                 basicColors={edgeColorOptions}
               />
-              <button onClick={() => removeEdge(idx)} disabled={edges.length <= 1} style={{ marginLeft: 8, minWidth: 32, width: 32, height: 32, fontSize: 22, fontWeight: 700, lineHeight: '28px', padding: 0, borderRadius: '50%', background: '#f5f5f5', border: '1px solid #ccc', color: '#d32f2f', cursor: edges.length <= 1 ? 'not-allowed' : 'pointer' }} title="删除">×</button>
+              <button onClick={() => removeEdge(idx)} style={{ marginLeft: 8, background: 'none', border: 'none', color: '#d32f2f', fontSize: 22, fontWeight: 700, cursor: 'pointer', padding: 0, minWidth: 'auto' }} title="删除">×</button>
             </div>
           ))}
           <button onClick={addEdge}>添加边</button>
