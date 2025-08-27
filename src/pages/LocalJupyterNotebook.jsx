@@ -83,7 +83,7 @@ function LocalJupyterNotebook() {
   };
 
   return (
-    <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
+    <div style={{ padding: '20px', width: '100vw', maxWidth: '100vw', overflowX: 'hidden', margin: 0, marginLeft: 0 }}>
       <h1 style={{ textAlign: 'center', color: '#1976d2', marginBottom: '20px' }}>
         本地Jupyter Notebook
       </h1>

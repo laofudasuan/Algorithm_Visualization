@@ -324,10 +324,18 @@ function DynamicProgrammingVisualization() {
   };
 
   return (
-    <div style={{ height: '100vh', padding: '20px', overflowY: 'auto' }}>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20, maxWidth: '1200px', margin: '0 auto' }}>
-        <h1 style={{ margin: 0, color: '#1976d2' }}>动态规划可视化</h1>
-        
+    <div style={{ padding: '20px', minHeight: '100vh', width: '100vw', maxWidth: '100vw', overflowX: 'hidden', margin: 0, marginLeft: 0 }}>
+      <h1 style={{ textAlign: 'center', color: '#1976d2' }}>动态规划可视化</h1>
+      
+      <div style={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        alignItems: 'center', 
+        gap: '30px',
+        maxWidth: '1400px',
+        margin: '0 auto',
+        width: '100%'
+      }}>
         {/* 控制面板 */}
         <div style={{ 
           display: 'flex', 

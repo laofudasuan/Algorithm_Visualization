@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Box, Paper, Typography } from '@mui/material';
 import GraphInput from '../components/GraphInput';
 import GraphD3 from '../components/GraphD3';
 import '../styles/modal.css';
@@ -20,7 +21,7 @@ function GraphVisualization() {
     { from: '4', to: '1', label: '8', color: '#000000' },
     { from: '1', to: '1', label: '12', color: '#000000' }
   ]);
-  const [directed, setDirected] = useState(true);
+  const [directed, setDirected] = useState(false);
   const [showGraph, setShowGraph] = useState(false);
   const [animating, setAnimating] = useState(false);
   // 新增参数
@@ -943,7 +944,7 @@ function GraphVisualization() {
   };
 
   // 层次布局函数
-  const arrangeAsTree = async () => {
+  const arrangeNodesByLevels = async () => {
     if (nodes.length === 0) return;
     
     // 构建邻接表
@@ -996,9 +997,9 @@ function GraphVisualization() {
         }
       });
 
-      const LeavfNodes = nodes.filter(node => Degree[node.id] === 1);
-      if (LeavfNodes.length > 1) {
-        defaultRoot = LeavfNodes[0].id;
+      const LeafNodes = nodes.filter(node => Degree[node.id] === 1);
+      if (LeafNodes.length > 0) {
+        defaultRoot = LeafNodes[0].id;
       }
     }
     
@@ -1178,62 +1179,20 @@ function GraphVisualization() {
   };
 
   return (
-    <div style={{ height: '100vh', minHeight: '100vh' }}>
-      <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: 16, width: '100%', minHeight: canvasHeight + 48 }}>
-        {/* 左列：可折叠的输入面板 */}
-        <div style={{ 
-          flex: leftPanelCollapsed ? '0 0 40px' : '0 0 340px', 
-          minWidth: leftPanelCollapsed ? 40 : 320, 
-          maxWidth: leftPanelCollapsed ? 40 : 400,
-          transition: 'all 0.3s ease-in-out',
-          background: '#f8f9fa',
-          borderRadius: '8px',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-          overflow: 'hidden'
-        }}>
-          {/* 折叠/展开按钮 */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: leftPanelCollapsed ? 'center' : 'space-between',
-            padding: '12px 16px',
-            background: '#e3f2fd',
-            borderBottom: '1px solid #ddd',
-            cursor: 'pointer'
-          }}
-          onClick={() => setLeftPanelCollapsed(!leftPanelCollapsed)}>
-            {!leftPanelCollapsed && <span style={{ fontWeight: '600', color: '#1976d2' }}>点/边列表</span>}
-            <span style={{ 
-              color: '#1976d2', 
-              fontSize: '18px',
-              transform: leftPanelCollapsed ? 'rotate(0deg)' : 'rotate(0deg)',
-              transition: 'transform 0.3s ease'
-            }}>
-              {leftPanelCollapsed ? '▶' : '◀'}
-            </span>
-          </div>
-          {/* 面板内容 */}
-          {!leftPanelCollapsed && (
-            <div style={{ padding: '16px' }}>
-              <GraphInput
-                nodes={nodes}
-                setNodes={setNodes}
-                setNodeFixed={setNodeFixed}
-                edges={edges}
-                setEdges={setEdges}
-                directed={directed}
-                setDirected={setDirected}
-                getNextNodeId={getNextNodeId}
-                onRandomGenerate={randomGenerate}
-                // 新增颜色选项
-                nodeColorOptions={["#69b3a2", "#1976d2", "#ff9800", "#e91e63", "#FFB6C1", "#ffff00"]}
-                edgeColorOptions={["#000000", "#1976d2", "#ff9800", "#e91e63", "#69b3a2", "#ffff00"]}
-              />
-            </div>
-          )}
-        </div>
-        {/* 中列：图 */}
-        <div style={{ flex: '1 1 0', minWidth: 400, margin: '24px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative' }}>
+    <div style={{ height: '100vh', minHeight: '100vh', position: 'relative', width: '100vw', maxWidth: '100vw', overflowX: 'hidden', margin: 0, padding: 0, marginLeft: 0 }}>
+      {/* 主图区域 */}
+      <div style={{ 
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <div style={{ position: 'relative' }}>
           <GraphD3
             nodes={nodes}
             edges={edges}
@@ -1263,256 +1222,311 @@ function GraphVisualization() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              transition: isDragging ? 'none' : 'all 0.2s'
+              transition: isDragging ? 'none' : 'all 0.2s',
+              zIndex: 20 // 确保按钮在最上层
             }}
             onMouseDown={handleResizeMouseDown}
             title="拖动调整画布大小"
           >
-            {/* 调整大小图标 */}
-            <div style={{
-              width: '12px',
-              height: '12px',
-              background: `linear-gradient(
-                45deg,
-                transparent 40%,
-                ${isDragging ? '#007bff' : '#666'} 40%,
-                ${isDragging ? '#007bff' : '#666'} 45%,
-                transparent 45%,
-                transparent 55%,
-                ${isDragging ? '#007bff' : '#666'} 55%,
-                ${isDragging ? '#007bff' : '#666'} 60%,
-                transparent 60%
-              )`
-            }} />
+            {/* 调整大小图标 - 使用带箭头的图标 */}
+            <svg width="12" height="12" viewBox="0 0 12 12">
+              <path 
+                d="M 4 0 L 4 4 L 0 4 L 0 6 L 4 6 L 4 12 L 6 12 L 6 6 L 12 6 L 12 4 L 6 4 L 6 0 Z" 
+                fill={isDragging ? '#007bff' : '#666'}
+                transform="rotate(-45 6 6)"
+              />
+            </svg>
           </div>
-          {/* BFS队列可视化 */}
-          {bfsAnimating && (
-            <div style={{ marginTop: 24, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <div style={{ fontWeight: 'bold', fontSize: 22, marginBottom: 8 }}>BFS队列</div>
-              <div style={{ display: 'flex', flexDirection: 'row', gap: 12, minHeight: 48 }}>
-                {bfsQueue.length === 0 ? (
-                  <span style={{ color: '#aaa' }}>空</span>
-                ) : (
-                  bfsQueue.map((id, i) => (
-                    <div key={i} style={{ 
-                      width: 40, height: 40, 
-                      borderRadius: 20, 
-                      border: '2px solid #1976d2', 
-                      background: id == bfsQueuefront ? '#ff0' : '#fff', 
-                      color: '#1976d2', 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      justifyContent: 'center', 
-                      fontSize: 18, 
-                      fontWeight: 600 }}>
-                      {id}
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-          )}
         </div>
-        {/* 右列：可折叠的配置/动画选项卡 */}
-        <div style={{ 
-          flex: rightPanelCollapsed ? '0 0 40px' : '0 0 260px', 
-          minWidth: rightPanelCollapsed ? 40 : 220, 
-          maxWidth: rightPanelCollapsed ? 40 : 320,
-          transition: 'all 0.3s ease-in-out',
-          background: '#f8f9fa',
-          borderRadius: '8px',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-          overflow: 'hidden'
-        }}>
-          {/* 折叠/展开按钮 */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: rightPanelCollapsed ? 'center' : 'space-between',
-            padding: '12px 16px',
-            background: '#e8f5e8',
-            borderBottom: '1px solid #ddd',
-            cursor: 'pointer'
-          }}
-          onClick={() => setRightPanelCollapsed(!rightPanelCollapsed)}>
-            <span style={{ 
-              color: '#4caf50', 
-              fontSize: '18px',
-              transform: rightPanelCollapsed ? 'rotate(0deg)' : 'rotate(0deg)',
-              transition: 'transform 0.3s ease'
-            }}>
-              {rightPanelCollapsed ? '◀' : '▶'}
-            </span>
-            {!rightPanelCollapsed && <span style={{ fontWeight: '600', color: '#4caf50' }}>配置&动画</span>}
-          </div>
-          {/* 面板内容 */}
-          {!rightPanelCollapsed && (
-            <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', alignItems: 'left', justifyContent: 'flex-start', gap: 10 }}>
-              {/* 选项卡切换 */}
-              <div style={{ display: 'flex', width: '100%', marginBottom: 0 }}>
-                <button onClick={() => setRightTab('config')} style={{ flex: 1, padding: 8, fontWeight: rightTab === 'config' ? 700 : 400, background: rightTab === 'config' ? '#e3f2fd' : '#f5f5f5', border: '1px solid #90caf9', borderBottom: rightTab === 'config' ? '2px solid #1976d2' : '1px solid #90caf9', color: '#1976d2', cursor: 'pointer' }}>基本配置</button>
-                <button onClick={() => setRightTab('anim')} style={{ flex: 1, padding: 8, fontWeight: rightTab === 'anim' ? 700 : 400, background: rightTab === 'anim' ? '#e3f2fd' : '#f5f5f5', border: '1px solid #90caf9', borderBottom: rightTab === 'anim' ? '2px solid #1976d2' : '1px solid #90caf9', color: '#1976d2', cursor: 'pointer' }}>播放动画</button>
-              </div>
-          {/* 基本配置 */}
-          {rightTab === 'config' && (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', width: '100%' }}>
-              <label style={{ marginBottom: 8 }}>点半径: <input type="number" min={8} max={100} value={nodeRadius} onChange={e => setNodeRadius(Number(e.target.value))} style={{ width: 40 }} /></label>
-              <label style={{ marginBottom: 8 }}>箭头大小: <input type="number" min={2} max={30} value={arrowSize} onChange={e => setArrowSize(Number(e.target.value))} style={{ width: 40 }} /></label>
-              <label style={{ marginBottom: 8 }}>边的粗细: <input type="number" min={1} max={20} value={edgeWidth} onChange={e => setEdgeWidth(Number(e.target.value))} style={{ width: 40 }} /></label>
-              <label style={{ marginBottom: 8 }}>斥力强度: <input type="number" min={-10000} max={10000} step={10} value={chargeStrength} onChange={e => setChargeStrength(Number(e.target.value))} style={{ width: 60 }} /></label>
-              <div style={{ marginTop: 0, textAlign: 'left', width: '100%' }}>
-                <label>
-                  <input
-                    type="radio"
-                    name="graph-type"
-                    checked={directed}
-                    onChange={() => setDirected(true)}
-                  />
-                  有向图
-                </label>
-                <label style={{ marginLeft: 16 }}>
-                  <input
-                    type="radio"
-                    name="graph-type"
-                    checked={!directed}
-                    onChange={() => setDirected(false)}
-                  />
-                  无向图
-                </label>
-              </div>
-              <div style={{ marginTop: 16, width: '100%' }}>
-                <button 
-                  onClick={arrangeAsTree}
-                  style={{
-                    width: '100%',
-                    padding: '8px 12px',
-                    background: '#4caf50',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    fontSize: '14px',
-                    fontWeight: '500'
-                  }}
-                  title="将所有节点按BFS层次结构排列并固定"
-                >
-                  层次布局
-                </button>
-              </div>
-            </div>
-          )}
-          {/* 动画与DFS控制 */}
-          {rightTab === 'anim' && (
-            <>
-              {/* DFS递归栈可视化 */}
-              {dfsAnimating && (
-                <div style={{ width: '100%', marginBottom: 16 }}>
-                  <div style={{ fontWeight: 'bold', marginBottom: 8, fontSize: 28, textAlign: 'center' }}>递归栈</div>
-                  <div
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      border: '2px solid #1976d2',
-                      borderRadius: 12,
-                      padding: '12px 0',
-                      width: 60,
-                      height: 440,
-                      boxSizing: 'border-box',
-                      background: '#f9fafd',
-                      margin: '0 auto'
-                    }}
-                  >
-                    {dfsStack.length === 0 ? (
-                      <span style={{ color: '#aaa' }}>空</span>
-                    ) : (
-                      Array.from({ length: 8 }).map((_, i) => {
-                        // i=0是最上面（栈顶），i=9是最下面（栈底）
-                        const val = dfsStack[i] || null;
-                        return (
-                          <div
-                            key={i}
-                            style={{
-                              width: 40,
-                              height: 40,
-                              borderRadius: 20,
-                              border: '2px solid #1976d2',
-                              background: val ? '#1976d2' : 'transparent',
-                              color: val ? '#fff' : 'transparent',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              margin: '4px 0',
-                              fontSize: 18,
-                              transition: 'background 0.2s'
-                            }}
-                          >
-                            {val || '空'}
-                          </div>
-                        );
-                      })
-                    )}
+        {/* BFS队列可视化 */}
+        {bfsAnimating && (
+          <div style={{ 
+            position: 'absolute',
+            bottom: '40px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: '100%', 
+            display: 'flex', 
+            flexDirection: 'column', 
+            alignItems: 'center' 
+          }}>
+            <div style={{ fontWeight: 'bold', fontSize: 22, marginBottom: 8 }}>BFS队列</div>
+            <div style={{ display: 'flex', flexDirection: 'row', gap: 12, minHeight: 48 }}>
+              {bfsQueue.length === 0 ? (
+                <span style={{ color: '#aaa' }}>空</span>
+              ) : (
+                bfsQueue.map((id, i) => (
+                  <div key={i} style={{ 
+                    width: 40, height: 40, 
+                    borderRadius: 20, 
+                    border: '2px solid #1976d2', 
+                    background: id == bfsQueuefront ? '#ff0' : '#fff', 
+                    color: '#1976d2', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center', 
+                    fontSize: 18, 
+                    fontWeight: 600 }}>
+                    {id}
                   </div>
-                </div>
+                ))
               )}
-              {/* 动画按钮和DFS/BFS控制 */}
-              <button onClick={playAnimation} disabled={animating} style={{marginTop: 0}}>
-                {ordAnimating ? '播放中...' : '播放点亮动画'}
-              </button>
-              <div style={{ marginTop: 0, width: '100%' }}>
-                <label>DFS起点: </label>
-                <select value={dfsStart} onChange={e => setDfsStart(e.target.value)} disabled={dfsAnimating || animating}>
-                  {nodes.map(n => (
-                    <option key={n.id} value={n.id}>{n.id}</option>
-                  ))}
-                </select>
-                <button onClick={playDFS} disabled={dfsAnimating || animating || !dfsStart} style={{ marginLeft: 8 }}>
-                  {dfsAnimating ? 'DFS中...' : '播放DFS'}
-                </button>
-                <label style={{ marginLeft: 12 }}>
-                  每步播放时长（秒）:
-                  <input
-                    type="number"
-                    min={0.1}
-                    max={10}
-                    step={0.1}
-                    value={dfsAnimatingSpeed / 1000}
-                    onChange={e => setDfsAnimatingSpeed(Number(e.target.value) * 1000)}
-                    disabled={dfsAnimating || animating}
-                    style={{ width: 50, marginLeft: 4 }}
-                  />
-                </label>
-              </div>
-              {/* BFS控制区 */}
-              <div style={{ marginTop: 16, width: '100%' }}>
-                <label>BFS起点: </label>
-                <select value={bfsStart} onChange={e => setBfsStart(e.target.value)} disabled={bfsAnimating || animating}>
-                  {nodes.map(n => (
-                    <option key={n.id} value={n.id}>{n.id}</option>
-                  ))}
-                </select>
-                <button onClick={playBFS} disabled={bfsAnimating || animating || !bfsStart} style={{ marginLeft: 8 }}>
-                  {bfsAnimating ? 'BFS中...' : '播放BFS'}
-                </button>
-                <label style={{ marginLeft: 12 }}>
-                  每步播放时长（秒）:
-                  <input
-                    type="number"
-                    min={0.1}
-                    max={10}
-                    step={0.1}
-                    value={bfsAnimatingSpeed / 1000}
-                    onChange={e => setBfsAnimatingSpeed(Number(e.target.value) * 1000)}
-                    disabled={bfsAnimating || animating}
-                    style={{ width: 50, marginLeft: 4 }}
-                  />
-                </label>
-              </div>
-            </>
-          )}
             </div>
-          )}
+          </div>
+        )}
+      </div>
+      
+      {/* 左侧面板：点/边列表 */}
+      <div style={{ 
+        position: 'absolute',
+        top: '20px',
+        width: leftPanelCollapsed ? '40px' : '340px',
+        maxHeight: 'calc(100vh - 40px)',
+        background: '#f8f9fa',
+        borderRadius: '8px',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+        overflow: 'hidden',
+        zIndex: 10,
+        transition: 'width 0.3s ease-in-out'
+      }}>
+        {/* 折叠/展开按钮 */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: leftPanelCollapsed ? 'center' : 'space-between',
+          padding: '12px 16px',
+          background: '#e3f2fd',
+          borderBottom: '1px solid #ddd',
+          cursor: 'pointer'
+        }}
+        onClick={() => setLeftPanelCollapsed(!leftPanelCollapsed)}>
+          {!leftPanelCollapsed && <span style={{ fontWeight: '600', color: '#1976d2' }}>点/边列表</span>}
+          <span style={{ 
+            color: '#1976d2', 
+            fontSize: '18px',
+            transform: leftPanelCollapsed ? 'rotate(0deg)' : 'rotate(0deg)',
+            transition: 'transform 0.3s ease'
+          }}>
+            {leftPanelCollapsed ? '▶' : '◀'}
+          </span>
         </div>
+        {/* 面板内容 */}
+        {!leftPanelCollapsed && (
+          <div style={{ padding: '16px', overflowY: 'auto', maxHeight: 'calc(100vh - 100px)' }}>
+            <GraphInput
+              nodes={nodes}
+              setNodes={setNodes}
+              setNodeFixed={setNodeFixed}
+              edges={edges}
+              setEdges={setEdges}
+              directed={directed}
+              setDirected={setDirected}
+              getNextNodeId={getNextNodeId}
+              onRandomGenerate={randomGenerate}
+              // 新增颜色选项
+              nodeColorOptions={["#69b3a2", "#1976d2", "#ff9800", "#e91e63", "#FFB6C1", "#ffff00"]}
+              edgeColorOptions={["#000000", "#1976d2", "#ff9800", "#e91e63", "#69b3a2", "#ffff00"]}
+            />
+          </div>
+        )}
+      </div>
+      
+      {/* 右侧面板：配置&动画 */}
+      <div style={{ 
+        position: 'absolute',
+        top: '20px',
+        right: '120px',
+        width: rightPanelCollapsed ? '40px' : '260px',
+        maxHeight: 'calc(100vh - 40px)',
+        background: '#f8f9fa',
+        borderRadius: '8px',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+        overflow: 'hidden',
+        zIndex: 10,
+        transition: 'width 0.3s ease-in-out'
+      }}>
+        {/* 折叠/展开按钮 */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: rightPanelCollapsed ? 'center' : 'space-between',
+          padding: '12px 16px',
+          background: '#e8f5e8',
+          borderBottom: '1px solid #ddd',
+          cursor: 'pointer'
+        }}
+        onClick={() => setRightPanelCollapsed(!rightPanelCollapsed)}>
+          <span style={{ 
+            color: '#4caf50', 
+            fontSize: '18px',
+            transform: rightPanelCollapsed ? 'rotate(0deg)' : 'rotate(0deg)',
+            transition: 'transform 0.3s ease'
+          }}>
+            {rightPanelCollapsed ? '◀' : '▶'}
+          </span>
+          {!rightPanelCollapsed && <span style={{ fontWeight: '600', color: '#4caf50' }}>配置&动画</span>}
+        </div>
+        {/* 面板内容 */}
+        {!rightPanelCollapsed && (
+          <div style={{ 
+            padding: '16px', 
+            display: 'flex', 
+            flexDirection: 'column', 
+            alignItems: 'left', 
+            justifyContent: 'flex-start', 
+            gap: 10,
+            overflowY: 'auto',
+            maxHeight: 'calc(100vh - 100px)'
+          }}>
+            {/* 选项卡切换 */}
+            <div style={{ display: 'flex', width: '100%', marginBottom: 0 }}>
+              <button onClick={() => setRightTab('config')} style={{ flex: 1, padding: 8, fontWeight: rightTab === 'config' ? 700 : 400, background: rightTab === 'config' ? '#e3f2fd' : '#f5f5f5', border: '1px solid #90caf9', borderBottom: rightTab === 'config' ? '2px solid #1976d2' : '1px solid #90caf9', color: '#1976d2', cursor: 'pointer' }}>基本配置</button>
+              <button onClick={() => setRightTab('anim')} style={{ flex: 1, padding: 8, fontWeight: rightTab === 'anim' ? 700 : 400, background: rightTab === 'anim' ? '#e3f2fd' : '#f5f5f5', border: '1px solid #90caf9', borderBottom: rightTab === 'anim' ? '2px solid #1976d2' : '1px solid #90caf9', color: '#1976d2', cursor: 'pointer' }}>播放动画</button>
+            </div>
+            
+            {/* 基本配置 */}
+            {rightTab === 'config' && (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', width: '100%' }}>
+                <label style={{ marginBottom: 8 }}>点半径: <input type="number" min={8} max={100} value={nodeRadius} onChange={e => setNodeRadius(Number(e.target.value))} style={{ width: 40 }} /></label>
+                <label style={{ marginBottom: 8 }}>箭头大小: <input type="number" min={2} max={30} value={arrowSize} onChange={e => setArrowSize(Number(e.target.value))} style={{ width: 40 }} /></label>
+                <label style={{ marginBottom: 8 }}>边的粗细: <input type="number" min={1} max={20} value={edgeWidth} onChange={e => setEdgeWidth(Number(e.target.value))} style={{ width: 40 }} /></label>
+                <label style={{ marginBottom: 8 }}>斥力强度: <input type="number" min={-10000} max={10000} step={10} value={chargeStrength} onChange={e => setChargeStrength(Number(e.target.value))} style={{ width: 60 }} /></label>
+                <div style={{ marginTop: 0, textAlign: 'left', width: '100%' }}>
+                  <label>
+                    <input
+                      type="radio"
+                      name="graphType"
+                      checked={!directed}
+                      onChange={() => setDirected(false)}
+                    />
+                    无向图
+                  </label>
+                  <label style={{ marginLeft: 16 }}>
+                    <input
+                      type="radio"
+                      name="graphType"
+                      checked={directed}
+                      onChange={() => setDirected(true)}
+                    />
+                    有向图
+                  </label>
+                </div>
+                <button onClick={arrangeNodesByLevels} style={{ marginTop: 8, padding: '6px 12px' }}>
+                  自动排列节点
+                </button>
+              </div>
+            )}
+            
+            {/* 动画播放 */}
+            {rightTab === 'anim' && (
+              <>
+                {/* DFS可视化 */}
+                {dfsAnimating && (
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+                    <div style={{ fontWeight: 'bold', marginBottom: 8 }}>DFS栈</div>
+                    <div
+                      style={{
+                        border: '2px solid #1976d2',
+                        borderRadius: 12,
+                        padding: '12px 0',
+                        width: 60,
+                        height: 440,
+                        boxSizing: 'border-box',
+                        background: '#f9fafd',
+                        margin: '0 auto'
+                      }}
+                    >
+                      {dfsStack.length === 0 ? (
+                        <span style={{ color: '#aaa' }}>空</span>
+                      ) : (
+                        Array.from({ length: 8 }).map((_, i) => {
+                          // i=0是最上面（栈顶），i=9是最下面（栈底）
+                          const val = dfsStack[i] || null;
+                          return (
+                            <div
+                              key={i}
+                              style={{
+                                width: 40,
+                                height: 40,
+                                borderRadius: 20,
+                                border: '2px solid #1976d2',
+                                background: val ? '#1976d2' : 'transparent',
+                                color: val ? '#fff' : 'transparent',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                margin: '4px 0',
+                                fontSize: 18,
+                                transition: 'background 0.2s'
+                              }}
+                            >
+                              {val || '空'}
+                            </div>
+                          );
+                        })
+                      )}
+                    </div>
+                  </div>
+                )}
+                
+                {/* 动画按钮和DFS/BFS控制 */}
+                <button onClick={playAnimation} disabled={animating} style={{marginTop: 0}}>
+                  {ordAnimating ? '播放中...' : '播放点亮动画'}
+                </button>
+                <div style={{ marginTop: 0, width: '100%' }}>
+                  <label>DFS起点: </label>
+                  <select value={dfsStart} onChange={e => setDfsStart(e.target.value)} disabled={dfsAnimating || animating}>
+                    {nodes.map(n => (
+                      <option key={n.id} value={n.id}>{n.id}</option>
+                    ))}
+                  </select>
+                  <button onClick={playDFS} disabled={dfsAnimating || animating || !dfsStart} style={{ marginLeft: 8 }}>
+                    {dfsAnimating ? 'DFS中...' : '播放DFS'}
+                  </button>
+                  <label style={{ marginLeft: 12 }}>
+                    每步播放时长（秒）:
+                    <input
+                      type="number"
+                      min={0.1}
+                      max={10}
+                      step={0.1}
+                      value={dfsAnimatingSpeed / 1000}
+                      onChange={e => setDfsAnimatingSpeed(Number(e.target.value) * 1000)}
+                      disabled={dfsAnimating || animating}
+                      style={{ width: 50, marginLeft: 4 }}
+                    />
+                  </label>
+                </div>
+                
+                {/* BFS控制区 */}
+                <div style={{ marginTop: 16, width: '100%' }}>
+                  <label>BFS起点: </label>
+                  <select value={bfsStart} onChange={e => setBfsStart(e.target.value)} disabled={bfsAnimating || animating}>
+                    {nodes.map(n => (
+                      <option key={n.id} value={n.id}>{n.id}</option>
+                    ))}
+                  </select>
+                  <button onClick={playBFS} disabled={bfsAnimating || animating || !bfsStart} style={{ marginLeft: 8 }}>
+                    {bfsAnimating ? 'BFS中...' : '播放BFS'}
+                  </button>
+                  <label style={{ marginLeft: 12 }}>
+                    每步播放时长（秒）:
+                    <input
+                      type="number"
+                      min={0.1}
+                      max={10}
+                      step={0.1}
+                      value={bfsAnimatingSpeed / 1000}
+                      onChange={e => setBfsAnimatingSpeed(Number(e.target.value) * 1000)}
+                      disabled={bfsAnimating || animating}
+                      style={{ width: 50, marginLeft: 4 }}
+                    />
+                  </label>
+                </div>
+              </>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

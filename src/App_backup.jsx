@@ -20,7 +20,7 @@ function App() {
     { from: '4', to: '1', label: '8', color: '#000000' },
     { from: '1', to: '1', label: '12', color: '#000000' }
   ]);
-  const [directed, setDirected] = useState(true);
+  const [directed, setDirected] = useState(false);
   const [showGraph, setShowGraph] = useState(false);
   const [animating, setAnimating] = useState(false);
   // 新增参数

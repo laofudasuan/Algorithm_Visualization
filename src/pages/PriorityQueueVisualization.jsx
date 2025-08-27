@@ -239,8 +239,8 @@ function PriorityQueueVisualization() {
   };
   
   return (
-    <div style={{ height: '100vh', padding: '20px', overflowY: 'auto' }}>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20, maxWidth: '1200px', margin: '0 auto' }}>
+    <div style={{ height: '100vh', padding: '20px', overflowY: 'auto', width: '100vw', maxWidth: '100vw', overflowX: 'hidden', margin: 0, marginLeft: 0 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20, maxWidth: '100%', margin: '0 auto', width: '100%' }}>
         <h1 style={{ margin: 0, color: '#1976d2' }}>优先队列可视化</h1>
         <div style={{ textAlign: 'center', color: '#666', fontSize: '16px' }}>
           当前堆类型: <strong style={{ color: '#1976d2' }}>{heapType === 'max' ? '最大堆' : '最小堆'}</strong>
@@ -251,7 +251,7 @@ function PriorityQueueVisualization() {
             </>
           )}
         </div>
-        
+
         {/* 控制面板 */}
         <div style={{ 
           display: 'flex', 
@@ -261,7 +261,8 @@ function PriorityQueueVisualization() {
           border: '1px solid #ddd', 
           borderRadius: 8, 
           backgroundColor: '#f9f9f9',
-          width: '100%'
+          width: '100%',
+          maxWidth: '100%'
         }}>
           {/* 动画速度控制 */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 16, justifyContent: 'center' }}>

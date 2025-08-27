@@ -366,19 +366,19 @@ function SearchVisualization() {
   }, []);
 
   return (
-    <div style={{ padding: '20px', maxWidth: '1400px', margin: '0 auto' }}>
+    <div style={{ padding: '20px 0 20px 0', width: '100vw', margin: '0 auto', maxWidth: '100vw', overflowX: 'hidden', marginLeft: 0, marginRight: 0 }}>
       <h1 style={{ textAlign: 'center', marginBottom: '30px', color: '#1976d2' }}>路径搜索可视化</h1>
       
       {/* 控制面板 */}
       <div style={{ 
         display: 'flex', 
+        justifyContent: 'center', 
         gap: '20px', 
-        marginBottom: '20px', 
-        padding: '20px', 
-        backgroundColor: '#f5f5f5', 
-        borderRadius: '8px',
+        marginBottom: '30px',
         flexWrap: 'wrap',
-        alignItems: 'center'
+        padding: '20px',
+        backgroundColor: '#f8f9fa',
+        borderRadius: '8px'
       }}>
         <div>
           <label style={{ marginRight: '10px', fontWeight: 'bold' }}>算法:</label>

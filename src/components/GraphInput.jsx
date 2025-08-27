@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import '../styles/modal.css';
 
 // 颜色选择器组件
@@ -7,6 +7,7 @@ const ColorSelector = ({ value, onChange, basicColors }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
   const [tempColor, setTempColor] = useState(value); // 临时颜色，用于色盘模式
+  const colorSelectorRef = useRef(null);
 
   const handleColorSelect = (color) => {
     onChange(color);
@@ -27,16 +28,33 @@ const ColorSelector = ({ value, onChange, basicColors }) => {
     if (!showDropdown) {
       const rect = event.currentTarget.getBoundingClientRect();
       setDropdownPosition({
-        top: rect.bottom + window.scrollY + 4,
-        left: rect.left + window.scrollX
+        top: rect.bottom + 4,
+        left: rect.left
       });
       setTempColor(value); // 初始化临时颜色
     }
     setShowDropdown(!showDropdown);
   };
 
+  // 点击外部关闭下拉菜单
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (colorSelectorRef.current && !colorSelectorRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    };
+
+    if (showDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showDropdown]);
+
   return (
-    <div style={{ marginLeft: 8, position: 'relative' }}>
+    <div ref={colorSelectorRef} style={{ marginLeft: 8, position: 'relative' }}>
       {/* 颜色预览方块 */}
       <div 
         style={{ 

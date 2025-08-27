@@ -425,12 +425,20 @@ const BinaryIndexedTreeVisualization = () => {
   };
 
   return (
-    <div style={{ padding: '20px', backgroundColor: '#f5f5f5', minHeight: '100vh' }}>
+    <div style={{ padding: '20px', backgroundColor: '#f5f5f5', minHeight: '100vh', width: '100vw', maxWidth: '100vw', overflowX: 'hidden', margin: 0, marginLeft: 0 }}>
       <h1 style={{ textAlign: 'center', color: '#333', marginBottom: '30px' }}>
         树状数组 (Binary Indexed Tree) 可视化
       </h1>
       
-      <div style={{ display: 'flex', gap: '20px' }}>
+      <div style={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        alignItems: 'center', 
+        gap: '30px',
+        maxWidth: '1400px',
+        margin: '0 auto',
+        width: '100%'
+      }}>
         {/* 左侧控制面板 */}
         <div style={{ flex: '0 0 300px' }}>
           <div style={cardStyle}>

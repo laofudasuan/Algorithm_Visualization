@@ -250,8 +250,8 @@ function SegmentTreeVisualization() {
   };
 
   return (
-    <div style={{ height: '100vh', padding: '20px', overflowY: 'auto' }}>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20, maxWidth: '1200px', margin: '0 auto' }}>
+    <div style={{ height: '100vh', padding: '20px', overflowY: 'auto', width: '100vw', maxWidth: '100vw', overflowX: 'hidden', margin: 0, marginLeft: 0 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20, maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
         <h1 style={{ margin: 0, color: '#1976d2' }}>线段树可视化</h1>
         
         <div style={{ textAlign: 'center', color: '#666', fontSize: '16px' }}>

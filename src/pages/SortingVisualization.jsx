@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-function AlgorithmVisualization() {
+function SortingVisualization() {
   const [selectedAlgorithm, setSelectedAlgorithm] = useState('bubble-sort');
   const [array, setArray] = useState([64, 34, 25, 12, 22, 11, 90]);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -160,8 +160,8 @@ function AlgorithmVisualization() {
   };
 
   return (
-    <div style={{ height: '100vh', padding: '20px' }}>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20 }}>
+    <div style={{ height: '100vh', padding: '20px', width: '100vw', maxWidth: '100vw', overflowX: 'hidden', margin: 0, marginLeft: 0 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20, width: '100%' }}>
         <h1 style={{ margin: 0, color: '#1976d2' }}>排序可视化</h1>
         
         {/* 控制面板 */}
@@ -169,11 +169,12 @@ function AlgorithmVisualization() {
           display: 'flex', 
           flexWrap: 'wrap', 
           gap: 16, 
-          alignItems: 'center', 
-          padding: 20, 
-          border: '1px solid #ddd', 
-          borderRadius: 8, 
-          background: '#f9f9f9' 
+          justifyContent: 'center',
+          padding: '20px',
+          backgroundColor: '#f5f5f5',
+          borderRadius: '8px',
+          width: '100%',
+          maxWidth: '1200px'
         }}>
           <div>
             <label style={{ marginRight: 8 }}>选择算法:</label>
@@ -360,4 +361,4 @@ function AlgorithmVisualization() {
   );
 }
 
-export default AlgorithmVisualization;
+export default SortingVisualization;
