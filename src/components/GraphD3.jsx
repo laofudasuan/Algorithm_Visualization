@@ -509,9 +509,8 @@ export default function GraphD3({ nodes, edges, directed, width = 500, height = 
             
             // 如果节点变为固定状态，设置固定位置
             if (nodes[i].fixed) {
-              // 从非固定变为固定，使用节点的最新坐标作为固定位置
-              nodeObj.fx = nodeObj.x;
-              nodeObj.fy = nodeObj.y;
+              nodeObj.fx = nodes[i].fx !== undefined ? nodes[i].fx : nodeObj.x;
+              nodeObj.fy = nodes[i].fy !== undefined ? nodes[i].fy : nodeObj.y;
             } else {
               // 如果节点变为非固定状态，清除固定位置
               nodeObj.fx = null;
@@ -554,9 +553,9 @@ export default function GraphD3({ nodes, edges, directed, width = 500, height = 
             
             // 更新固定状态
             if (currentNode.fixed && !nodeObj.fixed) {
-              // 从非固定变为固定，使用节点的最新坐标作为固定位置
-              nodeObj.fx = nodeObj.x;
-              nodeObj.fy = nodeObj.y;
+              // 从非固定变为固定
+              nodeObj.fx = currentNode.fx !== undefined ? currentNode.fx : nodeObj.x;
+              nodeObj.fy = currentNode.fy !== undefined ? currentNode.fy : nodeObj.y;
               nodeObj.fixed = true;
             } else if (!currentNode.fixed && nodeObj.fixed) {
               // 从固定变为非固定
