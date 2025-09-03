@@ -98,9 +98,12 @@ function Home() {
         </Typography>
       </Box>
 
-      <Grid container spacing={4}>
+      <Grid container spacing={4} justifyContent="center">
         {modules.map((module, index) => (
-          <Grid item xs={12} sm={6} md={4} key={index}>
+          <Grid item key={index} sx={{ 
+            width: 350,
+            display: 'flex'
+          }}>
             <Card 
               sx={{ 
                 height: '100%',
@@ -110,7 +113,8 @@ function Home() {
                 '&:hover': {
                   transform: 'translateY(-8px)',
                   boxShadow: '0 12px 30px rgba(0, 0, 0, 0.15)'
-                }
+                },
+                width: '100%'
               }}
             >
               <CardContent sx={{ 
@@ -130,7 +134,9 @@ function Home() {
                 <Typography variant="h6" component="h2" gutterBottom sx={{ fontWeight: 600 }}>
                   {module.title}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" color="text.secondary" sx={{ 
+                  wordWrap: 'break-word'
+                }}>
                   {module.description}
                 </Typography>
               </CardContent>

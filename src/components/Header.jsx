@@ -1,5 +1,6 @@
-import { AppBar, Toolbar, Typography, IconButton, Tooltip } from '@mui/material';
+import { AppBar, Toolbar, Typography, IconButton, Tooltip, Box } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
+import QQImage from '../assets/QQ.jpg'; // 导入QQ图片
 
 function Header() {
   return (
@@ -27,6 +28,36 @@ function Header() {
         >
           算法可视化平台
         </Typography>
+        
+        <Box sx={{ 
+          position: 'absolute', 
+          left: '50%', 
+          transform: 'translateX(-50%)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          textAlign: 'center'
+        }}>
+          <Typography 
+            variant="body1" 
+            component="div" 
+            sx={{ 
+              color: 'white',
+              mr: 1
+            }}
+          >
+            <p>本平台目前正在内侧阶段，由老虎大蒜(laofudasuan)开发中</p>
+            <p> 有任何疑问欢迎加入QQ群：251998253</p>
+          </Typography>
+          <img 
+            src={QQImage} 
+            alt="QQ群" 
+            style={{ 
+              height: '60px',
+              borderRadius: '4px'
+            }} 
+          />
+        </Box>
         
       </Toolbar>
     </AppBar>

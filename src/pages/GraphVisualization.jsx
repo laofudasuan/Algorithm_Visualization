@@ -30,7 +30,7 @@ function GraphVisualization() {
   const [nodeRadius, setNodeRadius] = useState(20);
   const [arrowSize, setArrowSize] = useState(5);
   const [edgeWidth, setEdgeWidth] = useState(2);
-  const [chargeStrength, setChargeStrength] = useState(-300);
+  const [chargeStrength, setChargeStrength] = useState(-100);
   const [ordAnimating, setordAnimating] = useState(false);
   const [dfsStart, setDfsStart] = useState(nodes[0]?.id || '');
   const [dfsAnimating, setDfsAnimating] = useState(false);
@@ -1224,7 +1224,7 @@ function GraphVisualization() {
               alignItems: 'center',
               justifyContent: 'center',
               transition: isDragging ? 'none' : 'all 0.2s',
-              zIndex: 20 // 确保按钮在最上层
+              zIndex: 5 // 降低按钮的显示优先级
             }}
             onMouseDown={handleResizeMouseDown}
             title="拖动调整画布大小"
@@ -1242,14 +1242,18 @@ function GraphVisualization() {
         {/* BFS队列可视化 */}
         {bfsAnimating && (
           <div style={{ 
-            position: 'absolute',
-            bottom: '40px',
+            position: 'fixed',
+            bottom: '20px',
             left: '50%',
             transform: 'translateX(-50%)',
             width: '100%', 
             display: 'flex', 
             flexDirection: 'column', 
-            alignItems: 'center' 
+            alignItems: 'center',
+            zIndex: 10,
+            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+            padding: '10px 0',
+            boxShadow: '0 -2px 10px rgba(0, 0, 0, 0.1)'
           }}>
             <div style={{ fontWeight: 'bold', fontSize: 22, marginBottom: 8 }}>BFS队列</div>
             <div style={{ display: 'flex', flexDirection: 'row', gap: 12, minHeight: 48 }}>
@@ -1398,10 +1402,11 @@ function GraphVisualization() {
                     onChange={e => setChargeStrength(Number(e.target.value))}
                     style={{ width: 80, marginLeft: 8 }}
                   >
-                    <option value={-3000}>特大</option>
-                    <option value={-1000}>大</option>
-                    <option value={-300}>中</option>
                     <option value={300}>小</option>
+                    <option value={-100}>中</option>
+                    <option value={-300}>大</option>
+                    <option value={-1000}>特大</option>
+                    <option value={-3000}>特大+</option>
                   </select>
                 </label>
                 <div style={{ marginTop: 0, textAlign: 'left', width: '100%' }}>
@@ -1439,48 +1444,45 @@ function GraphVisualization() {
               <>
                 {/* DFS可视化 */}
                 {dfsAnimating && (
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
-                    <div style={{ fontWeight: 'bold', marginBottom: 8 }}>DFS栈</div>
-                    <div
-                      style={{
-                        border: '2px solid #1976d2',
-                        borderRadius: 12,
-                        padding: '12px 0',
-                        width: 60,
-                        height: 440,
-                        boxSizing: 'border-box',
-                        background: '#f9fafd',
-                        margin: '0 auto'
-                      }}
-                    >
+                  <div style={{ 
+                    position: 'fixed',
+                    bottom: '20px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    width: '100%', 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    alignItems: 'center',
+                    zIndex: 10,
+                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                    padding: '10px 0',
+                    boxShadow: '0 -2px 10px rgba(0, 0, 0, 0.1)'
+                  }}>
+                    <div style={{ fontWeight: 'bold', fontSize: 22, marginBottom: 8 }}>DFS栈</div>
+                    <div style={{ display: 'flex', flexDirection: 'row', gap: 12, minHeight: 48 }}>
                       {dfsStack.length === 0 ? (
                         <span style={{ color: '#aaa' }}>空</span>
                       ) : (
-                        Array.from({ length: 8 }).map((_, i) => {
-                          // i=0是最上面（栈顶），i=9是最下面（栈底）
-                          const val = dfsStack[i] || null;
-                          return (
-                            <div
-                              key={i}
-                              style={{
-                                width: 40,
-                                height: 40,
-                                borderRadius: 20,
-                                border: '2px solid #1976d2',
-                                background: val ? '#1976d2' : 'transparent',
-                                color: val ? '#fff' : 'transparent',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                margin: '4px 0',
-                                fontSize: 18,
-                                transition: 'background 0.2s'
-                              }}
-                            >
-                              {val || '空'}
-                            </div>
-                          );
-                        })
+                        dfsStack.map((val, i) => (
+                          <div
+                            key={i}
+                            style={{
+                              width: 40,
+                              height: 40,
+                              borderRadius: 20,
+                              border: '2px solid #1976d2',
+                              background: val ? '#1976d2' : 'transparent',
+                              color: val ? '#fff' : 'transparent',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontSize: 18,
+                              fontWeight: 600
+                            }}
+                          >
+                            {val || '空'}
+                          </div>
+                        ))
                       )}
                     </div>
                   </div>
