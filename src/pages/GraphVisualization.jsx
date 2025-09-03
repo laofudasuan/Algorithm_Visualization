@@ -253,7 +253,11 @@ function GraphVisualization() {
     while (used.has(i)) i++;
     return String(i);
   };
-
+  
+  const clearGraph = () => {
+    setNodes([]);
+    setEdges([]);
+  };
   // 随机生成图
   const randomGenerate = async () => {
     // 创建统一配置弹窗
@@ -689,6 +693,8 @@ function GraphVisualization() {
 
     // 如果用户取消了操作
     if (config === null) return;
+
+    clearGraph();
 
     const { nodeCount, graphType } = config;
 
@@ -1328,6 +1334,7 @@ function GraphVisualization() {
               setDirected={setDirected}
               getNextNodeId={getNextNodeId}
               onRandomGenerate={randomGenerate}
+              clearGraph={clearGraph}
               // 新增颜色选项
               nodeColorOptions={["#69b3a2", "#1976d2", "#ff9800", "#e91e63", "#FFB6C1", "#ffff00"]}
               edgeColorOptions={["#000000", "#1976d2", "#ff9800", "#e91e63", "#69b3a2", "#ffff00"]}

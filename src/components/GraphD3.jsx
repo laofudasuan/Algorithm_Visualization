@@ -28,6 +28,8 @@ export default function GraphD3({ nodes, edges, directed, width = 500, height = 
       .filter(n => n.id)
       .map((n, i, arr) => ({
         ...n,
+        // 确保非固定节点不保留fx和fy属性
+        ...(n.fixed ? {} : { fx: null, fy: null }),
         x: n.x ?? width / 2 + (nodeRadius * 2 + 10) * Math.cos((2 * Math.PI * i) / Math.max(1, arr.length)),
         y: n.y ?? height / 2 + (nodeRadius * 2 + 10) * Math.sin((2 * Math.PI * i) / Math.max(1, arr.length)),
       }));
@@ -507,9 +509,11 @@ export default function GraphD3({ nodes, edges, directed, width = 500, height = 
             
             // 如果节点变为固定状态，设置固定位置
             if (nodes[i].fixed) {
-              nodeObj.fx = nodes[i].fx !== undefined ? nodes[i].fx : nodeObj.x;
-              nodeObj.fy = nodes[i].fy !== undefined ? nodes[i].fy : nodeObj.y;
+              // 从非固定变为固定，使用节点的最新坐标作为固定位置
+              nodeObj.fx = nodeObj.x;
+              nodeObj.fy = nodeObj.y;
             } else {
+              // 如果节点变为非固定状态，清除固定位置
               nodeObj.fx = null;
               nodeObj.fy = null;
             }
@@ -550,9 +554,9 @@ export default function GraphD3({ nodes, edges, directed, width = 500, height = 
             
             // 更新固定状态
             if (currentNode.fixed && !nodeObj.fixed) {
-              // 从非固定变为固定
-              nodeObj.fx = currentNode.fx !== undefined ? currentNode.fx : nodeObj.x;
-              nodeObj.fy = currentNode.fy !== undefined ? currentNode.fy : nodeObj.y;
+              // 从非固定变为固定，使用节点的最新坐标作为固定位置
+              nodeObj.fx = nodeObj.x;
+              nodeObj.fy = nodeObj.y;
               nodeObj.fixed = true;
             } else if (!currentNode.fixed && nodeObj.fixed) {
               // 从固定变为非固定
@@ -565,6 +569,10 @@ export default function GraphD3({ nodes, edges, directed, width = 500, height = 
               // 已经是固定状态，但可能位置需要更新
               nodeObj.fx = currentNode.fx !== undefined ? currentNode.fx : nodeObj.x;
               nodeObj.fy = currentNode.fy !== undefined ? currentNode.fy : nodeObj.y;
+            } else if (!currentNode.fixed && !nodeObj.fixed) {
+              // 保持非固定状态，确保没有fx/fy属性
+              nodeObj.fx = null;
+              nodeObj.fy = null;
             }
             
             // 更新标签

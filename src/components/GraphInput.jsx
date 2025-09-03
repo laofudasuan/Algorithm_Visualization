@@ -228,7 +228,8 @@ export default function GraphInput({
   getNextNodeId,
   nodeColorOptions = ["#69b3a2", "#1976d2", "#ff9800", "#e91e63", "#FFB6C1", "#ffff00"],
   edgeColorOptions = ["#000000", "#1976d2", "#ff9800", "#e91e63", "#69b3a2", "#ffff00"],
-  onRandomGenerate // 新增随机生成回调函数
+  onRandomGenerate,
+  clearGraph
 }) {
   // Add node
   const addNode = () => setNodes([...nodes, { id: getNextNodeId ? getNextNodeId() : '', fixed: false, label: '', color: '#69b3a2' }]);
@@ -258,6 +259,9 @@ export default function GraphInput({
   const [showBulkModal, setShowBulkModal] = useState(false); // 控制批量输入弹窗
 
   const parseBulkText = () => {
+    // 先清空现有图
+    clearGraph();
+    
     const lines = bulkText.split(/\r?\n/).map(l => l.trim()).filter(l => l && !l.startsWith('#'));
     const nodeSet = new Set();
     const edgeList = [];
