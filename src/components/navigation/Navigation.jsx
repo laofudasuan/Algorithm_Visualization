@@ -57,7 +57,7 @@ function Navigation() {
           },
         }}
       >
-        <Box sx={{ paddingTop: '80px' }}>
+        <Box sx={{ paddingTop: '0px' }}>
           <List>
             {navItems.map((item) => (
               <ListItem
@@ -72,8 +72,8 @@ function Navigation() {
                       ? 'primary.dark' 
                       : 'rgba(0, 0, 0, 0.04)'
                   },
-                  borderRadius: '0 50px 50px 0',
-                  margin: '5px 10px',
+                  borderRadius: '10px',
+                  margin: '5px 0px',
                   padding: '8px 16px',
                   height: '48px',
                   display: 'flex',

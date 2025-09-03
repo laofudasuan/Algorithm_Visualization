@@ -1554,9 +1554,9 @@ function GraphVisualization() {
       {/* 左侧面板：点/边列表 */}
       <div style={{ 
         position: 'absolute',
-        top: '20px',
-        width: leftPanelCollapsed ? '40px' : '340px',
-        maxHeight: 'calc(100vh - 40px)',
+        top: '0px',
+        width: leftPanelCollapsed ? '60px' : '340px',
+        maxHeight: '100vh',
         background: '#f8f9fa',
         borderRadius: '8px',
         boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
@@ -1610,9 +1610,9 @@ function GraphVisualization() {
       {/* 右侧面板：配置&动画 */}
       <div style={{ 
         position: 'absolute',
-        top: '20px',
+        top: '0px',
         right: '120px',
-        width: rightPanelCollapsed ? '40px' : '260px',
+        width: rightPanelCollapsed ? '60px' : '260px',
         maxHeight: 'calc(100vh - 40px)',
         background: '#f8f9fa',
         borderRadius: '8px',

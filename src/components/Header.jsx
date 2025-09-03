@@ -7,6 +7,7 @@ function Header() {
     <AppBar 
       position="fixed" 
       sx={{ 
+        borderRadius: '0px',
         backgroundColor: 'primary.main',
         boxShadow: '0 2px 15px rgba(0,0,0,0.1)',
         mb: 2,
@@ -54,7 +55,6 @@ function Header() {
             alt="QQ群" 
             style={{ 
               height: '60px',
-              borderRadius: '4px'
             }} 
           />
         </Box>
