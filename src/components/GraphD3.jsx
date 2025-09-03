@@ -18,21 +18,64 @@ export default function GraphD3({ nodes, edges, directed, width = 500, height = 
 
   // 重建图形的函数
   const rebuildGraph = () => {
+    console.log("触发重建函数");
     const svg = d3.select(ref.current);
     svg.selectAll('*').remove();
     svg.attr('width', width).attr('height', height);
+
+    // 创建一个映射来保存现有节点的位置信息
+    const existingNodeMap = new Map();
+    nodeObjsRef.current.forEach(node => {
+      existingNodeMap.set(node.id, node);
+    });
 
     // 过滤无效点和边，节点结构为 {id, fixed, label, x,y, idx}
     const nodeObjs = nodes
       .map((n, i) => ({ ...n, idx: i }))
       .filter(n => n.id)
-      .map((n, i, arr) => ({
-        ...n,
-        // 确保非固定节点不保留fx和fy属性
-        ...(n.fixed ? {} : { fx: null, fy: null }),
-        x: n.x ?? width / 2 + (nodeRadius * 2 + 10) * Math.cos((2 * Math.PI * i) / Math.max(1, arr.length)),
-        y: n.y ?? height / 2 + (nodeRadius * 2 + 10) * Math.sin((2 * Math.PI * i) / Math.max(1, arr.length)),
-      }));
+      .map((n, i, arr) => {
+        // 检查是否是已存在的节点
+        const existingNode = existingNodeMap.get(n.id);
+        
+        // 对于fixed节点，优先保持其原有位置
+        if (n.fixed) {
+          let x, y;
+          // 如果是已存在的fixed节点，保持其当前位置
+          if (existingNode && existingNode.fixed) {
+            x = existingNode.x;
+            y = existingNode.y;
+          } else {
+            // 新的fixed节点或从非fixed变为fixed的节点
+            x = n.x !== undefined ? n.x : width / 2 + (nodeRadius * 2 + 10) * Math.cos((2 * Math.PI * i) / Math.max(1, arr.length));
+            y = n.y !== undefined ? n.y : height / 2 + (nodeRadius * 2 + 10) * Math.sin((2 * Math.PI * i) / Math.max(1, arr.length));
+          }
+          
+          // 检查边界，确保fixed节点不会超出画布范围
+          const margin = nodeRadius + 8;
+          x = Math.max(margin, Math.min(width - margin, x));
+          y = Math.max(margin, Math.min(height - margin, y));
+          
+          return {
+            ...n,
+            x: x,
+            y: y,
+            fx: x,
+            fy: y
+          };
+        } else {
+          // 对于非fixed节点，使用默认的初始化逻辑
+          const x = n.x !== undefined ? n.x : width / 2 + (nodeRadius * 2 + 10) * Math.cos((2 * Math.PI * i) / Math.max(1, arr.length));
+          const y = n.y !== undefined ? n.y : height / 2 + (nodeRadius * 2 + 10) * Math.sin((2 * Math.PI * i) / Math.max(1, arr.length));
+          
+          return {
+            ...n,
+            x: x,
+            y: y,
+            fx: null,
+            fy: null
+          };
+        }
+      });
     nodeObjsRef.current = nodeObjs;
     const nodeIdSet = new Set(nodeObjs.map(n => n.id));
     // 边结构带 label 和 color
@@ -290,10 +333,11 @@ export default function GraphD3({ nodes, edges, directed, width = 500, height = 
   useEffect(() => {
     const cleanup = rebuildGraph();
     return cleanup;
-  }, [width, height, chargeStrength]); // 移除 nodes.length，避免节点数量变化时重建图形
+  }, [width, height, chargeStrength]);
 
   // 专门处理节点变化（添加、删除、ID、固定状态、标签等），使用 D3 的 join 更新
   useEffect(() => {
+    console.log("触发专门处理节点变化（添加、删除、ID、固定状态、标签等）的useEffect");
     if (simulationRef.current) {
       const svg = d3.select(ref.current);
       
@@ -483,6 +527,7 @@ export default function GraphD3({ nodes, edges, directed, width = 500, height = 
 
   // 专门处理节点ID、固定状态、标签和nodeRadius变化，不重建整个图形
   useEffect(() => {
+    console.log("触发专门处理节点ID、固定状态、标签和nodeRadius变化的useEffect");
     if (simulationRef.current && nodeObjsRef.current.length > 0) {
       const svg = d3.select(ref.current);
       
@@ -565,9 +610,6 @@ export default function GraphD3({ nodes, edges, directed, width = 500, height = 
               // 重启仿真以便节点可以重新移动
               simulationRef.current.alpha(0.3).restart();
             } else if (currentNode.fixed && nodeObj.fixed) {
-              // 已经是固定状态，但可能位置需要更新
-              nodeObj.fx = currentNode.fx !== undefined ? currentNode.fx : nodeObj.x;
-              nodeObj.fy = currentNode.fy !== undefined ? currentNode.fy : nodeObj.y;
             } else if (!currentNode.fixed && !nodeObj.fixed) {
               // 保持非固定状态，确保没有fx/fy属性
               nodeObj.fx = null;

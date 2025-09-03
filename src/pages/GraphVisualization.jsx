@@ -968,6 +968,228 @@ function GraphVisualization() {
       }
     });
     
+    // 弹出选择框让用户选择遍历方式
+    const traversalType = await new Promise((resolve) => {
+      // 创建一个模态对话框
+      const modalContainer = document.createElement('div');
+      modalContainer.className = 'modal-overlay';
+
+      const modal = document.createElement('div');
+      modal.className = 'modal-container';
+
+      const title = document.createElement('h3');
+      title.textContent = '选择遍历方式';
+      title.className = 'modal-title';
+
+      const instruction = document.createElement('p');
+      instruction.textContent = '请选择节点排列的方式';
+      instruction.className = 'modal-hint';
+
+      const traversalContainer = document.createElement('div');
+      traversalContainer.style.margin = '15px 0';
+      
+      const bfsRadio = document.createElement('input');
+      bfsRadio.type = 'radio';
+      bfsRadio.name = 'traversalType';
+      bfsRadio.value = 'bfs';
+      bfsRadio.id = 'bfsRadio';
+      bfsRadio.checked = true;
+      
+      const bfsLabel = document.createElement('label');
+      bfsLabel.textContent = 'BFS';
+      bfsLabel.htmlFor = 'bfsRadio';
+      bfsLabel.style.marginRight = '15px';
+      bfsLabel.style.fontWeight = 'normal';
+      
+      const dfsRadio = document.createElement('input');
+      dfsRadio.type = 'radio';
+      dfsRadio.name = 'traversalType';
+      dfsRadio.value = 'dfs';
+      dfsRadio.id = 'dfsRadio';
+      
+      const dfsLabel = document.createElement('label');
+      dfsLabel.textContent = 'DFS';
+      dfsLabel.htmlFor = 'dfsRadio';
+      dfsLabel.style.marginRight = '15px';
+      dfsLabel.style.fontWeight = 'normal';
+      
+      const topoRadio = document.createElement('input');
+      topoRadio.type = 'radio';
+      topoRadio.name = 'traversalType';
+      topoRadio.value = 'topo';
+      topoRadio.id = 'topoRadio';
+      
+      const topoLabel = document.createElement('label');
+      topoLabel.textContent = '拓扑排序';
+      topoLabel.htmlFor = 'topoRadio';
+      topoLabel.style.fontWeight = 'normal';
+      
+      // 如果是无向图，禁用拓扑排序选项
+      if (!directed) {
+        topoRadio.disabled = true;
+        topoLabel.style.color = '#999';
+        topoLabel.title = '拓扑排序仅适用于有向图';
+      }
+      
+      traversalContainer.appendChild(bfsRadio);
+      traversalContainer.appendChild(bfsLabel);
+      traversalContainer.appendChild(dfsRadio);
+      traversalContainer.appendChild(dfsLabel);
+      traversalContainer.appendChild(topoRadio);
+      traversalContainer.appendChild(topoLabel);
+
+      const buttonContainer = document.createElement('div');
+      buttonContainer.className = 'modal-buttons';
+
+      const cancelButton = document.createElement('button');
+      cancelButton.textContent = '取消';
+      cancelButton.className = 'modal-button modal-button-cancel';
+      cancelButton.addEventListener('click', () => {
+        document.body.removeChild(modalContainer);
+        resolve(null);
+      });
+
+      const confirmButton = document.createElement('button');
+      confirmButton.textContent = '确认';
+      confirmButton.className = 'modal-button modal-button-success';
+      confirmButton.addEventListener('click', () => {
+        const selectedTraversal = document.querySelector('input[name="traversalType"]:checked').value;
+        document.body.removeChild(modalContainer);
+        resolve(selectedTraversal);
+      });
+
+      buttonContainer.appendChild(cancelButton);
+      buttonContainer.appendChild(confirmButton);
+
+      modal.appendChild(title);
+      modal.appendChild(instruction);
+      modal.appendChild(traversalContainer);
+      modal.appendChild(buttonContainer);
+      modalContainer.appendChild(modal);
+      document.body.appendChild(modalContainer);
+    });
+
+    // 如果用户取消了操作
+    if (traversalType === null) {
+      return;
+    }
+
+    // 如果选择拓扑排序，直接执行拓扑排序逻辑
+    if (traversalType === 'topo') {
+      // 拓扑排序逻辑
+      const inDegree = {};
+      
+      nodes.forEach(node => {
+        inDegree[node.id] = 0;
+      });
+      
+      edges.forEach(edge => {
+        if (inDegree[edge.to] !== undefined) {
+          inDegree[edge.to]++;
+        }
+      });
+
+      // 找到所有入度为0的节点
+      const zeroInDegreeNodes = nodes.filter(node => inDegree[node.id] === 0).map(node => node.id);
+      
+      if (zeroInDegreeNodes.length === 0) {
+        alert('图中存在环，无法进行拓扑排序');
+        return;
+      }
+
+      // 按照拓扑顺序排列节点
+      const levels = [];
+      const visited = new Set();
+      let currentLevelNodes = [...zeroInDegreeNodes];
+      
+      while (currentLevelNodes.length > 0) {
+        levels.push([...currentLevelNodes]);
+        currentLevelNodes.forEach(nodeId => visited.add(nodeId));
+        
+        const nextLevelNodes = [];
+        currentLevelNodes.forEach(nodeId => {
+          if (adjList[nodeId]) {
+            adjList[nodeId].forEach(childId => {
+              if (!visited.has(childId)) {
+                // 减少子节点的入度
+                inDegree[childId]--;
+                // 如果入度为0，加入下一层
+                if (inDegree[childId] === 0) {
+                  nextLevelNodes.push(childId);
+                }
+              }
+            });
+          }
+        });
+        
+        currentLevelNodes = nextLevelNodes;
+      }
+
+      // 检查是否所有节点都被访问（检测环）
+      if (visited.size !== nodes.length) {
+        alert('图中存在环，无法进行完整的拓扑排序');
+        return;
+      }
+
+      // 计算位置并更新节点
+      const levelHeight = canvasHeight / Math.max(1, levels.length);
+      
+      // 先取消所有节点的固定状态
+      setNodes(currentNodes => currentNodes.map(node => ({
+        ...node,
+        fixed: false,
+        fx: null,
+        fy: null
+      })));
+
+      // 使用 setTimeout 确保先取消固定状态的更新生效
+      setTimeout(() => {
+        setNodes(currentNodes => currentNodes.map(node => {
+          // 找到节点所在的层级
+          let nodeLevel = 0;
+          let nodeIndex = 0;
+          
+          for (let i = 0; i < levels.length; i++) {
+            const index = levels[i].indexOf(node.id);
+            if (index !== -1) {
+              nodeLevel = i;
+              nodeIndex = index;
+              break;
+            }
+          }
+          
+          // 计算位置
+          const levelWidth = canvasWidth / Math.max(1, levels[nodeLevel].length);
+          const x = levelWidth * (nodeIndex + 0.5);
+          const y = levelHeight * (nodeLevel + 0.5);
+          
+          return {
+            ...node,
+            x: x,
+            y: y,
+            fixed: true,
+            fx: x,
+            fy: y
+          };
+        }));
+      }, 100); // 100ms 延迟
+      
+      // 把x,y,fx,fy作为一次性使用，改完以后自动取消
+      setTimeout(() => {
+      setNodes(currentNodes => currentNodes.map(node => {
+        return {
+          ...node,
+          x: undefined,
+          y: undefined,
+          fx: undefined,
+          fy: undefined
+        };
+      }));
+      },1000); // 1000ms 延迟
+      return;
+    }
+    
+    // 如果选择BFS或DFS，继续原来的逻辑，让用户选择根节点
     // 默认根节点为0
     let defaultRoot = nodes[0].id;
     
@@ -1103,42 +1325,61 @@ function GraphVisualization() {
     const levels = [];
     const visited = new Set();
     
-    // 第一层：所有选中的根节点
-    levels[0] = [...rootIds];
     rootIds.forEach(rootId => visited.add(rootId));
     
-    // 从第一层开始BFS
-    let currentLevel = 0;
-    while (currentLevel < levels.length) {
-      const nextLevelNodes = [];
-      
-      levels[currentLevel].forEach(nodeId => {
-        // 添加子节点到下一层
+    // 根据选择的遍历方式构建层级结构
+    if (traversalType === 'bfs') {
+      // 第一层：所有选中的根节点
+      levels[0] = [...rootIds];
+      // 从第一层开始BFS
+      let currentLevel = 0;
+      while (currentLevel < levels.length) {
+        const nextLevelNodes = [];
+        
+        levels[currentLevel].forEach(nodeId => {
+          // 添加子节点到下一层
+          if (adjList[nodeId]) {
+            adjList[nodeId].forEach(childId => {
+              if (!visited.has(childId)) {
+                visited.add(childId);
+                nextLevelNodes.push(childId);
+              }
+            });
+          }
+        });
+        
+        if (nextLevelNodes.length > 0) {
+          levels[currentLevel + 1] = nextLevelNodes;
+        }
+        currentLevel++;
+      }
+    } else {
+      // DFS遍历构建层级结构
+      const dfs = (nodeId, level) => {
+        // 确保层级数组足够长
+        if (levels.length <= level) {
+          levels.push([]);
+        }
+        
+        // 将节点添加到对应层级
+        levels[level].push(nodeId);
+        
+        // 遍历子节点
         if (adjList[nodeId]) {
           adjList[nodeId].forEach(childId => {
             if (!visited.has(childId)) {
               visited.add(childId);
-              nextLevelNodes.push(childId);
+              dfs(childId, level + 1);
             }
           });
         }
-      });
+      };
       
-      if (nextLevelNodes.length > 0) {
-        levels[currentLevel + 1] = nextLevelNodes;
-      }
-      currentLevel++;
+      // 对每个根节点执行DFS
+      rootIds.forEach(rootId => {
+          dfs(rootId, 0);
+      });
     }
-    
-    // 添加未访问的节点到最后一层
-    nodes.forEach(node => {
-      if (!visited.has(node.id)) {
-        if (levels.length === 0) {
-          levels.push([]);
-        }
-        levels[levels.length - 1].push(node.id);
-      }
-    });
     
     // 计算位置并更新节点
     const levelHeight = canvasHeight / Math.max(1, levels.length);
@@ -1167,6 +1408,16 @@ function GraphVisualization() {
           }
         }
         
+        // 对于未访问的节点，保持fixed为false，fx和fy为null
+        if (!visited.has(node.id)) {
+          return {
+            ...node,
+            fixed: false,
+            fx: null,
+            fy: null
+          };
+        }
+        
         // 计算位置
         const levelWidth = canvasWidth / Math.max(1, levels[nodeLevel].length);
         const x = levelWidth * (nodeIndex + 0.5);
@@ -1182,6 +1433,19 @@ function GraphVisualization() {
         };
       }));
     }, 100); // 100ms 延迟
+
+    // 把x,y,fx,fy作为一次性使用，改完以后自动取消
+      setTimeout(() => {
+      setNodes(currentNodes => currentNodes.map(node => {
+        return {
+          ...node,
+          x: undefined,
+          y: undefined,
+          fx: undefined,
+          fy: undefined
+        };
+      }));
+      },1000); // 1000ms 延迟
   };
 
   return (
@@ -1441,7 +1705,7 @@ function GraphVisualization() {
                   className="action-button action-button-warning"
                   style={{ marginTop: 8 }}
                 >
-                  自动排列节点
+                  分层排列节点
                 </button>
               </div>
             )}
