@@ -1,14 +1,16 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Drawer, List, ListItem, ListItemIcon, ListItemText, Box } from '@mui/material';
+import { Drawer, List, ListItem, ListItemIcon, ListItemText, Box, Collapse } from '@mui/material';
 import { Home as HomeIcon, BarChart as BarChartIcon, Search as SearchIcon, 
          Functions as FunctionsIcon, Link as LinkIcon, List as ListIcon, 
          AccountTree as AccountTreeIcon, Balance as BalanceIcon, 
-         ShowChart as ShowChartIcon, Note as NoteIcon, Sort as SortIcon } from '@mui/icons-material';
+         ShowChart as ShowChartIcon, Note as NoteIcon, Sort as SortIcon,
+         ExpandLess, ExpandMore, PlayArrow as PlayArrowIcon, TextFields as TextFieldsIcon } from '@mui/icons-material';
 
 function Navigation() {
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(true);
+  const [openMenus, setOpenMenus] = useState({});
 
   const handleMouseEnter = () => {
     setCollapsed(false);
@@ -18,19 +20,215 @@ function Navigation() {
     setCollapsed(true);
   };
 
+  const handleClick = (menu) => {
+    setOpenMenus(prev => ({
+      ...prev,
+      [menu]: !prev[menu]
+    }));
+  };
+
   const navItems = [
     { name: '首页', path: '/', icon: <HomeIcon /> },
-    { name: '图结构', path: '/graph', icon: <BarChartIcon /> },
-    { name: '排序', path: '/algorithm', icon: <SortIcon /> },
-    { name: '搜索', path: '/search', icon: <SearchIcon /> },
-    { name: '动态规划', path: '/dp', icon: <FunctionsIcon /> },
-    { name: '链表', path: '/linkedlist', icon: <LinkIcon /> },
-    { name: '优先队列', path: '/priorityqueue', icon: <ListIcon /> },
-    { name: '线段树', path: '/segmenttree', icon: <AccountTreeIcon /> },
-    { name: '平衡树', path: '/balancedtree', icon: <BalanceIcon /> },
-    { name: '树状数组', path: '/binarytree', icon: <ShowChartIcon /> },
-    { name: 'Jupyter Notebook', path: '/local-jupyter', icon: <NoteIcon /> }
+    { 
+      name: '图论', 
+      icon: <BarChartIcon />, 
+      path: '/graph' 
+    },
+    { 
+      name: '基础算法', 
+      icon: <PlayArrowIcon />,
+      children: [
+        { name: '排序', path: '/algorithm', icon: <SortIcon /> }
+      ]
+    },
+    { 
+      name: '动态规划', 
+      path: '/dp', 
+      icon: <FunctionsIcon /> 
+    },
+    { 
+      name: '搜索', 
+      path: '/search', 
+      icon: <SearchIcon /> 
+    },
+    { 
+      name: '数据结构', 
+      icon: <AccountTreeIcon />,
+      children: [
+        { name: '链表', path: '/linkedlist', icon: <LinkIcon /> },
+        { name: '优先队列', path: '/priorityqueue', icon: <ListIcon /> },
+        { name: '线段树', path: '/segmenttree', icon: <AccountTreeIcon /> },
+        { name: '平衡树', path: '/balancedtree', icon: <BalanceIcon /> },
+        { name: '树状数组', path: '/binarytree', icon: <ShowChartIcon /> }
+      ]
+    },
+    { 
+      name: '字符串', 
+      icon: <TextFieldsIcon />,
+      children: [
+        { name: 'KMP算法', path: '/kmp', icon: <TextFieldsIcon /> },
+        { name: 'AC自动机', path: '/ac-automation', icon: <TextFieldsIcon /> }
+      ]
+    },
+    { 
+      name: 'Jupyter', 
+      path: '/local-jupyter', 
+      icon: <NoteIcon /> 
+    }
   ];
+
+  const renderNavItem = (item, index) => {
+    if (item.children) {
+      const isOpen = openMenus[item.name];
+      return (
+        <div key={index}>
+          <ListItem
+            button
+            onClick={() => handleClick(item.name)}
+            sx={{
+              backgroundColor: 'transparent',
+              color: 'text.primary',
+              '&:hover': {
+                backgroundColor: 'rgba(0, 0, 0, 0.04)'
+              },
+              borderRadius: '10px',
+              margin: '5px 0px',
+              padding: '8px 16px',
+              height: '48px',
+              display: 'flex',
+              alignItems: 'center'
+            }}
+          >
+            <ListItemIcon 
+              sx={{ 
+                color: 'text.primary',
+                minWidth: '40px',
+                minHeight: '24px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              {item.icon}
+            </ListItemIcon>
+            <ListItemText 
+              primary={item.name} 
+              sx={{ 
+                opacity: collapsed ? 0 : 1,
+                transition: 'opacity 0.3s ease',
+                margin: 0,
+                padding: 0,
+                paddingLeft: '8px',
+                width: collapsed ? 0 : 'auto',
+                overflow: 'hidden'
+              }} 
+            />
+            {collapsed ? null : (isOpen ? <ExpandLess /> : <ExpandMore />)}
+          </ListItem>
+          <Collapse in={!collapsed && isOpen} timeout="auto" unmountOnExit>
+            <List component="div" disablePadding>
+              {item.children.map((child, childIndex) => (
+                <ListItem
+                  key={childIndex}
+                  component={Link}
+                  to={child.path}
+                  sx={{
+                    backgroundColor: location.pathname === child.path ? 'primary.main' : 'transparent',
+                    color: location.pathname === child.path ? 'primary.contrastText' : 'text.primary',
+                    '&:hover': {
+                      backgroundColor: location.pathname === child.path 
+                        ? 'primary.dark' 
+                        : 'rgba(0, 0, 0, 0.04)'
+                    },
+                    borderRadius: '10px',
+                    margin: '5px 0px',
+                    padding: '8px 16px',
+                    height: '48px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    pl: 4
+                  }}
+                >
+                  <ListItemIcon 
+                    sx={{ 
+                      color: location.pathname === child.path ? 'white' : 'text.primary',
+                      minWidth: '40px',
+                      minHeight: '24px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                  >
+                    {child.icon}
+                  </ListItemIcon>
+                  <ListItemText 
+                    primary={child.name} 
+                    sx={{ 
+                      opacity: collapsed ? 0 : 1,
+                      transition: 'opacity 0.3s ease',
+                      margin: 0,
+                      padding: 0,
+                      paddingLeft: '8px',
+                      width: collapsed ? 0 : 'auto',
+                      overflow: 'hidden'
+                    }} 
+                  />
+                </ListItem>
+              ))}
+            </List>
+          </Collapse>
+        </div>
+      );
+    }
+
+    return (
+      <ListItem
+        key={index}
+        component={Link}
+        to={item.path}
+        sx={{
+          backgroundColor: location.pathname === item.path ? 'primary.main' : 'transparent',
+          color: location.pathname === item.path ? 'primary.contrastText' : 'text.primary',
+          '&:hover': {
+            backgroundColor: location.pathname === item.path 
+              ? 'primary.dark' 
+              : 'rgba(0, 0, 0, 0.04)'
+          },
+          borderRadius: '10px',
+          margin: '5px 0px',
+          padding: '8px 16px',
+          height: '48px',
+          display: 'flex',
+          alignItems: 'center'
+        }}
+      >
+        <ListItemIcon 
+          sx={{ 
+            color: location.pathname === item.path ? 'white' : 'text.primary',
+            minWidth: '40px',
+            minHeight: '24px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+        >
+          {item.icon}
+        </ListItemIcon>
+        <ListItemText 
+          primary={item.name} 
+          sx={{ 
+            opacity: collapsed ? 0 : 1,
+            transition: 'opacity 0.3s ease',
+            margin: 0,
+            padding: 0,
+            paddingLeft: '8px',
+            width: collapsed ? 0 : 'auto',
+            overflow: 'hidden'
+          }} 
+        />
+      </ListItem>
+    );
+  };
 
   return (
     <>
@@ -59,53 +257,7 @@ function Navigation() {
       >
         <Box sx={{ paddingTop: '0px' }}>
           <List>
-            {navItems.map((item) => (
-              <ListItem
-                key={item.path}
-                component={Link}
-                to={item.path}
-                sx={{
-                  backgroundColor: location.pathname === item.path ? 'primary.main' : 'transparent',
-                  color: location.pathname === item.path ? 'primary.contrastText' : 'text.primary',
-                  '&:hover': {
-                    backgroundColor: location.pathname === item.path 
-                      ? 'primary.dark' 
-                      : 'rgba(0, 0, 0, 0.04)'
-                  },
-                  borderRadius: '10px',
-                  margin: '5px 0px',
-                  padding: '8px 16px',
-                  height: '48px',
-                  display: 'flex',
-                  alignItems: 'center'
-                }}
-              >
-                <ListItemIcon 
-                  sx={{ 
-                    color: location.pathname === item.path ? 'white' : 'text.primary',
-                    minWidth: '40px',
-                    minHeight: '24px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}
-                >
-                  {item.icon}
-                </ListItemIcon>
-                <ListItemText 
-                  primary={item.name} 
-                  sx={{ 
-                    opacity: collapsed ? 0 : 1,
-                    transition: 'opacity 0.3s ease',
-                    margin: 0,
-                    padding: 0,
-                    paddingLeft: '8px',
-                    width: collapsed ? 0 : 'auto',
-                    overflow: 'hidden'
-                  }} 
-                />
-              </ListItem>
-            ))}
+            {navItems.map((item, index) => renderNavItem(item, index))}
           </List>
         </Box>
       </Drawer>

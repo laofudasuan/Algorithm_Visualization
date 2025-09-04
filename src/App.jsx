@@ -14,6 +14,8 @@ import SegmentTreeVisualization from './pages/SegmentTreeVisualization';
 import BalancedTreeVisualization from './pages/BalancedTreeVisualization';
 import BinaryIndexedTreeVisualization from './pages/BinaryIndexedTreeVisualization';
 import LocalJupyterNotebook from './pages/LocalJupyterNotebook';
+import KMPVisualization from './pages/KMPVisualization';
+import ACAutomationVisualization from './pages/ACAutomationVisualization';
 import theme from './theme';
 import './App.css';
 import Header from './components/Header';
@@ -64,6 +66,8 @@ function App() {
               <Route path="/balancedtree" element={<BalancedTreeVisualization />} />
               <Route path="/binarytree" element={<BinaryIndexedTreeVisualization />} />
               <Route path="/local-jupyter" element={<LocalJupyterNotebook />} />
+              <Route path="/kmp" element={<KMPVisualization />} />
+              <Route path="/ac-automation" element={<ACAutomationVisualization />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </Box>

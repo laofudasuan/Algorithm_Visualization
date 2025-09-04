@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Card, CardContent, CardActions, Button, Typography, Grid, Box, Container } from '@mui/material';
+import { Card, CardContent, CardActions, Button, Typography, Grid, Box, Container, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import SearchIcon from '@mui/icons-material/Search';
@@ -11,68 +11,113 @@ import BalanceIcon from '@mui/icons-material/Balance';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import NoteIcon from '@mui/icons-material/Note';
 import SortIcon from '@mui/icons-material/Sort';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import TextFieldsIcon from '@mui/icons-material/TextFields';
 
 function Home() {
-  const modules = [
+  const moduleCategories = [
     {
-      title: '图结构可视化',
-      description: '动态创建和可视化图结构，支持有向图和无向图，提供遍历算法演示',
-      path: '/graph',
-      icon: <BarChartIcon sx={{ fontSize: 48 }} />
+      category: '图论',
+      icon: <BarChartIcon sx={{ fontSize: 48 }} />,
+      modules: [
+        {
+          title: '图结构可视化',
+          description: '动态创建和可视化图结构，支持有向图和无向图，提供遍历算法演示',
+          path: '/graph'
+        }
+      ]
     },
     {
-      title: '排序',
-      description: '可视化排序算法，包括冒泡排序、选择排序、插入排序等',
-      path: '/algorithm',
-      icon: <SortIcon sx={{ fontSize: 48 }} />
+      category: '基础算法',
+      icon: <PlayArrowIcon sx={{ fontSize: 48 }} />,
+      modules: [
+        {
+          title: '排序',
+          description: '可视化排序算法，包括冒泡排序、选择排序、插入排序等',
+          path: '/algorithm'
+        }
+      ]
     },
     {
-      title: '搜索算法',
-      description: '深度优先搜索、广度优先搜索、A*搜索',
-      path: '/search',
-      icon: <SearchIcon sx={{ fontSize: 48 }} />
+      category: '动态规划',
+      icon: <FunctionsIcon sx={{ fontSize: 48 }} />,
+      modules: [
+        {
+          title: '动态规划',
+          description: '展示动态规划问题的求解过程，帮助理解状态转移方程',
+          path: '/dp'
+        }
+      ]
     },
     {
-      title: '动态规划',
-      description: '展示动态规划问题的求解过程，帮助理解状态转移方程',
-      path: '/dp',
-      icon: <FunctionsIcon sx={{ fontSize: 48 }} />
+      category: '搜索',
+      icon: <SearchIcon sx={{ fontSize: 48 }} />,
+      modules: [
+        {
+          title: '搜索算法',
+          description: '深度优先搜索、广度优先搜索、A*搜索',
+          path: '/search'
+        }
+      ]
     },
     {
-      title: '链表',
-      description: '可视化链表结构和操作，包括单链表、双链表等',
-      path: '/linkedlist',
-      icon: <LinkIcon sx={{ fontSize: 48 }} />
+      category: '数据结构',
+      icon: <AccountTreeIcon sx={{ fontSize: 48 }} />,
+      modules: [
+        {
+          title: '链表',
+          description: '可视化链表结构和操作，包括单链表、双链表等',
+          path: '/linkedlist'
+        },
+        {
+          title: '优先队列',
+          description: '展示优先队列的实现和操作过程',
+          path: '/priorityqueue'
+        },
+        {
+          title: '线段树',
+          description: '可视化线段树的构建和操作过程',
+          path: '/segmenttree'
+        },
+        {
+          title: '平衡树',
+          description: '展示平衡树的结构和旋转操作',
+          path: '/balancedtree'
+        },
+        {
+          title: '树状数组',
+          description: '可视化树状数组的结构和操作',
+          path: '/binarytree'
+        }
+      ]
     },
     {
-      title: '优先队列',
-      description: '展示优先队列的实现和操作过程',
-      path: '/priorityqueue',
-      icon: <ListIcon sx={{ fontSize: 48 }} />
+      category: '字符串',
+      icon: <TextFieldsIcon sx={{ fontSize: 48 }} />,
+      modules: [
+        {
+          title: 'KMP算法',
+          description: 'KMP字符串匹配算法可视化，展示模式匹配过程和LPS数组构建',
+          path: '/kmp'
+        },
+        {
+          title: 'AC自动机',
+          description: 'AC自动机多模式匹配算法可视化，展示Trie树和失败指针构建过程',
+          path: '/ac-automation'
+        }
+      ]
     },
     {
-      title: '线段树',
-      description: '可视化线段树的构建和操作过程',
-      path: '/segmenttree',
-      icon: <AccountTreeIcon sx={{ fontSize: 48 }} />
-    },
-    {
-      title: '平衡树',
-      description: '展示平衡树的结构和旋转操作',
-      path: '/balancedtree',
-      icon: <BalanceIcon sx={{ fontSize: 48 }} />
-    },
-    {
-      title: '树状数组',
-      description: '可视化树状数组的结构和操作',
-      path: '/binarytree',
-      icon: <ShowChartIcon sx={{ fontSize: 48 }} />
-    },
-    {
-      title: '本地Jupyter Notebook',
-      description: '集成本地Jupyter Notebook环境，支持完整的交互式编程体验',
-      path: '/local-jupyter',
-      icon: <NoteIcon sx={{ fontSize: 48 }} />
+      category: 'Jupyter',
+      icon: <NoteIcon sx={{ fontSize: 48 }} />,
+      modules: [
+        {
+          title: '本地Jupyter Notebook',
+          description: '集成本地Jupyter Notebook环境，支持完整的交互式编程体验',
+          path: '/local-jupyter'
+        }
+      ]
     }
   ];
 
@@ -98,68 +143,107 @@ function Home() {
         </Typography>
       </Box>
 
-      <Grid container spacing={4} justifyContent="center">
-        {modules.map((module, index) => (
-          <Grid item key={index} sx={{ 
-            width: 350,
-            display: 'flex'
-          }}>
-            <Card 
-              sx={{ 
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  transform: 'translateY(-8px)',
-                  boxShadow: '0 12px 30px rgba(0, 0, 0, 0.15)'
-                },
-                width: '100%'
+      <Box sx={{ mb: 6 }}>
+        {moduleCategories.map((category, categoryIndex) => (
+          <Accordion 
+            key={categoryIndex} 
+            defaultExpanded={false}
+            sx={{ 
+              mb: 2,
+              borderRadius: 2,
+              '&:before': {
+                display: 'none'
+              }
+            }}
+          >
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              sx={{
+                backgroundColor: 'background.paper',
+                borderRadius: 2,
+                minHeight: 72,
+                '&.Mui-expanded': {
+                  minHeight: 72
+                }
               }}
             >
-              <CardContent sx={{ 
-                flexGrow: 1,
+              <Box sx={{ 
                 display: 'flex',
-                flexDirection: 'column',
                 alignItems: 'center',
-                textAlign: 'center',
-                py: 3
+                width: '100%'
               }}>
                 <Box sx={{ 
-                  mb: 2,
+                  mr: 3,
                   color: 'primary.main'
                 }}>
-                  {module.icon}
+                  {category.icon}
                 </Box>
-                <Typography variant="h6" component="h2" gutterBottom sx={{ fontWeight: 600 }}>
-                  {module.title}
+                <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                  {category.category}
                 </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ 
-                  wordWrap: 'break-word'
-                }}>
-                  {module.description}
-                </Typography>
-              </CardContent>
-              <CardActions sx={{ justifyContent: 'center', pb: 3 }}>
-                <Button 
-                  component={Link} 
-                  to={module.path} 
-                  variant="contained" 
-                  color="primary"
-                  size="medium"
-                  sx={{ 
-                    px: 3,
-                    py: 1,
-                    borderRadius: 2
-                  }}
-                >
-                  立即体验
-                </Button>
-              </CardActions>
-            </Card>
-          </Grid>
+              </Box>
+            </AccordionSummary>
+            <AccordionDetails sx={{ backgroundColor: 'background.default' }}>
+              <Grid container spacing={4} justifyContent="center">
+                {category.modules.map((module, moduleIndex) => (
+                  <Grid item key={moduleIndex} sx={{ 
+                    width: 350,
+                    display: 'flex'
+                  }}>
+                    <Card 
+                      sx={{ 
+                        height: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        transition: 'all 0.3s ease',
+                        '&:hover': {
+                          transform: 'translateY(-8px)',
+                          boxShadow: '0 12px 30px rgba(0, 0, 0, 0.15)'
+                        },
+                        width: '100%'
+                      }}
+                    >
+                      <CardContent sx={{ 
+                        flexGrow: 1,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        textAlign: 'center',
+                        py: 3
+                      }}>
+                        <Typography variant="h6" component="h2" gutterBottom sx={{ fontWeight: 600 }}>
+                          {module.title}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" sx={{ 
+                          wordWrap: 'break-word'
+                        }}>
+                          {module.description}
+                        </Typography>
+                      </CardContent>
+                      <CardActions sx={{ justifyContent: 'center', pb: 3 }}>
+                        <Button 
+                          component={Link} 
+                          to={module.path} 
+                          variant="contained" 
+                          color="primary"
+                          size="medium"
+                          sx={{ 
+                            px: 3,
+                            py: 1,
+                            borderRadius: 2
+                          }}
+                        >
+                          立即体验
+                        </Button>
+                      </CardActions>
+                    </Card>
+                  </Grid>
+                ))}
+              </Grid>
+            </AccordionDetails>
+          </Accordion>
         ))}
-      </Grid>
+      </Box>
 
       <Box sx={{ 
         mt: 8, 
