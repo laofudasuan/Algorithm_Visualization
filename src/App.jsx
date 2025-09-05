@@ -16,6 +16,15 @@ import BinaryIndexedTreeVisualization from './pages/BinaryIndexedTreeVisualizati
 import LocalJupyterNotebook from './pages/LocalJupyterNotebook';
 import KMPVisualization from './pages/KMPVisualization';
 import ACAutomationVisualization from './pages/ACAutomationVisualization';
+import FibonacciVisualization from './pages/FibonacciVisualization';
+import LCSVisualization from './pages/LCSVisualization';
+import KnapsackVisualization from './pages/KnapsackVisualization';
+import BasicAlgorithmsVisualization from './pages/BasicAlgorithmsVisualization';
+import SortingAlgorithms from './pages/SortingAlgorithms';
+import BinarySearch from './pages/BinarySearch';
+import DivideConquer from './pages/DivideConquer';
+import Doubling from './pages/Doubling';
+import TreeDP from './pages/TreeDP';
 import theme from './theme';
 import './App.css';
 import Header from './components/Header';
@@ -60,6 +69,10 @@ function App() {
               <Route path="/algorithm" element={<SortingVisualization />} />
               <Route path="/search" element={<SearchVisualization />} />
               <Route path="/dp" element={<DynamicProgrammingVisualization />} />
+              <Route path="/dp/fibonacci" element={<FibonacciVisualization />} />
+              <Route path="/dp/lcs" element={<LCSVisualization />} />
+              <Route path="/dp/knapsack" element={<KnapsackVisualization />} />
+              <Route path="/dp/tree-dp" element={<TreeDP />} />
               <Route path="/linkedlist" element={<LinkedListVisualization />} />
               <Route path="/priorityqueue" element={<PriorityQueueVisualization />} />
               <Route path="/segmenttree" element={<SegmentTreeVisualization />} />
@@ -68,6 +81,11 @@ function App() {
               <Route path="/local-jupyter" element={<LocalJupyterNotebook />} />
               <Route path="/kmp" element={<KMPVisualization />} />
               <Route path="/ac-automation" element={<ACAutomationVisualization />} />
+              <Route path="/basic" element={<BasicAlgorithmsVisualization />} />
+              <Route path="/basic/sorting" element={<SortingAlgorithms />} />
+              <Route path="/basic/binary-search" element={<BinarySearch />} />
+              <Route path="/basic/divide-conquer" element={<DivideConquer />} />
+              <Route path="/basic/doubling" element={<Doubling />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </Box>

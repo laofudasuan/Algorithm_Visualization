@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Drawer, List, ListItem, ListItemIcon, ListItemText, Box, Collapse } from '@mui/material';
+import { Drawer, List, ListItem, ListItemIcon, ListItemText, Box, Collapse, IconButton } from '@mui/material';
 import { Home as HomeIcon, BarChart as BarChartIcon, Search as SearchIcon, 
          Functions as FunctionsIcon, Link as LinkIcon, List as ListIcon, 
          AccountTree as AccountTreeIcon, Balance as BalanceIcon, 
@@ -12,6 +12,26 @@ function Navigation() {
   const [collapsed, setCollapsed] = useState(true);
   const [openMenus, setOpenMenus] = useState({});
 
+  // Extracted common styles
+  const listItemBaseStyle = {
+    borderRadius: '10px',
+    margin: '5px 0px',
+    padding: '8px 16px',
+    height: '48px',
+    display: 'flex',
+    alignItems: 'center',
+  };
+
+  const listItemHoverStyle = (isActive) => ({
+    backgroundColor: isActive ? 'primary.dark' : 'rgba(0, 0, 0, 0.04)',
+  });
+
+  const listItemActiveStyle = (isActive) => ({
+    backgroundColor: isActive ? 'primary.main' : 'transparent',
+    color: isActive ? 'primary.contrastText' : 'text.primary',
+    '&:hover': listItemHoverStyle(isActive),
+  });
+
   const handleMouseEnter = () => {
     setCollapsed(false);
   };
@@ -21,9 +41,9 @@ function Navigation() {
   };
 
   const handleClick = (menu) => {
-    setOpenMenus(prev => ({
+    setOpenMenus((prev) => ({
       ...prev,
-      [menu]: !prev[menu]
+      [menu]: !prev[menu],
     }));
   };
 
@@ -36,15 +56,25 @@ function Navigation() {
     },
     { 
       name: '基础算法', 
+      path: '/basic', 
       icon: <PlayArrowIcon />,
       children: [
-        { name: '排序', path: '/algorithm', icon: <SortIcon /> }
+        { name: '排序', path: '/basic/sorting', icon: <SortIcon /> },
+        { name: '二分查找', path: '/basic/binary-search', icon: <SearchIcon /> },
+        { name: '分治算法', path: '/basic/divide-conquer', icon: <AccountTreeIcon /> },
+        { name: '倍增算法', path: '/basic/doubling', icon: <ShowChartIcon /> }
       ]
     },
     { 
       name: '动态规划', 
       path: '/dp', 
-      icon: <FunctionsIcon /> 
+      icon: <FunctionsIcon />,
+      children: [
+        { name: '斐波那契数列', path: '/dp/fibonacci', icon: <FunctionsIcon /> },
+        { name: '最长公共子序列', path: '/dp/lcs', icon: <FunctionsIcon /> },
+        { name: '0-1背包问题', path: '/dp/knapsack', icon: <FunctionsIcon /> },
+        { name: '树形动态规划', path: '/dp/tree-dp', icon: <AccountTreeIcon /> }
+      ]
     },
     { 
       name: '搜索', 
@@ -83,13 +113,13 @@ function Navigation() {
       return (
         <div key={index}>
           <ListItem
-            button
-            onClick={() => handleClick(item.name)}
             sx={{
-              backgroundColor: 'transparent',
-              color: 'text.primary',
+              backgroundColor: location.pathname === item.path ? 'primary.main' : 'transparent',
+              color: location.pathname === item.path ? 'primary.contrastText' : 'text.primary',
               '&:hover': {
-                backgroundColor: 'rgba(0, 0, 0, 0.04)'
+                backgroundColor: location.pathname === item.path 
+                  ? 'primary.dark' 
+                  : 'rgba(0, 0, 0, 0.04)'
               },
               borderRadius: '10px',
               margin: '5px 0px',
@@ -101,7 +131,7 @@ function Navigation() {
           >
             <ListItemIcon 
               sx={{ 
-                color: 'text.primary',
+                color: location.pathname === item.path ? 'white' : 'text.primary',
                 minWidth: '40px',
                 minHeight: '24px',
                 display: 'flex',
@@ -113,6 +143,8 @@ function Navigation() {
             </ListItemIcon>
             <ListItemText 
               primary={item.name} 
+              component={Link}
+              to={item.path}
               sx={{ 
                 opacity: collapsed ? 0 : 1,
                 transition: 'opacity 0.3s ease',
@@ -120,35 +152,41 @@ function Navigation() {
                 padding: 0,
                 paddingLeft: '8px',
                 width: collapsed ? 0 : 'auto',
-                overflow: 'hidden'
+                overflow: 'hidden',
+                cursor: 'pointer',
+                textDecoration: 'none',
+                color: 'inherit'
               }} 
             />
-            {collapsed ? null : (isOpen ? <ExpandLess /> : <ExpandMore />)}
+            <IconButton
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleClick(item.name);
+              }}
+              sx={{
+                color: location.pathname === item.path ? 'white' : 'text.primary',
+                opacity: collapsed ? 0 : 1,
+                transition: 'opacity 0.3s ease',
+                padding: 0
+              }}
+            >
+              {isOpen ? <ExpandLess /> : <ExpandMore />}
+            </IconButton>
           </ListItem>
           <Collapse in={!collapsed && isOpen} timeout="auto" unmountOnExit>
             <List component="div" disablePadding>
               {item.children.map((child, childIndex) => (
                 <ListItem
-                  key={childIndex}
-                  component={Link}
-                  to={child.path}
-                  sx={{
-                    backgroundColor: location.pathname === child.path ? 'primary.main' : 'transparent',
-                    color: location.pathname === child.path ? 'primary.contrastText' : 'text.primary',
-                    '&:hover': {
-                      backgroundColor: location.pathname === child.path 
-                        ? 'primary.dark' 
-                        : 'rgba(0, 0, 0, 0.04)'
-                    },
-                    borderRadius: '10px',
-                    margin: '5px 0px',
-                    padding: '8px 16px',
-                    height: '48px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    pl: 4
-                  }}
-                >
+                key={childIndex}
+                component={Link}
+                to={child.path}
+                sx={{
+                  ...listItemBaseStyle,
+                  pl: 4,
+                  ...listItemActiveStyle(location.pathname === child.path),
+                }}
+              >
                   <ListItemIcon 
                     sx={{ 
                       color: location.pathname === child.path ? 'white' : 'text.primary',
@@ -187,19 +225,8 @@ function Navigation() {
         component={Link}
         to={item.path}
         sx={{
-          backgroundColor: location.pathname === item.path ? 'primary.main' : 'transparent',
-          color: location.pathname === item.path ? 'primary.contrastText' : 'text.primary',
-          '&:hover': {
-            backgroundColor: location.pathname === item.path 
-              ? 'primary.dark' 
-              : 'rgba(0, 0, 0, 0.04)'
-          },
-          borderRadius: '10px',
-          margin: '5px 0px',
-          padding: '8px 16px',
-          height: '48px',
-          display: 'flex',
-          alignItems: 'center'
+          ...listItemBaseStyle,
+          ...listItemActiveStyle(location.pathname === item.path),
         }}
       >
         <ListItemIcon 
