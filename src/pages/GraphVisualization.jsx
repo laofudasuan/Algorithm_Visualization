@@ -987,6 +987,7 @@ function GraphVisualization() {
 
       const traversalContainer = document.createElement('div');
       traversalContainer.style.margin = '15px 0';
+      traversalContainer.style.padding = '0 10px';
       
       const bfsRadio = document.createElement('input');
       bfsRadio.type = 'radio';

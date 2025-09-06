@@ -306,7 +306,7 @@ export default function GraphInput({
           <div className="modal-container">
             <div style={{ marginBottom: 16 }}>
               <h2 style={{ margin: 0, textAlign: 'center', color: '#333', fontSize: 18 }}>批量输入</h2>
-              <div style={{ display: 'flex', flexDirection: 'column', fontSize: '12px', color: '#666', marginTop: 6, textAlign: 'center' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', fontSize: '12px', color: '#666', marginTop: 6, textAlign: 'center', padding: '0 10px' }}>
                 <div>每行一个点或一条边</div>
                 <div>边格式：起点 终点 [标签]</div>
                 <div>支持#注释</div>

@@ -10,30 +10,33 @@
   justify-content: center;
   align-items: center;
   z-index: 10000;
-  padding: 16px;
+  padding: 20px !important;
   box-sizing: border-box;
 }
 
 .modal-container {
-  background: white;
-  border-radius: 8px;
-  padding: 24px;
-  min-width: 300px;
-  max-width: 400px;
-  max-height: 70vh;
-  overflow-y: auto;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  background: white !important;
+  border-radius: 8px !important;
+  padding: 20px !important;
+  min-width: 300px !important;
+  width: 100% !important;
+  max-width: 500px !important;
+  box-sizing: border-box !important;
+  max-height: 70vh !important;
+  overflow-y: auto !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
 }
 
 .modal-title {
-  margin: 0 0 16px 0;
+  margin: 0 0 24px 0;
   color: #333;
   font-size: 18px;
   text-align: center;
 }
 
 .modal-section {
-  margin-bottom: 20px;
+  margin-bottom: 10px;
+  padding: 0 0;
 }
 
 .modal-label {
@@ -62,6 +65,7 @@
   color: #333;
   cursor: pointer;
   font-size: 14px;
+  padding: 0px;
 }
 
 .modal-checkbox-label input[type="checkbox"] {
@@ -89,7 +93,7 @@
 }
 
 .modal-subsection {
-  padding: 12px 0;
+  padding: 12px 5px;
 }
 
 .modal-select {
@@ -101,12 +105,14 @@
   font-size: 12px;
   color: #666;
   margin-top: 6px;
+  padding: 0 10px;
 }
 
 .modal-radio-group {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  padding: 0px 0;
 }
 
 .modal-radio-label {
@@ -116,6 +122,7 @@
   color: #333;
   cursor: pointer;
   font-size: 14px;
+  padding: 0px;
 }
 
 .modal-radio-label input[type="radio"] {
@@ -127,8 +134,8 @@
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  margin-top: 24px;
-  padding-top: 16px;
+  margin-top: 32px;
+  padding-top: 24px;
   border-top: 1px solid #eee;
 }
 
