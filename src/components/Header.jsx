@@ -47,7 +47,7 @@ function Header() {
               mr: 1
             }}
           >
-            <p>本平台目前正在内侧阶段，由老虎大蒜(laofudasuan)开发中</p>
+            <p>本平台目前由老虎大蒜(laofudasuan)开发中，还在开发的起步阶段，所以有很多错误内容待修改</p>
             <p> 有任何疑问欢迎加入QQ群：251998253</p>
           </Typography>
           <img 

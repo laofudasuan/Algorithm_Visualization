@@ -126,7 +126,8 @@ function Navigation() {
               padding: '8px 16px',
               height: '48px',
               display: 'flex',
-              alignItems: 'center'
+               alignItems: 'center',
+              overflow: 'hidden'
             }}
           >
             <ListItemIcon 
@@ -152,10 +153,13 @@ function Navigation() {
                 padding: 0,
                 paddingLeft: '8px',
                 width: collapsed ? 0 : 'auto',
+                minWidth: collapsed ? 0 : 'auto',
                 overflow: 'hidden',
                 cursor: 'pointer',
                 textDecoration: 'none',
-                color: 'inherit'
+                color: 'inherit',
+                flex: '1 1 auto',
+                whiteSpace: 'nowrap'
               }} 
             />
             <IconButton
@@ -185,6 +189,7 @@ function Navigation() {
                   ...listItemBaseStyle,
                   pl: 4,
                   ...listItemActiveStyle(location.pathname === child.path),
+                  overflow: 'hidden'
                 }}
               >
                   <ListItemIcon 
@@ -208,7 +213,10 @@ function Navigation() {
                       padding: 0,
                       paddingLeft: '8px',
                       width: collapsed ? 0 : 'auto',
-                      overflow: 'hidden'
+                      minWidth: collapsed ? 0 : 'auto',
+                      overflow: 'hidden',
+                      flex: '1 1 auto',
+                      whiteSpace: 'nowrap'
                     }} 
                   />
                 </ListItem>
@@ -227,6 +235,7 @@ function Navigation() {
         sx={{
           ...listItemBaseStyle,
           ...listItemActiveStyle(location.pathname === item.path),
+          overflow: 'hidden'
         }}
       >
         <ListItemIcon 
@@ -250,7 +259,10 @@ function Navigation() {
             padding: 0,
             paddingLeft: '8px',
             width: collapsed ? 0 : 'auto',
-            overflow: 'hidden'
+            minWidth: collapsed ? 0 : 'auto',
+            overflow: 'hidden',
+            flex: '1 1 auto',
+            whiteSpace: 'nowrap'
           }} 
         />
       </ListItem>
