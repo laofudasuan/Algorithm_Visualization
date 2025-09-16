@@ -56,8 +56,6 @@ function App() {
               py: 2,
               width: '100%',
               maxWidth: '100vw',
-              // Add left margin to account for navigation width when expanded
-              ml: '80px', // Default to collapsed width
               transition: 'margin 0.3s ease',
               // Add top margin to account for fixed header
               mt: '64px' // Approximately the height of the header

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Drawer, List, ListItem, ListItemIcon, ListItemText, Box, Collapse, IconButton } from '@mui/material';
 import { Home as HomeIcon, BarChart as BarChartIcon, Search as SearchIcon, 
@@ -7,16 +7,26 @@ import { Home as HomeIcon, BarChart as BarChartIcon, Search as SearchIcon,
          ShowChart as ShowChartIcon, Note as NoteIcon, Sort as SortIcon,
          ExpandLess, ExpandMore, PlayArrow as PlayArrowIcon, TextFields as TextFieldsIcon } from '@mui/icons-material';
 
+// 全局变量跟踪导航栏可见状态
+let isNavigationVisible = false;
+
+// 全局函数用于切换导航栏可见性
+window.toggleNavigation = function() {
+  isNavigationVisible = !isNavigationVisible;
+  // 触发自定义事件通知组件更新
+  window.dispatchEvent(new CustomEvent('navigationToggle', { detail: isNavigationVisible }));
+};
+
 function Navigation() {
   const location = useLocation();
-  const [collapsed, setCollapsed] = useState(true);
+  const [visible, setVisible] = useState(isNavigationVisible);
   const [openMenus, setOpenMenus] = useState({});
-
+  
   // Extracted common styles
   const listItemBaseStyle = {
     borderRadius: '10px',
     margin: '5px 0px',
-    padding: '8px 16px',
+    padding: '8px 8px',
     height: '48px',
     display: 'flex',
     alignItems: 'center',
@@ -32,13 +42,34 @@ function Navigation() {
     '&:hover': listItemHoverStyle(isActive),
   });
 
-  const handleMouseEnter = () => {
-    setCollapsed(false);
+  // 为父级菜单设置不同的高亮样式
+  const parentItemActiveStyle = (isActive) => ({
+    backgroundColor: isActive ? 'primary.light' : 'transparent',
+    color: isActive ? 'primary.contrastText' : 'text.primary',
+    '&:hover': listItemHoverStyle(isActive),
+  });
+
+  // 检查当前路径是否匹配给定路径或其子路径
+  const isPathActive = (path) => {
+    if (!path) return false;
+    // 精确匹配
+    if (location.pathname === path) return true;
+    // 前缀匹配（检查是否为子路径）
+    if (path !== '/' && location.pathname.startsWith(path)) return true;
+    return false;
   };
 
-  const handleMouseLeave = () => {
-    setCollapsed(true);
-  };
+  // 监听全局导航切换事件
+  useEffect(() => {
+    const handleToggle = (event) => {
+      setVisible(event.detail);
+    };
+    
+    window.addEventListener('navigationToggle', handleToggle);
+    return () => {
+      window.removeEventListener('navigationToggle', handleToggle);
+    };
+  }, []);
 
   const handleClick = (menu) => {
     setOpenMenus((prev) => ({
@@ -110,34 +141,27 @@ function Navigation() {
   const renderNavItem = (item, index) => {
     if (item.children) {
       const isOpen = openMenus[item.name];
+      const isCurrentItemActive = isPathActive(item.path);
       return (
         <div key={index}>
           <ListItem
             sx={{
-              backgroundColor: location.pathname === item.path ? 'primary.main' : 'transparent',
-              color: location.pathname === item.path ? 'primary.contrastText' : 'text.primary',
-              '&:hover': {
-                backgroundColor: location.pathname === item.path 
-                  ? 'primary.dark' 
-                  : 'rgba(0, 0, 0, 0.04)'
-              },
-              borderRadius: '10px',
-              margin: '5px 0px',
-              padding: '8px 16px',
-              height: '48px',
-              display: 'flex',
-               alignItems: 'center',
-              overflow: 'hidden'
+              ...listItemBaseStyle,
+              ...parentItemActiveStyle(isCurrentItemActive),
+              overflow: 'hidden',
+              padding: '8px 8px'
             }}
           >
             <ListItemIcon 
               sx={{ 
-                color: location.pathname === item.path ? 'white' : 'text.primary',
+                color: isCurrentItemActive ? 'white' : 'text.primary',
                 minWidth: '40px',
                 minHeight: '24px',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                margin: 0,
+                padding: 0
               }}
             >
               {item.icon}
@@ -147,13 +171,13 @@ function Navigation() {
               component={Link}
               to={item.path}
               sx={{ 
-                opacity: collapsed ? 0 : 1,
+                opacity: visible ? 1 : 0,
                 transition: 'opacity 0.3s ease',
                 margin: 0,
                 padding: 0,
                 paddingLeft: '8px',
-                width: collapsed ? 0 : 'auto',
-                minWidth: collapsed ? 0 : 'auto',
+                width: visible ? 'auto' : 0,
+                minWidth: visible ? 'auto' : 0,
                 overflow: 'hidden',
                 cursor: 'pointer',
                 textDecoration: 'none',
@@ -169,8 +193,8 @@ function Navigation() {
                 handleClick(item.name);
               }}
               sx={{
-                color: location.pathname === item.path ? 'white' : 'text.primary',
-                opacity: collapsed ? 0 : 1,
+                color: isCurrentItemActive ? 'white' : 'text.primary',
+                opacity: visible ? 1 : 0,
                 transition: 'opacity 0.3s ease',
                 padding: 0
               }}
@@ -178,7 +202,7 @@ function Navigation() {
               {isOpen ? <ExpandLess /> : <ExpandMore />}
             </IconButton>
           </ListItem>
-          <Collapse in={!collapsed && isOpen} timeout="auto" unmountOnExit>
+          <Collapse in={visible && isOpen} timeout="auto" unmountOnExit>
             <List component="div" disablePadding>
               {item.children.map((child, childIndex) => (
                 <ListItem
@@ -189,7 +213,8 @@ function Navigation() {
                   ...listItemBaseStyle,
                   pl: 4,
                   ...listItemActiveStyle(location.pathname === child.path),
-                  overflow: 'hidden'
+                  overflow: 'hidden',
+                  padding: '8px 8px'
                 }}
               >
                   <ListItemIcon 
@@ -199,7 +224,9 @@ function Navigation() {
                       minHeight: '24px',
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'center'
+                      justifyContent: 'center',
+                      margin: 0,
+                      padding: 0
                     }}
                   >
                     {child.icon}
@@ -207,13 +234,13 @@ function Navigation() {
                   <ListItemText 
                     primary={child.name} 
                     sx={{ 
-                      opacity: collapsed ? 0 : 1,
+                      opacity: visible ? 1 : 0,
                       transition: 'opacity 0.3s ease',
                       margin: 0,
                       padding: 0,
                       paddingLeft: '8px',
-                      width: collapsed ? 0 : 'auto',
-                      minWidth: collapsed ? 0 : 'auto',
+                      width: visible ? 'auto' : 0,
+                      minWidth: visible ? 'auto' : 0,
                       overflow: 'hidden',
                       flex: '1 1 auto',
                       whiteSpace: 'nowrap'
@@ -235,7 +262,8 @@ function Navigation() {
         sx={{
           ...listItemBaseStyle,
           ...listItemActiveStyle(location.pathname === item.path),
-          overflow: 'hidden'
+          overflow: 'hidden',
+          padding: '8px 8px'
         }}
       >
         <ListItemIcon 
@@ -245,7 +273,9 @@ function Navigation() {
             minHeight: '24px',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center'
+            justifyContent: 'center',
+            margin: 0,
+            padding: 0
           }}
         >
           {item.icon}
@@ -253,13 +283,13 @@ function Navigation() {
         <ListItemText 
           primary={item.name} 
           sx={{ 
-            opacity: collapsed ? 0 : 1,
+            opacity: visible ? 1 : 0,
             transition: 'opacity 0.3s ease',
             margin: 0,
             padding: 0,
             paddingLeft: '8px',
-            width: collapsed ? 0 : 'auto',
-            minWidth: collapsed ? 0 : 'auto',
+            width: visible ? 'auto' : 0,
+            minWidth: visible ? 'auto' : 0,
             overflow: 'hidden',
             flex: '1 1 auto',
             whiteSpace: 'nowrap'
@@ -274,31 +304,31 @@ function Navigation() {
       {/* Navigation Drawer - Fixed positioned to stay in place during scroll */}
       <Drawer
         variant="permanent"
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
         sx={{
-          width: collapsed ? '80px' : '200px',
+          width: visible ? '240px' : '0px',
           flexShrink: 0,
           [`& .MuiDrawer-paper`]: {
-            width: collapsed ? '80px' : '200px',
+            width: visible ? '240px' : '0px',
             boxSizing: 'border-box',
             backgroundColor: 'background.paper',
             borderRight: '1px solid rgba(0, 0, 0, 0.12)',
             transition: 'width 0.3s ease',
             overflowX: 'hidden',
-            marginTop: '64px', // Height of the fixed header
+            marginTop: '64px',
             height: 'calc(100% - 64px)',
-            // Make the drawer fixed positioned
             position: 'fixed',
-            zIndex: 1100 // Ensure it's above content but below modals
+            zIndex: 1100
           },
         }}
       >
-        <Box sx={{ paddingTop: '0px' }}>
-          <List>
-            {navItems.map((item, index) => renderNavItem(item, index))}
-          </List>
-        </Box>
+        {/* 只有在显示时才渲染内容 */}
+        {visible && (
+          <Box sx={{ paddingTop: '0px' }}>
+            <List>
+              {navItems.map((item, index) => renderNavItem(item, index))}
+            </List>
+          </Box>
+        )}
       </Drawer>
     </>
   );

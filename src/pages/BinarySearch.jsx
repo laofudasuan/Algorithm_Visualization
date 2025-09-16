@@ -96,8 +96,12 @@ function BinarySearch() {
   };
 
   return (
-    <div style={{ padding: '20px', minHeight: '100vh', width: '100vw', maxWidth: '100vw', overflowX: 'hidden', margin: 0, marginLeft: 0 }}>
-      <h1 style={{ textAlign: 'center', color: '#1976d2' }}>二分查找算法可视化</h1>
+    <div style={{ padding: '20px', minHeight: '100vh', width: '100vw', maxWidth: '100vw', overflowX: 'hidden', margin: 0, marginLeft: '60px' }}>
+      <h1 style={{ 
+        textAlign: 'center', 
+        color: '#1976d2',
+        marginBottom: '30px'
+      }}>二分查找算法可视化</h1>
       
       <div style={{ 
         display: 'flex', 

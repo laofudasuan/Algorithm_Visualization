@@ -93,14 +93,16 @@ function FibonacciVisualization() {
 
   return (
     <div style={{ padding: '20px', minHeight: '100vh', width: '100vw', maxWidth: '100vw', overflowX: 'hidden', margin: 0, marginLeft: 0 }}>
-      <h1 style={{ textAlign: 'center', color: '#1976d2' }}>斐波那契数列动态规划可视化</h1>
+      <h1 style={{ 
+        textAlign: 'center', 
+        color: '#1976d2',
+        marginBottom: '30px'
+      }}>斐波那契数列动态规划可视化</h1>
       
       <div style={{ 
         display: 'flex', 
         flexDirection: 'column', 
         alignItems: 'center', 
-        gap: '30px',
-        maxWidth: '1400px',
         margin: '0 auto',
         width: '100%'
       }}>
@@ -114,7 +116,7 @@ function FibonacciVisualization() {
           border: '1px solid #ddd', 
           borderRadius: 8, 
           backgroundColor: '#f9f9f9',
-          width: '100%',
+          width: '100%', // 改回100%宽度
           justifyContent: 'center'
         }}>
           {/* 动画速度 */}
@@ -181,17 +183,18 @@ function FibonacciVisualization() {
         </div>
 
         {/* 可视化区域 */}
-        <div style={{ width: '100%', maxWidth: '1000px' }}>
+        <div style={{ width: '100%', maxWidth: '1200px' }}>
           {renderFibonacciTable()}
         </div>
 
         {/* 算法说明 */}
         <div style={{ 
           maxWidth: '800px', 
-          padding: '20px', 
+          padding: '24px', 
           backgroundColor: '#f8f9fa', 
           borderRadius: '8px',
-          width: '100%'
+          width: '100%',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
         }}>
           <h3 style={{ color: '#1976d2', marginBottom: '15px' }}>算法说明</h3>
           <div>

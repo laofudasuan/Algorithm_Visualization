@@ -123,14 +123,16 @@ function KnapsackVisualization() {
 
   return (
     <div style={{ padding: '20px', minHeight: '100vh', width: '100vw', maxWidth: '100vw', overflowX: 'hidden', margin: 0, marginLeft: 0 }}>
-      <h1 style={{ textAlign: 'center', color: '#1976d2' }}>0-1背包问题动态规划可视化</h1>
+      <h1 style={{ 
+        textAlign: 'center', 
+        color: '#1976d2',
+        marginBottom: '30px'
+      }}>0-1背包问题动态规划可视化</h1>
       
       <div style={{ 
         display: 'flex', 
         flexDirection: 'column', 
-        alignItems: 'center', 
-        gap: '30px',
-        maxWidth: '1400px',
+        alignItems: 'center',
         margin: '0 auto',
         width: '100%'
       }}>
@@ -144,7 +146,7 @@ function KnapsackVisualization() {
           border: '1px solid #ddd', 
           borderRadius: 8, 
           backgroundColor: '#f9f9f9',
-          width: '100%',
+          width: '100%', // 改回100%宽度
           justifyContent: 'center'
         }}>
           {/* 动画速度 */}

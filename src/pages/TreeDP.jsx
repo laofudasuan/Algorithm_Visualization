@@ -123,14 +123,16 @@ function TreeDP() {
 
   return (
     <div style={{ padding: '20px', minHeight: '100vh', width: '100vw', maxWidth: '100vw', overflowX: 'hidden', margin: 0, marginLeft: 0 }}>
-      <h1 style={{ textAlign: 'center', color: '#1976d2' }}>树形动态规划可视化</h1>
+      <h1 style={{ 
+        textAlign: 'center', 
+        color: '#1976d2',
+        marginBottom: '30px'
+      }}>树形动态规划可视化</h1>
       
       <div style={{ 
         display: 'flex', 
         flexDirection: 'column', 
         alignItems: 'center', 
-        gap: '20px',
-        maxWidth: '1200px',
         margin: '0 auto',
         width: '100%'
       }}>
@@ -139,11 +141,13 @@ function TreeDP() {
           display: 'flex', 
           flexWrap: 'wrap', 
           gap: 16, 
-          justifyContent: 'center',
-          padding: '20px',
-          backgroundColor: '#f5f5f5',
-          borderRadius: '8px',
-          width: '100%'
+          alignItems: 'center', 
+          padding: 20, 
+          border: '1px solid #ddd', 
+          borderRadius: 8, 
+          backgroundColor: '#f9f9f9',
+          width: '100%', // 改回100%宽度
+          justifyContent: 'center'
         }}>
           <div>
             <label style={{ marginRight: 8 }}>动画速度:</label>

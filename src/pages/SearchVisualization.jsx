@@ -373,8 +373,7 @@ function SearchVisualization() {
       <div style={{ 
         display: 'flex', 
         justifyContent: 'center', 
-        gap: '20px', 
-        marginBottom: '30px',
+        gap: '10px', 
         flexWrap: 'wrap',
         padding: '20px',
         backgroundColor: '#f8f9fa',
@@ -471,83 +470,98 @@ function SearchVisualization() {
         </button>
       </div>
 
-      {/* 图例 */}
+      {/* 图例和网格容器 */}
       <div style={{ 
         display: 'flex', 
-        gap: '15px', 
-        marginBottom: '20px', 
-        padding: '15px', 
-        backgroundColor: '#ffffff', 
-        borderRadius: '8px',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+        justifyContent: 'flex-start',
+        alignItems: 'flex-start',
+        marginBottom: '20px',
+        gap: '20px',
         flexWrap: 'wrap'
       }}>
-        {[
-          { type: CELL_TYPES.START, label: '起点' },
-          { type: CELL_TYPES.END, label: '终点' },
-          { type: CELL_TYPES.WALL, label: '墙壁' },
-          { type: CELL_TYPES.VISITED, label: '已访问' },
-          { type: CELL_TYPES.CURRENT, label: '当前访问' },
-          { type: CELL_TYPES.PATH, label: '最短路径' }
-        ].map(({ type, label }) => (
-          <div key={type} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-            <div style={{
-              width: '20px',
-              height: '20px',
-              backgroundColor: getCellColor(type),
-              border: '1px solid #ccc',
-              borderRadius: '2px'
-            }}></div>
-            <span style={{ fontSize: '14px' }}>{label}</span>
-          </div>
-        ))}
-      </div>
+        {/* 图例 */}
+        <div style={{ 
+          display: 'flex', 
+          flexDirection: 'column',
+          gap: '15px', 
+          padding: '15px', 
+          backgroundColor: '#ffffff', 
+          borderRadius: '8px',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+          minWidth: '120px',
+          position: 'sticky',
+          top: '80px',
+          alignSelf: 'flex-start'
+        }}>
+          {[
+            { type: CELL_TYPES.START, label: '起点' },
+            { type: CELL_TYPES.END, label: '终点' },
+            { type: CELL_TYPES.WALL, label: '墙壁' },
+            { type: CELL_TYPES.VISITED, label: '已访问' },
+            { type: CELL_TYPES.CURRENT, label: '当前访问' },
+            { type: CELL_TYPES.PATH, label: '最短路径' }
+          ].map(({ type, label }) => (
+            <div key={type} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <div style={{
+                width: '20px',
+                height: '20px',
+                backgroundColor: getCellColor(type),
+                border: '1px solid #ccc',
+                borderRadius: '2px'
+              }}></div>
+              <span style={{ fontSize: '14px' }}>{label}</span>
+            </div>
+          ))}
+        </div>
 
-      {/* 网格 */}
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center',
-        marginBottom: '20px'
-      }}>
-        <div 
-          style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(20, 25px)',
-            gap: '1px',
-            backgroundColor: '#ccc',
-            padding: '1px',
-            borderRadius: '4px'
-          }}
-          onMouseLeave={handleMouseUp}
-        >
-          {grid.map((row, rowIndex) =>
-            row.map((cell, colIndex) => (
-              <div
-                key={`${rowIndex}-${colIndex}`}
-                style={{
-                  width: '25px',
-                  height: '25px',
-                  backgroundColor: getCellColor(cell),
-                  cursor: isRunning ? 'not-allowed' : 'pointer',
-                  transition: 'background-color 0.2s ease',
-                  border: '1px solid #ddd',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '10px',
-                  fontWeight: 'bold',
-                  color: distances[rowIndex][colIndex] >= 0 ? 
-                    (cell === CELL_TYPES.VISITED || cell === CELL_TYPES.PATH || cell === CELL_TYPES.CURRENT ? '#fff' : '#333') : 
-                    'transparent'
-                }}
-                onMouseDown={() => handleMouseDown(rowIndex, colIndex)}
-                onMouseEnter={() => handleMouseEnter(rowIndex, colIndex)}
-                onMouseUp={handleMouseUp}
-              >
-                {distances[rowIndex][colIndex] >= 0 ? distances[rowIndex][colIndex] : ''}
-              </div>
-            ))
-          )}
+        {/* 网格容器 - 添加居中对齐 */}
+        <div style={{ 
+          display: 'flex',
+          justifyContent: 'center',
+          flex: 1,
+          minWidth: 0
+        }}>
+          {/* 网格 */}
+          <div 
+            style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(20, 25px)',
+              gap: '1px',
+              backgroundColor: '#ccc',
+              padding: '1px',
+              borderRadius: '4px'
+            }}
+            onMouseLeave={handleMouseUp}
+          >
+            {grid.map((row, rowIndex) =>
+              row.map((cell, colIndex) => (
+                <div
+                  key={`${rowIndex}-${colIndex}`}
+                  style={{
+                    width: '25px',
+                    height: '25px',
+                    backgroundColor: getCellColor(cell),
+                    cursor: isRunning ? 'not-allowed' : 'pointer',
+                    transition: 'background-color 0.2s ease',
+                    border: '1px solid #ddd',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '10px',
+                    fontWeight: 'bold',
+                    color: distances[rowIndex][colIndex] >= 0 ? 
+                      (cell === CELL_TYPES.VISITED || cell === CELL_TYPES.PATH || cell === CELL_TYPES.CURRENT ? '#fff' : '#333') : 
+                      'transparent'
+                  }}
+                  onMouseDown={() => handleMouseDown(rowIndex, colIndex)}
+                  onMouseEnter={() => handleMouseEnter(rowIndex, colIndex)}
+                  onMouseUp={handleMouseUp}
+                >
+                  {distances[rowIndex][colIndex] >= 0 ? distances[rowIndex][colIndex] : ''}
+                </div>
+              ))
+            )}
+          </div>
         </div>
       </div>
 

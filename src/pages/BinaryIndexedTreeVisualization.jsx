@@ -435,7 +435,6 @@ const BinaryIndexedTreeVisualization = () => {
         flexDirection: 'column', 
         alignItems: 'center', 
         gap: '30px',
-        maxWidth: '1400px',
         margin: '0 auto',
         width: '100%'
       }}>
