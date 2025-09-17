@@ -1450,7 +1450,7 @@ function GraphVisualization() {
   };
 
   return (
-    <div style={{ height: '100vh', minHeight: '100vh', position: 'relative', width: '100vw', maxWidth: '100vw', overflowX: 'hidden', margin: 0, padding: 0, marginLeft: 0 }}>
+    <div style={{ height: '100vh', minHeight: '100vh', position: 'relative', width: '100%', maxWidth: '100%', overflowX: 'hidden', margin: 0, padding: 0 }}>
       {/* 主图区域 */}
       <div style={{ 
         position: 'absolute',
@@ -1556,6 +1556,7 @@ function GraphVisualization() {
       <div style={{ 
         position: 'absolute',
         top: '0px',
+        left: '0px',
         width: leftPanelCollapsed ? '60px' : '340px',
         maxHeight: '100vh',
         background: '#f8f9fa',
@@ -1612,7 +1613,7 @@ function GraphVisualization() {
       <div style={{ 
         position: 'absolute',
         top: '0px',
-        right: '120px',
+        right: '0px',
         width: rightPanelCollapsed ? '60px' : '260px',
         maxHeight: 'calc(100vh - 40px)',
         background: '#f8f9fa',

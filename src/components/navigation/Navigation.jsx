@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Drawer, List, ListItem, ListItemIcon, ListItemText, Box, Collapse, IconButton } from '@mui/material';
 import { Home as HomeIcon, BarChart as BarChartIcon, Search as SearchIcon, 
@@ -21,6 +21,7 @@ function Navigation() {
   const location = useLocation();
   const [visible, setVisible] = useState(isNavigationVisible);
   const [openMenus, setOpenMenus] = useState({});
+  const navigationRef = useRef(null);
   
   // Extracted common styles
   const listItemBaseStyle = {
@@ -50,14 +51,8 @@ function Navigation() {
   });
 
   // 检查当前路径是否匹配给定路径或其子路径
-  const isPathActive = (path) => {
-    if (!path) return false;
-    // 精确匹配
-    if (location.pathname === path) return true;
-    // 前缀匹配（检查是否为子路径）
-    if (path !== '/' && location.pathname.startsWith(path)) return true;
-    return false;
-  };
+  const isPathActive = (path) => 
+    !!path && (location.pathname === path || (path !== '/' && location.pathname.startsWith(path)));
 
   // 监听全局导航切换事件
   useEffect(() => {
@@ -70,6 +65,27 @@ function Navigation() {
       window.removeEventListener('navigationToggle', handleToggle);
     };
   }, []);
+
+  // 监听点击事件，当导航栏展开时点击外部区域则隐藏导航栏
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      // 如果导航栏未展开，则不处理
+      if (!visible) return;
+      
+      // 如果点击的元素不在导航栏内，则隐藏导航栏
+      if (navigationRef.current && !navigationRef.current.contains(event.target)) {
+        window.toggleNavigation();
+      }
+    };
+
+    // 添加事件监听器
+    document.addEventListener('mousedown', handleClickOutside);
+    
+    return () => {
+      // 清理事件监听器
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [visible]);
 
   const handleClick = (menu) => {
     setOpenMenus((prev) => ({
@@ -114,21 +130,24 @@ function Navigation() {
     },
     { 
       name: '数据结构', 
+      path: '/data-structure',
       icon: <AccountTreeIcon />,
       children: [
-        { name: '链表', path: '/linkedlist', icon: <LinkIcon /> },
-        { name: '优先队列', path: '/priorityqueue', icon: <ListIcon /> },
-        { name: '线段树', path: '/segmenttree', icon: <AccountTreeIcon /> },
-        { name: '平衡树', path: '/balancedtree', icon: <BalanceIcon /> },
-        { name: '树状数组', path: '/binarytree', icon: <ShowChartIcon /> }
+        { name: '链表', path: '/data-structure/linkedlist', icon: <LinkIcon /> },
+        { name: '优先队列', path: '/data-structure/priorityqueue', icon: <ListIcon /> },
+        { name: '线段树', path: '/data-structure/segmenttree', icon: <AccountTreeIcon /> },
+        { name: '平衡树', path: '/data-structure/balancedtree', icon: <BalanceIcon /> },
+        { name: '树状数组', path: '/data-structure/binarytree', icon: <ShowChartIcon /> }
       ]
     },
     { 
       name: '字符串', 
+      path: '/string-algorithms',
       icon: <TextFieldsIcon />,
       children: [
-        { name: 'KMP算法', path: '/kmp', icon: <TextFieldsIcon /> },
-        { name: 'AC自动机', path: '/ac-automation', icon: <TextFieldsIcon /> }
+        { name: 'KMP算法', path: '/string-algorithms/kmp', icon: <TextFieldsIcon /> },
+        { name: 'AC自动机', path: '/string-algorithms/ac-automation', icon: <TextFieldsIcon /> },
+        { name: '后缀自动机', path: '/string-algorithms/suffix-automaton', icon: <TextFieldsIcon /> }
       ]
     },
     { 
@@ -304,6 +323,7 @@ function Navigation() {
       {/* Navigation Drawer - Fixed positioned to stay in place during scroll */}
       <Drawer
         variant="permanent"
+        ref={navigationRef}
         sx={{
           width: visible ? '240px' : '0px',
           flexShrink: 0,

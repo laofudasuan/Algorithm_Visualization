@@ -25,6 +25,9 @@ import BinarySearch from './pages/BinarySearch';
 import DivideConquer from './pages/DivideConquer';
 import Doubling from './pages/Doubling';
 import TreeDP from './pages/TreeDP';
+import DataStructureVisualization from './pages/DataStructureVisualization';
+import StringAlgorithmsVisualization from './pages/StringAlgorithmsVisualization';
+import SuffixAutomatonVisualization from './pages/SuffixAutomatonVisualization';
 import theme from './theme';
 import './App.css';
 import Header from './components/Header';
@@ -71,19 +74,22 @@ function App() {
               <Route path="/dp/lcs" element={<LCSVisualization />} />
               <Route path="/dp/knapsack" element={<KnapsackVisualization />} />
               <Route path="/dp/tree-dp" element={<TreeDP />} />
-              <Route path="/linkedlist" element={<LinkedListVisualization />} />
-              <Route path="/priorityqueue" element={<PriorityQueueVisualization />} />
-              <Route path="/segmenttree" element={<SegmentTreeVisualization />} />
-              <Route path="/balancedtree" element={<BalancedTreeVisualization />} />
-              <Route path="/binarytree" element={<BinaryIndexedTreeVisualization />} />
+              <Route path="/data-structure/linkedlist" element={<LinkedListVisualization />} />
+              <Route path="/data-structure/priorityqueue" element={<PriorityQueueVisualization />} />
+              <Route path="/data-structure/segmenttree" element={<SegmentTreeVisualization />} />
+              <Route path="/data-structure/balancedtree" element={<BalancedTreeVisualization />} />
+              <Route path="/data-structure/binarytree" element={<BinaryIndexedTreeVisualization />} />
               <Route path="/local-jupyter" element={<LocalJupyterNotebook />} />
-              <Route path="/kmp" element={<KMPVisualization />} />
-              <Route path="/ac-automation" element={<ACAutomationVisualization />} />
+              <Route path="/string-algorithms/kmp" element={<KMPVisualization />} />
+              <Route path="/string-algorithms/ac-automation" element={<ACAutomationVisualization />} />
+              <Route path="/string-algorithms/suffix-automaton" element={<SuffixAutomatonVisualization />} />
               <Route path="/basic" element={<BasicAlgorithmsVisualization />} />
               <Route path="/basic/sorting" element={<SortingAlgorithms />} />
               <Route path="/basic/binary-search" element={<BinarySearch />} />
               <Route path="/basic/divide-conquer" element={<DivideConquer />} />
               <Route path="/basic/doubling" element={<Doubling />} />
+              <Route path="/data-structure" element={<DataStructureVisualization />} />
+              <Route path="/string-algorithms" element={<StringAlgorithmsVisualization />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </Box>
