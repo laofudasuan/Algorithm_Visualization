@@ -14,6 +14,7 @@ import SortIcon from '@mui/icons-material/Sort';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import TextFieldsIcon from '@mui/icons-material/TextFields';
+import AnimationIcon from '@mui/icons-material/AutoAwesome';
 
 function Home() {
   const moduleCategories = [
@@ -109,13 +110,44 @@ function Home() {
       ]
     },
     {
-      category: 'Jupyter',
-      icon: <NoteIcon sx={{ fontSize: 48 }} />,
+      category: '数据结构',
+      icon: <AccountTreeIcon sx={{ fontSize: 48 }} />,
       modules: [
         {
-          title: '本地Jupyter Notebook',
-          description: '集成本地Jupyter Notebook环境，支持完整的交互式编程体验',
-          path: '/local-jupyter'
+          title: '链表',
+          description: '可视化链表结构和操作，包括单链表、双链表等',
+          path: '/linkedlist'
+        },
+        {
+          title: '优先队列',
+          description: '展示优先队列的实现和操作过程',
+          path: '/priorityqueue'
+        },
+        {
+          title: '线段树',
+          description: '可视化线段树的构建和操作过程',
+          path: '/segmenttree'
+        },
+        {
+          title: '平衡树',
+          description: '展示平衡树的结构和旋转操作',
+          path: '/balancedtree'
+        },
+        {
+          title: '树状数组',
+          description: '可视化树状数组的结构和操作',
+          path: '/binarytree'
+        }
+      ]
+    },
+    {
+      category: '测试页面',
+      icon: <AnimationIcon sx={{ fontSize: 48 }} />,
+      modules: [
+        {
+          title: '动画测试',
+          description: '测试各种动画效果和交互',
+          path: '/animation-test'
         }
       ]
     }

@@ -5,7 +5,8 @@ import { Home as HomeIcon, BarChart as BarChartIcon, Search as SearchIcon,
          Functions as FunctionsIcon, Link as LinkIcon, List as ListIcon, 
          AccountTree as AccountTreeIcon, Balance as BalanceIcon, 
          ShowChart as ShowChartIcon, Note as NoteIcon, Sort as SortIcon,
-         ExpandLess, ExpandMore, PlayArrow as PlayArrowIcon, TextFields as TextFieldsIcon } from '@mui/icons-material';
+         ExpandLess, ExpandMore, PlayArrow as PlayArrowIcon, TextFields as TextFieldsIcon, 
+         AutoAwesome as AutoAwesomeIcon } from '@mui/icons-material';
 
 // 全局变量跟踪导航栏可见状态
 let isNavigationVisible = false;
@@ -149,6 +150,11 @@ function Navigation() {
         { name: 'AC自动机', path: '/string-algorithms/ac-automation', icon: <TextFieldsIcon /> },
         { name: '后缀自动机', path: '/string-algorithms/suffix-automaton', icon: <TextFieldsIcon /> }
       ]
+    },
+    { 
+      name: '测试页面', 
+      path: '/animation-test', 
+      icon: <AutoAwesomeIcon /> 
     },
     { 
       name: 'Jupyter', 

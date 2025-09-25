@@ -28,6 +28,7 @@ import TreeDP from './pages/TreeDP';
 import DataStructureVisualization from './pages/DataStructureVisualization';
 import StringAlgorithmsVisualization from './pages/StringAlgorithmsVisualization';
 import SuffixAutomatonVisualization from './pages/SuffixAutomatonVisualization';
+import AnimationTest from './pages/AnimationTest';
 import theme from './theme';
 import './App.css';
 import Header from './components/Header';
@@ -90,6 +91,7 @@ function App() {
               <Route path="/basic/doubling" element={<Doubling />} />
               <Route path="/data-structure" element={<DataStructureVisualization />} />
               <Route path="/string-algorithms" element={<StringAlgorithmsVisualization />} />
+              <Route path="/animation-test" element={<AnimationTest />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </Box>
