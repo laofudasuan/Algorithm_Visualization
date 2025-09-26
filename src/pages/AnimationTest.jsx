@@ -1,52 +1,9 @@
-import { animate, createScope, createSpring, createDraggable } from 'animejs';
-import { useEffect, useRef, useState } from 'react';
-import reactLogo from '../assets/react.svg';
+import React, { useState } from 'react';
+import GraphCanvas from '../components/animation/GraphCanvas';
 import '../App.css';
 
 function AnimationTest() {
-  const root = useRef(null);
-  const scope = useRef(null);
-  const [ rotations, setRotations ] = useState(0);
   const [nodeSize, setNodeSize] = useState(20); // 默认节点大小为20
-
-  useEffect(() => {
-  
-    scope.current = createScope({ root }).add( self => {
-
-      // Animate circle nodes by targeting their transform attribute
-      animate('.node-circle', {
-        scale: 1.1,
-        duration: 1000,
-        loop: true,
-        direction: 'alternate',
-        easing: 'easeInOutSine'
-      });
-      
-      // Animate square nodes by targeting their transform attribute
-      animate('.node-square', {
-        scale: 1.1,
-        duration: 1000,
-        loop: true,
-        direction: 'alternate',
-        easing: 'easeInOutSine'
-      });
-
-      // Animate the text
-      animate('.animated-text', {
-        scale: 1.2,
-        fill: '#ff4081',
-        duration: 1500,
-        loop: true,
-        direction: 'alternate',
-        easing: 'easeInOutQuad'
-      });
-
-    });
-
-    // Properly cleanup all anime.js instances declared inside the scope
-    return () => scope.current.revert()
-
-  }, []);
 
   // 定义节点数据
   const nodes = [
@@ -69,14 +26,25 @@ function AnimationTest() {
     { source: 5, target: 6 }
   ];
 
+  // 图选项
+  const graphOptions = {
+    nodeSize: nodeSize,
+    physicalParameters: {
+      charge: -1000,
+      linkDistance: 100,
+      gravity: 0.05,
+      friction: 0.8
+    }
+  };
+
   return (
-    <div ref={root}>
+    <div>
       {/* 控制面板 */}
       <div style={{ 
         position: 'absolute', 
         top: '20px', 
         left: '20px', 
-        zIndex: 1000, 
+        zIndex: 1001, 
         backgroundColor: 'white', 
         padding: '15px', 
         borderRadius: '8px', 
@@ -99,93 +67,16 @@ function AnimationTest() {
         </div>
       </div>
 
-      {/* SVG Graph Visualization Canvas */}
-      <div className="medium row">
-        <svg width="1000" height="600" className="svg-canvas" viewBox="0 0 400 300">
-          {/* Background */}
-          <rect width="100%" height="100%" fill="#f8f8f8" />
-          
-          {/* Edges (lines connecting nodes) */}
-          {edges.map((edge, index) => {
-            // Find source and target nodes
-            const sourceNode = nodes.find(node => node.id === edge.source);
-            const targetNode = nodes.find(node => node.id === edge.target);
-            
-            if (!sourceNode || !targetNode) return null;
-            
-            return (
-              <line
-                key={index}
-                x1={sourceNode.x}
-                y1={sourceNode.y}
-                x2={targetNode.x}
-                y2={targetNode.y}
-                stroke="#999"
-                strokeWidth="2"
-                className="edge"
-              />
-            );
-          })}
-          
-          {/* Nodes (circles and squares) */}
-          {nodes.map(node => {
-            if (node.type === 'circle') {
-              return (
-                <g key={node.id} className="node" transform={`translate(${node.x},${node.y})`}>
-                  <circle
-                    r={nodeSize}
-                    fill="#3f51b5"
-                    stroke="#fff"
-                    strokeWidth="2"
-                    className="node-circle"
-                  />
-                  <text
-                    y="5"
-                    textAnchor="middle"
-                    fill="#fff"
-                    fontSize="14"
-                    fontWeight="bold"
-                    pointerEvents="none"
-                  >
-                    {node.label}
-                  </text>
-                </g>
-              );
-            } else {
-              return (
-                <g key={node.id} className="node" transform={`translate(${node.x},${node.y})`}>
-                  <rect
-                    x={-nodeSize}
-                    y={-nodeSize}
-                    width={nodeSize * 2}
-                    height={nodeSize * 2}
-                    fill="#ff4081"
-                    stroke="#fff"
-                    strokeWidth="2"
-                    rx="5"
-                    ry="5"
-                    className="node-square"
-                  />
-                  <text
-                    y="5"
-                    textAnchor="middle"
-                    fill="#fff"
-                    fontSize="14"
-                    fontWeight="bold"
-                    pointerEvents="none"
-                  >
-                    {node.label}
-                  </text>
-                </g>
-              );
-            }
-          })}
-          
-          
-        </svg>
-      </div>
+      {/* 使用GraphCanvas组件 */}
+      <GraphCanvas 
+        width={1000} 
+        height={600} 
+        nodes={nodes} 
+        edges={edges} 
+        options={graphOptions} 
+      />
     </div>
-  )
+  );
 }
 
 export default AnimationTest;
