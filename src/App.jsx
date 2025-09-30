@@ -1,16 +1,20 @@
-import { useState, useEffect, Suspense, lazy } from 'react'
-import { Routes, Route, useLocation, useNavigate } from 'react-router-dom'
-import Home from './pages/Home'
-import Navbar from './components/Navbar'
-import ScrollToTop from './components/ScrollToTop'
+import React, { useState, useEffect, Suspense, lazy } from 'react';
+import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import ScrollToTop from './components/ScrollToTop';
+import './index.css';
 
-// 懒加载子页面组件
-const GraphVisualization = lazy(() => import('./pages/GraphVisualization'))
-const GraphVisualizationTools = lazy(() => import('./pages/GraphVisualizationTools'))
-const DynamicProgramming = lazy(() => import('./pages/DynamicProgramming'))
-const BasicAlgorithms = lazy(() => import('./pages/BasicAlgorithms'))
-const StringAlgorithms = lazy(() => import('./pages/StringAlgorithms'))
-const NotFound = lazy(() => import('./pages/NotFound'))
+// 懒加载组件
+const Home = lazy(() => import('./pages/Home'));
+const BasicAlgorithms = lazy(() => import('./pages/BasicAlgorithms'));
+const StringAlgorithms = lazy(() => import('./pages/StringAlgorithms'));
+const DynamicProgramming = lazy(() => import('./pages/DynamicProgramming'));
+const GraphVisualization = lazy(() => import('./pages/GraphVisualization'));
+const GraphVisualizationTools = lazy(() => import('./pages/GraphVisualizationTools'));
+const KnowledgeGraphPage = lazy(() => import('./pages/KnowledgeGraphPage'));
+const CoursewareList = lazy(() => import('./pages/CoursewareList'));
+const CoursewareDetail = lazy(() => import('./pages/CoursewareDetail'));
+const NotFound = lazy(() => import('./pages/NotFound'));
 
 function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -29,6 +33,8 @@ function App() {
 
   const menuItems = [
     { name: '主页', path: '/' },
+    { name: '知识图谱', path: '/knowledge-graph' },
+    { name: '交互式课件', path: '/courseware' },
     { name: '图算法可视化', path: '/graph-visualization' },
     { name: '动态规划可视化', path: '/dynamic-programming' },
     { name: '基础算法可视化', path: '/basic-algorithms' },
@@ -65,6 +71,9 @@ function App() {
           <Route path="/dynamic-programming" element={<DynamicProgramming />} />
           <Route path="/basic-algorithms" element={<BasicAlgorithms />} />
           <Route path="/string-algorithms" element={<StringAlgorithms />} />
+          <Route path="/knowledge-graph" element={<KnowledgeGraphPage />} />
+          <Route path="/courseware" element={<CoursewareList />} />
+          <Route path="/courseware/:id" element={<CoursewareDetail />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
