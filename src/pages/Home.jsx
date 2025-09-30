@@ -1,0 +1,329 @@
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
+import anime from 'animejs'
+
+const Home = ({ menuItems }) => {
+  const [showCatalog, setShowCatalog] = useState(false)
+  const [scrollY, setScrollY] = useState(0)
+
+  // 监听滚动事件，实现视差效果和目录动画触发
+  useEffect(() => {
+    // 直接设置showCatalog为true，让目录可见
+    setShowCatalog(true)
+    
+    const handleScroll = () => {
+      const newScrollY = window.scrollY
+      setScrollY(newScrollY)
+      
+      // 当滚动超过hero区域高度时触发目录动画
+      if (newScrollY > window.innerHeight * 0.3) {
+        // 确保动画只执行一次
+        if (document.querySelectorAll('.catalog-card').length > 0) {
+          // 添加类以确保卡片可见
+          document.querySelectorAll('.catalog-card').forEach(card => {
+            card.classList.add('opacity-100')
+            card.classList.remove('opacity-0')
+          })
+          animateCatalogCards()
+        }
+      }
+    }
+
+    // 页面加载后立即执行一次滚动检测
+    setTimeout(() => {
+      handleScroll()
+    }, 100)
+
+    // 添加滚动监听
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, []) // 空依赖数组，只在组件挂载时执行一次
+
+  // 页面加载时启动hero动画
+  useEffect(() => {
+    startHeroAnimation()
+  }, [])
+
+  // Hero区域动画
+  const startHeroAnimation = () => {
+    // 标题动画
+    anime({
+      targets: '.hero-title',
+      opacity: [0, 1],
+      translateY: [20, 0],
+      duration: 1000,
+      easing: 'easeOutQuad'
+    })
+
+    // 副标题动画
+    anime({
+      targets: '.hero-subtitle',
+      opacity: [0, 1],
+      translateY: [20, 0],
+      duration: 1000,
+      delay: 300,
+      easing: 'easeOutQuad'
+    })
+
+    // 按钮动画
+    anime({
+      targets: '.hero-button',
+      opacity: [0, 1],
+      translateY: [20, 0],
+      duration: 800,
+      delay: 600,
+      easing: 'easeOutQuad'
+    })
+
+    // 动画元素 - 小圆点
+    const dots = anime({
+      targets: '.animated-dots .dot',
+      scale: [0, 1],
+      opacity: [0, 1],
+      duration: 600,
+      delay: (el, i) => i * 100,
+      easing: 'easeOutQuad'
+    })
+
+    // 3D立方体动画
+    anime({
+      targets: '.cube-container',
+      opacity: [0, 1],
+      duration: 1500,
+      delay: 800,
+      easing: 'easeOutQuad'
+    })
+
+    // 立方体旋转动画
+    anime({
+      targets: '.cube',
+      rotateY: ['0deg', '360deg'],
+      rotateX: ['0deg', '360deg'],
+      duration: 20000,
+      delay: 1500,
+      easing: 'linear',
+      loop: true
+    })
+  }
+
+  // 目录卡片动画
+  const animateCatalogCards = () => {
+    anime({
+      targets: '.catalog-card',
+      opacity: [0, 1],
+      translateY: [30, 0],
+      duration: 800,
+      delay: (el, i) => i * 200,
+      easing: 'easeOutQuad'
+    })
+  }
+
+  // 算法卡片数据
+  const algorithmCards = [
+    {
+      title: "图算法可视化",
+      description: "探索最短路径、最小生成树、拓扑排序等图算法的运行过程",
+      icon: "<svg className='h-10 w-10 text-primary' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z' /></svg>",
+      path: "/graph-visualization"
+    },
+    {
+      title: "动态规划可视化",
+      description: "直观理解动态规划问题的状态转移和最优子结构",
+      icon: "<svg className='h-10 w-10 text-secondary' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' /></svg>",
+      path: "/dynamic-programming"
+    },
+    {
+      title: "基础算法可视化",
+      description: "深入理解排序、搜索等基础算法的工作原理",
+      icon: "<svg className='h-10 w-10 text-accent' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4' /></svg>",
+      path: "/basic-algorithms"
+    },
+    {
+      title: "字符串算法可视化",
+      description: "探索字符串匹配、编辑距离等算法的执行过程",
+      icon: "<svg className='h-10 w-10 text-primary' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253' /></svg>",
+      path: "/string-algorithms"
+    }
+  ]
+
+  // 修改滚动函数，使用更精确的目录位置定位
+  const scrollToCatalog = () => {
+    try {
+      // 获取目录区域的元素
+      const catalogSection = document.querySelector('.py-20'); // 目录区域的类名
+      if (catalogSection) {
+        // 滚动到目录区域
+        const catalogPosition = catalogSection.getBoundingClientRect().top + window.pageYOffset;
+        window.scrollTo({
+          top: catalogPosition,
+          behavior: 'smooth'
+        });
+      } else {
+        // 如果找不到目录区域，则使用回退方案
+        console.log('目录区域未找到，使用回退滚动方案');
+        window.scrollTo({
+          top: window.innerHeight,
+          behavior: 'smooth'
+        });
+      }
+    } catch (error) {
+      console.error('滚动出错:', error);
+      // 降级到传统滚动方式
+      window.scrollTo(0, window.innerHeight);
+    }
+  }
+
+  return (
+    <div className="min-h-screen">
+      {/* Hero区域 */}
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        <div 
+          className="absolute inset-0 bg-gradient-to-br from-light to-gray-100"
+          style={{ transform: `translateY(${scrollY * 0.1}px)` }}
+        ></div>
+        
+        {/* 动画装饰元素 */}
+        <div className="animated-dots absolute inset-0 pointer-events-none">
+          {[...Array(20)].map((_, i) => (
+            <div 
+              key={i}
+              className="dot absolute rounded-full bg-primary/10"
+              style={{
+                width: `${Math.random() * 10 + 5}px`,
+                height: `${Math.random() * 10 + 5}px`,
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                opacity: Math.random() * 0.5 + 0.2
+              }}
+            ></div>
+          ))}
+        </div>
+        
+        {/* 3D立方体 */}
+        <div 
+          className="cube-container absolute right-1/4 transform-3d" 
+          style={{ transform: `translateY(${scrollY * 0.2}px)` }}
+        >
+          <div className="cube w-64 h-64 relative transform-3d">
+            <div className="absolute w-full h-full bg-primary/20 rounded-md flex items-center justify-center shadow-lg transform translateZ(32px)">
+              <div className="text-center">
+                <svg className="h-16 w-16 text-primary mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                </svg>
+                <p className="mt-2 font-semibold text-primary">算法可视化</p>
+              </div>
+            </div>
+            <div className="absolute w-full h-full bg-secondary/20 rounded-md flex items-center justify-center shadow-lg transform -rotateY(90deg) translateZ(32px)">
+              <div className="text-center">
+                <svg className="h-16 w-16 text-secondary mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                </svg>
+                <p className="mt-2 font-semibold text-secondary">交互式学习</p>
+              </div>
+            </div>
+            <div className="absolute w-full h-full bg-accent/20 rounded-md flex items-center justify-center shadow-lg transform rotateY(90deg) translateZ(32px)">
+              <div className="text-center">
+                <svg className="h-16 w-16 text-accent mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>
+                <p className="mt-2 font-semibold text-accent">直观理解</p>
+              </div>
+            </div>
+            <div className="absolute w-full h-full bg-gray-200 rounded-md flex items-center justify-center shadow-lg transform rotateY(180deg) translateZ(32px)">
+              <div className="text-center">
+                <svg className="h-16 w-16 text-gray-600 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
+                </svg>
+                <p className="mt-2 font-semibold text-gray-600">基础算法</p>
+              </div>
+            </div>
+            <div className="absolute w-full h-full bg-gray-100 rounded-md flex items-center justify-center shadow-lg transform rotateX(90deg) translateZ(32px)">
+              <div className="text-center">
+                <svg className="h-16 w-16 text-gray-500 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                <p className="mt-2 font-semibold text-gray-500">深入探索</p>
+              </div>
+            </div>
+            <div className="absolute w-full h-full bg-gray-300 rounded-md flex items-center justify-center shadow-lg transform -rotateX(90deg) translateZ(32px)">
+              <div className="text-center">
+                <svg className="h-16 w-16 text-gray-700 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                <p className="mt-2 font-semibold text-gray-700">快速掌握</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* 主要内容 */}
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="max-w-3xl" style={{ transform: `translateY(${scrollY * 0.15}px)` }}>
+            <h1 className="hero-title text-4xl md:text-6xl font-bold text-center leading-tight mb-6">
+              通过<span className="text-primary">可视化</span>探索算法的奥秘
+            </h1>
+            <p className="hero-subtitle text-xl text-gray-600 text-center mb-10 max-w-2xl mx-auto">
+              直观理解复杂算法的工作原理，通过交互式动画掌握算法思想
+            </p>
+            <div className="flex justify-center">
+              <button 
+                onClick={scrollToCatalog}
+                className="hero-button bg-primary hover:bg-primary/90 text-white font-medium py-3 px-8 rounded-md shadow-lg transition-all duration-300 flex items-center group"
+              >
+                开始探索
+                <svg className="w-5 h-5 ml-2 transform transition-transform duration-300 group-hover:translate-y-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        {/* 向下滚动提示 */}
+        <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce">
+          <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+          </svg>
+        </div>
+      </section>
+
+      {/* 目录区域 - 始终显示 */}
+      <section className="py-20">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">探索算法类别</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">选择一个算法类别开始您的可视化学习之旅</p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {algorithmCards.map((card, index) => (
+              <Link
+                key={index}
+                to={card.path}
+                className="catalog-card bg-white rounded-xl shadow-md overflow-hidden card-hover opacity-100"
+              >
+                <div className="p-6">
+                  <div className="flex justify-center mb-6">
+                    <div dangerouslySetInnerHTML={{ __html: card.icon }}></div>
+                  </div>
+                  <h3 className="text-xl font-semibold text-center mb-3">{card.title}</h3>
+                  <p className="text-gray-600 text-center">{card.description}</p>
+                  <div className="mt-6 flex justify-center">
+                    <span className="text-primary font-medium flex items-center group">
+                      查看详情
+                      <svg className="w-4 h-4 ml-1 transform transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                      </svg>
+                    </span>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+    </div>
+  )
+}
+
+export default Home
