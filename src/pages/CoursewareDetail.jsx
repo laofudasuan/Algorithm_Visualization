@@ -1,4 +1,4 @@
-import React, { useState, useEffect, lazy, Suspense } from 'react';
+import React, { useState, useEffect, lazy, Suspense, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import anime from 'animejs/lib/anime.es.js';
@@ -10,6 +10,9 @@ const CoursewareDetail = () => {
   const [CoursewareContent, setCoursewareContent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageCount, setPageCount] = useState(0);
+  const contentRef = useRef(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -44,6 +47,45 @@ const CoursewareDetail = () => {
 
     loadCourseware();
   }, [id]);
+
+  // 处理页面滚动
+  const handleScroll = () => {
+    if (contentRef.current) {
+      const scrollPosition = window.scrollY + window.innerHeight / 2;
+      const pageElements = contentRef.current.querySelectorAll('[data-page]');
+      
+      for (let i = 0; i < pageElements.length; i++) {
+        const pageElement = pageElements[i];
+        const pageTop = pageElement.offsetTop;
+        const pageBottom = pageTop + pageElement.offsetHeight;
+        
+        if (scrollPosition >= pageTop && scrollPosition <= pageBottom) {
+          if (currentPage !== i) {
+            setCurrentPage(i);
+          }
+          break;
+        }
+      }
+    }
+  };
+
+  // 更新页面计数
+  useEffect(() => {
+    const updatePageCount = () => {
+      if (contentRef.current) {
+        const pageElements = contentRef.current.querySelectorAll('[data-page]');
+        setPageCount(pageElements.length);
+      }
+    };
+
+    // 等待内容渲染完成
+    setTimeout(updatePageCount, 100);
+  }, [CoursewareContent]);
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [currentPage]);
 
   if (loading) {
     return (
@@ -93,23 +135,48 @@ const CoursewareDetail = () => {
         animate={{ opacity: 1, y: 0 }}
       >
         <h1 className="text-4xl font-bold mb-4">{courseware.title || '未命名课件'}</h1>
-          <p className="text-gray-600 mb-4">{courseware.description || '暂无描述'}</p>
-          <div className="flex flex-wrap gap-4 text-sm text-gray-500">
-            <span>作者: {courseware.author || '未知'}</span>
-            <span>创建时间: {courseware.createdAt || '未知'}</span>
-          </div>
+        <p className="text-gray-600 mb-4">{courseware.description || '暂无描述'}</p>
+        <div className="flex flex-wrap gap-4 text-sm text-gray-500">
+          <span>作者: {courseware.author || '未知'}</span>
+          <span>创建时间: {courseware.createdAt || '未知'}</span>
+        </div>
       </motion.div>
+
+      {/* 分页指示器 */}
+      {pageCount > 0 && (
+        <div className="fixed right-8 top-1/2 transform -translate-y-1/2 z-10 flex flex-col gap-2">
+          {Array.from({ length: pageCount }).map((_, index) => (
+            <button
+              key={index}
+              onClick={() => {
+                const element = document.querySelector(`[data-page="${index}"]`);
+                if (element) {
+                  window.scrollTo({
+                    top: element.offsetTop - 100,
+                    behavior: 'smooth'
+                  });
+                }
+              }}
+              className={`w-3 h-3 rounded-full transition-all ${
+                currentPage === index ? 'bg-primary scale-125' : 'bg-gray-300'
+              }`}
+            />
+          ))}
+        </div>
+      )}
 
       {/* 课件内容 */}
       <motion.div 
-        className="bg-white rounded-lg shadow-md p-6 md:p-8 max-w-3xl mx-auto"
+        className="bg-white rounded-lg shadow-md p-6 md:p-8 max-w-3xl mx-auto relative"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2 }}
       >
-        <Suspense fallback={<div className="text-center py-8">正在渲染内容...</div>}>
-          <CoursewareContent />
-        </Suspense>
+        <div ref={contentRef}>
+          <Suspense fallback={<div className="text-center py-8">正在渲染内容...</div>}>
+            <CoursewareContent />
+          </Suspense>
+        </div>
       </motion.div>
     </div>
   );
