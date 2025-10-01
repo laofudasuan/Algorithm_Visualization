@@ -94,7 +94,7 @@ const CoursewareList = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="page-content max-w-4xl mx-auto">
           <div className="text-center mb-16">
-            <h1 className="text-4xl font-bold mb-4">交互式课件</h1>
+            <h1 className="text-4xl font-bold mb-4">课件</h1>
             <p className="text-gray-600">
               探索算法世界的精彩课件，包含详细的概念讲解、数学公式和实例演示
             </p>

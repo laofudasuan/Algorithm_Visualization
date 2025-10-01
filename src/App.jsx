@@ -34,11 +34,17 @@ function App() {
   const menuItems = [
     { name: '主页', path: '/' },
     { name: '知识图谱', path: '/knowledge-graph' },
-    { name: '交互式课件', path: '/courseware' },
-    { name: '图算法可视化', path: '/graph-visualization' },
-    { name: '动态规划可视化', path: '/dynamic-programming' },
-    { name: '基础算法可视化', path: '/basic-algorithms' },
-    { name: '字符串算法可视化', path: '/string-algorithms' }
+    { name: '课件', path: '/courseware' },
+    { 
+      name: '可视化模块', 
+      path: '/visualization', // 作为下拉菜单的触发点
+      children: [
+        { name: '图算法可视化', path: '/graph-visualization' },
+        { name: '动态规划可视化', path: '/dynamic-programming' },
+        { name: '基础算法可视化', path: '/basic-algorithms' },
+        { name: '字符串算法可视化', path: '/string-algorithms' }
+      ]
+    }
   ]
 
   // 加载中的占位组件
