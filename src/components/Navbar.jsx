@@ -1,12 +1,16 @@
 import { Link } from 'react-router-dom'
 import { useState, useEffect, useRef } from 'react'
-import anime from 'animejs'
 
 const Navbar = ({ menuItems, isMenuOpen, setIsMenuOpen, hasScrolled, currentPath }) => {
   // 用于存储哪个下拉菜单是打开的
   const [openDropdown, setOpenDropdown] = useState(null)
   // 用于检测点击外部区域关闭下拉菜单
   const dropdownRefs = useRef({})
+  // 引用导航栏元素
+  const navRef = useRef(null)
+
+  // 检查是否在课件子页面（不是主页）
+  const isCoursewareSubpage = currentPath.startsWith('/courseware/') && currentPath !== '/courseware'
 
   // 检测点击外部区域关闭下拉菜单
   useEffect(() => {
@@ -25,78 +29,17 @@ const Navbar = ({ menuItems, isMenuOpen, setIsMenuOpen, hasScrolled, currentPath
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [openDropdown])
 
-  // 菜单项动画效果
-  useEffect(() => {
-    if (isMenuOpen) {
-      anime({
-        targets: '.mobile-menu-item',
-        opacity: [0, 1],
-        translateY: [20, 0],
-        duration: 300,
-        delay: (el, i) => i * 50,
-        easing: 'easeOutQuad'
-      })
-    }
-  }, [isMenuOpen])
-
-  // 导航栏滚动动画
-  useEffect(() => {
-    const navElement = document.getElementById('navbar')
-    if (navElement) {
-      anime({
-        targets: navElement,
-        backgroundColor: hasScrolled ? 'rgba(255, 255, 255, 0.95)' : 'transparent',
-        boxShadow: hasScrolled ? '0 4px 6px -1px rgba(0, 0, 0, 0.1)' : 'none',
-        paddingTop: hasScrolled ? '0.75rem' : '1.5rem',
-        paddingBottom: hasScrolled ? '0.75rem' : '1.5rem',
-        duration: 300,
-        easing: 'easeInOutQuad'
-      })
-    }
-  }, [hasScrolled])
+  // 导航栏样式直接通过Tailwind类实现，使用transition-all来保证匀速动画
+  const navClass = isCoursewareSubpage ? 
+    'bg-white py-0.25 transition-all duration-500 linear' : 
+    (hasScrolled ? 'bg-white py-3 transition-all duration-500 linear' : 'bg-transparent py-6 transition-all duration-500 linear')
+  const shadowClass = (hasScrolled || isCoursewareSubpage) ? 'shadow-md' : ''
 
   // 处理下拉菜单的显示/隐藏
   const toggleDropdown = (index, event) => {
     event.preventDefault()
-    const dropdownElement = document.querySelector(`.dropdown-menu-${index}`)
-    
-    if (openDropdown === index) {
-      // 关闭动画
-      if (dropdownElement) {
-        anime({
-          targets: dropdownElement,
-          opacity: [1, 0],
-          scale: [1, 0.95],
-          duration: 200,
-          easing: 'easeInOutQuad',
-          complete: () => {
-            setOpenDropdown(null)
-          }
-        })
-      }
-    } else {
-      // 设置当前下拉菜单
-      setOpenDropdown(index)
-      
-      // 打开动画 - 使用setTimeout确保DOM已更新
-      setTimeout(() => {
-        const newDropdownElement = document.querySelector(`.dropdown-menu-${index}`)
-        if (newDropdownElement) {
-          // 先设置初始状态
-          newDropdownElement.style.opacity = '0'
-          newDropdownElement.style.transform = 'scale(0.95)'
-          
-          // 然后执行动画
-          anime({
-            targets: newDropdownElement,
-            opacity: [0, 1],
-            scale: [0.95, 1],
-            duration: 250,
-            easing: 'easeOutQuad'
-          })
-        }
-      }, 10)
-    }
+    // 简单的状态切换，不再使用anime动画
+    setOpenDropdown(openDropdown === index ? null : index)
   }
 
   // 检查某个路径是否为当前活动路径或其子路径
@@ -104,10 +47,38 @@ const Navbar = ({ menuItems, isMenuOpen, setIsMenuOpen, hasScrolled, currentPath
     return currentPath === path || currentPath.startsWith(path + '/')
   }
 
+  // 在课件子页面中显示最小化导航栏
+  if (isCoursewareSubpage) {
+    return (
+      <nav 
+        id="navbar"
+        ref={navRef}
+        className={`fixed top-0 left-0 right-0 z-50 ${navClass} ${shadowClass}`}
+      >
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-start items-center py-0.25">
+            <Link 
+              to="/courseware" 
+              className="flex items-center justify-center"
+              aria-label="返回课件列表"
+            >
+              <div className="w-8 h-8 rounded-full bg-blue-500 shadow-lg flex items-center justify-center hover:bg-blue-600 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v4m0 8v4M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+            </Link>
+          </div>
+        </div>
+      </nav>
+    )
+  }
+
   return (
     <nav 
       id="navbar"
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${hasScrolled ? 'nav-scrolled' : ''}`}
+      ref={navRef}
+      className={`fixed top-0 left-0 right-0 z-50 ${navClass} ${shadowClass}`}
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center">
@@ -118,7 +89,7 @@ const Navbar = ({ menuItems, isMenuOpen, setIsMenuOpen, hasScrolled, currentPath
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
                 </svg>
               </div>
-              <span className="font-bold text-xl tracking-tight">可视化网站</span>
+              <span className="font-bold text-xl tracking-tight">可视化网站(欢迎加入QQ群251998253交流)</span>
             </Link>
           </div>
           
