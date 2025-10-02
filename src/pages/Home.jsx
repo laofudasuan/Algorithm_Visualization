@@ -65,16 +65,6 @@ const Home = ({ menuItems }) => {
       easing: 'easeOutQuad'
     })
 
-    // 按钮动画
-    anime({
-      targets: '.hero-button',
-      opacity: [0, 1],
-      translateY: [20, 0],
-      duration: 800,
-      delay: 600,
-      easing: 'easeOutQuad'
-    })
-
     // 动画元素 - 小圆点
     const dots = anime({
       targets: '.animated-dots .dot',
@@ -85,24 +75,26 @@ const Home = ({ menuItems }) => {
       easing: 'easeOutQuad'
     })
 
-    // 3D立方体动画
-    anime({
-      targets: '.cube-container',
+    // 3D立方体动画 - 透明度和初始位置
+    anime({  
+      targets: '.cube-container, .cube-animated',
       opacity: [0, 1],
+      translateY: [30, 0],
       duration: 1500,
       delay: 800,
-      easing: 'easeOutQuad'
-    })
-
-    // 立方体旋转动画
-    anime({
-      targets: '.cube',
-      rotateY: ['0deg', '360deg'],
-      rotateX: ['0deg', '360deg'],
-      duration: 20000,
-      delay: 1500,
-      easing: 'linear',
-      loop: true
+      easing: 'easeOutQuad',
+      complete: function() {
+        // 等透明度动画完成后，才开始旋转动画
+        anime({
+          targets: '.cube-animated',
+          rotateY: ['0deg', '360deg'],
+          rotateX: ['0deg', '360deg'],
+          duration: 20000,
+          easing: 'linear',
+          loop: true,
+          autoplay: true
+        })
+      }
     })
   }
 
@@ -201,56 +193,183 @@ const Home = ({ menuItems }) => {
         
         {/* 3D立方体 */}
         <div 
-          className="cube-container absolute right-1/4 transform-3d" 
-          style={{ transform: `translateY(${scrollY * 0.2}px)` }}
+          className="absolute right-1/4 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-256 h-256 perspective-1500"
+          style={{ transform: `translate3d(0, calc(-50% + ${scrollY * 0.2}px), 0)` }}
         >
-          <div className="cube w-64 h-64 relative transform-3d">
-            <div className="absolute w-full h-full bg-primary/20 rounded-md flex items-center justify-center shadow-lg transform translateZ(32px)">
+          <div 
+            className="cube-animated w-full h-full relative" 
+            style={{ 
+              transformStyle: 'preserve-3d',
+              position: 'relative',
+              rotateY: '0deg', // 从正对视角开始
+              rotateX: '0deg'
+            }}
+          >
+            {/* 前面 */}
+            <div 
+              className="cube-face absolute" 
+              style={{ 
+                width: '256px',
+                height: '256px',
+                backgroundColor: 'rgba(37, 99, 235, 0.8)',
+                borderRadius: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 8px 16px -2px rgba(0, 0, 0, 0.2)',
+                backfaceVisibility: 'hidden',
+                transform: 'translate3d(0, 0, 128px)',
+                left: '50%',
+                top: '50%',
+                marginLeft: '-128px',
+                marginTop: '-128px'
+              }}
+            >
               <div className="text-center">
-                <svg className="h-16 w-16 text-primary mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="h-40 w-40 text-white mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
                 </svg>
-                <p className="mt-2 font-semibold text-primary">算法可视化</p>
+                <p className="mt-4 font-semibold text-white text-2xl">算法可视化</p>
               </div>
             </div>
-            <div className="absolute w-full h-full bg-secondary/20 rounded-md flex items-center justify-center shadow-lg transform -rotateY(90deg) translateZ(32px)">
+            
+            {/* 右面 */}
+            <div 
+              className="cube-face absolute" 
+              style={{ 
+                width: '256px',
+                height: '256px',
+                backgroundColor: 'rgba(20, 184, 166, 0.8)',
+                borderRadius: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 8px 16px -2px rgba(0, 0, 0, 0.2)',
+                backfaceVisibility: 'hidden',
+                transform: 'rotateY(90deg) translate3d(0, 0, 128px)',
+                left: '50%',
+                top: '50%',
+                marginLeft: '-128px',
+                marginTop: '-128px'
+              }}
+            >
               <div className="text-center">
-                <svg className="h-16 w-16 text-secondary mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="h-40 w-40 text-white mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                 </svg>
-                <p className="mt-2 font-semibold text-secondary">交互式学习</p>
+                <p className="mt-4 font-semibold text-white text-2xl">交互式学习</p>
               </div>
             </div>
-            <div className="absolute w-full h-full bg-accent/20 rounded-md flex items-center justify-center shadow-lg transform rotateY(90deg) translateZ(32px)">
+            
+            {/* 后面 */}
+            <div 
+              className="cube-face absolute" 
+              style={{ 
+                width: '256px',
+                height: '256px',
+                backgroundColor: 'rgba(167, 139, 250, 0.8)',
+                borderRadius: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 8px 16px -2px rgba(0, 0, 0, 0.2)',
+                backfaceVisibility: 'hidden',
+                transform: 'rotateY(180deg) translate3d(0, 0, 128px)',
+                left: '50%',
+                top: '50%',
+                marginLeft: '-128px',
+                marginTop: '-128px'
+              }}
+            >
               <div className="text-center">
-                <svg className="h-16 w-16 text-accent mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="h-40 w-40 text-white mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                 </svg>
-                <p className="mt-2 font-semibold text-accent">直观理解</p>
+                <p className="mt-4 font-semibold text-white text-2xl">知识图谱</p>
               </div>
             </div>
-            <div className="absolute w-full h-full bg-gray-200 rounded-md flex items-center justify-center shadow-lg transform rotateY(180deg) translateZ(32px)">
+            
+            {/* 左面 */}
+            <div 
+              className="cube-face absolute" 
+              style={{ 
+                width: '256px',
+                height: '256px',
+                backgroundColor: 'rgba(75, 85, 99, 0.8)',
+                borderRadius: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 8px 16px -2px rgba(0, 0, 0, 0.2)',
+                backfaceVisibility: 'hidden',
+                transform: 'rotateY(-90deg) translate3d(0, 0, 128px)',
+                left: '50%',
+                top: '50%',
+                marginLeft: '-128px',
+                marginTop: '-128px'
+              }}
+            >
               <div className="text-center">
-                <svg className="h-16 w-16 text-gray-600 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="h-40 w-40 text-white mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
                 </svg>
-                <p className="mt-2 font-semibold text-gray-600">基础算法</p>
+                <p className="mt-4 font-semibold text-white text-2xl">基础算法</p>
               </div>
             </div>
-            <div className="absolute w-full h-full bg-gray-100 rounded-md flex items-center justify-center shadow-lg transform rotateX(90deg) translateZ(32px)">
+            
+            {/* 顶面 */}
+            <div 
+              className="cube-face absolute" 
+              style={{ 
+                width: '256px',
+                height: '256px',
+                backgroundColor: 'rgba(79, 70, 229, 0.8)',
+                borderRadius: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 8px 16px -2px rgba(0, 0, 0, 0.2)',
+                backfaceVisibility: 'hidden',
+                transform: 'rotateX(90deg) translate3d(0, 0, 128px)',
+                left: '50%',
+                top: '50%',
+                marginLeft: '-128px',
+                marginTop: '-128px'
+              }}
+            >
               <div className="text-center">
-                <svg className="h-16 w-16 text-gray-500 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="h-40 w-40 text-white mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
-                <p className="mt-2 font-semibold text-gray-500">深入探索</p>
+                <p className="mt-4 font-semibold text-white text-2xl">深入探索</p>
               </div>
             </div>
-            <div className="absolute w-full h-full bg-gray-300 rounded-md flex items-center justify-center shadow-lg transform -rotateX(90deg) translateZ(32px)">
+            
+            {/* 底面 */}
+            <div 
+              className="cube-face absolute" 
+              style={{ 
+                width: '256px',
+                height: '256px',
+                backgroundColor: 'rgba(244, 63, 94, 0.8)',
+                borderRadius: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 8px 16px -2px rgba(0, 0, 0, 0.2)',
+                backfaceVisibility: 'hidden',
+                transform: 'rotateX(-90deg) translate3d(0, 0, 128px)',
+                left: '50%',
+                top: '50%',
+                marginLeft: '-128px',
+                marginTop: '-128px'
+              }}
+            >
               <div className="text-center">
-                <svg className="h-16 w-16 text-gray-700 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="h-40 w-40 text-white mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
-                <p className="mt-2 font-semibold text-gray-700">快速掌握</p>
+                <p className="mt-4 font-semibold text-white text-2xl">动态课件</p>
               </div>
             </div>
           </div>
@@ -266,15 +385,7 @@ const Home = ({ menuItems }) => {
               直观理解复杂算法的工作原理，通过交互式动画掌握算法思想
             </p>
             <div className="flex justify-center">
-              <button 
-                onClick={scrollToCatalog}
-                className="hero-button bg-primary hover:bg-primary/90 text-white font-medium py-3 px-8 rounded-md shadow-lg transition-all duration-300 flex items-center group"
-              >
-                开始探索
-                <svg className="w-5 h-5 ml-2 transform transition-transform duration-300 group-hover:translate-y-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                </svg>
-              </button>
+              {/* 按钮已移除 */}
             </div>
           </div>
         </div>
