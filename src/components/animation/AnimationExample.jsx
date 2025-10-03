@@ -1,7 +1,6 @@
 // AnimationExample.jsx - 演示如何使用修改后的drawingTools进行动画
 import React, { useRef, useEffect } from 'react';
-import { animateGraph } from './animateGraph';
-
+import { animateGraph } from './animateGraph.jsx';
 const AnimationExample = () => {
   const canvasRef = useRef(null);
   const animationFrameRef = useRef(null);
