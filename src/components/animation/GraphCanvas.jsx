@@ -1,7 +1,8 @@
 // GraphCanvas.jsx - 支持多图切换的React组件
 import React, { useState, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
 import AnimateGraph from './animateGraph.jsx';
-import { drawingTools } from './drawingTools';
+import { generateExampleGraph } from './generateExampleGraph';
+
 
 const GraphCanvas = forwardRef(({ width = 1000, height = 600, graphCount = 1 }, ref) => {
   // 状态
@@ -13,6 +14,8 @@ const GraphCanvas = forwardRef(({ width = 1000, height = 600, graphCount = 1 }, 
   const animateGraphRefs = useRef([]);
   
   // 初始化多个图控制器和数据
+  // 创建graphCount个图元素，每个图线初始化为ExampleGraph，所有图初始的宽度和高度与容器一致
+  // 初始化当前图索引为0
   useEffect(() => {
     // 初始化控制器数组
     const controllers = [];
@@ -25,7 +28,7 @@ const GraphCanvas = forwardRef(({ width = 1000, height = 600, graphCount = 1 }, 
     const graphs = [];
     for (let i = 0; i < graphCount; i++) {
       // 使用generateExampleGraph函数生成样例图数据
-      const exampleGraph = drawingTools.generateExampleGraph(width, height);
+      const exampleGraph = generateExampleGraph(width, height);
       graphs.push(exampleGraph);
     }
     setGraphData(graphs);

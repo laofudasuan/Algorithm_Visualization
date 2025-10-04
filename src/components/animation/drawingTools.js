@@ -199,9 +199,9 @@ export class CanvasRenderer {
   }
   
   /**
-   * 创建节点动画
+   * 创建通用动画
    */
-  animateNode(id, initialProps, targetProps, duration = 500, easing = 'easeOutQuad') {
+  createAnimation(id, initialProps, targetProps, duration = 500, easing = 'easeOutQuad', onComplete) {
     // 检查是否有正在进行的动画，如果有则取消
     if (this.animations.has(id)) {
       const currentAnim = this.animations.get(id);
@@ -223,6 +223,9 @@ export class CanvasRenderer {
       complete: () => {
         // 动画完成后从映射中移除
         this.animations.delete(id);
+        if (onComplete) {
+          onComplete();
+        }
       }
     });
     
@@ -231,22 +234,6 @@ export class CanvasRenderer {
     
     // 返回动画对象，以便调用方可以获取当前值
     return animTarget;
-  }
-  
-  /**
-   * 创建边动画
-   */
-  animateEdge(id, initialProps, targetProps, duration = 500, easing = 'easeOutQuad') {
-    // 边动画实现与节点类似，但可能需要特殊处理
-    return this.animateNode(id, initialProps, targetProps, duration, easing);
-  }
-  
-  /**
-   * 创建批注动画
-   */
-  animateAnnotation(id, initialProps, targetProps, duration = 300, easing = 'easeOutQuad') {
-    // 批注动画可能需要更短的持续时间
-    return this.animateNode(id, initialProps, targetProps, duration, easing);
   }
   
   /**
@@ -570,6 +557,10 @@ export class GraphRenderer {
     this.animatedNodes = new Map();
     this.animatedEdges = new Map();
     
+    // 存储已存在的节点和边的ID，用于检测新增元素
+    this.existingNodeIds = new Set();
+    this.existingEdgeIds = new Set();
+    
     // 默认样式
     this.defaultNodeStyle = {
       fill: '#3f51b5',
@@ -748,9 +739,56 @@ export class GraphRenderer {
   }
   
   /**
-   * 添加节点动画
+   * 节点出现动画
    */
-  animateNode(nodeId, targetProps, duration = 500, easing = 'easeOutQuad', onComplete) {
+  animateNodeAppearance(nodeId, targetProps, duration = 500, easing = 'easeOutQuad', onComplete) {
+    const node = this.nodes.find(n => n.id === nodeId);
+    if (!node) return;
+    
+    // 初始属性 - 从不可见到可见
+    const initialProps = {
+      x: node.x,
+      y: node.y,
+      size: 0, // 从0大小开始
+      fill: node.style?.fill,
+      stroke: node.style?.stroke,
+      opacity: 0 // 从透明开始
+    };
+    
+    // 目标属性
+    const finalTargetProps = {
+      x: targetProps.x || node.x,
+      y: targetProps.y || node.y,
+      size: targetProps.size || node.size || 20,
+      fill: targetProps.fill || node.style?.fill,
+      stroke: targetProps.stroke || node.style?.stroke,
+      opacity: 1 // 完全可见
+    };
+    
+    // 创建动画
+    const animTarget = this.canvasRenderer.createAnimation(
+      `node_appearance_${nodeId}`,
+      initialProps,
+      finalTargetProps,
+      duration,
+      easing,
+      onComplete
+    );
+    
+    // 存储动画目标
+    this.animatedNodes.set(nodeId, animTarget);
+    
+    // 将节点ID添加到已存在的集合中
+    this.existingNodeIds.add(nodeId);
+    
+    // 启动动画循环
+    this.startAnimationLoop();
+  }
+  
+  /**
+   * 节点消失动画
+   */
+  animateNodeDisappearance(nodeId, duration = 500, easing = 'easeInQuad', onComplete) {
     const node = this.nodes.find(n => n.id === nodeId);
     if (!node) return;
     
@@ -758,44 +796,188 @@ export class GraphRenderer {
     const initialProps = {
       x: node.x,
       y: node.y,
-      size: node.size,
+      size: node.size || 20,
       fill: node.style?.fill,
       stroke: node.style?.stroke,
       opacity: 1
     };
     
+    // 目标属性 - 从不透明到透明
+    const targetProps = {
+      size: 0, // 缩小到0
+      opacity: 0 // 变为透明
+    };
+    
     // 创建动画
-    const animTarget = this.canvasRenderer.animateNode(
-      `node_${nodeId}`,
+    const animTarget = this.canvasRenderer.createAnimation(
+      `node_disappearance_${nodeId}`,
       initialProps,
       targetProps,
       duration,
-      easing
+      easing,
+      () => {
+        // 动画完成后从集合中移除
+        this.animatedNodes.delete(nodeId);
+        this.existingNodeIds.delete(nodeId);
+        if (onComplete) {
+          onComplete();
+        }
+      }
     );
     
     // 存储动画目标
     this.animatedNodes.set(nodeId, animTarget);
-    
-    // 当动画完成时的回调
-    if (onComplete) {
-      setTimeout(() => {
-        this.animatedNodes.delete(nodeId);
-        onComplete();
-      }, duration);
-    } else {
-      setTimeout(() => {
-        this.animatedNodes.delete(nodeId);
-      }, duration);
-    }
     
     // 启动动画循环
     this.startAnimationLoop();
   }
   
   /**
-   * 添加边动画
+   * 节点变化动画
    */
-  animateEdge(edgeId, targetProps, duration = 500, easing = 'easeOutQuad', onComplete) {
+  animateNodeChange(nodeId, targetProps, duration = 500, easing = 'easeOutQuad', onComplete) {
+    const node = this.nodes.find(n => n.id === nodeId);
+    if (!node) return;
+    
+    // 初始属性
+    const initialProps = {
+      x: node.x,
+      y: node.y,
+      size: node.size || 20,
+      fill: node.style?.fill,
+      stroke: node.style?.stroke,
+      opacity: 1
+    };
+    
+    // 创建动画
+    const animTarget = this.canvasRenderer.createAnimation(
+      `node_change_${nodeId}`,
+      initialProps,
+      targetProps,
+      duration,
+      easing,
+      onComplete
+    );
+    
+    // 存储动画目标
+    this.animatedNodes.set(nodeId, animTarget);
+    
+    // 启动动画循环
+    this.startAnimationLoop();
+  }
+  
+  /**
+   * 边出现动画
+   */
+  animateEdgeAppearance(edgeId, targetProps, duration = 500, easing = 'easeOutQuad', onComplete) {
+    const edge = this.edges.find(e => e.id === edgeId);
+    if (!edge) return;
+    
+    const sourceNode = this.nodes.find(n => n.id === edge.source);
+    const targetNode = this.nodes.find(n => n.id === edge.target);
+    
+    if (!sourceNode || !targetNode) return;
+    
+    // 初始属性 - 从不可见到可见
+    const initialProps = {
+      sourceX: targetProps.sourceX || sourceNode.x,
+      sourceY: targetProps.sourceY || sourceNode.y,
+      targetX: targetProps.sourceX || sourceNode.x, // 从起点开始
+      targetY: targetProps.sourceY || sourceNode.y,
+      stroke: edge.style?.stroke,
+      lineWidth: edge.style?.lineWidth,
+      opacity: 0 // 从透明开始
+    };
+    
+    // 目标属性
+    const finalTargetProps = {
+      sourceX: targetProps.sourceX || sourceNode.x,
+      sourceY: targetProps.sourceY || sourceNode.y,
+      targetX: targetProps.targetX || targetNode.x,
+      targetY: targetProps.targetY || targetNode.y,
+      stroke: targetProps.stroke || edge.style?.stroke,
+      lineWidth: targetProps.lineWidth || edge.style?.lineWidth,
+      opacity: 1 // 完全可见
+    };
+    
+    // 创建动画
+    const animTarget = this.canvasRenderer.createAnimation(
+      `edge_appearance_${edgeId}`,
+      initialProps,
+      finalTargetProps,
+      duration,
+      easing,
+      onComplete
+    );
+    
+    // 存储动画目标
+    this.animatedEdges.set(edgeId, animTarget);
+    
+    // 将边ID添加到已存在的集合中
+    this.existingEdgeIds.add(edgeId);
+    
+    // 启动动画循环
+    this.startAnimationLoop();
+  }
+  
+  /**
+   * 边消失动画
+   */
+  animateEdgeDisappearance(edgeId, duration = 500, easing = 'easeInQuad', onComplete) {
+    const edge = this.edges.find(e => e.id === edgeId);
+    if (!edge) return;
+    
+    const sourceNode = this.nodes.find(n => n.id === edge.source);
+    const targetNode = this.nodes.find(n => n.id === edge.target);
+    
+    if (!sourceNode || !targetNode) return;
+    
+    // 初始属性
+    const initialProps = {
+      sourceX: sourceNode.x,
+      sourceY: sourceNode.y,
+      targetX: targetNode.x,
+      targetY: targetNode.y,
+      stroke: edge.style?.stroke,
+      lineWidth: edge.style?.lineWidth,
+      opacity: 1
+    };
+    
+    // 目标属性 - 从不透明到透明，终点移动到起点
+    const targetProps = {
+      targetX: sourceNode.x,
+      targetY: sourceNode.y,
+      opacity: 0 // 变为透明
+    };
+    
+    // 创建动画
+    const animTarget = this.canvasRenderer.createAnimation(
+      `edge_disappearance_${edgeId}`,
+      initialProps,
+      targetProps,
+      duration,
+      easing,
+      () => {
+        // 动画完成后从集合中移除
+        this.animatedEdges.delete(edgeId);
+        this.existingEdgeIds.delete(edgeId);
+        if (onComplete) {
+          onComplete();
+        }
+      }
+    );
+    
+    // 存储动画目标
+    this.animatedEdges.set(edgeId, animTarget);
+    
+    // 启动动画循环
+    this.startAnimationLoop();
+  }
+  
+  /**
+   * 边变化动画
+   */
+  animateEdgeChange(edgeId, targetProps, duration = 500, easing = 'easeOutQuad', onComplete) {
     const edge = this.edges.find(e => e.id === edgeId);
     if (!edge) return;
     
@@ -816,28 +998,17 @@ export class GraphRenderer {
     };
     
     // 创建动画
-    const animTarget = this.canvasRenderer.animateEdge(
-      `edge_${edgeId}`,
+    const animTarget = this.canvasRenderer.createAnimation(
+      `edge_change_${edgeId}`,
       initialProps,
       targetProps,
       duration,
-      easing
+      easing,
+      onComplete
     );
     
     // 存储动画目标
     this.animatedEdges.set(edgeId, animTarget);
-    
-    // 当动画完成时的回调
-    if (onComplete) {
-      setTimeout(() => {
-        this.animatedEdges.delete(edgeId);
-        onComplete();
-      }, duration);
-    } else {
-      setTimeout(() => {
-        this.animatedEdges.delete(edgeId);
-      }, duration);
-    }
     
     // 启动动画循环
     this.startAnimationLoop();
@@ -853,6 +1024,8 @@ export class GraphRenderer {
       
       if (this.animatedNodes.size > 0 || this.animatedEdges.size > 0) {
         requestAnimationFrame(animate);
+      } else {
+        this.isAnimating = false;
       }
     };
     
@@ -860,13 +1033,6 @@ export class GraphRenderer {
     if (!this.isAnimating) {
       this.isAnimating = true;
       animate();
-      
-      // 设置一个检查点，确保即使没有动画也能停止循环
-      setTimeout(() => {
-        if (this.animatedNodes.size === 0 && this.animatedEdges.size === 0) {
-          this.isAnimating = false;
-        }
-      }, 1000);
     }
   }
   
@@ -883,50 +1049,29 @@ export class GraphRenderer {
     
     return this.svgRenderer.svgToString(svg);
   }
+  
+  /**
+   * 检查节点是否是新增的
+   */
+  isNodeNew(nodeId) {
+    return !this.existingNodeIds.has(nodeId);
+  }
+  
+  /**
+   * 检查边是否是新增的
+   */
+  isEdgeNew(edgeId) {
+    return !this.existingEdgeIds.has(edgeId);
+  }
+  
+  /**
+   * 记录当前节点和边的状态，用于后续变化检测
+   */
+  recordCurrentState() {
+    this.existingNodeIds = new Set(this.nodes.map(n => n.id));
+    this.existingEdgeIds = new Set(this.edges.map(e => e.id));
+  }
 }
-
-/**
- * 生成示例图数据
- * 返回包含nodes和edges的对象，可直接用于初始化AnimateGraph组件
- */
-const generateExampleGraph = (width = 800, height = 600) => {
-  // 创建节点
-  const nodes = [
-    { id: '1', label: '节点1', x: width * 0.3, y: height * 0.3, size: 30, type: 'circle', style: { fill: '#4CAF50' } },
-    { id: '2', label: '节点2', x: width * 0.7, y: height * 0.3, size: 25, type: 'circle', style: { fill: '#2196F3' } },
-    { id: '3', label: '节点3', x: width * 0.3, y: height * 0.7, size: 35, type: 'square', style: { fill: '#FF9800' } },
-    { id: '4', label: '节点4', x: width * 0.7, y: height * 0.7, size: 28, type: 'circle', style: { fill: '#9C27B0' } },
-    { id: '5', label: '节点5', x: width * 0.5, y: height * 0.5, size: 32, type: 'square', style: { fill: '#F44336' } },
-  ];
-  
-  // 创建边
-  const edges = [
-    { id: 'e1', source: '1', target: '2', style: { stroke: '#333', lineWidth: 2, arrow: true } },
-    { id: 'e2', source: '2', target: '4', style: { stroke: '#555', lineWidth: 1.5, arrow: true } },
-    { id: 'e3', source: '4', target: '3', style: { stroke: '#777', lineWidth: 1.5, arrow: true } },
-    { id: 'e4', source: '3', target: '1', style: { stroke: '#999', lineWidth: 1.5, arrow: true } },
-    { id: 'e5', source: '1', target: '5', style: { stroke: '#000', lineWidth: 2, arrow: true } },
-    { id: 'e6', source: '2', target: '5', style: { stroke: '#000', lineWidth: 2, arrow: true } },
-    { id: 'e7', source: '5', target: '3', style: { stroke: '#000', lineWidth: 2, arrow: true } },
-    { id: 'e8', source: '5', target: '4', style: { stroke: '#000', lineWidth: 2, arrow: true } },
-  ];
-  
-  // 默认样式
-  const nodesStyle = {
-    stroke: '#000000',
-    lineWidth: 2,
-    labelFill: '#ffffff',
-    labelFontSize: 14
-  };
-  
-  const edgesStyle = {
-    stroke: '#666666',
-    lineWidth: 2,
-    arrow: true
-  };
-  
-  return { nodes, edges, nodesStyle, edgesStyle };
-};
 
 /**
  * 导出组件和工具
@@ -935,8 +1080,7 @@ export const drawingTools = {
   CanvasRenderer,
   SVGRenderer,
   GraphRenderer,
-  geometry,
-  generateExampleGraph
+  geometry
 };
 
 export default drawingTools;
