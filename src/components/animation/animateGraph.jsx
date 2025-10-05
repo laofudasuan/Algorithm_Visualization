@@ -1,7 +1,6 @@
 // animateGraph.jsx - 图的动画组件
-import React, { useRef, useState, useEffect, forwardRef, useImperativeHandle } from 'react';
+import { useRef, useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { drawingTools } from './drawingTools';
-import { generateExampleGraph } from './generateExampleGraph';
 
 const AnimateGraph = forwardRef(({
   width = 800,
@@ -33,11 +32,11 @@ const AnimateGraph = forwardRef(({
   // Store indicators data
   const indicatorsRef = useRef(new Map());
   
-  // 存储之前的节点和边状态，用于变化检测
-  const prevNodesRef = useRef([]);
-  const prevEdgesRef = useRef([]);
-  const prevNodesStyleRef = useRef({});
-  const prevEdgesStyleRef = useRef({});
+  // 存储当前节点和边状态
+  const currentNodesRef = useRef([]);
+  const currentEdgesRef = useRef([]);
+  const currentNodesStyleRef = useRef({});
+  const currentEdgesStyleRef = useRef({});
   
   // Resize canvas to support high DPI displays
   const resizeCanvas = (canvas, w, h) => {
@@ -113,166 +112,6 @@ const AnimateGraph = forwardRef(({
     };
   }, [width, height]);
   
-  // 当nodes、edges、nodesStyle、edgesStyle发生变化时，检测变化并应用相应的动画
-  useEffect(() => {
-    const graphRenderer = refMain.current?.[Symbol('graphRenderer')];
-    if (!graphRenderer) return;
-    
-    // 更新图数据
-    graphRenderer.nodes = nodes;
-    graphRenderer.edges = edges;
-    
-    // 获取之前的状态
-    const prevNodes = prevNodesRef.current;
-    const prevEdges = prevEdgesRef.current;
-    const prevNStyle = prevNodesStyleRef.current;
-    const prevEStyle = prevEdgesStyleRef.current;
-    
-    // 检测节点变化
-    const currentNodeIds = new Set(nodes.map(n => n.id));
-    const prevNodeIds = new Set(prevNodes.map(n => n.id));
-    
-    // 新节点 - 应用出现动画
-    const newNodeIds = [...currentNodeIds].filter(id => !prevNodeIds.has(id));
-    newNodeIds.forEach(id => {
-      const node = nodes.find(n => n.id === id);
-      if (node) {
-        graphRenderer.animateNodeAppearance(id, { ...node });
-      }
-    });
-    
-    // 删除节点 - 应用消失动画
-    const removedNodeIds = [...prevNodeIds].filter(id => !currentNodeIds.has(id));
-    removedNodeIds.forEach(id => {
-      const prevNode = prevNodes.find(n => n.id === id);
-      if (prevNode) {
-        // 临时添加回节点以便执行消失动画
-        graphRenderer.nodes.push(prevNode);
-        graphRenderer.animateNodeDisappearance(id, 500, 'easeInQuad', () => {
-          // 动画完成后从节点数组中移除
-          graphRenderer.nodes = graphRenderer.nodes.filter(n => n.id !== id);
-        });
-      }
-    });
-    
-    // 已存在节点 - 检查属性变化
-    const existingNodeIds = [...currentNodeIds].filter(id => prevNodeIds.has(id));
-    existingNodeIds.forEach(id => {
-      const currentNode = nodes.find(n => n.id === id);
-      const prevNode = prevNodes.find(n => n.id === id);
-      
-      if (currentNode && prevNode) {
-        // 检查位置、大小、样式等属性是否发生变化
-        const hasChanged = 
-          currentNode.x !== prevNode.x ||
-          currentNode.y !== prevNode.y ||
-          currentNode.size !== prevNode.size ||
-          JSON.stringify(currentNode.style) !== JSON.stringify(prevNode.style);
-          
-        // 检查全局节点样式是否发生变化
-        const styleHasChanged = JSON.stringify(nodesStyle) !== JSON.stringify(prevNStyle);
-        
-        if (hasChanged || styleHasChanged) {
-          // 应用变化动画
-          const targetProps = { ...currentNode };
-          if (currentNode.style) {
-            targetProps.fill = currentNode.style.fill;
-            targetProps.stroke = currentNode.style.stroke;
-          }
-          graphRenderer.animateNodeChange(id, targetProps);
-        }
-      }
-    });
-    
-    // 检测边变化
-    const currentEdgeIds = new Set(edges.map(e => e.id));
-    const prevEdgeIds = new Set(prevEdges.map(e => e.id));
-    
-    // 新边 - 应用出现动画
-    const newEdgeIds = [...currentEdgeIds].filter(id => !prevEdgeIds.has(id));
-    newEdgeIds.forEach(id => {
-      const edge = edges.find(e => e.id === id);
-      if (edge) {
-        graphRenderer.animateEdgeAppearance(id, { ...edge });
-      }
-    });
-    
-    // 删除边 - 应用消失动画
-    const removedEdgeIds = [...prevEdgeIds].filter(id => !currentEdgeIds.has(id));
-    removedEdgeIds.forEach(id => {
-      const prevEdge = prevEdges.find(e => e.id === id);
-      if (prevEdge) {
-        // 临时添加回边以便执行消失动画
-        graphRenderer.edges.push(prevEdge);
-        graphRenderer.animateEdgeDisappearance(id, 500, 'easeInQuad', () => {
-          // 动画完成后从边数组中移除
-          graphRenderer.edges = graphRenderer.edges.filter(e => e.id !== id);
-        });
-      }
-    });
-    
-    // 已存在边 - 检查属性变化
-    const existingEdgeIds = [...currentEdgeIds].filter(id => prevEdgeIds.has(id));
-    existingEdgeIds.forEach(id => {
-      const currentEdge = edges.find(e => e.id === id);
-      const prevEdge = prevEdges.find(e => e.id === id);
-      
-      if (currentEdge && prevEdge) {
-        // 检查源节点、目标节点、样式等属性是否发生变化
-        const hasChanged = 
-          currentEdge.source !== prevEdge.source ||
-          currentEdge.target !== prevEdge.target ||
-          JSON.stringify(currentEdge.style) !== JSON.stringify(prevEdge.style);
-          
-        // 检查连接的节点位置是否变化
-        const sourceNodeChanged = existingNodeIds.includes(currentEdge.source) &&
-          nodes.find(n => n.id === currentEdge.source) &&
-          prevNodes.find(n => n.id === currentEdge.source) &&
-          (nodes.find(n => n.id === currentEdge.source).x !== prevNodes.find(n => n.id === currentEdge.source).x ||
-           nodes.find(n => n.id === currentEdge.source).y !== prevNodes.find(n => n.id === currentEdge.source).y);
-          
-        const targetNodeChanged = existingNodeIds.includes(currentEdge.target) &&
-          nodes.find(n => n.id === currentEdge.target) &&
-          prevNodes.find(n => n.id === currentEdge.target) &&
-          (nodes.find(n => n.id === currentEdge.target).x !== prevNodes.find(n => n.id === currentEdge.target).x ||
-           nodes.find(n => n.id === currentEdge.target).y !== prevNodes.find(n => n.id === currentEdge.target).y);
-          
-        // 检查全局边样式是否发生变化
-        const styleHasChanged = JSON.stringify(edgesStyle) !== JSON.stringify(prevEStyle);
-        
-        if (hasChanged || sourceNodeChanged || targetNodeChanged || styleHasChanged) {
-          // 获取源节点和目标节点的位置
-          const sourceNode = nodes.find(n => n.id === currentEdge.source);
-          const targetNode = nodes.find(n => n.id === currentEdge.target);
-          
-          if (sourceNode && targetNode) {
-            // 应用变化动画
-            const targetProps = {
-              sourceX: sourceNode.x,
-              sourceY: sourceNode.y,
-              targetX: targetNode.x,
-              targetY: targetNode.y
-            };
-            
-            if (currentEdge.style) {
-              targetProps.stroke = currentEdge.style.stroke;
-              targetProps.lineWidth = currentEdge.style.lineWidth;
-            }
-            
-            graphRenderer.animateEdgeChange(id, targetProps);
-          }
-        }
-      }
-    });
-    
-    // 更新之前的状态引用
-    prevNodesRef.current = [...nodes];
-    prevEdgesRef.current = [...edges];
-    prevNodesStyleRef.current = { ...nodesStyle };
-    prevEdgesStyleRef.current = { ...edgesStyle };
-    
-  }, [nodes, edges, nodesStyle, edgesStyle]);
-  
   // Render the graph on the main canvas - 仅用于重新画整张图
   const renderGraph = () => {
     const renderer = mainRendererRef.current;
@@ -282,13 +121,13 @@ const AnimateGraph = forwardRef(({
     renderer.clear();
     
     // Set default styles
-    const defaultNodeStyle = { ...nodesStyle };
-    const defaultEdgeStyle = { ...edgesStyle };
+    const defaultNodeStyle = { ...currentNodesStyleRef.current };
+    const defaultEdgeStyle = { ...currentEdgesStyleRef.current };
     
     // Draw edges first
-    edges.forEach(edge => {
-      const sourceNode = nodes.find(n => n.id === edge.source);
-      const targetNode = nodes.find(n => n.id === edge.target);
+    currentEdgesRef.current.forEach(edge => {
+      const sourceNode = currentNodesRef.current.find(n => n.id === edge.source);
+      const targetNode = currentNodesRef.current.find(n => n.id === edge.target);
       
       if (sourceNode && targetNode) {
         const edgeStyle = { ...defaultEdgeStyle, ...edge.style };
@@ -310,7 +149,7 @@ const AnimateGraph = forwardRef(({
     });
     
     // Draw nodes
-    nodes.forEach(node => {
+    currentNodesRef.current.forEach(node => {
       const nodeStyle = { ...defaultNodeStyle, ...node.style };
       
       if (node.type === 'circle' || !node.type) {
@@ -394,49 +233,122 @@ const AnimateGraph = forwardRef(({
     },
     
     setNodes: (newNodes) => {
-      // 节点更新由外部props变化触发动画
-      // 这里可以添加额外的控制逻辑
+      // 更新节点
+      currentNodesRef.current = [...newNodes];
+      
+      // 获取GraphRenderer实例
+      const graphRenderer = refMain.current?.[Symbol('graphRenderer')];
+      if (graphRenderer) {
+        graphRenderer.nodes = newNodes;
+        graphRenderer.recordCurrentState();
+      }
+      
+      // 重新渲染
+      renderGraph();
     },
     
     setEdges: (newEdges) => {
-      // 边更新由外部props变化触发动画
-      // 这里可以添加额外的控制逻辑
+      // 更新边
+      currentEdgesRef.current = [...newEdges];
+      
+      // 获取GraphRenderer实例
+      const graphRenderer = refMain.current?.[Symbol('graphRenderer')];
+      if (graphRenderer) {
+        graphRenderer.edges = newEdges;
+        graphRenderer.recordCurrentState();
+      }
+      
+      // 重新渲染
+      renderGraph();
+    },
+    
+    setNodesStyle: (style) => {
+      // 更新节点样式
+      currentNodesStyleRef.current = { ...style };
+      
+      // 重新渲染
+      renderGraph();
+    },
+    
+    setEdgesStyle: (style) => {
+      // 更新边样式
+      currentEdgesStyleRef.current = { ...style };
+      
+      // 重新渲染
+      renderGraph();
     },
     
     updateNode: (nodeId, updates) => {
       // 找到节点并更新
-      const nodeIndex = nodes.findIndex(n => n.id === nodeId);
+      const nodeIndex = currentNodesRef.current.findIndex(n => n.id === nodeId);
       if (nodeIndex !== -1) {
-        const updatedNodes = [...nodes];
-        updatedNodes[nodeIndex] = { ...updatedNodes[nodeIndex], ...updates };
-        // 这里应该由父组件更新props
+        currentNodesRef.current[nodeIndex] = { ...currentNodesRef.current[nodeIndex], ...updates };
+        
+        // 获取GraphRenderer实例
+        const graphRenderer = refMain.current?.[Symbol('graphRenderer')];
+        if (graphRenderer) {
+          graphRenderer.nodes = currentNodesRef.current;
+          graphRenderer.recordCurrentState();
+        }
+        
+        // 重新渲染
+        renderGraph();
       }
     },
     
     updateEdge: (edgeId, updates) => {
       // 找到边并更新
-      const edgeIndex = edges.findIndex(e => e.id === edgeId);
+      const edgeIndex = currentEdgesRef.current.findIndex(e => e.id === edgeId);
       if (edgeIndex !== -1) {
-        const updatedEdges = [...edges];
-        updatedEdges[edgeIndex] = { ...updatedEdges[edgeIndex], ...updates };
-        // 这里应该由父组件更新props
+        currentEdgesRef.current[edgeIndex] = { ...currentEdgesRef.current[edgeIndex], ...updates };
+        
+        // 获取GraphRenderer实例
+        const graphRenderer = refMain.current?.[Symbol('graphRenderer')];
+        if (graphRenderer) {
+          graphRenderer.edges = currentEdgesRef.current;
+          graphRenderer.recordCurrentState();
+        }
+        
+        // 重新渲染
+        renderGraph();
       }
     },
     
     addNode: (node) => {
-      // 添加新节点，由父组件更新props
+      // 添加新节点
+      currentNodesRef.current.push(node);
+      
+      // 获取GraphRenderer实例
+      const graphRenderer = refMain.current?.[Symbol('graphRenderer')];
+      if (graphRenderer) {
+        graphRenderer.nodes = currentNodesRef.current;
+        graphRenderer.recordCurrentState();
+      }
+      
+      // 重新渲染
+      renderGraph();
     },
     
     addEdge: (source, target, properties = {}) => {
-      // 添加新边，由父组件更新props
-    },
-    
-    setNodesStyle: (style) => {
-      // 设置所有节点的样式，由父组件更新props
-    },
-    
-    setEdgesStyle: (style) => {
-      // 设置所有边的样式，由父组件更新props
+      // 添加新边
+      const newEdge = {
+        id: `edge-${Date.now()}`, // 生成唯一ID
+        source,
+        target,
+        ...properties
+      };
+      
+      currentEdgesRef.current.push(newEdge);
+      
+      // 获取GraphRenderer实例
+      const graphRenderer = refMain.current?.[Symbol('graphRenderer')];
+      if (graphRenderer) {
+        graphRenderer.edges = currentEdgesRef.current;
+        graphRenderer.recordCurrentState();
+      }
+      
+      // 重新渲染
+      renderGraph();
     },
     
     clearAnnotations: () => {
