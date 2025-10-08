@@ -22,9 +22,9 @@ const AnimateGraph = forwardRef(({
   const [lastMousePos, setLastMousePos] = useState({ x: 0, y: 0 });
   
   // Store the drawing tools instances
-  const mainRendererRef = useRef(null);
   const annotationRendererRef = useRef(null);
   const indicatorRendererRef = useRef(null);
+  const graphRendererRef = useRef(null);
   
   // Store annotations data
   const annotationsRef = useRef([]);
@@ -38,26 +38,7 @@ const AnimateGraph = forwardRef(({
   const currentNodesStyleRef = useRef({});
   const currentEdgesStyleRef = useRef({});
   
-  // Resize canvas to support high DPI displays
-  const resizeCanvas = (canvas, w, h) => {
-    const dpr = window.devicePixelRatio || 1;
-    
-    // Set CSS size
-    canvas.style.width = `${w}px`;
-    canvas.style.height = `${h}px`;
-    
-    // Set actual size (accounting for device pixel ratio)
-    canvas.width = w * dpr;
-    canvas.height = h * dpr;
-    
-    // Scale context
-    const ctx = canvas.getContext('2d');
-    ctx.scale(dpr, dpr);
-    
-    return ctx;
-  };
-  
-  // Initialize the renderers
+  // Initialize the renderers - 只负责初始化
   useEffect(() => {
     const mainCanvas = refMain.current;
     const annotationCanvas = refAnnotation.current;
@@ -65,13 +46,34 @@ const AnimateGraph = forwardRef(({
     
     if (!mainCanvas || !annotationCanvas || !indicatorCanvas) return;
     
-    // Resize all canvases
-    const mainCtx = resizeCanvas(mainCanvas, width, height);
-    const annotationCtx = resizeCanvas(annotationCanvas, width, height);
-    const indicatorCtx = resizeCanvas(indicatorCanvas, width, height);
+    // Resize all canvases to support high DPI displays
+    const dpr = window.devicePixelRatio || 1;
     
-    // Initialize renderers
-    mainRendererRef.current = new drawingTools.CanvasRenderer(mainCtx, width, height);
+    // Set CSS size and actual size for main canvas
+    mainCanvas.style.width = `${width}px`;
+    mainCanvas.style.height = `${height}px`;
+    mainCanvas.width = width * dpr;
+    mainCanvas.height = height * dpr;
+    const mainCtx = mainCanvas.getContext('2d');
+    mainCtx.scale(dpr, dpr);
+    
+    // Set CSS size and actual size for annotation canvas
+    annotationCanvas.style.width = `${width}px`;
+    annotationCanvas.style.height = `${height}px`;
+    annotationCanvas.width = width * dpr;
+    annotationCanvas.height = height * dpr;
+    const annotationCtx = annotationCanvas.getContext('2d');
+    annotationCtx.scale(dpr, dpr);
+    
+    // Set CSS size and actual size for indicator canvas
+    indicatorCanvas.style.width = `${width}px`;
+    indicatorCanvas.style.height = `${height}px`;
+    indicatorCanvas.width = width * dpr;
+    indicatorCanvas.height = height * dpr;
+    const indicatorCtx = indicatorCanvas.getContext('2d');
+    indicatorCtx.scale(dpr, dpr);
+    
+    // Initialize renderers (only annotation and indicator)
     annotationRendererRef.current = new drawingTools.CanvasRenderer(annotationCtx, width, height);
     indicatorRendererRef.current = new drawingTools.CanvasRenderer(indicatorCtx, width, height);
     
@@ -81,12 +83,14 @@ const AnimateGraph = forwardRef(({
       height
     });
     
-    // 存储GraphRenderer实例
-    const rendererKey = Symbol('graphRenderer');
-    mainCanvas[rendererKey] = graphRenderer;
+    // 存储GraphRenderer实例到ref
+    graphRendererRef.current = graphRenderer;
     
-    // 初始渲染
-    renderGraph();
+    // 保存初始节点和边数据
+    currentNodesRef.current = [...nodes];
+    currentEdgesRef.current = [...edges];
+    currentNodesStyleRef.current = { ...nodesStyle };
+    currentEdgesStyleRef.current = { ...edgesStyle };
     
     // 记录初始状态
     if (graphRenderer) {
@@ -94,6 +98,9 @@ const AnimateGraph = forwardRef(({
       graphRenderer.edges = edges;
       graphRenderer.recordCurrentState();
     }
+    
+    // 初始渲染
+    renderGraph();
     
     // Setup the controller interface
     const controller = getController();
@@ -105,73 +112,22 @@ const AnimateGraph = forwardRef(({
     
     // Cleanup function
     return () => {
-      // Stop any animations
-      if (mainRendererRef.current) {
-        mainRendererRef.current.clearAnimations();
+      // Clear any animations
+      if (graphRendererRef.current) {
+        // Assuming there's a method to clear animations
+        graphRendererRef.current.clearAnimations?.();
       }
     };
-  }, [width, height]);
+  }, []);
   
   // Render the graph on the main canvas - 仅用于重新画整张图
   const renderGraph = () => {
-    const renderer = mainRendererRef.current;
-    if (!renderer) return;
+    // 获取GraphRenderer实例
+    const graphRenderer = graphRendererRef.current;
+    if (!graphRenderer) return;
     
-    // Clear the canvas
-    renderer.clear();
-    
-    // Set default styles
-    const defaultNodeStyle = { ...currentNodesStyleRef.current };
-    const defaultEdgeStyle = { ...currentEdgesStyleRef.current };
-    
-    // Draw edges first
-    currentEdgesRef.current.forEach(edge => {
-      const sourceNode = currentNodesRef.current.find(n => n.id === edge.source);
-      const targetNode = currentNodesRef.current.find(n => n.id === edge.target);
-      
-      if (sourceNode && targetNode) {
-        const edgeStyle = { ...defaultEdgeStyle, ...edge.style };
-        
-        if (edgeStyle.arrow) {
-          renderer.drawArrow(
-            sourceNode.x, sourceNode.y, 
-            targetNode.x, targetNode.y, 
-            edgeStyle
-          );
-        } else {
-          renderer.drawLine(
-            sourceNode.x, sourceNode.y, 
-            targetNode.x, targetNode.y, 
-            edgeStyle
-          );
-        }
-      }
-    });
-    
-    // Draw nodes
-    currentNodesRef.current.forEach(node => {
-      const nodeStyle = { ...defaultNodeStyle, ...node.style };
-      
-      if (node.type === 'circle' || !node.type) {
-        renderer.drawCircle(node.x, node.y, node.size || 20, nodeStyle);
-      } else if (node.type === 'square') {
-        const size = node.size || 20;
-        renderer.drawRect(node.x - size, node.y - size, size * 2, size * 2, {
-          ...nodeStyle,
-          radius: nodeStyle.radius || 0
-        });
-      }
-      
-      // Draw label if present
-      if (node.label) {
-        renderer.drawText(node.label, node.x, node.y, {
-          fill: nodeStyle.labelFill || '#ffffff',
-          fontSize: nodeStyle.labelFontSize || 14,
-          textAlign: 'center',
-          textBaseline: 'middle'
-        });
-      }
-    });
+    // 使用GraphRenderer更新图数据并渲染
+    graphRenderer.updateGraph(currentNodesRef.current, currentEdgesRef.current);
   };
   
   // Handle mouse down for annotation
@@ -222,22 +178,13 @@ const AnimateGraph = forwardRef(({
   
   // 控制器接口函数
   const getController = () => ({
-    setSize: (w, h) => {
-      // Resize the canvas and redraw
-      if (refMain.current && refAnnotation.current && refIndicator.current) {
-        resizeCanvas(refMain.current, w, h);
-        resizeCanvas(refAnnotation.current, w, h);
-        resizeCanvas(refIndicator.current, w, h);
-        renderGraph();
-      }
-    },
     
     setNodes: (newNodes) => {
       // 更新节点
       currentNodesRef.current = [...newNodes];
       
       // 获取GraphRenderer实例
-      const graphRenderer = refMain.current?.[Symbol('graphRenderer')];
+      const graphRenderer = graphRendererRef.current;
       if (graphRenderer) {
         graphRenderer.nodes = newNodes;
         graphRenderer.recordCurrentState();
@@ -252,7 +199,7 @@ const AnimateGraph = forwardRef(({
       currentEdgesRef.current = [...newEdges];
       
       // 获取GraphRenderer实例
-      const graphRenderer = refMain.current?.[Symbol('graphRenderer')];
+      const graphRenderer = graphRendererRef.current;
       if (graphRenderer) {
         graphRenderer.edges = newEdges;
         graphRenderer.recordCurrentState();
@@ -285,7 +232,7 @@ const AnimateGraph = forwardRef(({
         currentNodesRef.current[nodeIndex] = { ...currentNodesRef.current[nodeIndex], ...updates };
         
         // 获取GraphRenderer实例
-        const graphRenderer = refMain.current?.[Symbol('graphRenderer')];
+        const graphRenderer = graphRendererRef.current;
         if (graphRenderer) {
           graphRenderer.nodes = currentNodesRef.current;
           graphRenderer.recordCurrentState();
@@ -303,7 +250,7 @@ const AnimateGraph = forwardRef(({
         currentEdgesRef.current[edgeIndex] = { ...currentEdgesRef.current[edgeIndex], ...updates };
         
         // 获取GraphRenderer实例
-        const graphRenderer = refMain.current?.[Symbol('graphRenderer')];
+        const graphRenderer = graphRendererRef.current;
         if (graphRenderer) {
           graphRenderer.edges = currentEdgesRef.current;
           graphRenderer.recordCurrentState();
@@ -319,7 +266,7 @@ const AnimateGraph = forwardRef(({
       currentNodesRef.current.push(node);
       
       // 获取GraphRenderer实例
-      const graphRenderer = refMain.current?.[Symbol('graphRenderer')];
+      const graphRenderer = graphRendererRef.current;
       if (graphRenderer) {
         graphRenderer.nodes = currentNodesRef.current;
         graphRenderer.recordCurrentState();
@@ -341,7 +288,7 @@ const AnimateGraph = forwardRef(({
       currentEdgesRef.current.push(newEdge);
       
       // 获取GraphRenderer实例
-      const graphRenderer = refMain.current?.[Symbol('graphRenderer')];
+      const graphRenderer = graphRendererRef.current;
       if (graphRenderer) {
         graphRenderer.edges = currentEdgesRef.current;
         graphRenderer.recordCurrentState();

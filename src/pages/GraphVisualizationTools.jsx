@@ -9,7 +9,7 @@ function GraphVisualizationTools() {
       <GraphCanvas 
         width={1000} 
         height={600} 
-        graphCount={2} // 显示两个图
+        graphCount={1}
       />
     </div>
   );

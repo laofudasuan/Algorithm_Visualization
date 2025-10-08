@@ -8,22 +8,7 @@ const GraphCanvas = forwardRef(({ width = 1000, height = 600, graphCount = 1 }, 
   // 状态
   const [currentGraphIndex, setCurrentGraphIndex] = useState(0);
   const [graphControllers, setGraphControllers] = useState([]);
-  const [graphData, setGraphData] = useState([]);
-  
-  // Refs
-  const animateGraphRefs = useRef([]);
-  
-  // 初始化多个图控制器和数据
-  // 创建graphCount个图元素，每个图线初始化为ExampleGraph，所有图初始的宽度和高度与容器一致
-  // 初始化当前图索引为0
-  useEffect(() => {
-    // 初始化控制器数组
-    const controllers = [];
-    for (let i = 0; i < graphCount; i++) {
-      controllers.push(null);
-    }
-    setGraphControllers(controllers);
-    
+  const [graphData, setGraphData] = useState(() => {
     // 初始化图数据，为每个图生成样例图数据
     const graphs = [];
     for (let i = 0; i < graphCount; i++) {
@@ -31,8 +16,11 @@ const GraphCanvas = forwardRef(({ width = 1000, height = 600, graphCount = 1 }, 
       const exampleGraph = generateExampleGraph(width, height);
       graphs.push(exampleGraph);
     }
-    setGraphData(graphs);
-  }, [graphCount, width, height]);
+    return graphs;
+  });
+  
+  // Refs
+  const animateGraphRefs = useRef([]);
   
   // 当AnimateGraph组件初始化时，保存其控制器
   const handleGraphInit = (index, controller) => {

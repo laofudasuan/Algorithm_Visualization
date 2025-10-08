@@ -580,162 +580,52 @@ export class GraphRenderer {
   updateGraph(nodes, edges) {
     this.nodes = nodes;
     this.edges = edges;
-    this.render();
+    this.rebuild();
   }
   
   /**
    * 渲染完整的图
    */
-  render() {
+  rebuild() {
     // 清空画布
     this.canvasRenderer.clear();
     
-    // 绘制边
+    // 清空动画元素和已存在元素的记录
+    this.animatedNodes.clear();
+    this.animatedEdges.clear();
+    this.existingNodeIds.clear();
+    this.existingEdgeIds.clear();
+    
+    // 为所有边添加出现动画
     this.edges.forEach(edge => {
       const sourceNode = this.nodes.find(n => n.id === edge.source);
       const targetNode = this.nodes.find(n => n.id === edge.target);
       
       if (sourceNode && targetNode) {
-        // 检查是否有动画中的边
-        const animatedEdge = this.animatedEdges.get(edge.id);
-        if (animatedEdge) {
-          // 使用动画中的属性
-          const edgeStyle = { 
-            ...this.defaultEdgeStyle, 
-            ...edge.style, 
-            ...animatedEdge 
-          };
-          
-          if (edgeStyle.arrow) {
-            this.canvasRenderer.drawArrow(
-              animatedEdge.sourceX || sourceNode.x,
-              animatedEdge.sourceY || sourceNode.y,
-              animatedEdge.targetX || targetNode.x,
-              animatedEdge.targetY || targetNode.y,
-              edgeStyle
-            );
-          } else {
-            this.canvasRenderer.drawLine(
-              animatedEdge.sourceX || sourceNode.x,
-              animatedEdge.sourceY || sourceNode.y,
-              animatedEdge.targetX || targetNode.x,
-              animatedEdge.targetY || targetNode.y,
-              edgeStyle
-            );
-          }
-        } else {
-          // 使用原始属性
-          const edgeStyle = { ...this.defaultEdgeStyle, ...edge.style };
-          
-          if (edgeStyle.arrow) {
-            this.canvasRenderer.drawArrow(
-              sourceNode.x,
-              sourceNode.y,
-              targetNode.x,
-              targetNode.y,
-              edgeStyle
-            );
-          } else {
-            this.canvasRenderer.drawLine(
-              sourceNode.x,
-              sourceNode.y,
-              targetNode.x,
-              targetNode.y,
-              edgeStyle
-            );
-          }
-        }
+        this.animateEdgeAppearance(edge.id, {
+          sourceX: sourceNode.x,
+          sourceY: sourceNode.y,
+          targetX: targetNode.x,
+          targetY: targetNode.y,
+          stroke: edge.style?.stroke,
+          lineWidth: edge.style?.lineWidth
+        });
       }
     });
     
-    // 绘制节点
+    // 为所有节点添加出现动画
     this.nodes.forEach(node => {
-      // 检查是否有动画中的节点
-      const animatedNode = this.animatedNodes.get(node.id);
-      if (animatedNode) {
-        // 使用动画中的属性
-        const nodeStyle = { 
-          ...this.defaultNodeStyle, 
-          ...node.style, 
-          ...animatedNode 
-        };
-        
-        if (node.type === 'circle' || !node.type) {
-          this.canvasRenderer.drawCircle(
-            animatedNode.x || node.x,
-            animatedNode.y || node.y,
-            animatedNode.size || node.size || 20,
-            nodeStyle
-          );
-        } else if (node.type === 'square') {
-          const size = animatedNode.size || node.size || 20;
-          this.canvasRenderer.drawRect(
-            (animatedNode.x || node.x) - size,
-            (animatedNode.y || node.y) - size,
-            size * 2,
-            size * 2,
-            {
-              ...nodeStyle,
-              radius: nodeStyle.radius || 0
-            }
-          );
-        }
-        
-        // 绘制标签
-        if (node.label) {
-          this.canvasRenderer.drawText(
-            node.label,
-            animatedNode.x || node.x,
-            animatedNode.y || node.y,
-            {
-              fill: nodeStyle.labelFill || '#ffffff',
-              fontSize: nodeStyle.labelFontSize || 14,
-              textAlign: 'center',
-              textBaseline: 'middle'
-            }
-          );
-        }
-      } else {
-        // 使用原始属性
-        const nodeStyle = { ...this.defaultNodeStyle, ...node.style };
-        
-        if (node.type === 'circle' || !node.type) {
-          this.canvasRenderer.drawCircle(
-            node.x,
-            node.y,
-            node.size || 20,
-            nodeStyle
-          );
-        } else if (node.type === 'square') {
-          const size = node.size || 20;
-          this.canvasRenderer.drawRect(
-            node.x - size,
-            node.y - size,
-            size * 2,
-            size * 2,
-            {
-              ...nodeStyle,
-              radius: nodeStyle.radius || 0
-            }
-          );
-        }
-        
-        // 绘制标签
-        if (node.label) {
-          this.canvasRenderer.drawText(
-            node.label,
-            node.x,
-            node.y,
-            {
-              fill: nodeStyle.labelFill || '#ffffff',
-              fontSize: nodeStyle.labelFontSize || 14,
-              textAlign: 'center',
-              textBaseline: 'middle'
-            }
-          );
-        }
-      }
+      this.animateNodeAppearance(node.id, {
+        x: node.x,
+        y: node.y,
+        size: node.size || 20,
+        fill: node.style?.fill,
+        stroke: node.style?.stroke
+      });
     });
+    
+    // 启动动画循环
+    this.startAnimationLoop();
   }
   
   /**
@@ -780,9 +670,6 @@ export class GraphRenderer {
     
     // 将节点ID添加到已存在的集合中
     this.existingNodeIds.add(nodeId);
-    
-    // 启动动画循环
-    this.startAnimationLoop();
   }
   
   /**
@@ -827,9 +714,6 @@ export class GraphRenderer {
     
     // 存储动画目标
     this.animatedNodes.set(nodeId, animTarget);
-    
-    // 启动动画循环
-    this.startAnimationLoop();
   }
   
   /**
@@ -861,9 +745,6 @@ export class GraphRenderer {
     
     // 存储动画目标
     this.animatedNodes.set(nodeId, animTarget);
-    
-    // 启动动画循环
-    this.startAnimationLoop();
   }
   
   /**
@@ -878,12 +759,12 @@ export class GraphRenderer {
     
     if (!sourceNode || !targetNode) return;
     
-    // 初始属性 - 从不可见到可见
+    // 初始属性 - 从起点到起点（长度为0）
     const initialProps = {
-      sourceX: targetProps.sourceX || sourceNode.x,
-      sourceY: targetProps.sourceY || sourceNode.y,
-      targetX: targetProps.sourceX || sourceNode.x, // 从起点开始
-      targetY: targetProps.sourceY || sourceNode.y,
+      sourceX: sourceNode.x,
+      sourceY: sourceNode.y,
+      targetX: sourceNode.x,
+      targetY: sourceNode.y,
       stroke: edge.style?.stroke,
       lineWidth: edge.style?.lineWidth,
       opacity: 0 // 从透明开始
@@ -915,9 +796,6 @@ export class GraphRenderer {
     
     // 将边ID添加到已存在的集合中
     this.existingEdgeIds.add(edgeId);
-    
-    // 启动动画循环
-    this.startAnimationLoop();
   }
   
   /**
@@ -969,9 +847,6 @@ export class GraphRenderer {
     
     // 存储动画目标
     this.animatedEdges.set(edgeId, animTarget);
-    
-    // 启动动画循环
-    this.startAnimationLoop();
   }
   
   /**
@@ -1009,9 +884,6 @@ export class GraphRenderer {
     
     // 存储动画目标
     this.animatedEdges.set(edgeId, animTarget);
-    
-    // 启动动画循环
-    this.startAnimationLoop();
   }
   
   /**
@@ -1020,7 +892,6 @@ export class GraphRenderer {
   startAnimationLoop() {
     // 简单实现：使用requestAnimationFrame持续渲染，直到没有活动的动画
     const animate = () => {
-      this.render();
       
       if (this.animatedNodes.size > 0 || this.animatedEdges.size > 0) {
         requestAnimationFrame(animate);
