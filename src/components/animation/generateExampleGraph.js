@@ -19,7 +19,7 @@ export const generateExampleGraph = (width = 800, height = 600) => {
   // 创建边
   const edges = [
     { id: 'e1', source: '1', target: '2', style: { stroke: '#333', lineWidth: 2, arrow: true } },
-    { id: 'e2', source: '2', target: '4', style: { stroke: '#555', lineWidth: 1.5, arrow: true } },
+    { id: 'e2', label: '边2', source: '2', target: '4', style: { stroke: '#555', lineWidth: 1.5, arrow: true } },
     { id: 'e3', source: '4', target: '3', style: { stroke: '#777', lineWidth: 1.5, arrow: true } },
     { id: 'e4', source: '3', target: '1', style: { stroke: '#999', lineWidth: 1.5, arrow: true } },
     { id: 'e5', source: '1', target: '5', style: { stroke: '#000', lineWidth: 2, arrow: true } },
