@@ -1,32 +1,45 @@
-import { useEffect } from 'react'
+import React from 'react'
 import { Link } from 'react-router-dom'
-import anime from 'animejs'
+import { motion } from 'framer-motion'
 
 const NotFound = () => {
-  useEffect(() => {
-    // 页面进入动画
-    anime({
-      targets: '.not-found-content',
-      opacity: [0, 1],
-      scale: [0.9, 1],
-      duration: 800,
-      easing: 'easeOutQuad'
-    })
+  // 使用Framer Motion的动画变体
+  const containerVariants = {
+    hidden: { opacity: 0, scale: 0.9 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: {
+        duration: 0.8,
+        ease: "easeOut"
+      }
+    }
+  }
 
-    // 数字404动画
-    anime({
-      targets: '.error-number',
-      opacity: [0, 1],
-      y: [-50, 0],
-      duration: 1000,
-      easing: 'easeOutBounce'
-    })
-  }, [])
+  const numberVariants = {
+    hidden: { opacity: 0, y: -50 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 1,
+        ease: "backOut"
+      }
+    }
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="not-found-content max-w-md w-full text-center">
-        <div className="error-number text-9xl font-bold text-gray-100 mb-6">404</div>
+      <motion.div 
+        className="not-found-content max-w-md w-full text-center"
+        initial="hidden"
+        animate="visible"
+        variants={containerVariants}
+      >
+        <motion.div 
+          className="error-number text-9xl font-bold text-gray-100 mb-6"
+          variants={numberVariants}
+        >404</motion.div>
         <h1 className="text-3xl font-bold mb-4">页面未找到</h1>
         <p className="text-gray-600 mb-8">抱歉，您访问的页面不存在或已被移除</p>
         <Link 
@@ -38,7 +51,7 @@ const NotFound = () => {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
         </Link>
-      </div>
+      </motion.div>
     </div>
   )
 }

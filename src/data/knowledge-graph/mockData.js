@@ -51,7 +51,7 @@ export const knowledgeGraphData = {
     { id: 'data_indexing', type: NODE_TYPES.APPLICATION, label: '数据索引', color: '#8b5cf6', size: 20 },
     
     // 资源节点
-    { id: 'leetcode', type: NODE_TYPES.RESOURCE, label: 'LeetCode', color: '#ef4444', size: 15 },
+    { id: 'luogu', type: NODE_TYPES.RESOURCE, label: '洛谷', color: '#ef4444', size: 15 },
     { id: 'algorithm_books', type: NODE_TYPES.RESOURCE, label: '算法书籍', color: '#ef4444', size: 15 }
   ],
   
@@ -88,8 +88,8 @@ export const knowledgeGraphData = {
     { source: 'binary_search', target: 'data_indexing', type: RELATION_TYPES.APPLIES_TO },
     
     // 资源关联
-    { source: 'binary_search', target: 'leetcode', type: RELATION_TYPES.RELATED_TO },
-    { source: 'quick_sort', target: 'leetcode', type: RELATION_TYPES.RELATED_TO },
+    { source: 'binary_search', target: 'luogu', type: RELATION_TYPES.RELATED_TO },
+    { source: 'quick_sort', target: 'luogu', type: RELATION_TYPES.RELATED_TO },
     { source: 'algorithms', target: 'algorithm_books', type: RELATION_TYPES.RELATED_TO }
   ]
 };

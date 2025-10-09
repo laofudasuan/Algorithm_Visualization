@@ -1,7 +1,6 @@
 import React, { useState, useEffect, lazy, Suspense, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import anime from 'animejs/lib/anime.es.js';
 import 'katex/dist/katex.min.css';
 const CoursewareDetail = () => {
   const { id } = useParams();
@@ -16,14 +15,6 @@ const CoursewareDetail = () => {
   const [showMainPage, setShowMainPage] = useState(true); // 控制显示主页还是子页面
   const contentRef = useRef(null);
   useEffect(() => {
-    // 页面进入动画
-    anime({
-      targets: 'body',
-      opacity: [0, 1],
-      duration: 500,
-      easing: 'easeOutQuad'
-    });
-
     const loadCourseware = async () => {
       try {
         // 动态导入对应的MDX课件文件
@@ -110,21 +101,31 @@ const CoursewareDetail = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen pt-32 pb-20 container mx-auto px-4">
+      <motion.div 
+        className="min-h-screen pt-32 pb-20 container mx-auto px-4"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+      >
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
         </div>
-      </div>
+      </motion.div>
     );
   }
 
   if (error || !courseware) {
     return (
-      <div className="min-h-screen pt-32 pb-20 container mx-auto px-4">
+      <motion.div 
+        className="min-h-screen pt-32 pb-20 container mx-auto px-4"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+      >
         <div className="text-center py-12 bg-gray-50 rounded-lg">
           <h3 className="text-xl font-bold mb-4">课件不存在或已被删除</h3>
         </div>
-      </div>
+      </motion.div>
     );
   }
 
@@ -162,7 +163,12 @@ const CoursewareDetail = () => {
 
   // 子页面视图
   return (
-    <div className="min-h-screen pt-12 pb-32 container mx-auto px-4 relative">
+    <motion.div 
+      className="min-h-screen pt-12 pb-32 container mx-auto px-4 relative"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+    >
       {/* 课件内容容器 - 左右滑动结构 */}
       <div className="max-w-3xl mx-auto relative" style={{ minHeight: '500px' }}>
         <div 
@@ -251,7 +257,7 @@ const CoursewareDetail = () => {
           />
         </motion.div>
       )}
-    </div>
+    </motion.div>
   );
 };
 

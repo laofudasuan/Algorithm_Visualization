@@ -1,6 +1,5 @@
 // drawingTools.js - 负责图的绘制和动画实现，使用animejs库
-import anime from 'animejs';
-
+import { animate, createTimeline, stagger, utils, spring } from 'animejs';
 /**
  * Canvas渲染器类
  * 负责在Canvas上绘制各种图形元素
@@ -111,17 +110,7 @@ export class CanvasRenderer {
     if (style.stroke) {
       this.ctx.strokeStyle = style.stroke;
       this.ctx.lineWidth = style.lineWidth || 1;
-      
-      if (style.dashed) {
-        this.ctx.setLineDash(style.dashArray || [5, 5]);
-      }
-      
       this.ctx.stroke();
-      
-      // 重置虚线设置
-      if (style.dashed) {
-        this.ctx.setLineDash([]);
-      }
     }
   }
   
@@ -129,13 +118,15 @@ export class CanvasRenderer {
    * 绘制箭头
    */
   drawArrow(x1, y1, x2, y2, style = {}) {
-    // 绘制线段
+    const headLength = 10;
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const angle = Math.atan2(dy, dx);
+    
+    // 绘制主线
     this.drawLine(x1, y1, x2, y2, style);
     
-    // 绘制箭头头部
-    const headLength = style.arrowHeadLength || 10;
-    const angle = Math.atan2(y2 - y1, x2 - x1);
-    
+    // 绘制箭头
     this.ctx.beginPath();
     this.ctx.moveTo(x2, y2);
     this.ctx.lineTo(
@@ -158,7 +149,7 @@ export class CanvasRenderer {
   /**
    * 绘制贝塞尔曲线
    */
-  drawBezier(x1, y1, cp1x, cp1y, cp2x, cp2y, x2, y2, style = {}) {
+  drawBezierCurve(x1, y1, cp1x, cp1y, cp2x, cp2y, x2, y2, style = {}) {
     this.ctx.beginPath();
     this.ctx.moveTo(x1, y1);
     this.ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, x2, y2);
@@ -166,17 +157,7 @@ export class CanvasRenderer {
     if (style.stroke) {
       this.ctx.strokeStyle = style.stroke;
       this.ctx.lineWidth = style.lineWidth || 1;
-      
-      if (style.dashed) {
-        this.ctx.setLineDash(style.dashArray || [5, 5]);
-      }
-      
       this.ctx.stroke();
-      
-      // 重置虚线设置
-      if (style.dashed) {
-        this.ctx.setLineDash([]);
-      }
     }
   }
   
@@ -184,18 +165,26 @@ export class CanvasRenderer {
    * 绘制文本
    */
   drawText(text, x, y, style = {}) {
-    this.ctx.font = `${style.fontWeight || 'normal'} ${style.fontSize || 14}px ${style.fontFamily || 'Arial'}`;
-    this.ctx.fillStyle = style.fill || '#000000';
-    this.ctx.textAlign = style.textAlign || 'left';
+    if (style.fontSize) {
+      this.ctx.font = `${style.fontSize}px ${style.fontFamily || 'Arial, sans-serif'}`;
+    }
+    
+    if (style.fill) {
+      this.ctx.fillStyle = style.fill;
+    }
+    
+    this.ctx.textAlign = style.textAlign || 'start';
     this.ctx.textBaseline = style.textBaseline || 'alphabetic';
+    
+    if (style.fill) {
+      this.ctx.fillText(text, x, y);
+    }
     
     if (style.stroke) {
       this.ctx.strokeStyle = style.stroke;
-      this.ctx.lineWidth = style.strokeWidth || 1;
+      this.ctx.lineWidth = style.lineWidth || 1;
       this.ctx.strokeText(text, x, y);
     }
-    
-    this.ctx.fillText(text, x, y);
   }
   
   /**
@@ -211,9 +200,8 @@ export class CanvasRenderer {
     // 创建动画对象
     const animTarget = { ...initialProps };
     
-    // 创建anime动画
-    const animation = anime({
-      targets: animTarget,
+    // 创建anime动画 - 使用v4.0的animate API
+    const animation = animate(animTarget, {
       ...targetProps,
       duration,
       easing,
@@ -251,204 +239,90 @@ export class CanvasRenderer {
   }
   
   /**
-   * 清除所有动画
+   * 停止所有动画
    */
-  clearAnimations() {
+  stopAnimations() {
     this.animations.forEach(anim => anim.pause());
     this.animations.clear();
-  }
-  
-  /**
-   * 获取动画进度
-   */
-  getAnimationProgress(id) {
-    const anim = this.animations.get(id);
-    return anim ? anim.progress : 0;
-  }
-  
-  /**
-   * 设置动画速度
-   */
-  setAnimationSpeed(speed) {
-    this.animations.forEach(anim => {
-      anim.speed = speed;
-    });
   }
 }
 
 /**
  * SVG渲染器类
- * 负责将图形渲染为SVG格式，用于导出
+ * 负责将图导出为SVG格式
  */
 export class SVGRenderer {
   constructor() {
-    this.svgNS = 'http://www.w3.org/2000/svg';
+    this.svgns = 'http://www.w3.org/2000/svg';
   }
   
   /**
-   * 创建SVG元素
-   */
-  createSVGElement(tagName) {
-    return document.createElementNS(this.svgNS, tagName);
-  }
-  
-  /**
-   * 设置SVG元素属性
-   */
-  setAttributes(element, attributes) {
-    for (const [key, value] of Object.entries(attributes)) {
-      if (value !== undefined && value !== null) {
-        element.setAttribute(key, value);
-      }
-    }
-  }
-  
-  /**
-   * 创建SVG根元素
-   */
-  createSVG(width, height) {
-    const svg = this.createSVGElement('svg');
-    this.setAttributes(svg, {
-      width,
-      height,
-      viewBox: `0 0 ${width} ${height}`,
-      xmlns: this.svgNS
-    });
-    return svg;
-  }
-  
-  /**
-   * 创建节点元素
-   */
-  createNodeElement(node) {
-    let element;
-    
-    if (node.type === 'circle' || !node.type) {
-      element = this.createSVGElement('circle');
-      this.setAttributes(element, {
-        cx: node.x,
-        cy: node.y,
-        r: node.size || 20,
-        fill: node.style?.fill || '#3f51b5',
-        stroke: node.style?.stroke || '#ffffff',
-        strokeWidth: node.style?.lineWidth || 2
-      });
-    } else if (node.type === 'square') {
-      const size = node.size || 20;
-      element = this.createSVGElement('rect');
-      this.setAttributes(element, {
-        x: node.x - size,
-        y: node.y - size,
-        width: size * 2,
-        height: size * 2,
-        rx: node.style?.radius || 0,
-        ry: node.style?.radius || 0,
-        fill: node.style?.fill || '#ff4081',
-        stroke: node.style?.stroke || '#ffffff',
-        strokeWidth: node.style?.lineWidth || 2
-      });
-    }
-    
-    // 如果有标签，添加文本元素
-    if (element && node.label) {
-      const textElement = this.createSVGElement('text');
-      this.setAttributes(textElement, {
-        x: node.x,
-        y: node.y,
-        textAnchor: 'middle',
-        dominantBaseline: 'middle',
-        fill: node.style?.labelFill || '#ffffff',
-        fontSize: node.style?.labelFontSize || '14px',
-        fontWeight: node.style?.labelFontWeight || 'bold'
-      });
-      textElement.textContent = node.label;
-      element.appendChild(textElement);
-    }
-    
-    return element;
-  }
-  
-  /**
-   * 创建边元素
-   */
-  createEdgeElement(edge, sourceNode, targetNode) {
-    const element = this.createSVGElement('path');
-    
-    // 计算路径
-    let d = `M ${sourceNode.x} ${sourceNode.y} L ${targetNode.x} ${targetNode.y}`;
-    
-    // 设置边的样式
-    this.setAttributes(element, {
-      d,
-      fill: 'none',
-      stroke: edge.style?.stroke || '#999999',
-      strokeWidth: edge.style?.lineWidth || 2
-    });
-    
-    // 如果需要箭头，添加标记引用
-    if (edge.style?.arrow) {
-      // 箭头标记需要预先定义在defs中
-      this.setAttributes(element, {
-        markerEnd: 'url(#arrowhead)'
-      });
-    }
-    
-    return element;
-  }
-  
-  /**
-   * 创建箭头标记定义
-   */
-  createArrowheadMarker() {
-    const defs = this.createSVGElement('defs');
-    const marker = this.createSVGElement('marker');
-    
-    this.setAttributes(marker, {
-      id: 'arrowhead',
-      markerWidth: 10,
-      markerHeight: 7,
-      refX: 9,
-      refY: 3.5,
-      orient: 'auto'
-    });
-    
-    const polygon = this.createSVGElement('polygon');
-    this.setAttributes(polygon, {
-      points: '0 0, 10 3.5, 0 7',
-      fill: '#999999'
-    });
-    
-    marker.appendChild(polygon);
-    defs.appendChild(marker);
-    
-    return defs;
-  }
-  
-  /**
-   * 将图数据转换为SVG
+   * 将图数据转换为SVG元素
    */
   graphToSVG(nodes, edges, width, height) {
-    const svg = this.createSVG(width, height);
+    // 创建SVG元素
+    const svg = document.createElementNS(this.svgns, 'svg');
+    svg.setAttribute('width', width);
+    svg.setAttribute('height', height);
+    svg.setAttribute('xmlns', this.svgns);
     
-    // 添加箭头标记定义
-    svg.appendChild(this.createArrowheadMarker());
-    
-    // 首先创建边元素，因为它们应该在节点下面
+    // 添加边
     edges.forEach(edge => {
       const sourceNode = nodes.find(n => n.id === edge.source);
       const targetNode = nodes.find(n => n.id === edge.target);
       
       if (sourceNode && targetNode) {
-        const edgeElement = this.createEdgeElement(edge, sourceNode, targetNode);
-        svg.appendChild(edgeElement);
+        const line = document.createElementNS(this.svgns, 'line');
+        line.setAttribute('x1', sourceNode.x);
+        line.setAttribute('y1', sourceNode.y);
+        line.setAttribute('x2', targetNode.x);
+        line.setAttribute('y2', targetNode.y);
+        line.setAttribute('stroke', edge.style?.stroke || '#999999');
+        line.setAttribute('stroke-width', edge.style?.lineWidth || 2);
+        
+        svg.appendChild(line);
       }
     });
     
-    // 然后创建节点元素
+    // 添加节点
     nodes.forEach(node => {
-      const nodeElement = this.createNodeElement(node);
-      if (nodeElement) {
-        svg.appendChild(nodeElement);
+      const size = node.size || 20;
+      let element;
+      
+      if (node.type === 'square') {
+        // 创建矩形节点
+        element = document.createElementNS(this.svgns, 'rect');
+        element.setAttribute('x', node.x - size / 2);
+        element.setAttribute('y', node.y - size / 2);
+        element.setAttribute('width', size);
+        element.setAttribute('height', size);
+      } else {
+        // 创建圆形节点
+        element = document.createElementNS(this.svgns, 'circle');
+        element.setAttribute('cx', node.x);
+        element.setAttribute('cy', node.y);
+        element.setAttribute('r', size / 2);
+      }
+      
+      // 设置节点样式
+      element.setAttribute('fill', node.style?.fill || '#3f51b5');
+      element.setAttribute('stroke', node.style?.stroke || '#ffffff');
+      element.setAttribute('stroke-width', node.style?.lineWidth || 2);
+      
+      svg.appendChild(element);
+      
+      // 添加节点标签
+      if (node.label) {
+        const text = document.createElementNS(this.svgns, 'text');
+        text.setAttribute('x', node.x);
+        text.setAttribute('y', node.y);
+        text.setAttribute('text-anchor', 'middle');
+        text.setAttribute('dominant-baseline', 'middle');
+        text.setAttribute('fill', node.style?.labelFill || '#ffffff');
+        text.setAttribute('font-size', node.style?.labelFontSize || 12);
+        text.textContent = node.label;
+        
+        svg.appendChild(text);
       }
     });
     
@@ -456,61 +330,29 @@ export class SVGRenderer {
   }
   
   /**
-   * 将SVG转换为字符串
+   * 将SVG元素转换为字符串
    */
-  svgToString(svgElement) {
-    return new XMLSerializer().serializeToString(svgElement);
+  svgToString(svg) {
+    const serializer = new XMLSerializer();
+    return serializer.serializeToString(svg);
   }
 }
 
 /**
- * 几何工具函数
+ * 几何工具
  */
 export const geometry = {
   /**
-   * 计算两点间距离
+   * 计算两点之间的距离
    */
   distance(x1, y1, x2, y2) {
-    const dx = x2 - x1;
-    const dy = y2 - y1;
-    return Math.sqrt(dx * dx + dy * dy);
+    return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
   },
   
   /**
-   * 计算两点间的角度
+   * 计算点到线段的最短距离
    */
-  angle(x1, y1, x2, y2) {
-    return Math.atan2(y2 - y1, x2 - x1);
-  },
-  
-  /**
-   * 将极坐标转换为笛卡尔坐标
-   */
-  polarToCartesian(centerX, centerY, radius, angleInRadians) {
-    return {
-      x: centerX + radius * Math.cos(angleInRadians),
-      y: centerY + radius * Math.sin(angleInRadians)
-    };
-  },
-  
-  /**
-   * 检查点是否在矩形内
-   */
-  pointInRect(px, py, rx, ry, rw, rh) {
-    return px >= rx && px <= rx + rw && py >= ry && py <= ry + rh;
-  },
-  
-  /**
-   * 检查点是否在圆内
-   */
-  pointInCircle(px, py, cx, cy, radius) {
-    return this.distance(px, py, cx, cy) <= radius;
-  },
-  
-  /**
-   * 计算线段与点的最近距离
-   */
-  distancePointToLine(px, py, x1, y1, x2, y2) {
+  distanceToLine(px, py, x1, y1, x2, y2) {
     const A = px - x1;
     const B = py - y1;
     const C = x2 - x1;
@@ -520,7 +362,9 @@ export const geometry = {
     const lenSq = C * C + D * D;
     let param = -1;
     
-    if (lenSq !== 0) param = dot / lenSq;
+    if (lenSq !== 0) {
+      param = dot / lenSq;
+    }
     
     let xx, yy;
     
@@ -535,27 +379,40 @@ export const geometry = {
       yy = y1 + param * D;
     }
     
-    return this.distance(px, py, xx, yy);
+    const dx = px - xx;
+    const dy = py - yy;
+    
+    return Math.sqrt(dx * dx + dy * dy);
   }
 };
 
 /**
- * 导出图形对象
+ * GraphRenderer类
+ * 使用DOM元素和CSS样式渲染图，并使用animejs v4.0进行动画
  */
 export class GraphRenderer {
   constructor(canvas, options = {}) {
-    this.canvas = canvas;
-    this.ctx = canvas.getContext('2d');
-    this.canvasRenderer = new CanvasRenderer(this.ctx, canvas.width, canvas.height);
-    this.svgRenderer = new SVGRenderer();
+    // 创建一个容器元素来放置节点和边
+    this.container = document.createElement('div');
+    this.container.style.position = 'absolute';
+    this.container.style.top = '0';
+    this.container.style.left = '0';
+    this.container.style.width = `${canvas.width}px`;
+    this.container.style.height = `${canvas.height}px`;
+    this.container.style.pointerEvents = 'none'; // 确保容器不阻止事件传递
+    
+    // 如果传入的是canvas元素，将容器放在canvas的上层
+    if (canvas) {
+      canvas.parentNode.appendChild(this.container);
+    }
     
     // 存储当前的图状态
     this.nodes = [];
     this.edges = [];
     
-    // 存储动画中的元素
-    this.animatedNodes = new Map();
-    this.animatedEdges = new Map();
+    // 为每个节点和边创建DOM元素引用
+    this.nodeElements = new Map(); // 存储节点DOM元素
+    this.edgeElements = new Map(); // 存储边DOM元素
     
     // 存储已存在的节点和边的ID，用于检测新增元素
     this.existingNodeIds = new Set();
@@ -572,6 +429,52 @@ export class GraphRenderer {
       stroke: '#999999',
       lineWidth: 2
     };
+    
+    // 添加CSS样式到页面
+    this.addCSSStyles();
+  }
+  
+  /**
+   * 添加必要的CSS样式
+   */
+  addCSSStyles() {
+    // 检查是否已经添加过样式
+    if (document.getElementById('graph-renderer-styles')) {
+      return;
+    }
+    
+    const styleElement = document.createElement('style');
+    styleElement.id = 'graph-renderer-styles';
+    styleElement.textContent = `
+      .graph-node {
+        position: absolute;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: opacity 0.3s ease;
+      }
+      .graph-node.circle {
+        border-radius: 50%;
+      }
+      .graph-node.square {
+        border-radius: 4px;
+      }
+      .graph-node-label {
+        color: white;
+        font-size: 12px;
+        font-weight: bold;
+        pointer-events: none;
+      }
+      .graph-edge {
+        position: absolute;
+        background-color: #999999;
+        transform-origin: 0 0;
+        pointer-events: none;
+        z-index: 1;
+      }
+    `;
+    
+    document.head.appendChild(styleElement);
   }
   
   /**
@@ -587,323 +490,272 @@ export class GraphRenderer {
    * 渲染完整的图
    */
   rebuild() {
-    // 清空画布
-    this.canvasRenderer.clear();
+    // 清理不再使用的DOM元素
+    this.cleanupRemovedElements();
     
-    // 清空动画元素和已存在元素的记录
-    this.animatedNodes.clear();
-    this.animatedEdges.clear();
-    this.existingNodeIds.clear();
-    this.existingEdgeIds.clear();
-    
-    // 为所有边添加出现动画
+    // 更新或创建边
     this.edges.forEach(edge => {
       const sourceNode = this.nodes.find(n => n.id === edge.source);
       const targetNode = this.nodes.find(n => n.id === edge.target);
       
       if (sourceNode && targetNode) {
-        this.animateEdgeAppearance(edge.id, {
-          sourceX: sourceNode.x,
-          sourceY: sourceNode.y,
-          targetX: targetNode.x,
-          targetY: targetNode.y,
-          stroke: edge.style?.stroke,
-          lineWidth: edge.style?.lineWidth
-        });
+        if (this.isEdgeNew(edge.id)) {
+          // 新增边，添加出现动画
+          this.createEdgeElement(edge.id, sourceNode, targetNode, edge.style);
+          this.animateEdgeAppearance(edge.id);
+          this.existingEdgeIds.add(edge.id);
+        } else {
+          // 更新现有边的位置
+          this.updateEdgePosition(edge.id, sourceNode, targetNode);
+        }
       }
     });
     
-    // 为所有节点添加出现动画
+    // 更新或创建节点
     this.nodes.forEach(node => {
-      this.animateNodeAppearance(node.id, {
-        x: node.x,
-        y: node.y,
-        size: node.size || 20,
-        fill: node.style?.fill,
-        stroke: node.style?.stroke
-      });
+      if (this.isNodeNew(node.id)) {
+        // 新增节点，添加出现动画
+        this.createNodeElement(node.id, node);
+        this.animateNodeAppearance(node.id);
+        this.existingNodeIds.add(node.id);
+      } else {
+        // 更新现有节点的位置和样式
+        this.updateNodeElement(node.id, node);
+      }
     });
+  }
+  
+  /**
+   * 创建节点DOM元素
+   */
+  createNodeElement(nodeId, node) {
+    const size = node.size || 20;
     
-    // 启动动画循环
-    this.startAnimationLoop();
+    // 创建节点容器
+    const nodeElement = document.createElement('div');
+    nodeElement.className = `graph-node ${node.type === 'square' ? 'square' : 'circle'}`;
+    nodeElement.style.width = `${size}px`;
+    nodeElement.style.height = `${size}px`;
+    nodeElement.style.backgroundColor = node.style?.fill || this.defaultNodeStyle.fill;
+    nodeElement.style.border = `${node.style?.lineWidth || this.defaultNodeStyle.lineWidth}px solid ${node.style?.stroke || this.defaultNodeStyle.stroke}`;
+    nodeElement.style.left = `${node.x - size / 2}px`;
+    nodeElement.style.top = `${node.y - size / 2}px`;
+    nodeElement.style.zIndex = '2';
+    nodeElement.style.opacity = '0';
+    nodeElement.style.transform = 'scale(0)';
+    
+    // 添加节点标签
+    if (node.label) {
+      const labelElement = document.createElement('div');
+      labelElement.className = 'graph-node-label';
+      labelElement.textContent = node.label;
+      labelElement.style.color = node.style?.labelFill || '#ffffff';
+      labelElement.style.fontSize = `${node.style?.labelFontSize || 12}px`;
+      
+      nodeElement.appendChild(labelElement);
+    }
+    
+    // 添加到容器
+    this.container.appendChild(nodeElement);
+    
+    // 存储节点元素引用
+    this.nodeElements.set(nodeId, nodeElement);
+  }
+  
+  /**
+   * 创建边DOM元素
+   */
+  createEdgeElement(edgeId, sourceNode, targetNode, style) {
+    // 计算边的长度和角度
+    const dx = targetNode.x - sourceNode.x;
+    const dy = targetNode.y - sourceNode.y;
+    const length = Math.sqrt(dx * dx + dy * dy);
+    const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+    
+    // 创建边元素
+    const edgeElement = document.createElement('div');
+    edgeElement.className = 'graph-edge';
+    edgeElement.style.width = `${length}px`;
+    edgeElement.style.height = `${style?.lineWidth || this.defaultEdgeStyle.lineWidth}px`;
+    edgeElement.style.backgroundColor = style?.stroke || this.defaultEdgeStyle.stroke;
+    edgeElement.style.left = `${sourceNode.x}px`;
+    edgeElement.style.top = `${sourceNode.y}px`;
+    edgeElement.style.transform = `rotate(${angle}deg)`;
+    edgeElement.style.opacity = '0';
+    
+    // 添加到容器
+    this.container.appendChild(edgeElement);
+    
+    // 存储边元素引用
+    this.edgeElements.set(edgeId, { element: edgeElement, sourceNode, targetNode });
+  }
+  
+  /**
+   * 更新节点元素
+   */
+  updateNodeElement(nodeId, node) {
+    const nodeElement = this.nodeElements.get(nodeId);
+    if (!nodeElement) return;
+    
+    const size = node.size || 20;
+    
+    // 更新节点样式
+    nodeElement.style.width = `${size}px`;
+    nodeElement.style.height = `${size}px`;
+    nodeElement.style.backgroundColor = node.style?.fill || this.defaultNodeStyle.fill;
+    nodeElement.style.border = `${node.style?.lineWidth || this.defaultNodeStyle.lineWidth}px solid ${node.style?.stroke || this.defaultNodeStyle.stroke}`;
+    
+    // 更新节点标签
+    const labelElement = nodeElement.querySelector('.graph-node-label');
+    if (node.label) {
+      if (labelElement) {
+        labelElement.textContent = node.label;
+        labelElement.style.color = node.style?.labelFill || '#ffffff';
+        labelElement.style.fontSize = `${node.style?.labelFontSize || 12}px`;
+      } else {
+        const newLabelElement = document.createElement('div');
+        newLabelElement.className = 'graph-node-label';
+        newLabelElement.textContent = node.label;
+        newLabelElement.style.color = node.style?.labelFill || '#ffffff';
+        newLabelElement.style.fontSize = `${node.style?.labelFontSize || 12}px`;
+        nodeElement.appendChild(newLabelElement);
+      }
+    } else if (labelElement) {
+      nodeElement.removeChild(labelElement);
+    }
+    
+    // 直接设置样式，避免使用animejs动画
+    nodeElement.style.transition = 'left 1000ms ease, top 1000ms ease';
+    nodeElement.style.left = `${node.x - size / 2}px`;
+    nodeElement.style.top = `${node.y - size / 2}px`;
+  }
+  
+  /**
+   * 更新边位置
+   */
+  updateEdgePosition(edgeId, sourceNode, targetNode) {
+    const edgeData = this.edgeElements.get(edgeId);
+    if (!edgeData) return;
+    
+    const edgeElement = edgeData.element;
+    
+    // 计算新的长度和角度
+    const dx = targetNode.x - sourceNode.x;
+    const dy = targetNode.y - sourceNode.y;
+    const length = Math.sqrt(dx * dx + dy * dy);
+    const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+    
+    // 直接设置样式，避免使用animejs的width属性动画
+    edgeElement.style.width = `${length}px`;
+    edgeElement.style.left = `${sourceNode.x}px`;
+    edgeElement.style.top = `${sourceNode.y}px`;
+    edgeElement.style.rotate = `${angle}deg`;
+    
+    // 更新边数据
+    edgeData.sourceNode = sourceNode;
+    edgeData.targetNode = targetNode;
   }
   
   /**
    * 节点出现动画
    */
-  animateNodeAppearance(nodeId, targetProps, duration = 500, easing = 'easeOutQuad', onComplete) {
-    const node = this.nodes.find(n => n.id === nodeId);
-    if (!node) return;
+  animateNodeAppearance(nodeId, duration = 1000, easing = spring({ bounce: 0.7 }), onComplete) {
+    const nodeElement = this.nodeElements.get(nodeId);
+    if (!nodeElement) return;
     
-    // 初始属性 - 从不可见到可见
-    const initialProps = {
-      x: node.x,
-      y: node.y,
-      size: 0, // 从0大小开始
-      fill: node.style?.fill,
-      stroke: node.style?.stroke,
-      opacity: 0 // 从透明开始
-    };
+    // 使用CSS transitions替代animejs，避免类型错误
+    nodeElement.style.transition = `opacity ${duration}ms ease, transform ${duration}ms ease`;
+    nodeElement.style.opacity = '0';
+    nodeElement.style.transform = 'scale(0.8)';
     
-    // 目标属性
-    const finalTargetProps = {
-      x: targetProps.x || node.x,
-      y: targetProps.y || node.y,
-      size: targetProps.size || node.size || 20,
-      fill: targetProps.fill || node.style?.fill,
-      stroke: targetProps.stroke || node.style?.stroke,
-      opacity: 1 // 完全可见
-    };
-    
-    // 创建动画
-    const animTarget = this.canvasRenderer.createAnimation(
-      `node_appearance_${nodeId}`,
-      initialProps,
-      finalTargetProps,
-      duration,
-      easing,
-      onComplete
-    );
-    
-    // 存储动画目标
-    this.animatedNodes.set(nodeId, animTarget);
-    
-    // 将节点ID添加到已存在的集合中
-    this.existingNodeIds.add(nodeId);
-  }
-  
-  /**
-   * 节点消失动画
-   */
-  animateNodeDisappearance(nodeId, duration = 500, easing = 'easeInQuad', onComplete) {
-    const node = this.nodes.find(n => n.id === nodeId);
-    if (!node) return;
-    
-    // 初始属性
-    const initialProps = {
-      x: node.x,
-      y: node.y,
-      size: node.size || 20,
-      fill: node.style?.fill,
-      stroke: node.style?.stroke,
-      opacity: 1
-    };
-    
-    // 目标属性 - 从不透明到透明
-    const targetProps = {
-      size: 0, // 缩小到0
-      opacity: 0 // 变为透明
-    };
-    
-    // 创建动画
-    const animTarget = this.canvasRenderer.createAnimation(
-      `node_disappearance_${nodeId}`,
-      initialProps,
-      targetProps,
-      duration,
-      easing,
-      () => {
-        // 动画完成后从集合中移除
-        this.animatedNodes.delete(nodeId);
-        this.existingNodeIds.delete(nodeId);
-        if (onComplete) {
+    // 使用setTimeout确保样式应用后再开始动画
+    setTimeout(() => {
+      nodeElement.style.opacity = '1';
+      nodeElement.style.transform = 'scale(1)';
+      
+      if (onComplete && typeof onComplete === 'function') {
+        // 为了与原动画完成时间保持一致，使用setTimeout延迟调用onComplete
+        setTimeout(() => {
           onComplete();
-        }
+        }, duration);
       }
-    );
-    
-    // 存储动画目标
-    this.animatedNodes.set(nodeId, animTarget);
-  }
-  
-  /**
-   * 节点变化动画
-   */
-  animateNodeChange(nodeId, targetProps, duration = 500, easing = 'easeOutQuad', onComplete) {
-    const node = this.nodes.find(n => n.id === nodeId);
-    if (!node) return;
-    
-    // 初始属性
-    const initialProps = {
-      x: node.x,
-      y: node.y,
-      size: node.size || 20,
-      fill: node.style?.fill,
-      stroke: node.style?.stroke,
-      opacity: 1
-    };
-    
-    // 创建动画
-    const animTarget = this.canvasRenderer.createAnimation(
-      `node_change_${nodeId}`,
-      initialProps,
-      targetProps,
-      duration,
-      easing,
-      onComplete
-    );
-    
-    // 存储动画目标
-    this.animatedNodes.set(nodeId, animTarget);
+    }, 10);
   }
   
   /**
    * 边出现动画
    */
-  animateEdgeAppearance(edgeId, targetProps, duration = 500, easing = 'easeOutQuad', onComplete) {
-    const edge = this.edges.find(e => e.id === edgeId);
-    if (!edge) return;
+  animateEdgeAppearance(edgeId, duration = 1000, easing = spring({ bounce: 0.7 }), onComplete) {
+    const edgeData = this.edgeElements.get(edgeId);
+    if (!edgeData) return;
     
-    const sourceNode = this.nodes.find(n => n.id === edge.source);
-    const targetNode = this.nodes.find(n => n.id === edge.target);
+    const edgeElement = edgeData.element;
     
-    if (!sourceNode || !targetNode) return;
+    // 避免使用width属性，直接使用transition
+    // 移除之前的宽度设置
+    edgeElement.style.transition = `opacity ${duration}ms ease`;
+    edgeElement.style.opacity = '0';
     
-    // 初始属性 - 从起点到起点（长度为0）
-    const initialProps = {
-      sourceX: sourceNode.x,
-      sourceY: sourceNode.y,
-      targetX: sourceNode.x,
-      targetY: sourceNode.y,
-      stroke: edge.style?.stroke,
-      lineWidth: edge.style?.lineWidth,
-      opacity: 0 // 从透明开始
-    };
-    
-    // 目标属性
-    const finalTargetProps = {
-      sourceX: targetProps.sourceX || sourceNode.x,
-      sourceY: targetProps.sourceY || sourceNode.y,
-      targetX: targetProps.targetX || targetNode.x,
-      targetY: targetProps.targetY || targetNode.y,
-      stroke: targetProps.stroke || edge.style?.stroke,
-      lineWidth: targetProps.lineWidth || edge.style?.lineWidth,
-      opacity: 1 // 完全可见
-    };
-    
-    // 创建动画
-    const animTarget = this.canvasRenderer.createAnimation(
-      `edge_appearance_${edgeId}`,
-      initialProps,
-      finalTargetProps,
-      duration,
-      easing,
-      onComplete
-    );
-    
-    // 存储动画目标
-    this.animatedEdges.set(edgeId, animTarget);
-    
-    // 将边ID添加到已存在的集合中
-    this.existingEdgeIds.add(edgeId);
+    // 使用setTimeout确保样式应用后再开始动画
+    setTimeout(() => {
+      // 直接修改样式，不使用animejs的width属性动画
+      edgeElement.style.opacity = '1';
+      if (onComplete && typeof onComplete === 'function') {
+        onComplete();
+      }
+    }, 10);
   }
   
   /**
-   * 边消失动画
+   * 清理不再使用的元素
    */
-  animateEdgeDisappearance(edgeId, duration = 500, easing = 'easeInQuad', onComplete) {
-    const edge = this.edges.find(e => e.id === edgeId);
-    if (!edge) return;
-    
-    const sourceNode = this.nodes.find(n => n.id === edge.source);
-    const targetNode = this.nodes.find(n => n.id === edge.target);
-    
-    if (!sourceNode || !targetNode) return;
-    
-    // 初始属性
-    const initialProps = {
-      sourceX: sourceNode.x,
-      sourceY: sourceNode.y,
-      targetX: targetNode.x,
-      targetY: targetNode.y,
-      stroke: edge.style?.stroke,
-      lineWidth: edge.style?.lineWidth,
-      opacity: 1
-    };
-    
-    // 目标属性 - 从不透明到透明，终点移动到起点
-    const targetProps = {
-      targetX: sourceNode.x,
-      targetY: sourceNode.y,
-      opacity: 0 // 变为透明
-    };
-    
-    // 创建动画
-    const animTarget = this.canvasRenderer.createAnimation(
-      `edge_disappearance_${edgeId}`,
-      initialProps,
-      targetProps,
-      duration,
-      easing,
-      () => {
-        // 动画完成后从集合中移除
-        this.animatedEdges.delete(edgeId);
-        this.existingEdgeIds.delete(edgeId);
-        if (onComplete) {
-          onComplete();
+  cleanupRemovedElements() {
+    // 清理节点
+    const currentNodeIds = new Set(this.nodes.map(n => n.id));
+    for (const nodeId of this.existingNodeIds) {
+      if (!currentNodeIds.has(nodeId)) {
+        const nodeElement = this.nodeElements.get(nodeId);
+        if (nodeElement) {
+          // 使用CSS transitions替代animejs动画
+          nodeElement.style.transition = 'opacity 1000ms ease, transform 1000ms ease';
+          nodeElement.style.opacity = '0';
+          nodeElement.style.transform = 'scale(0)';
+          
+          // 使用setTimeout在动画完成后移除元素
+          setTimeout(() => {
+            // 动画完成后移除元素
+            if (nodeElement.parentNode) {
+              nodeElement.parentNode.removeChild(nodeElement);
+            }
+            this.nodeElements.delete(nodeId);
+          }, 1000);
         }
+        this.existingNodeIds.delete(nodeId);
       }
-    );
+    }
     
-    // 存储动画目标
-    this.animatedEdges.set(edgeId, animTarget);
-  }
-  
-  /**
-   * 边变化动画
-   */
-  animateEdgeChange(edgeId, targetProps, duration = 500, easing = 'easeOutQuad', onComplete) {
-    const edge = this.edges.find(e => e.id === edgeId);
-    if (!edge) return;
-    
-    const sourceNode = this.nodes.find(n => n.id === edge.source);
-    const targetNode = this.nodes.find(n => n.id === edge.target);
-    
-    if (!sourceNode || !targetNode) return;
-    
-    // 初始属性
-    const initialProps = {
-      sourceX: sourceNode.x,
-      sourceY: sourceNode.y,
-      targetX: targetNode.x,
-      targetY: targetNode.y,
-      stroke: edge.style?.stroke,
-      lineWidth: edge.style?.lineWidth,
-      opacity: 1
-    };
-    
-    // 创建动画
-    const animTarget = this.canvasRenderer.createAnimation(
-      `edge_change_${edgeId}`,
-      initialProps,
-      targetProps,
-      duration,
-      easing,
-      onComplete
-    );
-    
-    // 存储动画目标
-    this.animatedEdges.set(edgeId, animTarget);
-  }
-  
-  /**
-   * 开始动画循环
-   */
-  startAnimationLoop() {
-    // 简单实现：使用requestAnimationFrame持续渲染，直到没有活动的动画
-    const animate = () => {
-      
-      if (this.animatedNodes.size > 0 || this.animatedEdges.size > 0) {
-        requestAnimationFrame(animate);
-      } else {
-        this.isAnimating = false;
+    // 清理边
+    const currentEdgeIds = new Set(this.edges.map(e => e.id));
+    for (const edgeId of this.existingEdgeIds) {
+      if (!currentEdgeIds.has(edgeId)) {
+        const edgeData = this.edgeElements.get(edgeId);
+        if (edgeData) {
+          // 使用CSS transitions替代animejs动画，避免width属性导致的类型错误
+          const edgeElement = edgeData.element;
+          edgeElement.style.transition = 'opacity 1000ms ease';
+          edgeElement.style.opacity = '0';
+          
+          // 使用setTimeout在动画完成后移除元素
+          setTimeout(() => {
+            // 动画完成后移除元素
+            if (edgeElement.parentNode) {
+              edgeElement.parentNode.removeChild(edgeElement);
+            }
+            this.edgeElements.delete(edgeId);
+          }, 1000);
+        }
+        this.existingEdgeIds.delete(edgeId);
       }
-    };
-    
-    // 只有在没有活动循环时才启动新的循环
-    if (!this.isAnimating) {
-      this.isAnimating = true;
-      animate();
     }
   }
   
@@ -911,14 +763,15 @@ export class GraphRenderer {
    * 导出为SVG字符串
    */
   exportAsSVG() {
-    const svg = this.svgRenderer.graphToSVG(
+    const svgRenderer = new SVGRenderer();
+    const svg = svgRenderer.graphToSVG(
       this.nodes,
       this.edges,
-      this.canvas.width,
-      this.canvas.height
+      parseInt(this.container.style.width),
+      parseInt(this.container.style.height)
     );
     
-    return this.svgRenderer.svgToString(svg);
+    return svgRenderer.svgToString(svg);
   }
   
   /**
@@ -941,6 +794,13 @@ export class GraphRenderer {
   recordCurrentState() {
     this.existingNodeIds = new Set(this.nodes.map(n => n.id));
     this.existingEdgeIds = new Set(this.edges.map(e => e.id));
+  }
+  
+  /**
+   * 清除所有动画
+   */
+  clearAnimations() {
+    // animejs v4.0 中，动画实例会自动管理，不需要手动清除
   }
 }
 

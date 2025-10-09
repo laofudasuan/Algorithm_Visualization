@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import anime from 'animejs';
-
 // 页面加载时立即执行的console.log，验证组件是否正常加载
 console.log('CoursewareList组件已加载');
 
@@ -15,16 +13,7 @@ const CoursewareList = () => {
     // 立即打印加载开始信息
     console.log('开始加载课件数据');
     
-    // 页面进入动画
-    anime({
-      targets: '.page-content',
-      opacity: [0, 1],
-      translateY: [20, 0],
-      duration: 800,
-      easing: 'easeOutQuad'
-    });
-
-        // 模拟加载课件数据
+    // 模拟加载课件数据
     const loadCoursewares = async () => {
       try {
         // 动态导入目录中的所有.mdx文件
@@ -92,7 +81,12 @@ const CoursewareList = () => {
   return (
     <div className="min-h-screen pt-32 pb-20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="page-content max-w-4xl mx-auto">
+        <motion.div 
+          className="page-content max-w-4xl mx-auto"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+        >
           <div className="text-center mb-16">
             <h1 className="text-4xl font-bold mb-4">课件</h1>
             <p className="text-gray-600">
@@ -152,7 +146,7 @@ const CoursewareList = () => {
               </div>
             </div>
           )}
-        </div>
+        </motion.div>
       </div>
     </div>
   );

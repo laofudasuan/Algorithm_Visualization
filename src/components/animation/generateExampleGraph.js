@@ -9,11 +9,11 @@
 export const generateExampleGraph = (width = 800, height = 600) => {
   // 创建节点
   const nodes = [
-    { id: '1', label: '节点1', x: width * 0.3, y: height * 0.3, size: 30, type: 'circle', style: { fill: '#4CAF50' } },
-    { id: '2', label: '节点2', x: width * 0.7, y: height * 0.3, size: 25, type: 'circle', style: { fill: '#2196F3' } },
-    { id: '3', label: '节点3', x: width * 0.3, y: height * 0.7, size: 35, type: 'square', style: { fill: '#FF9800' } },
-    { id: '4', label: '节点4', x: width * 0.7, y: height * 0.7, size: 28, type: 'circle', style: { fill: '#9C27B0' } },
-    { id: '5', label: '节点5', x: width * 0.5, y: height * 0.5, size: 32, type: 'square', style: { fill: '#F44336' } },
+    { id: '1', label: '节点1', x: width * 0.3, y: height * 0.3, size: 60, type: 'circle', style: { fill: '#4CAF50' } },
+    { id: '2', label: '节点2', x: width * 0.7, y: height * 0.3, size: 50, type: 'circle', style: { fill: '#2196F3' } },
+    { id: '3', label: '节点3', x: width * 0.3, y: height * 0.7, size: 70, type: 'square', style: { fill: '#FF9800' } },
+    { id: '4', label: '节点4', x: width * 0.7, y: height * 0.7, size: 56, type: 'circle', style: { fill: '#9C27B0' } },
+    { id: '5', label: '节点5', x: width * 0.5, y: height * 0.5, size: 64, type: 'square', style: { fill: '#F44336' } },
   ];
   
   // 创建边

@@ -1,22 +1,16 @@
 import { useEffect } from 'react'
-import anime from 'animejs'
+import { motion } from 'framer-motion'
 
 const DynamicProgramming = () => {
-  useEffect(() => {
-    // 页面进入动画
-    anime({
-      targets: '.page-content',
-      opacity: [0, 1],
-      translateY: [20, 0],
-      duration: 800,
-      easing: 'easeOutQuad'
-    })
-  }, [])
-
   return (
     <div className="min-h-screen pt-32 pb-20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="page-content max-w-4xl mx-auto">
+        <motion.div 
+          className="page-content max-w-4xl mx-auto"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+        >
           <div className="text-center mb-16">
             <h1 className="text-4xl font-bold mb-4">动态规划可视化</h1>
             <p className="text-gray-600">直观理解动态规划问题的状态转移和最优子结构</p>
@@ -31,7 +25,7 @@ const DynamicProgramming = () => {
               <p className="text-gray-400">此页面的可视化内容正在开发中，敬请期待...</p>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   )

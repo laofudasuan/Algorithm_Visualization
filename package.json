@@ -14,7 +14,7 @@
     "@mdx-js/rollup": "^3.1.1",
     "@react-three/drei": "^10.7.6",
     "@react-three/fiber": "^9.3.0",
-    "animejs": "^3.2.2",
+    "animejs": "^4.0.0",
     "d3": "^7.9.0",
     "framer-motion": "^12.23.22",
     "katex": "^0.16.22",
