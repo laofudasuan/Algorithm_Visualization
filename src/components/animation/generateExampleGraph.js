@@ -18,14 +18,14 @@ export const generateExampleGraph = (width = 800, height = 600) => {
   
   // 创建边
   const edges = [
-    { id: 'e1', source: '1', target: '2', style: { stroke: '#333', lineWidth: 2, arrow: true } },
+    { id: 'e1', label: '边1', source: '1', target: '2', style: { stroke: '#333', lineWidth: 2, arrow: true } },
     { id: 'e2', label: '边2', source: '2', target: '4', style: { stroke: '#555', lineWidth: 1.5, arrow: true } },
-    { id: 'e3', source: '4', target: '3', style: { stroke: '#777', lineWidth: 1.5, arrow: true } },
-    { id: 'e4', source: '3', target: '1', style: { stroke: '#999', lineWidth: 1.5, arrow: true } },
-    { id: 'e5', source: '1', target: '5', style: { stroke: '#000', lineWidth: 2, arrow: true } },
-    { id: 'e6', source: '2', target: '5', style: { stroke: '#000', lineWidth: 2, arrow: true } },
-    { id: 'e7', source: '5', target: '3', style: { stroke: '#000', lineWidth: 2, arrow: true } },
-    { id: 'e8', source: '5', target: '4', style: { stroke: '#000', lineWidth: 2, arrow: true } },
+    { id: 'e3', label: '边3', source: '4', target: '3', style: { stroke: '#777', lineWidth: 1.5, arrow: true } },
+    { id: 'e4', label: '边4', source: '3', target: '1', style: { stroke: '#999', lineWidth: 1.5, arrow: true } },
+    { id: 'e5', label: '边5', source: '1', target: '5', style: { stroke: '#000', lineWidth: 2, arrow: true } },
+    { id: 'e6', label: '边6', source: '2', target: '5', style: { stroke: '#000', lineWidth: 2, arrow: true } },
+    { id: 'e7', label: '边7', source: '5', target: '3', style: { stroke: '#000', lineWidth: 5, arrow: true } },
+    { id: 'e8', label: '边8', source: '5', target: '4', style: { stroke: '#000', lineWidth: 2, arrow: true } },
   ];
   
   // 默认样式

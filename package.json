@@ -16,6 +16,7 @@
     "@react-three/fiber": "^9.3.0",
     "animejs": "^4.0.0",
     "d3": "^7.9.0",
+    "fabric": "^6.7.1",
     "framer-motion": "^12.23.22",
     "katex": "^0.16.22",
     "marked": "^16.3.0",

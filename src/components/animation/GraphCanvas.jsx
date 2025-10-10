@@ -152,6 +152,7 @@ const GraphCanvas = forwardRef(({ width = 1000, height = 600, graphCount = 1 }, 
               edges={exampleGraph.edges}
               nodesStyle={exampleGraph.nodesStyle}
               edgesStyle={exampleGraph.edgesStyle}
+              initialMode="none"
               onInit={(controller) => handleGraphInit(index, controller)}
             />
           </div>
