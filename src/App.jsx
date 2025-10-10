@@ -11,6 +11,7 @@ const StringAlgorithms = lazy(() => import('./pages/StringAlgorithms'));
 const DynamicProgramming = lazy(() => import('./pages/DynamicProgramming'));
 const GraphVisualization = lazy(() => import('./pages/GraphVisualization'));
 const GraphVisualizationTools = lazy(() => import('./pages/GraphVisualizationTools'));
+const GraphRender = lazy(() => import('./pages/GraphTest'));
 const KnowledgeGraphPage = lazy(() => import('./pages/KnowledgeGraphPage'));
 const CoursewareList = lazy(() => import('./pages/CoursewareList'));
 const CoursewareDetail = lazy(() => import('./pages/CoursewareDetail'));
@@ -33,8 +34,6 @@ function App() {
 
   const menuItems = [
     { name: '主页', path: '/' },
-    { name: '知识图谱', path: '/knowledge-graph' },
-    { name: '课件', path: '/courseware' },
     { 
       name: '可视化模块', 
       path: '/visualization', // 作为下拉菜单的触发点
@@ -44,7 +43,9 @@ function App() {
         { name: '基础算法可视化', path: '/basic-algorithms' },
         { name: '字符串算法可视化', path: '/string-algorithms' }
       ]
-    }
+    },
+    { name: '课件', path: '/courseware' },
+    { name: '知识图谱', path: '/knowledge-graph' }
   ]
 
   // 加载中的占位组件
@@ -74,6 +75,7 @@ function App() {
           <Route path="/" element={<Home menuItems={menuItems} />} />
           <Route path="/graph-visualization" element={<GraphVisualization />} />
           <Route path="/graph-visualization-tools" element={<GraphVisualizationTools />} />
+          <Route path="/graph-render" element={<GraphRender />} />
           <Route path="/dynamic-programming" element={<DynamicProgramming />} />
           <Route path="/basic-algorithms" element={<BasicAlgorithms />} />
           <Route path="/string-algorithms" element={<StringAlgorithms />} />

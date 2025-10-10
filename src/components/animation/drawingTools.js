@@ -2,7 +2,7 @@
 import * as fabric from 'fabric';
 
 // 配置Fabric.js以提高动画性能
-fabric.Object.prototype.cacheProperties = []; // 禁用对象缓存以提高动画性能 (新版本fabric.js的正确方式)
+fabric.Object.prototype.objectCaching = false // ✅ 全局关闭缓存
 fabric.Canvas.prototype.renderOnAddRemove = false; // 禁用添加/删除时的自动渲染
 /**
  * Canvas渲染器类
@@ -406,14 +406,15 @@ export class GraphRenderer {
     this.canvasElement = document.createElement('canvas');
     this.canvasElement.setAttribute('width', width);
     this.canvasElement.setAttribute('height', height);
-    this.canvasElement.setAttribute('style', 'position: relative;');
+    this.canvasElement.setAttribute('style', 'position: relative; border: 1px solid #cccccc;');
     
     // 初始化Fabric.js画布
     this.canvas = new fabric.Canvas(this.canvasElement, {
       width: width,
       height: height,
       selection: false, // 禁用默认选择功能
-      preserveObjectStacking: true // 保持对象堆叠顺序
+      preserveObjectStacking: true, // 保持对象堆叠顺序
+      backgroundColor: '#f5f5f5' // 设置稍微浅一点的灰色背景
     });
     
     // 存储当前的图状态
@@ -764,7 +765,8 @@ export class GraphRenderer {
     
     // 使用Fabric.js动画更新路径
     const oldPath = edgeObject.path;
-    const newPath = fabric.parseSVGPath(newPathData);
+    const newPathObj = new fabric.Path(newPathData);
+    const newPath = newPathObj.path;
     
     // 使用自定义动画来平滑过渡路径
     this.animatePath(edgeObject, oldPath, newPath, 1000);

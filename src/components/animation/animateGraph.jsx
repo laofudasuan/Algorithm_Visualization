@@ -1,6 +1,7 @@
 // animateGraph.jsx - 图的动画组件
 import { useRef, useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { GraphRenderer, CanvasRenderer } from './drawingTools';
+import AnnotationTool from './annotationTools';
 
 const AnimateGraph = forwardRef(({
   width = 800,
@@ -18,42 +19,18 @@ const AnimateGraph = forwardRef(({
   // 切换模式函数
   const toggleMode = () => {
     setCurrentMode(prevMode => {
-      const newMode = prevMode === 'none' ? 'draw' : 'none';
-      
-      // 控制annotation canvas的显示/隐藏
-      if (refAnnotation.current) {
-        refAnnotation.current.style.display = newMode === 'none' ? 'none' : 'block';
-      }
-      
-      return newMode;
+      return prevMode === 'none' ? 'draw' : 'none';
     });
   };
   
-  // 清除注释内容函数
-  const clearAnnotations = () => {
-    if (refAnnotation.current) {
-      const ctx = refAnnotation.current.getContext('2d');
-      ctx.clearRect(0, 0, width, height);
-      // 清空annotations数据
-      annotationsRef.current = [];
-    }
-  };
   // Refs for the canvas layers
-  const refAnnotation = useRef(null);
   const refIndicator = useRef(null);
   const refSvgContainer = useRef(null); // 用于放置SVG元素的容器
-  
-  // State for drawing annotations
-  const [isDrawing, setIsDrawing] = useState(false);
-  const [lastMousePos, setLastMousePos] = useState({ x: 0, y: 0 });
+  const annotationToolRef = useRef(null);
   
   // Store the drawing tools instances
-  const annotationRendererRef = useRef(null);
   const indicatorRendererRef = useRef(null);
   const graphRendererRef = useRef(null);
-  
-  // Store annotations data
-  const annotationsRef = useRef([]);
   
   // Store indicators data
   const indicatorsRef = useRef(new Map());
@@ -69,14 +46,12 @@ const AnimateGraph = forwardRef(({
   
   // Initialize the renderers - 只负责初始化
   useEffect(() => {
-    const annotationCanvas = refAnnotation.current;
     const indicatorCanvas = refIndicator.current;
     const svgContainer = refSvgContainer.current;
     
-    if (!annotationCanvas || !indicatorCanvas || !svgContainer) return;
+    if (!indicatorCanvas || !svgContainer) return;
     
-    // 初始化renderers for annotation and indicator layers
-    annotationRendererRef.current = new CanvasRenderer(annotationCanvas, width, height);
+    // 初始化CanvasRenderer用于指示器图层
     indicatorRendererRef.current = new CanvasRenderer(indicatorCanvas, width, height);
     
     // 初始化GraphRenderer - 不再依赖canvas
@@ -113,7 +88,12 @@ const AnimateGraph = forwardRef(({
         svgContainer.removeChild(svgElement);
       }
       
-      // Clear any animations
+      // 清除所有脉冲动画定时器
+      if (typeof indicatorIntervalsRef !== 'undefined' && indicatorIntervalsRef.current) {
+        indicatorIntervalsRef.current.forEach(interval => clearInterval(interval));
+      }
+      
+      // 清除动画
       if (graphRendererRef.current) {
         graphRendererRef.current.clearAnimations?.();
       }
@@ -130,69 +110,19 @@ const AnimateGraph = forwardRef(({
     graphRenderer.updateGraph(currentNodesRef.current, currentEdgesRef.current);
   };
   
-  // Handle mouse down for annotation
-  const handleAnnotationMouseDown = (e) => {
-    if (currentMode !== 'draw') return;
-    
-    setIsDrawing(true);
-    const rect = refAnnotation.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    setLastMousePos({ x, y });
-  };
-  
-  // Handle mouse move for annotation
-  const handleAnnotationMouseMove = (e) => {
-    if (!isDrawing || currentMode !== 'draw') return;
-    
-    const rect = refAnnotation.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    
-    const ctx = refAnnotation.current.getContext('2d');
-    ctx.beginPath();
-    ctx.moveTo(lastMousePos.x, lastMousePos.y);
-    ctx.lineTo(x, y);
-    ctx.strokeStyle = '#ff5722';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-    
-    setLastMousePos({ x, y });
-    
-    // Store the annotation path for future reference
-    annotationsRef.current.push({
-      from: { ...lastMousePos },
-      to: { x, y }
-    });
-  };
-  
-  // Handle mouse up for annotation
-  const handleAnnotationMouseUp = () => {
-    setIsDrawing(false);
-  };
-  
-  // Handle mouse leave for annotation
-  const handleAnnotationMouseLeave = () => {
-    setIsDrawing(false);
-  };
-  
   // 控制器接口函数
   const getController = () => ({
     
     setMode: (newMode) => {
       if (newMode === 'none' || newMode === 'draw') {
         setCurrentMode(newMode);
-        
-        // 控制annotation canvas的显示/隐藏
-        if (refAnnotation.current) {
-          refAnnotation.current.style.display = newMode === 'none' ? 'none' : 'block';
-        }
       }
     },
     
     getMode: () => {
       return currentMode;
     },
+    
     setNodes: (newNodes) => {
       // 更新节点
       currentNodesRef.current = [...newNodes];
@@ -344,13 +274,6 @@ const AnimateGraph = forwardRef(({
       }
     },
     
-    clearAnnotations: () => {
-      // 清除所有注释
-      const ctx = refAnnotation.current.getContext('2d');
-      ctx.clearRect(0, 0, width, height);
-      annotationsRef.current = [];
-    },
-    
     clearIndicators: () => {
       // 清除所有指示器
       const ctx = refIndicator.current.getContext('2d');
@@ -459,16 +382,6 @@ const AnimateGraph = forwardRef(({
     redrawGraph: () => {
       // 强制重新绘制整个图
       renderGraph();
-    },
-    
-    clearDrawing: () => {
-      // 清除注释内容
-      if (refAnnotation.current) {
-        const ctx = refAnnotation.current.getContext('2d');
-        ctx.clearRect(0, 0, width, height);
-        // 清空annotations数据
-        annotationsRef.current = [];
-      }
     }
   });
   
@@ -481,21 +394,9 @@ const AnimateGraph = forwardRef(({
       <div
         ref={refSvgContainer}
         className="absolute top-0 left-0 w-full h-full"
-      />
-      
-      {/* 注释图层 - 用于用户手绘注释 */}
-      <canvas
-        ref={refAnnotation}
-        className="absolute top-0 left-0 w-full h-full"
         style={{
-          cursor: currentMode === 'none' ? 'default' : 'crosshair',
-          backgroundColor: 'transparent',
-          zIndex: 2
+          zIndex: 0 // 确保SVG容器在最底层
         }}
-        onMouseDown={handleAnnotationMouseDown}
-        onMouseMove={handleAnnotationMouseMove}
-        onMouseUp={handleAnnotationMouseUp}
-        onMouseLeave={handleAnnotationMouseLeave}
       />
       
       {/* 指示器图层 - 用于高亮、焦点等临时指示 */}
@@ -504,26 +405,21 @@ const AnimateGraph = forwardRef(({
         className="absolute top-0 left-0 w-full h-full"
         style={{
           backgroundColor: 'transparent',
-          zIndex: 1
+          zIndex: 1 // 指示器图层在SVG容器之上
         }}
       />
       
-      {/* 清除注释按钮 - 仅在绘图模式下显示，位于模式切换按钮左侧 */}
-      {currentMode === 'draw' && (
-        <button
-          className="fixed bottom-4 right-36 w-10 h-10 bg-red-600 text-white rounded-md text-sm hover:bg-red-700 transition-colors z-50 flex items-center justify-center"
-          onClick={clearAnnotations}
-          style={{
-            zIndex: 9999,
-            boxShadow: '0 4px 8px rgba(0,0,0,0.3)',
-            border: '1px solid #dc2626',
-            fontSize: '18px'
-          }}
-          title="清除绘图"
-        >
-          ✖️
-        </button>
-      )}
+      {/* 注释工具组件 - 确保在最上层 */}
+      <AnnotationTool
+        ref={annotationToolRef}
+        width={width}
+        height={height}
+        visible={currentMode === 'draw'}
+        style={{
+          backgroundColor: 'transparent',
+          zIndex: 2// 画图图层在最上方
+        }}
+      />
       
       {/* 模式切换按钮 - 右下角 */}
       <button
