@@ -8,16 +8,6 @@ const GraphCanvas = forwardRef(({ width = 1000, height = 600, graphCount = 1 }, 
   // 状态
   const [currentGraphIndex, setCurrentGraphIndex] = useState(0);
   const [graphControllers, setGraphControllers] = useState([]);
-  const [graphData, setGraphData] = useState(() => {
-    // 初始化图数据，为每个图生成样例图数据
-    const graphs = [];
-    for (let i = 0; i < graphCount; i++) {
-      // 使用generateExampleGraph函数生成样例图数据
-      const exampleGraph = generateExampleGraph(width, height);
-      graphs.push(exampleGraph);
-    }
-    return graphs;
-  });
   
   // Refs
   const animateGraphRefs = useRef([]);
@@ -67,21 +57,11 @@ const GraphCanvas = forwardRef(({ width = 1000, height = 600, graphCount = 1 }, 
       
       // 处理样式修改
       if (modifications.nodesStyle) {
-        // 应用节点样式到所有节点
-        if (graphData[currentGraphIndex]?.nodes) {
-          graphData[currentGraphIndex].nodes.forEach(node => {
-            if (node.id) {
-              currentController.updateNode(node.id, modifications.nodesStyle);
-            }
-          });
-        }
+        currentController.setNodesStyle(modifications.nodesStyle);
       }
       
       if (modifications.edgesStyle) {
-        // 应用边样式到所有边
-        if (currentController.updateEdges) {
-          currentController.updateEdges(modifications.edgesStyle);
-        }
+        currentController.setEdgesStyle(modifications.edgesStyle);
       }
     }
   };
@@ -108,7 +88,7 @@ const GraphCanvas = forwardRef(({ width = 1000, height = 600, graphCount = 1 }, 
     switchGraphIndex,
     getCurrentGraphIndex: () => currentGraphIndex,
     getGraphCount: () => graphCount
-  }), [currentGraphIndex, graphCount, graphControllers, graphData]);
+  }), [currentGraphIndex, graphCount, graphControllers]);
   
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%' }}>
@@ -150,7 +130,8 @@ const GraphCanvas = forwardRef(({ width = 1000, height = 600, graphCount = 1 }, 
       
       {/* 渲染所有图，但只显示当前索引对应的图 */}
       {Array.from({ length: graphCount }).map((_, index) => {
-        const graph = graphData[index];
+        // 生成临时示例图数据传递给AnimateGraph
+        const exampleGraph = generateExampleGraph(width, height);
         return (
           <div
             key={index}
@@ -167,10 +148,10 @@ const GraphCanvas = forwardRef(({ width = 1000, height = 600, graphCount = 1 }, 
               ref={el => animateGraphRefs.current[index] = el}
               width={width}
               height={height}
-              nodes={graph?.nodes || []}
-              edges={graph?.edges || []}
-              nodesStyle={graph?.nodesStyle || {}}
-              edgesStyle={graph?.edgesStyle || {}}
+              nodes={exampleGraph.nodes}
+              edges={exampleGraph.edges}
+              nodesStyle={exampleGraph.nodesStyle}
+              edgesStyle={exampleGraph.edgesStyle}
               onInit={(controller) => handleGraphInit(index, controller)}
             />
           </div>

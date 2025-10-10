@@ -397,9 +397,6 @@ const AnimateGraph = forwardRef(({
         }, defaults.pulseDuration / 2);
         
         // 保存定时器ID以便后续清除
-        if (!indicatorIntervalsRef) {
-          indicatorIntervalsRef = { current: [] };
-        }
         indicatorIntervalsRef.current.push(pulseInterval);
         
         // 设置超时后清除脉冲动画

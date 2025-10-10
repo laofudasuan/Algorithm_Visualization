@@ -19,8 +19,8 @@
     "framer-motion": "^12.23.22",
     "katex": "^0.16.22",
     "marked": "^16.3.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "react-markdown": "^10.1.0",
     "react-router-dom": "^6.21.3",
     "rehype-katex": "^7.0.1",
@@ -31,8 +31,8 @@
     "three-forcegraph": "^1.43.0"
   },
   "devDependencies": {
-    "@types/react": "^18.2.43",
-    "@types/react-dom": "^18.2.17",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.17",
     "eslint": "^8.55.0",

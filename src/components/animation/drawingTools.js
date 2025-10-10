@@ -519,7 +519,16 @@ export class GraphRenderer {
     nodeElement.setAttribute('stroke', nodeStyle.stroke);
     nodeElement.setAttribute('stroke-width', nodeStyle.lineWidth);
     nodeElement.setAttribute('opacity', '0');
-    nodeElement.setAttribute('transform', 'scale(0.8)');
+    
+    // 设置变换原点为中心点，初始缩放为0
+    let transformOrigin;
+    if (nodeElement.tagName === 'circle') {
+      transformOrigin = `${node.x}px ${node.y}px`;
+    } else {
+      transformOrigin = `${node.x}px ${node.y}px`;
+    }
+    nodeElement.style.transformOrigin = transformOrigin;
+    nodeElement.style.transform = 'scale(0)';
     
     // 添加到节点分组
     this.nodesGroup.appendChild(nodeElement);
@@ -706,9 +715,6 @@ export class GraphRenderer {
     const edgeElement = edgeData.element;
     const labelElement = this.edgeLabelElements.get(edgeId);
     
-    // 创建新的路径数据
-    const newPathData = this.createPathData(sourceNode.x, sourceNode.y, targetNode.x, targetNode.y);
-    
     // 使用animejs创建边动画
     const animTarget = {
       progress: 0,
@@ -785,14 +791,10 @@ export class GraphRenderer {
     
     if (!nodeElement) return;
     
-    // 重置样式
-    nodeElement.setAttribute('opacity', '0');
-    nodeElement.setAttribute('transform', 'scale(0.8)');
-    
     // 使用animejs创建节点动画
     animate(nodeElement, {
       opacity: [0, 1],
-      scale: [0.8, 1],
+      scale: [0, 1],
       duration,
       easing,
       complete: onComplete

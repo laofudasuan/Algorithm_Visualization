@@ -199,7 +199,7 @@ const CoursewareDetail = () => {
       </div>
 
       {/* 左右分页导航按钮 - 窗口底部两侧 */}
-      {pageCount > 1 && (
+      {pageCount > 0 && (
         <>
           {/* 左侧上一页按钮 */}
           <motion.button
@@ -245,7 +245,7 @@ const CoursewareDetail = () => {
       )}
 
       {/* 页面下方横向进度条 */}
-      {pageCount > 1 && (
+      {pageCount > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
