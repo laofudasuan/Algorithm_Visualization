@@ -1,222 +1,148 @@
-// annotationTools.jsx - React组件，使用Fabric.js实现绘图注释功能
-import React, { useRef, useEffect, forwardRef, useImperativeHandle, useState } from 'react';
+import React, { useEffect, useRef, useImperativeHandle, forwardRef, useState } from 'react';
 import * as fabric from 'fabric';
 
-/**
- * AnnotationTool React组件
- * 使用Fabric.js实现绘图、擦除等注释功能，并包含清除按钮
- */
-const AnnotationTool = forwardRef(({
-  width = 800,
-  height = 600,
-  visible = false,
-  onClear
-}, ref) => {
-  // Refs
+const AnnotationTool = forwardRef((props, ref) => {
+  const {
+    width = 800,
+    height = 600,
+    visible = false,
+    onClear,
+    style
+  } = props;
+
   const canvasRef = useRef(null);
   const fabricCanvasRef = useRef(null);
-  const [isDrawingEnabled, setIsDrawingEnabled] = useState(false);
-  
-  // 初始化Fabric.js画布
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [isErasing, setIsErasing] = useState(false);
+  const [brushColor, setBrushColor] = useState('#000000');
+  const [brushWidth, setBrushWidth] = useState(2);
+
+  // 暴露方法给父组件
+  useImperativeHandle(ref, () => ({
+    enableDrawing: () => {
+      setIsDrawing(true);
+      setIsErasing(false);
+      if (fabricCanvasRef.current) {
+        fabricCanvasRef.current.isDrawingMode = true;
+        fabricCanvasRef.current.freeDrawingBrush = new fabric.PencilBrush(fabricCanvasRef.current);
+        fabricCanvasRef.current.freeDrawingBrush.color = brushColor;
+        fabricCanvasRef.current.freeDrawingBrush.width = brushWidth;
+        fabricCanvasRef.current.freeDrawingBrush.shadow = new fabric.Shadow({
+          blur: 0,
+          offsetX: 0,
+          offsetY: 0,
+          affectStroke: true,
+          color: brushColor
+        });
+      }
+    },
+    disableDrawing: () => {
+      setIsDrawing(false);
+      setIsErasing(false);
+      if (fabricCanvasRef.current) {
+        fabricCanvasRef.current.isDrawingMode = false;
+      }
+    },
+    enableErasing: () => {
+      setIsErasing(true);
+      setIsDrawing(false);
+      if (fabricCanvasRef.current) {
+        fabricCanvasRef.current.isDrawingMode = true;
+        // 使用背景色覆盖作为擦除效果
+        const brush = new fabric.PencilBrush(fabricCanvasRef.current);
+        // 设置画笔属性用于擦除，使用更大的宽度获得更好的擦除效果
+        brush.color = '#ffffff'; // 假设背景是白色
+        brush.width = 15; // 使用固定的较大宽度
+        brush.opacity = 1;
+        fabricCanvasRef.current.freeDrawingBrush = brush;
+        // 添加橡皮擦光标视觉提示
+        fabricCanvasRef.current.defaultCursor = 'url("data:image/svg+xml,%3Csvg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%23666666\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"%3E%3Cpath d=\"M18 13L5 5\"/%3E%3Cpath d=\"M14.5 5L21 11.5\"/%3E%3Cpath d=\"M9 9L3 3\"/%3E%3C/svg%3E") 12 12, auto';
+      }
+    },
+    clearAll: () => {
+      if (fabricCanvasRef.current) {
+        const objects = fabricCanvasRef.current.getObjects();
+        objects.forEach(obj => {
+          if (obj.type === 'path') {
+            fabricCanvasRef.current.remove(obj);
+          }
+        });
+        fabricCanvasRef.current.renderAll();
+        if (onClear) {
+          onClear();
+        }
+      }
+    },
+    setBrushColor: (color) => {
+      setBrushColor(color);
+      if (fabricCanvasRef.current && fabricCanvasRef.current.freeDrawingBrush) {
+        fabricCanvasRef.current.freeDrawingBrush.color = color;
+        if (fabricCanvasRef.current.freeDrawingBrush.shadow) {
+          fabricCanvasRef.current.freeDrawingBrush.shadow.color = color;
+        }
+      }
+    },
+    setBrushWidth: (width) => {
+      setBrushWidth(width);
+      if (fabricCanvasRef.current && fabricCanvasRef.current.freeDrawingBrush) {
+        fabricCanvasRef.current.freeDrawingBrush.width = width;
+      }
+    }
+  }));
+
+  // 初始化和销毁画布
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    
-    // 显式设置canvas元素的width和height属性
-    canvas.width = width;
-    canvas.height = height;
-    
-    // 创建Fabric.js画布实例 - 确保使用正确的配置
-    const fabricCanvas = new fabric.Canvas(canvas, {
+    if (!canvasRef.current || !visible) return;
+
+    // 初始化 Fabric 画布
+    fabricCanvasRef.current = new fabric.Canvas(canvasRef.current, {
       width: width,
       height: height,
       selection: false,
-      preserveObjectStacking: true,
       backgroundColor: 'transparent',
-      // 确保触摸和鼠标事件都能正常工作
-      enableRetinaScaling: false,
-      skipOffscreen: false
+      preserveObjectStacking: true
     });
-    
-    // 创建并配置画笔
-    const pencilBrush = new fabric.PencilBrush(fabricCanvas);
-    pencilBrush.color = '#ff5722';
-    pencilBrush.width = 3; // 稍微增加画笔宽度使其更明显
-    pencilBrush.shadow = new fabric.Shadow({
-      blur: 0,
-      offsetX: 0,
-      offsetY: 0,
-      color: '#ff5722'
+
+    // 添加路径创建事件监听
+    fabricCanvasRef.current.on('path:created', (e) => {
+      console.log('Path created:', e.path);
     });
-    
-    // 设置画笔
-    fabricCanvas.freeDrawingBrush = pencilBrush;
-    
-    // 存储Fabric.js画布实例
-    fabricCanvasRef.current = fabricCanvas;
-    
-    // 添加调试日志
-    console.log('Fabric.js canvas initialized with width:', width, 'height:', height);
-    
-    // 清理函数
+
     return () => {
-      fabricCanvas.dispose();
-      console.log('Fabric.js canvas disposed');
+      if (fabricCanvasRef.current) {
+        fabricCanvasRef.current.dispose();
+        fabricCanvasRef.current = null;
+      }
     };
-  }, [width, height]);
-  
-  // 根据visible属性控制画布显示/隐藏和绘图模式
+  }, [visible, width, height]);
+
+  // 当visible变化时，如果不可见，禁用绘图模式
   useEffect(() => {
-    const fabricCanvas = fabricCanvasRef.current;
-    if (!fabricCanvas) return;
-    
-    if (visible) {
-      enableDrawing();
-    } else {
-      disableDrawing();
+    if (!visible && fabricCanvasRef.current) {
+      fabricCanvasRef.current.isDrawingMode = false;
+      setIsDrawing(false);
+      setIsErasing(false);
     }
   }, [visible]);
-  
-  // 启用绘图模式
-  const enableDrawing = () => {
-    const fabricCanvas = fabricCanvasRef.current;
-    if (!fabricCanvas) {
-      console.log('Fabric canvas not initialized, cannot enable drawing');
-      return;
-    }
-    
-    console.log('Enabling drawing mode');
-    setIsDrawingEnabled(true);
-    
-    // 创建并配置画笔 - 与初始化部分保持一致
-    const pencilBrush = new fabric.PencilBrush(fabricCanvas);
-    pencilBrush.color = '#ff5722';
-    pencilBrush.width = 3;
-    pencilBrush.shadow = new fabric.Shadow({
-      blur: 0,
-      offsetX: 0,
-      offsetY: 0,
-      color: '#ff5722'
-    });
-    
-    // 设置画笔
-    fabricCanvas.freeDrawingBrush = pencilBrush;
-    
-    // 启用绘图模式
-    fabricCanvas.isDrawingMode = true;
-    
-    // 添加调试事件监听
-    const logBrushEvents = () => {
-      console.log('Brush event: path created');
-    };
-    
-    // 监听路径创建事件
-    fabricCanvas.on('path:created', logBrushEvents);
-    
-    // 清理函数 - 在disableDrawing中移除监听器
-    return () => {
-      fabricCanvas.off('path:created', logBrushEvents);
-    };
-  };
-  
-  // 禁用绘图/擦除模式
-  const disableDrawing = () => {
-    const fabricCanvas = fabricCanvasRef.current;
-    if (!fabricCanvas) return;
-    
-    setIsDrawingEnabled(false);
-    fabricCanvas.isDrawingMode = false;
-  };
-  
-  // 启用擦除模式
-  const enableErasing = () => {
-    const fabricCanvas = fabricCanvasRef.current;
-    if (!fabricCanvas) return;
-    
-    fabricCanvas.isDrawingMode = true;
-    const eraserBrush = new fabric.EraserBrush(fabricCanvas);
-    eraserBrush.width = 10;
-    fabricCanvas.freeDrawingBrush = eraserBrush;
-  };
-  
-  // 清除所有注释
-  const clearAll = () => {
-    const fabricCanvas = fabricCanvasRef.current;
-    if (!fabricCanvas) return;
-    
-    // 获取所有路径对象并移除
-    fabricCanvas.getObjects().forEach(obj => {
-      if (obj.type === 'path') {
-        fabricCanvas.remove(obj);
-      }
-    });
-    
-    // 重新渲染画布
-    fabricCanvas.renderAll();
-    
-    // 触发清除回调
-    if (typeof onClear === 'function') {
-      onClear();
-    }
-  };
-  
-  // 设置画笔颜色
-  const setBrushColor = (color) => {
-    const fabricCanvas = fabricCanvasRef.current;
-    if (!fabricCanvas) return;
-    
-    fabricCanvas.freeDrawingBrush.color = color;
-  };
-  
-  // 设置画笔宽度
-  const setBrushWidth = (width) => {
-    const fabricCanvas = fabricCanvasRef.current;
-    if (!fabricCanvas) return;
-    
-    fabricCanvas.freeDrawingBrush.width = width;
-  };
-  
-  // 暴露方法给父组件
-  useImperativeHandle(ref, () => ({
-    enableDrawing,
-    disableDrawing,
-    enableErasing,
-    clearAll,
-    setBrushColor,
-    setBrushWidth
-  }));
-  
+
   return (
-    <div className="relative w-full h-full">
-      {/* 注释画布 */}
+    <div 
+      className="relative"
+      style={{
+        width: width,
+        height: height,
+        display: visible ? 'block' : 'none',
+        ...style
+      }}
+    >
       <canvas
         ref={canvasRef}
-        className="absolute top-0 left-0 w-full h-full"
+        className="absolute top-0 left-0"
         style={{
-          cursor: isDrawingEnabled ? 'crosshair' : 'default',
-          backgroundColor: 'transparent',
-          zIndex: 10, // 确保在所有图层之上
-          display: visible ? 'block' : 'none',
-          pointerEvents: isDrawingEnabled ? 'auto' : 'none' // 确保在绘图模式下能接收鼠标事件
+          cursor: isDrawing || isErasing ? 'crosshair' : 'default',
+          pointerEvents: visible ? 'auto' : 'none'
         }}
       />
-      
-      {/* 清除注释按钮 - 仅在绘图模式下显示 */}
-      {visible && (
-        <button
-          className="fixed bottom-4 right-36 w-10 h-10 bg-red-600 text-white rounded-md text-sm hover:bg-red-700 transition-colors z-50 flex items-center justify-center"
-          onClick={clearAll}
-          style={{
-            zIndex: 9999,
-            boxShadow: '0 4px 8px rgba(0,0,0,0.3)',
-            border: '1px solid #dc2626',
-            fontSize: '18px'
-          }}
-          title="清除绘图"
-        >
-          ✖️
-        </button>
-      )}
     </div>
   );
 });

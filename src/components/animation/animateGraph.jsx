@@ -15,12 +15,25 @@ const AnimateGraph = forwardRef(({
 }, ref) => {
   // 本地状态管理绘图模式
   const [currentMode, setCurrentMode] = useState(initialMode);
+  const [drawingTool, setDrawingTool] = useState('brush'); // 'brush' 或 'eraser'
   
   // 切换模式函数
   const toggleMode = () => {
     setCurrentMode(prevMode => {
       return prevMode === 'none' ? 'draw' : 'none';
     });
+  };
+  
+  // 切换绘图工具
+  const switchDrawingTool = (tool) => {
+    setDrawingTool(tool);
+    if (annotationToolRef.current && currentMode === 'draw') {
+      if (tool === 'brush') {
+        annotationToolRef.current.enableDrawing();
+      } else if (tool === 'eraser') {
+        annotationToolRef.current.enableErasing();
+      }
+    }
   };
   
   // Refs for the canvas layers
@@ -385,6 +398,22 @@ const AnimateGraph = forwardRef(({
     }
   });
   
+  // 监听模式变化，启用或禁用绘图功能
+  useEffect(() => {
+    if (annotationToolRef.current) {
+      if (currentMode === 'draw') {
+        // 根据当前选择的工具启用相应的绘图模式
+        if (drawingTool === 'brush') {
+          annotationToolRef.current.enableDrawing();
+        } else if (drawingTool === 'eraser') {
+          annotationToolRef.current.enableErasing();
+        }
+      } else {
+        annotationToolRef.current.disableDrawing();
+      }
+    }
+  }, [currentMode, drawingTool]);
+
   // 暴露控制器给父组件
   useImperativeHandle(ref, () => getController());
   
@@ -421,22 +450,81 @@ const AnimateGraph = forwardRef(({
         }}
       />
       
-      {/* 模式切换按钮 - 右下角 */}
-      <button
-        className="fixed bottom-4 right-4 w-10 h-10 rounded-md text-sm transition-colors z-50 flex items-center justify-center"
-        onClick={toggleMode}
-        style={{
-          zIndex: 9999,
-          boxShadow: currentMode === 'none' ? '0 4px 8px rgba(0,0,0,0.3)' : '0 4px 12px rgba(37, 99, 235, 0.4)',
-          border: currentMode === 'none' ? '1px solid #4b5563' : '1px solid #2563eb',
-          backgroundColor: currentMode === 'none' ? '#4b5563' : '#2563eb',
-          color: '#ffffff',
-          fontSize: '18px'
-        }}
-        title={currentMode === 'none' ? '启用绘图' : '禁用绘图'}
-      >
-        ✏️
-      </button>
+      {/* 绘图工具栏 - 右下角 */}
+      <div className="fixed bottom-4 right-4 flex gap-2" style={{ zIndex: 9999 }}>
+        {/* 画笔按钮 */}
+        <button
+          className={`w-10 h-10 rounded-md flex items-center justify-center transition-colors ${currentMode === 'draw' && drawingTool === 'brush' ? 'bg-blue-500 text-white border-blue-500' : 'bg-gray-200 text-gray-700 border-gray-300'}`}
+          onClick={() => {
+            if (currentMode === 'draw') {
+              switchDrawingTool('brush');
+            }
+          }}
+          disabled={currentMode !== 'draw'}
+          title="画笔工具"
+          style={{
+            boxShadow: currentMode === 'draw' && drawingTool === 'brush' ? '0 4px 12px rgba(37, 99, 235, 0.4)' : '0 2px 4px rgba(0,0,0,0.2)',
+            border: '1px solid',
+            opacity: currentMode !== 'draw' ? 0.5 : 1
+          }}
+        >
+          ✏️
+        </button>
+        
+        {/* 橡皮擦按钮 */}
+        <button
+          className={`w-10 h-10 rounded-md flex items-center justify-center transition-colors ${currentMode === 'draw' && drawingTool === 'eraser' ? 'bg-blue-500 text-white border-blue-500' : 'bg-gray-200 text-gray-700 border-gray-300'}`}
+          onClick={() => {
+            if (currentMode === 'draw') {
+              switchDrawingTool('eraser');
+            }
+          }}
+          disabled={currentMode !== 'draw'}
+          title="橡皮擦工具"
+          style={{
+            boxShadow: currentMode === 'draw' && drawingTool === 'eraser' ? '0 4px 12px rgba(37, 99, 235, 0.4)' : '0 2px 4px rgba(0,0,0,0.2)',
+            border: '1px solid',
+            opacity: currentMode !== 'draw' ? 0.5 : 1
+          }}
+        >
+          🧹
+        </button>
+        
+        {/* 清空笔迹按钮 */}
+        <button
+          className={`w-10 h-10 rounded-md flex items-center justify-center transition-colors ${currentMode === 'draw' ? 'bg-red-500 text-white border-red-500' : 'bg-gray-200 text-gray-700 border-gray-300'}`}
+          onClick={() => {
+            if (annotationToolRef.current) {
+              annotationToolRef.current.clearAll();
+            }
+          }}
+          disabled={currentMode !== 'draw'}
+          title="清空所有笔迹"
+          style={{
+            boxShadow: currentMode === 'draw' ? '0 4px 12px rgba(239, 68, 68, 0.4)' : '0 2px 4px rgba(0,0,0,0.2)',
+            border: '1px solid',
+            opacity: currentMode !== 'draw' ? 0.5 : 1
+          }}
+        >
+          ❌
+        </button>
+        
+        {/* 模式切换按钮 */}
+        <button
+          className="w-10 h-10 rounded-md text-sm transition-colors flex items-center justify-center"
+          onClick={toggleMode}
+          style={{
+            boxShadow: currentMode === 'none' ? '0 4px 8px rgba(0,0,0,0.3)' : '0 4px 12px rgba(37, 99, 235, 0.4)',
+            border: currentMode === 'none' ? '1px solid #4b5563' : '1px solid #2563eb',
+            backgroundColor: currentMode === 'none' ? '#4b5563' : '#2563eb',
+            color: '#ffffff',
+            fontSize: '18px'
+          }}
+          title={currentMode === 'none' ? '启用绘图' : '禁用绘图'}
+        >
+          ✏️
+        </button>
+      </div>
     </div>
   );
 });
