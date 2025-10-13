@@ -95,13 +95,13 @@ const GraphCanvas = forwardRef(({ width = 1000, height = 600, graphCount = 1 }, 
       {/* 图切换指示器 */}
       <div style={{
         position: 'absolute',
-        top: '10px',
-        right: '10px',
+        top: '5px',
+        right: '30px',
         zIndex: 1000,
         display: 'flex',
         gap: '5px',
         backgroundColor: 'rgba(255, 255, 255, 0.8)',
-        padding: '5px',
+        padding: '0px',
         borderRadius: '4px'
       }}>
         {Array.from({ length: graphCount }).map((_, index) => (
