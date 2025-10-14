@@ -5,13 +5,41 @@ import { motion, AnimatePresence, useAnimation } from 'framer-motion'
 const Home = ({ menuItems }) => {
   const [showCatalog, setShowCatalog] = useState(false)
   const [scrollY, setScrollY] = useState(0)
+  const [randomPosition, setRandomPosition] = useState({ x: 0, y: 0 })
   const controls = useAnimation()
 
   useEffect(() => {
     setShowCatalog(true)
     const handleScroll = () => setScrollY(window.scrollY)
     window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
+    
+    // 生成随机位置的函数 - 在整个视口范围内
+    const generateRandomPosition = () => {
+      if (typeof window !== 'undefined') {
+        // 获取整个视口的尺寸
+        const maxX = window.innerWidth - 32 // 减去立方体宽度
+        const maxY = window.innerHeight - 32 // 减去立方体高度
+        // 生成随机位置
+        const x = Math.random() * maxX
+        const y = Math.random() * maxY
+        return { x, y }
+      }
+      // 降级方案：默认位置
+      return { x: 100, y: 100 }
+    }
+    
+    // 初始设置随机位置
+    setRandomPosition(generateRandomPosition())
+    
+    // 设置定时器，定期更新随机位置
+    const interval = setInterval(() => {
+      setRandomPosition(generateRandomPosition())
+    }, 3000) // 每3秒更换一次位置
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      clearInterval(interval)
+    }
   }, [])
 
   useEffect(() => {
@@ -67,8 +95,23 @@ const Home = ({ menuItems }) => {
     hidden: { opacity: 0 },
     visible: i => ({
       opacity: Math.random() * 0.5 + 0.2,
-      transition: { delay: i * 0.1, duration: 0.8 }
-    })
+      transition: {
+        delay: i * 0.1,
+        duration: 1.2
+      }
+    }),
+    fadeOut: {
+      opacity: 0,
+      transition: {
+        duration: 1.2
+      }
+    },
+    fadeIn: {
+      opacity: Math.random() * 0.5 + 0.2,
+      transition: {
+        duration: 1.2
+      }
+    }
   }
 
   return (
@@ -87,157 +130,125 @@ const Home = ({ menuItems }) => {
               key={i}
               custom={i}
               initial="hidden"
-              animate="visible"
               variants={dotVariants}
-              className="dot absolute rounded-full bg-primary/10"
-              style={{
-                width: `${Math.random() * 10 + 5}px`,
-                height: `${Math.random() * 10 + 5}px`,
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`
+              className="dot absolute rounded-full bg-primary/50"
+              animate={{ 
+                opacity: [0, Math.random() * 0.5 + 0.5, 0],
+                scale: [0, 1, 0],
               }}
+              transition={{ 
+                duration: 3 + Math.random() * 5,
+                repeat: Infinity,
+                repeatType: "loop",
+                delay: i * 0.5,
+                times: [0, 0.5, 1],
+              }}
+              style={(() => {
+                  // 使用同一个随机值确保宽高相同
+                  const size = Math.random() * 30 + 10
+                  return {
+                    width: `${size}px`,
+                    height: `${size}px`,
+                    left: `${Math.random() * 100}%`,
+                    top: `${Math.random() * 100}%`
+                  }
+                })()}
             />
           ))}
         </div>
 
-        {/* 3D 立方体 —— 已修复重叠 */}
-        <div
-          className="absolute right-1/4 top-1/2"
-          style={{
-            width: 256,
-            height: 256,
-            perspective: 1500,
-            transform: `translate3d(0, calc(-50% + ${scrollY * 0.2}px), 0)`
+        {/* 3D 立方体 - 在整个视口范围内随机移动 */}
+        <motion.div 
+          className="absolute w-32 h-32 pointer-events-none"
+          style={{ perspective: '1200px' }}
+          animate={{ 
+            left: randomPosition.x,
+            top: randomPosition.y,
+            transition: { duration: 1.5, ease: 'easeInOut' } // 平滑过渡到新位置
           }}
         >
-          <motion.div
+          <motion.div 
             className="w-full h-full relative"
-            initial={{ opacity: 0, rotateY: 0, rotateX: 0 }}
-            animate={{ opacity: 1, rotateY: 360, rotateX: 360 }}
-            transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-            style={{ transformStyle: 'preserve-3d', transform: 'translateZ(0)' }}
+            style={{ transformStyle: 'preserve-3d' }}
+            animate={{ 
+              rotateX: 360, 
+              rotateY: 360 
+            }}
+            transition={{ 
+              duration: 20, 
+              repeat: Infinity, 
+              ease: "linear"
+            }}
           >
-            {/* 前面 */}
-            <div
-              className="absolute w-full h-full rounded-2xl flex items-center justify-center shadow-2xl"
-              style={{
-                backgroundColor: 'rgba(37,99,235,.8)',
-                transform: 'translateZ(128px)'
-              }}
-            >
-              <div className="text-center">
-                <svg className="h-40 w-40 text-white mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
-                </svg>
-                <p className="mt-4 font-semibold text-white text-2xl">算法可视化</p>
+            {/* 3D立方体 - 使用数据驱动的方式渲染六个面 */}
+            {[
+              // 前面 - 动态规划
+              { text: '动态规划', bgColor: 'rgba(59, 130, 246, 0.85)', transform: 'translateZ(64px)' },
+              // 后面 - 图论
+              { text: '图论', bgColor: 'rgba(139, 92, 246, 0.85)', transform: 'rotateY(180deg) translateZ(64px)' },
+              // 上面 - 数据结构
+              { text: '数据结构', bgColor: 'rgba(16, 185, 129, 0.85)', transform: 'rotateX(90deg) translateZ(64px)' },
+              // 下面 - 字符串
+              { text: '字符串', bgColor: 'rgba(245, 158, 11, 0.85)', transform: 'rotateX(-90deg) translateZ(64px)' },
+              // 左面 - 数学
+              { text: '数学', bgColor: 'rgba(236, 72, 153, 0.85)', transform: 'rotateY(-90deg) translateZ(64px)' },
+              // 右面 - 基础算法
+              { text: '基础算法', bgColor: 'rgba(8, 145, 178, 0.85)', transform: 'rotateY(90deg) translateZ(64px)' }
+            ].map((face, index) => (
+              <div 
+                key={index}
+                className="absolute w-full h-full flex items-center justify-center text-white text-lg md:text-xl font-bold text-center"
+                style={{ 
+                  backgroundColor: face.bgColor,
+                  borderRadius: '0.5rem',
+                  backfaceVisibility: 'hidden',
+                  transform: face.transform
+                }}
+              >
+                <div className="break-words p-2 md:p-4">{face.text}</div>
               </div>
-            </div>
-
-            {/* 右面 */}
-            <div
-              className="absolute w-full h-full rounded-2xl flex items-center justify-center shadow-2xl"
-              style={{
-                backgroundColor: 'rgba(20,184,166,.8)',
-                transform: 'rotateY(90deg) translateZ(128px)'
-              }}
-            >
-              <div className="text-center">
-                <svg className="h-40 w-40 text-white mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-                </svg>
-                <p className="mt-4 font-semibold text-white text-2xl">交互式学习</p>
-              </div>
-            </div>
-
-            {/* 后面 */}
-            <div
-              className="absolute w-full h-full rounded-2xl flex items-center justify-center shadow-2xl"
-              style={{
-                backgroundColor: 'rgba(167,139,250,.8)',
-                transform: 'rotateY(180deg) translateZ(128px)'
-              }}
-            >
-              <div className="text-center">
-                <svg className="h-40 w-40 text-white mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                </svg>
-                <p className="mt-4 font-semibold text-white text-2xl">知识图谱</p>
-              </div>
-            </div>
-
-            {/* 左面 */}
-            <div
-              className="absolute w-full h-full rounded-2xl flex items-center justify-center shadow-2xl"
-              style={{
-                backgroundColor: 'rgba(75,85,99,.8)',
-                transform: 'rotateY(-90deg) translateZ(128px)'
-              }}
-            >
-              <div className="text-center">
-                <svg className="h-40 w-40 text-white mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
-                </svg>
-                <p className="mt-4 font-semibold text-white text-2xl">基础算法</p>
-              </div>
-            </div>
-
-            {/* 顶面 */}
-            <div
-              className="absolute w-full h-full rounded-2xl flex items-center justify-center shadow-2xl"
-              style={{
-                backgroundColor: 'rgba(79,70,229,.8)',
-                transform: 'rotateX(90deg) translateZ(128px)'
-              }}
-            >
-              <div className="text-center">
-                <svg className="h-40 w-40 text-white mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-                <p className="mt-4 font-semibold text-white text-2xl">深入探索</p>
-              </div>
-            </div>
-
-            {/* 底面 */}
-            <div
-              className="absolute w-full h-full rounded-2xl flex items-center justify-center shadow-2xl"
-              style={{
-                backgroundColor: 'rgba(244,63,94,.8)',
-                transform: 'rotateX(-90deg) translateZ(128px)'
-              }}
-            >
-              <div className="text-center">
-                <svg className="h-40 w-40 text-white mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-                <p className="mt-4 font-semibold text-white text-2xl">动态课件</p>
-              </div>
-            </div>
+            ))}
           </motion.div>
-        </div>
+        </motion.div>
 
-        {/* 主文案 */}
+          {/* 主文案 */}
         <div
           className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10"
           style={{ transform: `translateY(${scrollY * 0.15}px)` }}
         >
-          <div className="max-w-3xl">
-            <motion.h1
-              className="hero-title text-4xl md:text-6xl font-bold text-center leading-tight mb-6"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-            >
-              通过<span className="text-primary">可视化</span>探索算法的奥秘
-            </motion.h1>
-            <motion.p
-              className="hero-subtitle text-xl text-gray-600 text-center mb-10 max-w-2xl mx-auto"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
-            >
-              直观理解复杂算法的工作原理，通过交互式动画掌握算法思想
-            </motion.p>
-            <div className="flex justify-center" />
+          <div className="flex flex-col md:flex-row items-center justify-between max-w-5xl mx-auto">
+            {/* 左侧文本内容 */}
+            <div className="text-center md:text-left md:w-1/2 mb-8 md:mb-0">
+              <motion.h1
+                className="hero-title text-4xl md:text-6xl font-bold leading-tight mb-6"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+              >
+                欢迎来到<span className="text-primary">算法动画</span>播放厅
+              </motion.h1>
+              <motion.p
+                className="hero-subtitle text-xl text-gray-600 mb-10 max-w-md mx-auto md:mx-0"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.3 }}
+              >
+                QQ群：251998253
+              </motion.p>
+              <div className="flex justify-center md:justify-start" />
+            </div>
+            
+            {/* 右侧图片 */}
+            <div className="md:w-1/2 flex justify-center">
+              <motion.img
+                src="/images/teng10.png"
+                alt="算法动画"
+                className="w-full max-w-xs h-auto"
+                initial={{ opacity: 0, scale: 0.2 }}
+                animate={{ opacity: 1, scale: 0.8 }}
+                transition={{ duration: 0.8, delay: 0.5 }}
+              />
+            </div>
           </div>
         </div>
 
