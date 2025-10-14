@@ -121,17 +121,15 @@ const Navbar = ({ menuItems, isMenuOpen, setIsMenuOpen, hasScrolled, currentPath
                     </button>
                     
                   {/* 下拉菜单 */}
-                    {openDropdown === index && (
                       <div 
-                        className={`dropdown-menu-${index} absolute right-0 mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 hidden md:block overflow-hidden min-w-[480px]`}
-                        style={{ display: 'block' }}
+                        className={`dropdown-menu-${index} absolute right-0 mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 md:block overflow-hidden min-w-[240px] transition-all duration-300 transform origin-top-right ${openDropdown === index ? 'opacity-100 scale-100 pointer-events-auto' : 'opacity-0 scale-95 pointer-events-none'}`}
                       >
-                        <div className="flex p-2">
+                        <div className="flex p-1">
                           {item.children.map((childItem, childIndex) => (
                             <Link
                               key={childIndex}
                               to={childItem.path}
-                              className={`flex-1 text-center px-4 py-3 rounded-md transition-all duration-200 min-w-[200px] text-sm font-medium ${currentPath === childItem.path ? 'text-primary bg-primary/10' : 'text-gray-600 hover:text-primary'}`}
+                              className={`flex-1 text-center px-4 py-1.5 rounded-md transition-all duration-200 min-w-[100px] text-sm font-medium ${currentPath === childItem.path ? 'text-primary bg-primary/10' : 'text-gray-600 hover:text-primary'}`}
                               onClick={() => {
                                 setOpenDropdown(null)
                                 setIsMenuOpen(false)
@@ -142,7 +140,6 @@ const Navbar = ({ menuItems, isMenuOpen, setIsMenuOpen, hasScrolled, currentPath
                           ))}
                         </div>
                       </div>
-                    )}
                   </div>
                 )
               } else {

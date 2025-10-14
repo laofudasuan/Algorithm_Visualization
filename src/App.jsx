@@ -38,10 +38,10 @@ function App() {
       name: '可视化模块', 
       path: '/visualization', // 作为下拉菜单的触发点
       children: [
-        { name: '图算法可视化', path: '/graph-visualization' },
-        { name: '动态规划可视化', path: '/dynamic-programming' },
-        { name: '基础算法可视化', path: '/basic-algorithms' },
-        { name: '字符串算法可视化', path: '/string-algorithms' }
+        { name: '图', path: '/graph-visualization' },
+        { name: '动态规划', path: '/dynamic-programming' },
+        { name: '基础算法', path: '/basic-algorithms' },
+        { name: '字符串', path: '/string-algorithms' }
       ]
     },
     { name: '课件', path: '/courseware' },

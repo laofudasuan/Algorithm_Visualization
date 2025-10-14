@@ -11,7 +11,7 @@ function GraphVisualizationTools() {
           <GraphCanvas 
             width={1000} 
             height={600} 
-            graphCount={1}
+            graphCount={2}
           />
         </div>
       </div>
