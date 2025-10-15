@@ -11,9 +11,9 @@ const CoursewareList = () => {
 
   useEffect(() => {
     // 立即打印加载开始信息
-    console.log('开始加载课件数据');
+    console.log('开始加载内容数据');
     
-    // 模拟加载课件数据
+    // 模拟加载内容数据
     const loadCoursewares = async () => {
       try {
         // 动态导入目录中的所有.mdx文件
@@ -32,6 +32,7 @@ const CoursewareList = () => {
           const description = module.attributes?.description || module.frontmatter?.description || '暂无描述';
           const author = module.attributes?.author || module.frontmatter?.author || '未知作者';
           const createdAt = module.attributes?.createdAt || module.frontmatter?.createdAt || '未知时间';
+          const cover = module.attributes?.cover || module.frontmatter?.cover;
           
           console.log(`处理文件 ${filepath}:`, { id, title, description });
           
@@ -40,13 +41,14 @@ const CoursewareList = () => {
             title,
             description,
             author,
-            createdAt
+            createdAt,
+            cover
           };
         });
         
         setCoursewares(coursewaresData);
       } catch (error) {
-        console.error('加载课件数据失败:', error);
+        console.error('加载内容数据失败:', error);
       } finally {
         setLoading(false);
       }
@@ -88,9 +90,9 @@ const CoursewareList = () => {
           transition={{ duration: 0.8, ease: "easeOut" }}
         >
           <div className="text-center mb-16">
-            <h1 className="text-4xl font-bold mb-4">课件</h1>
+            <h1 className="text-4xl font-bold mb-4">内容区</h1>
             <p className="text-gray-600">
-              探索算法世界的精彩课件，包含详细的概念讲解、数学公式和实例演示
+              探索算法世界的精彩内容，包含详细的概念讲解、数学公式和实例演示
             </p>
           </div>
 
@@ -116,15 +118,23 @@ const CoursewareList = () => {
                   onClick={() => navigate(`/courseware/${courseware.id}`)}
                 >
                   <div className="h-48 bg-gray-200 overflow-hidden">
-                    <div className="w-full h-full bg-gradient-to-r from-blue-400 to-purple-500 flex items-center justify-center">
-                <span className="text-white text-2xl font-bold">
-                  {(() => {
-                    // 安全地获取标题首字母，如果没有标题则使用默认字母
-                    const title = courseware.title || 'A';
-                    return title.charAt(0) || 'A';
-                  })()}
-                </span>
-              </div>
+                    {courseware.cover ? (
+                      <img 
+                        src={courseware.cover} 
+                        alt={courseware.title} 
+                        className="w-full h-full object-cover" 
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-r from-blue-400 to-purple-500 flex items-center justify-center">
+                        <span className="text-white text-2xl font-bold">
+                          {(() => {
+                            // 安全地获取标题首字母，如果没有标题则使用默认字母
+                            const title = courseware.title || 'A';
+                            return title.charAt(0) || 'A';
+                          })()}
+                        </span>
+                      </div>
+                    )}
                   </div>
                   <div className="p-6">
                     <h3 className="text-xl font-bold mb-2">{courseware.title}</h3>
@@ -142,7 +152,7 @@ const CoursewareList = () => {
           {!loading && coursewares.length === 0 && (
             <div className="bg-white rounded-xl shadow-md p-8">
               <div className="text-center py-12">
-                <p className="text-gray-500">暂无可用课件</p>
+                <p className="text-gray-500">暂无可用内容</p>
               </div>
             </div>
           )}

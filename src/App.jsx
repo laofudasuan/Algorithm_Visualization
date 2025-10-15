@@ -44,7 +44,7 @@ function App() {
         { name: '字符串', path: '/string-algorithms' }
       ]
     },
-    { name: '课件', path: '/courseware' },
+    { name: '内容', path: '/courseware' },
     { name: '知识图谱', path: '/knowledge-graph' }
   ]
 

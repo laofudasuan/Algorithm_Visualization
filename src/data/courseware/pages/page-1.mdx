@@ -2,13 +2,27 @@
 title: 第一页内容
 ---
 
+import GraphCanvas from '../../../components/animation/GraphCanvas';
+
 # 第一页内容
 
 这是课件的第一页，包含一些基础概念介绍。
 
+## 图可视化演示
+
+下面是一个交互式图可视化组件，可以展示和切换多个图：
+
+<div className="my-8 rounded-lg p-4 bg-white shadow-sm" style={{ position: 'relative', height: '450px', display: 'block' }}>
+  <GraphCanvas width={600} height={400} graphCount={1} />
+</div>
+
+## 数学公式
+
 我们可以在这里放置一些公式：
 
 $$E = mc^2$$
+
+## 列表内容
 
 还可以放置一些列表：
 

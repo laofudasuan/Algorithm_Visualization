@@ -16,12 +16,31 @@ const AnimateGraph = forwardRef(({
   // 本地状态管理绘图模式
   const [currentMode, setCurrentMode] = useState(initialMode);
   const [drawingTool, setDrawingTool] = useState('brush'); // 'brush' 或 'eraser'
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [showTools, setShowTools] = useState(false);
   
-  // 切换模式函数
+  // 切换模式函数 - 添加动画控制
   const toggleMode = () => {
-    setCurrentMode(prevMode => {
-      return prevMode === 'none' ? 'draw' : 'none';
-    });
+    setIsAnimating(true);
+    
+    if (currentMode === 'none') {
+      // 开启绘图模式，先显示工具，再改变模式
+      setTimeout(() => {
+        setShowTools(true);
+        setTimeout(() => {
+          setCurrentMode('draw');
+          setIsAnimating(false);
+        }, 10);
+      }, 10);
+    } else {
+      // 关闭绘图模式，先隐藏工具（触发动画），再改变模式
+      setShowTools(false);
+      // 等待动画完成后再改变模式
+      setTimeout(() => {
+        setCurrentMode('none');
+        setIsAnimating(false);
+      }, 1000); // 与动画持续时间一致
+    }
   };
   
   // 切换绘图工具
@@ -450,80 +469,111 @@ const AnimateGraph = forwardRef(({
         }}
       />
       
-      {/* 绘图工具栏 - 右下角 */}
-      <div className="fixed bottom-4 right-4 flex gap-2" style={{ zIndex: 9999 }}>
-        {/* 画笔按钮 */}
-        <button
-          className={`w-10 h-10 rounded-md flex items-center justify-center transition-colors ${currentMode === 'draw' && drawingTool === 'brush' ? 'bg-blue-500 text-white border-blue-500' : 'bg-gray-200 text-gray-700 border-gray-300'}`}
-          onClick={() => {
-            if (currentMode === 'draw') {
-              switchDrawingTool('brush');
-            }
-          }}
-          disabled={currentMode !== 'draw'}
-          title="画笔工具"
-          style={{
-            boxShadow: currentMode === 'draw' && drawingTool === 'brush' ? '0 4px 12px rgba(37, 99, 235, 0.4)' : '0 2px 4px rgba(0,0,0,0.2)',
-            border: '1px solid',
-            opacity: currentMode !== 'draw' ? 0.5 : 1
-          }}
-        >
-          ✏️
-        </button>
-        
-        {/* 橡皮擦按钮 */}
-        <button
-          className={`w-10 h-10 rounded-md flex items-center justify-center transition-colors ${currentMode === 'draw' && drawingTool === 'eraser' ? 'bg-blue-500 text-white border-blue-500' : 'bg-gray-200 text-gray-700 border-gray-300'}`}
-          onClick={() => {
-            if (currentMode === 'draw') {
-              switchDrawingTool('eraser');
-            }
-          }}
-          disabled={currentMode !== 'draw'}
-          title="橡皮擦工具"
-          style={{
-            boxShadow: currentMode === 'draw' && drawingTool === 'eraser' ? '0 4px 12px rgba(37, 99, 235, 0.4)' : '0 2px 4px rgba(0,0,0,0.2)',
-            border: '1px solid',
-            opacity: currentMode !== 'draw' ? 0.5 : 1
-          }}
-        >
-          🧹
-        </button>
-        
-        {/* 清空笔迹按钮 */}
-        <button
-          className={`w-10 h-10 rounded-md flex items-center justify-center transition-colors ${currentMode === 'draw' ? 'bg-red-500 text-white border-red-500' : 'bg-gray-200 text-gray-700 border-gray-300'}`}
-          onClick={() => {
-            if (annotationToolRef.current) {
-              annotationToolRef.current.clearAll();
-            }
-          }}
-          disabled={currentMode !== 'draw'}
-          title="清空所有笔迹"
-          style={{
-            boxShadow: currentMode === 'draw' ? '0 4px 12px rgba(239, 68, 68, 0.4)' : '0 2px 4px rgba(0,0,0,0.2)',
-            border: '1px solid',
-            opacity: currentMode !== 'draw' ? 0.5 : 1
-          }}
-        >
-          ❌
-        </button>
-        
-        {/* 模式切换按钮 */}
-        <button
-          className="w-10 h-10 rounded-md text-sm transition-colors flex items-center justify-center"
-          onClick={toggleMode}
-          style={{
-            boxShadow: currentMode === 'none' ? '0 4px 8px rgba(0,0,0,0.3)' : '0 4px 12px rgba(37, 99, 235, 0.4)',
-            border: currentMode === 'none' ? '1px solid #4b5563' : '1px solid #2563eb',
-            backgroundColor: currentMode === 'none' ? '#4b5563' : '#2563eb',
-            color: '#ffffff',
-            fontSize: '18px'
-          }}
-          title={currentMode === 'none' ? '启用绘图' : '禁用绘图'}
-        >
-          ✏️
-        </button>
+      {/* 绘图工具栏 - 画布右下角 */}
+        <div style={{
+          position: 'absolute',
+          left: '5px',
+          top: '5px',
+          display: 'flex',
+          gap: showTools ? '5px' : '0px', // 修改为与工具按钮之间相同的间距
+          zIndex: 9999
+        }}>
+          {/* 模式切换按钮 */}
+          <button
+            className="w-8 h-8 rounded-md text-sm transition-colors flex items-center justify-center"
+            onClick={toggleMode}
+            style={{
+              boxShadow: currentMode === 'none' ? '0 4px 8px rgba(0,0,0,0.3)' : '0 4px 12px rgba(37, 99, 235, 0.4)',
+              border: currentMode === 'none' ? '1px solid #4b5563' : '1px solid #2563eb',
+              backgroundColor: currentMode === 'none' ? '#4b5563' : '#2563eb',
+              color: '#ffffff',
+              fontSize: '18px',
+              position: 'relative',
+              zIndex: 2
+            }}
+            title={currentMode === 'none' ? '启用绘图' : '禁用绘图'}
+          >
+            {currentMode === 'none' ? '→' : '←'}
+          </button>
+          
+          {/* 工具按钮容器 - 实现拉窗帘式动画 */}
+          <div 
+            style={{
+              display: 'flex',
+              gap: showTools ? '5px' : '0px', // 展开时有间距，收起时无间距
+              transition: 'all 1s ease-in-out',
+              position: 'relative'
+            }}
+          >
+            {/* 画笔按钮 */}
+            <button
+              className={`w-8 h-8 rounded-md flex items-center justify-center transition-colors ${currentMode === 'draw' && drawingTool === 'brush' ? 'bg-blue-500 text-white border-blue-500' : 'bg-gray-200 text-gray-700 border-gray-300'}`}
+              onClick={() => {
+                if (currentMode === 'draw') {
+                  switchDrawingTool('brush');
+                }
+              }}
+              disabled={currentMode !== 'draw'}
+              title="画笔工具"
+              style={{
+                boxShadow: currentMode === 'draw' && drawingTool === 'brush' ? '0 4px 12px rgba(37, 99, 235, 0.4)' : '0 2px 4px rgba(0,0,0,0.2)',
+                border: '1px solid',
+                opacity: currentMode !== 'draw' ? 0.5 : 1,
+                transform: showTools ? 'translateX(0)' : 'translateX(-100%)', // 展开时不偏移，收起时向左偏移
+                transition: 'transform 1s ease-in-out',
+                position: 'relative',
+                zIndex: 1
+              }}
+            >
+              ✏️
+            </button>
+            
+            {/* 橡皮擦按钮 */}
+            <button
+              className={`w-8 h-8 rounded-md flex items-center justify-center transition-colors ${currentMode === 'draw' && drawingTool === 'eraser' ? 'bg-blue-500 text-white border-blue-500' : 'bg-gray-200 text-gray-700 border-gray-300'}`}
+              onClick={() => {
+                if (currentMode === 'draw') {
+                  switchDrawingTool('eraser');
+                }
+              }}
+              disabled={currentMode !== 'draw'}
+              title="橡皮擦工具"
+              style={{
+                boxShadow: currentMode === 'draw' && drawingTool === 'eraser' ? '0 4px 12px rgba(37, 99, 235, 0.4)' : '0 2px 4px rgba(0,0,0,0.2)',
+                border: '1px solid',
+                opacity: currentMode !== 'draw' ? 0.5 : 1,
+                transform: showTools ? 'translateX(0)' : 'translateX(-200%)', // 展开时不偏移，收起时向左偏移更多
+                transition: 'transform 1s ease-in-out 0.1s', // 延迟一点开始动画，形成序列效果
+                position: 'relative',
+                zIndex: 1
+              }}
+            >
+              🧹
+            </button>
+            
+            {/* 清空笔迹按钮 */}
+            <button
+              className="w-8 h-8 rounded-md flex items-center justify-center transition-colors bg-gray-200 text-gray-700 border-gray-300"
+              onClick={() => {
+                if (annotationToolRef.current) {
+                  annotationToolRef.current.clearAll();
+                }
+              }}
+              disabled={currentMode !== 'draw'}
+              title="清空所有笔迹"
+              style={{
+                boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                border: '1px solid',
+                opacity: currentMode !== 'draw' ? 0.5 : 1,
+                transform: showTools ? 'translateX(0)' : 'translateX(-300%)', // 展开时不偏移，收起时向左偏移最多
+                transition: 'transform 1s ease-in-out 0.2s', // 再延迟一点开始动画，形成序列效果
+                position: 'relative',
+                zIndex: 1
+              }}
+            >
+              ❌
+            </button>
+          </div>
       </div>
     </div>
   );
