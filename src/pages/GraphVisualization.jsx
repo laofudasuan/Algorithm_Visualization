@@ -48,36 +48,7 @@ const GraphVisualization = () => {
             </div>
           </Link>
           
-          {/* 图动画测试模块介绍 */}
-          <Link 
-            to="/graph-render" 
-            className="block bg-white rounded-xl shadow-md overflow-hidden mb-8 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
-          >
-            <div className="p-8 flex flex-col md:flex-row items-center gap-6">
-              <div className="flex-shrink-0">
-                <svg className="h-16 w-16 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-              </div>
-              <div className="flex-grow text-left">
-                <h2 className="text-2xl font-bold mb-2 text-secondary">图动画测试模块</h2>
-                <p className="text-gray-600 mb-4">
-                  全面测试图动画和渲染功能的专用模块，支持测试节点和边的添加、删除、更新，以及各种动画效果。
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  <span className="bg-red-100 text-red-800 text-xs px-2 py-1 rounded">功能测试</span>
-                  <span className="bg-indigo-100 text-indigo-800 text-xs px-2 py-1 rounded">性能分析</span>
-                  <span className="bg-teal-100 text-teal-800 text-xs px-2 py-1 rounded">动画效果</span>
-                  <span className="bg-pink-100 text-pink-800 text-xs px-2 py-1 rounded">全面覆盖</span>
-                </div>
-              </div>
-              <div className="flex-shrink-0">
-                <svg className="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
-              </div>
-            </div>
-          </Link>
+          {/* 图算法模块介绍可以添加更多内容 */}
           
           <div className="bg-white rounded-xl shadow-md p-8">
             <div className="text-center py-16">

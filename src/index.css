@@ -154,3 +154,13 @@ html, body {
   transform: translateY(0);
   transition: opacity 0.8s ease, transform 0.8s ease;
 }
+
+/* 隐藏导航栏的样式 - 用于课件详情页 */
+body.hide-navbar .navbar, body.hide-navbar nav {
+  display: none !important;
+}
+
+/* 调整页面内边距，当导航栏隐藏时 */
+body.hide-navbar {
+  padding-top: 0 !important;
+}

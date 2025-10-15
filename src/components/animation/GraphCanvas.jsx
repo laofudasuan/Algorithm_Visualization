@@ -200,7 +200,7 @@ const GraphCanvas = forwardRef(({ width = 1000, height = 600, graphCount = 1, gr
             left: 0,
             width: '100%',
             height: '100%',
-            transition: 'transform 1s ease-out, opacity 1s ease-out',
+            transition: 'transform 0.5s ease-out, opacity 0.5s ease-out',
             zIndex: 1
           };
         

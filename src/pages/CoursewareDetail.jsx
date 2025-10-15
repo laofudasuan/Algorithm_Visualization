@@ -1,10 +1,11 @@
 import React, { useState, useEffect, lazy, Suspense, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import 'katex/dist/katex.min.css';
 import { headingComponents } from '../data/courseware/markdownConfig.jsx';
 const CoursewareDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [courseware, setCourseware] = useState(null);
   const [pageComponents, setPageComponents] = useState([]);
   const [pageAttributes, setPageAttributes] = useState([]);
@@ -15,6 +16,18 @@ const CoursewareDetail = () => {
   const [direction, setDirection] = useState('right'); // 'left' or 'right' to control animation direction
   const [showMainPage, setShowMainPage] = useState(true); // 控制显示主页还是子页面
   const contentRef = useRef(null);
+  
+  // 组件加载时隐藏Navbar
+  useEffect(() => {
+    // 添加类到body或html来隐藏Navbar
+    document.body.classList.add('hide-navbar');
+    
+    // 组件卸载时移除类
+    return () => {
+      document.body.classList.remove('hide-navbar');
+    };
+  }, []);
+  
   useEffect(() => {
     const loadCourseware = async () => {
       try {
@@ -100,6 +113,11 @@ const CoursewareDetail = () => {
     setCurrentPage(index);
   };
 
+  // 返回课件列表页面
+  const goBackToCoursewareList = () => {
+    navigate('/courseware');
+  };
+
   if (loading) {
     return (
       <motion.div 
@@ -125,6 +143,14 @@ const CoursewareDetail = () => {
       >
         <div className="text-center py-12 bg-gray-50 rounded-lg">
           <h3 className="text-xl font-bold mb-4">课件不存在或已被删除</h3>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={goBackToCoursewareList}
+            className="px-8 py-3 bg-primary text-white rounded-md text-lg font-medium hover:bg-primary/90 transition-all duration-300 shadow-lg"
+          >
+            返回课件列表
+          </motion.button>
         </div>
       </motion.div>
     );
@@ -148,15 +174,26 @@ const CoursewareDetail = () => {
             <span>创建时间: {courseware.createdAt || '未知'}</span>
           </div>
 
-          {/* 进入子页面按钮 */}
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={goToFirstPage}
-            className="px-10 py-4 bg-primary text-white rounded-md text-lg font-medium hover:bg-primary/90 transition-all duration-300 shadow-lg"
-          >
-            Start
-          </motion.button>
+          {/* 按钮组：Start按钮和返回按钮 */}
+          <div className="flex flex-wrap justify-center gap-4">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={goToFirstPage}
+              className="px-10 py-4 bg-primary text-white rounded-md text-lg font-medium hover:bg-primary/90 transition-all duration-300 shadow-lg"
+            >
+              Start
+            </motion.button>
+            
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={goBackToCoursewareList}
+              className="px-10 py-4 bg-gray-200 text-gray-800 rounded-md text-lg font-medium hover:bg-gray-300 transition-all duration-300 shadow-lg"
+            >
+              返回课件列表
+            </motion.button>
+          </div>
         </motion.div>
       </div>
     );
