@@ -16,30 +16,16 @@ const AnimateGraph = forwardRef(({
   // 本地状态管理绘图模式
   const [currentMode, setCurrentMode] = useState(initialMode);
   const [drawingTool, setDrawingTool] = useState('brush'); // 'brush' 或 'eraser'
-  const [isAnimating, setIsAnimating] = useState(false);
   const [showTools, setShowTools] = useState(false);// 工具栏是否展开
   
   // 切换模式函数 - 添加动画控制
   const toggleMode = () => {
-    setIsAnimating(true);
-    
     if (currentMode === 'none') {
-      // 开启绘图模式，先显示工具，再改变模式
-      setTimeout(() => {
-        setShowTools(true);
-        setTimeout(() => {
-          setCurrentMode('draw');
-          setIsAnimating(false);
-        }, 10);
-      }, 10);
+      setShowTools(true);
+      setCurrentMode('draw');
     } else {
-      // 关闭绘图模式，先隐藏工具（触发动画），再改变模式
       setShowTools(false);
-      // 等待动画完成后再改变模式
-      setTimeout(() => {
-        setCurrentMode('none');
-        setIsAnimating(false);
-      }, 1000); // 与动画持续时间一致
+      setCurrentMode('none');
     }
   };
   
@@ -57,7 +43,7 @@ const AnimateGraph = forwardRef(({
   
   // Refs for the canvas layers
   const refIndicator = useRef(null);
-  const refSvgContainer = useRef(null); // 用于放置SVG元素的容器
+  const refSvgContainer = useRef(null);
   const annotationToolRef = useRef(null);
   
   // Store the drawing tools instances
