@@ -57,9 +57,11 @@ const GraphCanvas = forwardRef(({ width = 1000, height = 600, graphCount = 1, gr
   
   // 当AnimateGraph组件初始化时，保存其控制器
   const handleGraphInit = (index, controller) => {
-    const newControllers = [...graphControllers];
-    newControllers[index] = controller;
-    setGraphControllers(newControllers);
+    setGraphControllers(prevControllers => {
+      const newControllers = [...prevControllers];
+      newControllers[index] = controller;
+      return newControllers;
+    });
   };
   
   // 切换当前显示的图索引

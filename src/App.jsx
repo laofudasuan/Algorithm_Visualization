@@ -11,6 +11,7 @@ const StringAlgorithms = lazy(() => import('./pages/StringAlgorithms'));
 const DynamicProgramming = lazy(() => import('./pages/DynamicProgramming'));
 const GraphVisualization = lazy(() => import('./pages/GraphVisualization'));
 const GraphVisualizationTools = lazy(() => import('./pages/GraphVisualizationTools'));
+const GraphVisualizationTest = lazy(() => import('./pages/GraphVisualizationTest'));
 const KnowledgeGraphPage = lazy(() => import('./pages/KnowledgeGraphPage'));
 const CoursewareList = lazy(() => import('./pages/CoursewareList'));
 const CoursewareDetail = lazy(() => import('./pages/CoursewareDetail'));
@@ -74,6 +75,7 @@ function App() {
           <Route path="/" element={<Home menuItems={menuItems} />} />
           <Route path="/graph-visualization" element={<GraphVisualization />} />
           <Route path="/graph-visualization-tools" element={<GraphVisualizationTools />} />
+          <Route path="/graph-visualization-test" element={<GraphVisualizationTest />} />
           <Route path="/dynamic-programming" element={<DynamicProgramming />} />
           <Route path="/basic-algorithms" element={<BasicAlgorithms />} />
           <Route path="/string-algorithms" element={<StringAlgorithms />} />
