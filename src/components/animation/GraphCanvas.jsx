@@ -7,8 +7,6 @@ import ExampleGraph from '../../data/graphs/ExampleGraph-500-300.json';
 const GraphCanvas = forwardRef(({ width = 1000, height = 600, graphCount = 1, graphNames = [], isLoading: externalIsLoading }, ref) => {
   // 状态
   const [currentGraphIndex, setCurrentGraphIndex] = useState(0);
-  const [prevGraphIndex, setPrevGraphIndex] = useState(0); // 跟踪上一个图的索引，用于动画方向
-  const [isAnimating, setIsAnimating] = useState(false); // 跟踪动画状态
   const [graphControllers, setGraphControllers] = useState([]);
   const [graphData, setGraphData] = useState([]);
   const [isInternalLoading, setIsInternalLoading] = useState(true); // 内部数据加载状态
@@ -67,14 +65,7 @@ const GraphCanvas = forwardRef(({ width = 1000, height = 600, graphCount = 1, gr
   // 切换当前显示的图索引
   const switchGraphIndex = (index) => {
     if (index >= 0 && index < graphCount && index !== currentGraphIndex) {
-      setIsAnimating(true);
-      setPrevGraphIndex(currentGraphIndex);
       setCurrentGraphIndex(index);
-      
-      // 动画完成后重置动画状态
-      setTimeout(() => {
-        setIsAnimating(false);
-      }, 1000); // 与CSS过渡时间匹配，改为1秒
     }
   };
   
@@ -207,38 +198,8 @@ const GraphCanvas = forwardRef(({ width = 1000, height = 600, graphCount = 1, gr
         // 当前显示的图
         if (index === currentGraphIndex) {
           style.zIndex = 3;
-          
-          // 如果正在动画中，根据方向设置初始位置
-          if (isAnimating) {
-            // 新图从上方或下方进入
-            if (index > prevGraphIndex) {
-              // 向下切换时，新图从上方进入
-              style.transform = 'translateY(0)';
-              style.opacity = 1;
-            } else {
-              // 向上切换时，新图从下方进入
-              style.transform = 'translateY(0)';
-              style.opacity = 1;
-            }
-          } else {
-            style.transform = 'translateY(0)';
-            style.opacity = 1;
-          }
-        }
-        // 上一个显示的图（用于动画）
-        else if (isAnimating && index === prevGraphIndex) {
-          style.zIndex = 2;
-          
-          // 根据方向设置退出动画
-          if (currentGraphIndex > prevGraphIndex) {
-            // 向下切换时，旧图向上退出
-            style.transform = 'translateY(-100%)';
-            style.opacity = 0;
-          } else {
-            // 向上切换时，旧图向下退出
-            style.transform = 'translateY(100%)';
-            style.opacity = 0;
-          }
+          style.transform = 'translateY(0)';
+          style.opacity = 1;
         }
         // 其他图
         else {

@@ -17,7 +17,7 @@ const AnimateGraph = forwardRef(({
   const [currentMode, setCurrentMode] = useState(initialMode);
   const [drawingTool, setDrawingTool] = useState('brush'); // 'brush' 或 'eraser'
   const [isAnimating, setIsAnimating] = useState(false);
-  const [showTools, setShowTools] = useState(false);
+  const [showTools, setShowTools] = useState(false);// 工具栏是否展开
   
   // 切换模式函数 - 添加动画控制
   const toggleMode = () => {
