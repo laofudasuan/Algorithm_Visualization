@@ -5,8 +5,6 @@
   "tags": ["交互式绘图", "物理仿真", "多种导出格式", "全屏模式"],
   "width": 1000,
   "height": 600,
-  "canvasWidth": "1200px",
-  "canvasHeight": "600px",
   "graphNames": [
     "ExampleGraph-1000-600",
     "ExampleGraph-500-300"

@@ -146,8 +146,8 @@ const GraphVisualizationDetail = () => {
             <div className="bg-transparent overflow-hidden mb-8">
               <div 
                 style={{ 
-                  width: visualization.canvasWidth || '100%', 
-                  height: visualization.canvasHeight || '600px', 
+                  width: visualization.width || '100%', 
+                  height: visualization.height || '600px', 
                   margin: '0 auto',
                   backgroundColor: 'transparent'
                 }}
