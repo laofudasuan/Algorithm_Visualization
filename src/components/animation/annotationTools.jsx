@@ -34,6 +34,22 @@ const AnnotationTool = forwardRef((props, ref) => {
           affectStroke: true,
           color: brushColor
         });
+        // 设置画笔光标样式
+        fabricCanvasRef.current.defaultCursor = 'crosshair';
+        fabricCanvasRef.current.cursor = 'crosshair';
+        // 确保canvas元素直接设置光标样式
+        const canvasEl = fabricCanvasRef.current.upperCanvasEl;
+        const wrapperEl = fabricCanvasRef.current.wrapperEl;
+        if (canvasEl) {
+          canvasEl.style.cursor = 'crosshair';
+        }
+        if (wrapperEl) {
+          wrapperEl.style.cursor = 'crosshair';
+        }
+      }
+      // 直接设置DOM元素样式
+      if (canvasRef.current) {
+        canvasRef.current.style.cursor = 'crosshair';
       }
     },
     disableDrawing: () => {
@@ -41,6 +57,22 @@ const AnnotationTool = forwardRef((props, ref) => {
       setIsErasing(false);
       if (fabricCanvasRef.current) {
         fabricCanvasRef.current.isDrawingMode = false;
+        // 恢复默认光标
+        fabricCanvasRef.current.defaultCursor = 'default';
+        fabricCanvasRef.current.cursor = 'default';
+        // 确保canvas元素恢复默认光标样式
+        const canvasEl = fabricCanvasRef.current.upperCanvasEl;
+        const wrapperEl = fabricCanvasRef.current.wrapperEl;
+        if (canvasEl) {
+          canvasEl.style.cursor = 'default';
+        }
+        if (wrapperEl) {
+          wrapperEl.style.cursor = 'default';
+        }
+      }
+      // 直接设置DOM元素样式
+      if (canvasRef.current) {
+        canvasRef.current.style.cursor = 'default';
       }
     },
     enableErasing: () => {
@@ -57,6 +89,20 @@ const AnnotationTool = forwardRef((props, ref) => {
         fabricCanvasRef.current.freeDrawingBrush = brush;
         // 添加橡皮擦光标视觉提示
         fabricCanvasRef.current.defaultCursor = 'url("data:image/svg+xml,%3Csvg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%23666666\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"%3E%3Cpath d=\"M18 13L5 5\"/%3E%3Cpath d=\"M14.5 5L21 11.5\"/%3E%3Cpath d=\"M9 9L3 3\"/%3E%3C/svg%3E") 12 12, crosshair';
+        fabricCanvasRef.current.cursor = 'crosshair';
+        // 确保canvas元素直接设置光标样式
+        const canvasEl = fabricCanvasRef.current.upperCanvasEl;
+        const wrapperEl = fabricCanvasRef.current.wrapperEl;
+        if (canvasEl) {
+          canvasEl.style.cursor = 'crosshair';
+        }
+        if (wrapperEl) {
+          wrapperEl.style.cursor = 'crosshair';
+        }
+      }
+      // 直接设置DOM元素样式
+      if (canvasRef.current) {
+        canvasRef.current.style.cursor = 'crosshair';
       }
     },
     clearAll: () => {

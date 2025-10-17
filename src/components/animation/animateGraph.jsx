@@ -1,6 +1,7 @@
 // animateGraph.jsx - 图的动画组件
 import { useRef, useState, useEffect, forwardRef, useImperativeHandle } from 'react';
-import { GraphRenderer, CanvasRenderer } from './drawingTools';
+import { GraphRenderer } from './GraphRenderer';
+import { CanvasRenderer } from './CanvasRenderer';
 import AnnotationTool from './annotationTools';
 
 const AnimateGraph = forwardRef(({
@@ -72,7 +73,6 @@ const AnimateGraph = forwardRef(({
     // 初始化CanvasRenderer用于指示器图层
     indicatorRendererRef.current = new CanvasRenderer(indicatorCanvas, width, height);
     
-    // 初始化GraphRenderer - 不再依赖canvas
     const graphRenderer = new GraphRenderer(width, height);
     
     // 获取SVG元素并添加到容器中
@@ -91,10 +91,8 @@ const AnimateGraph = forwardRef(({
     // 初始渲染
     renderGraph();
     
-    // Setup the controller interface
     const controller = getController();
     
-    // Call the onInit callback with the controller
     if (typeof onInit === 'function') {
       onInit(controller);
     }
@@ -115,17 +113,57 @@ const AnimateGraph = forwardRef(({
       if (graphRendererRef.current) {
         graphRendererRef.current.clearAnimations?.();
       }
+      
+      // 销毁CanvasRenderer实例，释放资源
+      if (indicatorRendererRef.current) {
+        indicatorRendererRef.current.dispose();
+        indicatorRendererRef.current = null;
+      }
     };
   }, []);
   
-  // Render the graph on the main canvas - 仅用于重新画整张图
+  // 重新画整张图
   const renderGraph = () => {
     // 获取GraphRenderer实例
     const graphRenderer = graphRendererRef.current;
     if (!graphRenderer) return;
     
-    // 使用GraphRenderer更新图数据并渲染
-    graphRenderer.updateGraph(currentNodesRef.current, currentEdgesRef.current);
+    // 使用GraphRenderer分别渲染节点和边
+    renderNodes();
+    renderEdges();
+  };
+  
+  // 渲染所有节点
+  const renderNodes = () => {
+    // 获取GraphRenderer实例
+    const graphRenderer = graphRendererRef.current;
+    if (!graphRenderer) return;
+    
+    graphRenderer.clearAllNodes();
+    
+    // 创建或更新节点
+    currentNodesRef.current.forEach(node => {
+        graphRenderer.createNodeElement(node.id, node);
+    });
+  };
+  
+  // 渲染所有边
+  const renderEdges = () => {
+    // 获取GraphRenderer实例
+    const graphRenderer = graphRendererRef.current;
+    if (!graphRenderer) return;
+    
+    graphRenderer.clearAllEdges();
+    
+    // 创建或更新边
+    currentEdgesRef.current.forEach(edge => {
+      const sourceNode = currentNodesRef.current.find(n => n.id === edge.source);
+      const targetNode = currentNodesRef.current.find(n => n.id === edge.target);
+      
+      if (sourceNode && targetNode) {
+        graphRenderer.createEdgeElement(edge.id, sourceNode, targetNode, edge.style, edge.label);
+      }
+    });
   };
   
   // 控制器接口函数
@@ -141,29 +179,6 @@ const AnimateGraph = forwardRef(({
       return currentMode;
     },
     
-    setNodes: (newNodes) => {
-      // 更新节点
-      currentNodesRef.current = [...newNodes];
-      
-      // 获取GraphRenderer实例
-      const graphRenderer = graphRendererRef.current;
-      if (graphRenderer) {
-        // 使用updateGraph方法更新整个图
-        graphRenderer.updateGraph(currentNodesRef.current, currentEdgesRef.current);
-      }
-    },
-    
-    setEdges: (newEdges) => {
-      // 更新边
-      currentEdgesRef.current = [...newEdges];
-      
-      // 获取GraphRenderer实例
-      const graphRenderer = graphRendererRef.current;
-      if (graphRenderer) {
-        // 使用updateGraph方法更新整个图
-        graphRenderer.updateGraph(currentNodesRef.current, currentEdgesRef.current);
-      }
-    },
     
     setNodesStyle: (style) => {
       // 更新节点样式
@@ -207,194 +222,242 @@ const AnimateGraph = forwardRef(({
       }
     },
     
-    updateNode: (nodeId, updates) => {
+    updateNode: (node) => {
       // 找到节点并更新
-      const nodeIndex = currentNodesRef.current.findIndex(n => n.id === nodeId);
-      if (nodeIndex !== -1) {
-        // 合并样式更新
-        if (updates.style) {
-          currentNodesRef.current[nodeIndex] = {
-            ...currentNodesRef.current[nodeIndex],
-            ...updates,
-            style: {
-              ...currentNodesRef.current[nodeIndex].style,
-              ...updates.style
-            }
-          };
-        } else {
-          currentNodesRef.current[nodeIndex] = { ...currentNodesRef.current[nodeIndex], ...updates };
-        }
-        
-        // 获取GraphRenderer实例
-        const graphRenderer = graphRendererRef.current;
-        if (graphRenderer) {
-          // 使用updateGraph方法更新整个图
-          graphRenderer.updateGraph(currentNodesRef.current, currentEdgesRef.current);
-        }
+      const nodeIndex = currentNodesRef.current.findIndex(n => n.id === node.id);
+      if (nodeIndex === -1) {
+        console.warn(`Warning: Cannot update node with id ${node.id}, node not found.`);
+        return;
+      }
+      
+      // 获取旧节点
+      const oldNode = currentNodesRef.current[nodeIndex];
+      // 合并属性，只有传入的节点中存在的属性才会更新
+      const updatedNode = {...oldNode, ...node};
+      // 特殊处理style属性，确保嵌套合并
+      if (node.style && oldNode.style) {
+        updatedNode.style = {...oldNode.style, ...node.style};
+      }
+      
+      // 更新节点引用
+      currentNodesRef.current[nodeIndex] = updatedNode;
+      
+      // 获取GraphRenderer实例
+      const graphRenderer = graphRendererRef.current;
+      if (graphRenderer) {
+        graphRenderer.updateNodeElement(node.id, updatedNode);
       }
     },
     
-    updateEdge: (edgeId, updates) => {
+    updateEdge: (edge) => {
       // 找到边并更新
-      const edgeIndex = currentEdgesRef.current.findIndex(e => e.id === edgeId);
-      if (edgeIndex !== -1) {
-        // 合并样式更新
-        if (updates.style) {
-          currentEdgesRef.current[edgeIndex] = {
-            ...currentEdgesRef.current[edgeIndex],
-            ...updates,
-            style: {
-              ...currentEdgesRef.current[edgeIndex].style,
-              ...updates.style
-            }
-          };
-        } else {
-          currentEdgesRef.current[edgeIndex] = { ...currentEdgesRef.current[edgeIndex], ...updates };
-        }
+      const edgeIndex = currentEdgesRef.current.findIndex(e => e.id === edge.id);
+      if (edgeIndex === -1) {
+        console.warn(`Warning: Cannot update edge with id ${edge.id}, edge not found.`);
+        return;
+      }
+      
+      // 获取旧边
+      const oldEdge = currentEdgesRef.current[edgeIndex];
+      // 合并属性，只有传入的边中存在的属性才会更新
+      const updatedEdge = {...oldEdge, ...edge};
+      // 特殊处理style属性，确保嵌套合并
+      if (edge.style && oldEdge.style) {
+        updatedEdge.style = {...oldEdge.style, ...edge.style};
+      }
+      
+      // 更新边引用
+      currentEdgesRef.current[edgeIndex] = updatedEdge;
+      
+      // 获取GraphRenderer实例
+      const graphRenderer = graphRendererRef.current;
+      if (graphRenderer) {
+        // 更新单个边
+        const sourceNode = currentNodesRef.current.find(n => n.id === updatedEdge.source);
+        const targetNode = currentNodesRef.current.find(n => n.id === updatedEdge.target);
         
-        // 获取GraphRenderer实例
-        const graphRenderer = graphRendererRef.current;
-        if (graphRenderer) {
-          // 使用updateGraph方法更新整个图
-          graphRenderer.updateGraph(currentNodesRef.current, currentEdgesRef.current);
+        if (sourceNode && targetNode) {
+          graphRenderer.updateEdgePosition(updatedEdge.id, sourceNode, targetNode, updatedEdge.label);
         }
       }
     },
     
     addNode: (node) => {
-      // 添加新节点
-      currentNodesRef.current.push(node);
+      // 检查节点ID是否已存在
+      if (currentNodesRef.current.some(n => n.id === node.id)) {
+        alert(`节点 ID "${node.id}" 已存在`);
+        return;
+      }
       
-      // 获取GraphRenderer实例
+      currentNodesRef.current.push(node);
       const graphRenderer = graphRendererRef.current;
       if (graphRenderer) {
-        // 使用updateGraph方法更新整个图
-        graphRenderer.updateGraph(currentNodesRef.current, currentEdgesRef.current);
+        graphRenderer.createNodeElement(node.id, node);
       }
     },
     
-    addEdge: (source, target, properties = {}) => {
+    addEdge: (edge) => {
       // 添加新边
       const newEdge = {
-        id: `edge-${Date.now()}`, // 生成唯一ID
-        source,
-        target,
-        ...properties
+        id: edge.id || `edge-${Date.now()}`, // 使用提供的ID或生成唯一ID
+        source: edge.source,
+        target: edge.target,
+        ...edge
       };
+      
+      // 检查边ID是否已存在
+      if (currentEdgesRef.current.some(e => e.id === newEdge.id)) {
+        alert(`边 ID "${newEdge.id}" 已存在`);
+        return;
+      }
       
       currentEdgesRef.current.push(newEdge);
       
       // 获取GraphRenderer实例
       const graphRenderer = graphRendererRef.current;
       if (graphRenderer) {
-        // 使用updateGraph方法更新整个图
-        graphRenderer.updateGraph(currentNodesRef.current, currentEdgesRef.current);
+        // 添加单个边
+        const sourceNode = currentNodesRef.current.find(n => n.id === edge.source);
+        const targetNode = currentNodesRef.current.find(n => n.id === edge.target);
+        
+        if (sourceNode && targetNode) {
+          graphRenderer.createEdgeElement(newEdge.id, sourceNode, targetNode, newEdge.style, newEdge.label);
+        }
+      }
+    },
+    
+    deleteNode: (nodeId) => {
+      // 检查节点是否存在
+      const nodeExists = currentNodesRef.current.some(n => n.id === nodeId);
+      if (!nodeExists) {
+        console.warn(`Warning: Cannot delete node with id ${nodeId}, node not found.`);
+        return;
+      }
+      
+      // 从节点数组中移除节点
+      currentNodesRef.current = currentNodesRef.current.filter(n => n.id !== nodeId);
+      
+      // 获取GraphRenderer实例
+      const graphRenderer = graphRendererRef.current;
+      if (graphRenderer) {
+        // 删除单个节点
+        graphRenderer.removeNodeElement(nodeId);
+      }
+    },
+    
+    deleteEdge: (edgeId) => {
+      // 检查边是否存在
+      const edgeExists = currentEdgesRef.current.some(e => e.id === edgeId);
+      if (!edgeExists) {
+        console.warn(`Warning: Cannot delete edge with id ${edgeId}, edge not found.`);
+        return;
+      }
+      
+      // 从边数组中移除边
+      currentEdgesRef.current = currentEdgesRef.current.filter(e => e.id !== edgeId);
+      
+      // 获取GraphRenderer实例
+      const graphRenderer = graphRendererRef.current;
+      if (graphRenderer) {
+        // 删除单个边
+        graphRenderer.removeEdgeElement(edgeId);
       }
     },
     
     clearIndicators: () => {
-      // 清除所有指示器
-      const ctx = refIndicator.current.getContext('2d');
-      ctx.clearRect(0, 0, width, height);
-      indicatorsRef.current.clear();
-      
-      // 清除所有脉冲动画定时器
-      if (typeof indicatorIntervalsRef !== 'undefined' && indicatorIntervalsRef.current) {
-        indicatorIntervalsRef.current.forEach(interval => clearInterval(interval));
-        indicatorIntervalsRef.current = [];
+      // 控制逻辑：委托给CanvasRenderer清除所有指示器
+      if (indicatorRendererRef.current) {
+        indicatorRendererRef.current.clearIndicators();
       }
+      
+      // 清除指示器信息
+      indicatorsRef.current.clear();
     },
     
-    addIndicator: (type, position, properties = {}) => {
-      // 添加指示器
-      const ctx = refIndicator.current.getContext('2d');
-      const indicatorId = Date.now().toString();
+    addIndicator: (options) => {
+      // 控制逻辑：创建指示器并委托给CanvasRenderer进行渲染
+      // 支持格式：{id, type, target, position, color, size, duration}
       
-      // 保存当前状态
-      ctx.save();
+      // 如果没有id，则生成一个
+      const indicatorId = options.id || Date.now().toString();
       
-      // 绘制指示器
-      if (type === 'highlight') {
-        ctx.beginPath();
-        ctx.arc(position.x, position.y, properties.radius || 30, 0, Math.PI * 2);
-        ctx.strokeStyle = properties.color || '#ffeb3b';
-        ctx.lineWidth = properties.lineWidth || 3;
-        ctx.stroke();
+      // 获取位置信息
+      let position;
+      if (options.position) {
+        // 如果直接提供了位置
+        position = options.position;
+      } else if (options.target) {
+        // 如果提供了目标节点ID，则查找该节点的位置
+        const targetNode = currentNodesRef.current.find(node => node.id === options.target);
+        if (!targetNode) {
+          console.warn(`Warning: Target node with id ${options.target} not found.`);
+          return;
+        }
+        position = { x: targetNode.x, y: targetNode.y };
+      } else {
+        console.warn('Warning: No position or target provided for indicator.');
+        return;
       }
       
-      // 恢复状态
-      ctx.restore();
+      const radius = options.size || options.radius || 30;
+      const color = options.color || '#ffeb3b';
       
-      // 如果需要脉冲动画，这里可以实现
-      if (properties.pulseDuration) {
-        // 注意：直接在canvas上实现脉冲效果
-        const defaults = {
-          color: properties.color || '#ffeb3b',
-          radius: properties.radius || 30,
-          pulseDuration: properties.pulseDuration
-        };
-        
-        const pulseInterval = setInterval(() => {
-          // 清除并重新绘制所有指示器和脉冲
-          const clearCtx = refIndicator.current.getContext('2d');
-          clearCtx.clearRect(0, 0, width, height);
+      // 根据类型调用CanvasRenderer的不同方法
+      if (indicatorRendererRef.current) {
+        if (options.type === 'highlight') {
+          indicatorRendererRef.current.addHighlightIndicator(
+            indicatorId, 
+            position.x, 
+            position.y, 
+            radius, 
+            color, 
+            options.lineWidth || 3
+          );
+        } else if (options.type === 'pulse') {
+          // 脉冲类型使用fabric.js实现
+          const duration = options.duration || 3000;
+          indicatorRendererRef.current.addPulseIndicator(
+            indicatorId, 
+            position.x, 
+            position.y, 
+            radius, 
+            color, 
+            duration
+          );
           
-          // 重新绘制所有指示器
-          indicatorsRef.current.forEach(({ type, position, properties }) => {
-            if (type === 'highlight') {
-              clearCtx.beginPath();
-              clearCtx.arc(position.x, position.y, properties.radius || 30, 0, Math.PI * 2);
-              clearCtx.strokeStyle = properties.color || '#ffeb3b';
-              clearCtx.lineWidth = properties.lineWidth || 3;
-              clearCtx.stroke();
-            }
-          });
-          
-          // 绘制脉冲
-          clearCtx.fillStyle = defaults.color;
-          clearCtx.globalAlpha = 0.3;
-          clearCtx.beginPath();
-          clearCtx.arc(position.x, position.y, defaults.radius * 1.5, 0, Math.PI * 2);
-          clearCtx.fill();
-        }, defaults.pulseDuration / 2);
-        
-        // 保存定时器ID以便后续清除
-        indicatorIntervalsRef.current.push(pulseInterval);
-        
-        // 设置超时后清除脉冲动画
-        setTimeout(() => {
-          clearInterval(pulseInterval);
-          const index = indicatorIntervalsRef.current.indexOf(pulseInterval);
-          if (index !== -1) {
-            indicatorIntervalsRef.current.splice(index, 1);
+          // 如果设置了持续时间，自动移除
+          if (duration > 0 && duration !== Infinity) {
+            setTimeout(() => {
+              removeIndicator(indicatorId);
+            }, duration * 3); // 播放3次动画后移除
           }
-          // 重新绘制所有指示器，不包括当前脉冲
-          removeIndicator(indicatorId);
-        }, defaults.pulseDuration * 3);
+        }
       }
       
       // 存储指示器信息
-      indicatorsRef.current.set(indicatorId, { type, position, properties });
+      indicatorsRef.current.set(indicatorId, {
+        id: indicatorId,
+        type: options.type,
+        target: options.target,
+        position: position,
+        properties: {
+          color: color,
+          radius: radius,
+          duration: options.duration
+        }
+      });
       
       return indicatorId;
     },
     
     removeIndicator: (indicatorId) => {
-      // 移除指示器
-      indicatorsRef.current.delete(indicatorId);
-      // 重新绘制所有指示器
-      const ctx = refIndicator.current.getContext('2d');
-      ctx.clearRect(0, 0, width, height);
+      // 控制逻辑：委托给CanvasRenderer移除指示器
+      if (indicatorRendererRef.current) {
+        indicatorRendererRef.current.removeIndicator(indicatorId);
+      }
       
-      indicatorsRef.current.forEach(({ type, position, properties }) => {
-        if (type === 'highlight') {
-          ctx.beginPath();
-          ctx.arc(position.x, position.y, properties.radius || 30, 0, Math.PI * 2);
-          ctx.strokeStyle = properties.color || '#ffeb3b';
-          ctx.lineWidth = properties.lineWidth || 3;
-          ctx.stroke();
-        }
-      });
+      // 移除指示器信息
+      indicatorsRef.current.delete(indicatorId);
     },
     
     redrawGraph: () => {
@@ -443,7 +506,7 @@ const AnimateGraph = forwardRef(({
         }}
       />
       
-      {/* 注释工具组件 - 确保在最上层 */}
+      {/* 注释工具组件 - 确保在合适的层级，不覆盖工具栏 */}
       <AnnotationTool
         ref={annotationToolRef}
         width={width}
@@ -451,7 +514,11 @@ const AnimateGraph = forwardRef(({
         visible={currentMode === 'draw'}
         style={{
           backgroundColor: 'transparent',
-          zIndex: 2// 画图图层在最上方
+          zIndex: 2, // 画图图层在图和指示器之上，但低于工具栏
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          pointerEvents: currentMode === 'draw' ? 'auto' : 'none'
         }}
       />
       

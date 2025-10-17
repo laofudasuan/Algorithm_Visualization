@@ -75,32 +75,46 @@ const GraphCanvas = forwardRef(({ width = 1000, height = 600, graphCount = 1, gr
   const modifyCurrentGraph = (modifications) => {
     const currentController = graphControllers[currentGraphIndex];
     if (currentController) {
-      // 根据传入的修改类型调用不同的方法
-      if (modifications.nodes) {
-        modifications.nodes.forEach(node => {
-          if (node.id) {
-            currentController.updateNode(node.id, node);
-          } else {
-            currentController.addNode(node);
-          }
+      // 处理节点操作
+      if (modifications.addNode) {
+        modifications.addNode.forEach(node => {
+          currentController.addNode(node);
         });
       }
       
-      if (modifications.edges) {
-        modifications.edges.forEach(edge => {
-          if (edge.id) {
-            currentController.updateEdge(edge.id, edge);
-          } else {
-            currentController.addEdge(edge.source, edge.target, edge);
-          }
+      if (modifications.updateNode) {
+        modifications.updateNode.forEach(node => {
+          currentController.updateNode(node);
         });
       }
       
-      if (modifications.layout) {
-        currentController.applyLayout(modifications.layout);
+      if (modifications.deleteNode) {
+        modifications.deleteNode.forEach(nodeId => {
+          // 这里需要在 AnimateGraph 中实现删除节点的方法
+          console.warn('deleteNode operation not yet implemented');
+        });
       }
       
-      // 处理样式修改
+      // 处理边操作
+      if (modifications.addEdge) {
+        modifications.addEdge.forEach(edge => {
+          currentController.addEdge(edge);
+        });
+      }
+      
+      if (modifications.updateEdge) {
+        modifications.updateEdge.forEach(edge => {
+            currentController.updateEdge(edge);
+        });
+      }
+      
+      if (modifications.deleteEdge) {
+        modifications.deleteEdge.forEach(edgeId => {
+          // 这里需要在 AnimateGraph 中实现删除边的方法
+          console.warn('deleteEdge operation not yet implemented');
+        });
+      }
+
       if (modifications.nodesStyle) {
         currentController.setNodesStyle(modifications.nodesStyle);
       }
@@ -139,16 +153,16 @@ const GraphCanvas = forwardRef(({ width = 1000, height = 600, graphCount = 1, gr
   // 只在数据加载完成后渲染图表内容
   // 当graphData.length > 0时才渲染内容，确保有数据可用
   if (isLoading || graphData.length === 0) {
-    return <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}></div>;
+    return <div style={{ position: 'relative', width, height, overflow: 'hidden' }}></div>;
   }
   
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}>
+    <div style={{ position: 'relative', width, height, overflow: 'hidden' }}>
       {/* 图切换指示器 */}
       <div style={{
         position: 'absolute',
         top: '5px',
-        left: `${width+5}px`, // 根据width计算右侧位置，确保紧贴画布右侧
+        right: '5px', // 放置在右侧内部，而不是外部
         zIndex: 1000,
         display: 'flex',
         flexDirection: 'column',
