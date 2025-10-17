@@ -43,107 +43,72 @@ const GraphCanvas = forwardRef(({ width = 1000, height = 600, graphCount = 1, gr
       }
       
       setGraphData(data);
+      setIsInternalLoading(false); // 数据加载完成
     };
     
     loadGraphData();
-    }, []); // 空依赖数组，只在组件挂载时执行一次
-    
-    // 当graphData更新时，检查是否所有数据都已加载完成
-    useEffect(() => {
-      if (graphData.length === graphCount && graphData.length > 0) {
-        setIsInternalLoading(false);
-      }
-    }, [graphData, graphCount]);
+  }, []); // 空依赖数组，只在组件挂载时执行一次
   
-  // 当AnimateGraph组件初始化时，保存其控制器
+  // 当graphData更新时，检查是否所有数据都已加载完成
+  useEffect(() => {
+    // 只有当所有图数据都已加载（graphData数组长度等于graphCount）
+    // 并且组件已经不再处于内部加载状态时，才将isInternalLoading设置为false
+    if (graphData.length === graphCount && isInternalLoading) {
+      setIsInternalLoading(false);
+    }
+  }, [graphData, graphCount, isInternalLoading]);
+
+  // 处理图的初始化
   const handleGraphInit = (index, controller) => {
+    // 使用函数式状态更新，确保基于最新的状态进行操作，避免异步更新导致的数据覆盖
     setGraphControllers(prevControllers => {
+      // 创建一个新的控制器数组副本，避免直接修改状态
       const newControllers = [...prevControllers];
+      // 更新指定索引处的控制器
       newControllers[index] = controller;
+      // 返回更新后的新数组
       return newControllers;
     });
   };
   
-  // 切换当前显示的图索引
+  // 切换图索引
   const switchGraphIndex = (index) => {
-    if (index >= 0 && index < graphCount && index !== currentGraphIndex) {
+    if (index >= 0 && index < graphCount) {
       setCurrentGraphIndex(index);
     }
   };
   
-  // 修改当前图，调用AnimateGraph的主图层修改函数
-  const modifyCurrentGraph = (modifications) => {
+  // 调度函数 - 根据操作类型调用相应的处理函数
+  const dispatchOperation = (operationType, operationData) => {
     const currentController = graphControllers[currentGraphIndex];
-    if (currentController) {
-      // 处理节点操作
-      if (modifications.addNode) {
-        modifications.addNode.forEach(node => {
-          currentController.addNode(node);
-        });
-      }
-      
-      if (modifications.updateNode) {
-        modifications.updateNode.forEach(node => {
-          currentController.updateNode(node);
-        });
-      }
-      
-      if (modifications.deleteNode) {
-        modifications.deleteNode.forEach(nodeId => {
-          // 这里需要在 AnimateGraph 中实现删除节点的方法
-          console.warn('deleteNode operation not yet implemented');
-        });
-      }
-      
-      // 处理边操作
-      if (modifications.addEdge) {
-        modifications.addEdge.forEach(edge => {
-          currentController.addEdge(edge);
-        });
-      }
-      
-      if (modifications.updateEdge) {
-        modifications.updateEdge.forEach(edge => {
-            currentController.updateEdge(edge);
-        });
-      }
-      
-      if (modifications.deleteEdge) {
-        modifications.deleteEdge.forEach(edgeId => {
-          // 这里需要在 AnimateGraph 中实现删除边的方法
-          console.warn('deleteEdge operation not yet implemented');
-        });
-      }
+    if (!currentController) return;
 
-      if (modifications.nodesStyle) {
-        currentController.setNodesStyle(modifications.nodesStyle);
-      }
-      
-      if (modifications.edgesStyle) {
-        currentController.setEdgesStyle(modifications.edgesStyle);
-      }
+    // 映射操作类型到相应的处理方法
+    const operationHandlers = {
+      'addNode': 'handleAddNode',
+      'updateNode': 'handleUpdateNode',
+      'deleteNode': 'handleDeleteNode',
+      'addEdge': 'handleAddEdge',
+      'updateEdge': 'handleUpdateEdge',
+      'deleteEdge': 'handleDeleteEdge',
+      'nodesStyle': 'handleNodesStyle',
+      'edgesStyle': 'handleEdgesStyle',
+      'highlight': 'handleHighlight',
+      'addIndicator': 'handleAddIndicator',
+      'removeIndicator': 'handleRemoveIndicator'
+    };
+
+    const handlerMethod = operationHandlers[operationType];
+    if (handlerMethod && typeof currentController[handlerMethod] === 'function') {
+      currentController[handlerMethod](operationData);
+    } else {
+      console.warn(`Unsupported operation type: ${operationType}`);
     }
   };
-  
-  // 增加指示，调用AnimateGraph的临时指示器修改函数
-  const addIndicator = (indicator) => {
-    const currentController = graphControllers[currentGraphIndex];
-    if (currentController) {
-      currentController.addIndicator(indicator);
-      
-      // 如果设置了持续时间，自动移除
-      if (indicator.duration) {
-        setTimeout(() => {
-          currentController.removeIndicator(indicator.id);
-        }, indicator.duration);
-      }
-    }
-  };
-  
+
   // 暴露方法给父组件
   useImperativeHandle(ref, () => ({
-    modifyCurrentGraph,
-    addIndicator,
+    dispatchOperation,
     switchGraphIndex,
     getCurrentGraphIndex: () => currentGraphIndex,
     getGraphCount: () => graphCount,
@@ -151,18 +116,27 @@ const GraphCanvas = forwardRef(({ width = 1000, height = 600, graphCount = 1, gr
   }), [currentGraphIndex, graphCount, graphControllers, isLoading]);
   
   // 只在数据加载完成后渲染图表内容
-  // 当graphData.length > 0时才渲染内容，确保有数据可用
+  // 如果组件仍在加载状态，则不渲染图表内容
   if (isLoading || graphData.length === 0) {
-    return <div style={{ position: 'relative', width, height, overflow: 'hidden' }}></div>;
+    // 可以返回一个加载中的提示
+    return <div style={{ width, height, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading...</div>;
   }
   
   return (
-    <div style={{ position: 'relative', width, height, overflow: 'hidden' }}>
+    <div 
+      style={{ 
+        width, 
+        height, 
+        position: 'relative',
+        overflow: 'hidden',
+        border: '1px solid #ccc' 
+      }}
+    >
       {/* 图切换指示器 */}
       <div style={{
         position: 'absolute',
         top: '5px',
-        right: '5px', // 放置在右侧内部，而不是外部
+        right: '5px',
         zIndex: 1000,
         display: 'flex',
         flexDirection: 'column',
@@ -194,32 +168,19 @@ const GraphCanvas = forwardRef(({ width = 1000, height = 600, graphCount = 1, gr
           </button>
         ))}
       </div>
-      
-      {/* 渲染所有图，添加滑动动画效果 */}
-      {Array.from({ length: graphCount }).map((_, index) => {
-        // 现在可以安全地使用graphData，因为我们确保只有在数据加载完成后才渲染这部分
-        const graph = graphData[index];
+      {graphData.map((graph, index) => {
+        // 计算图的样式
+        const style = {
+          position: 'absolute',
+          width: '100%',
+          height: '100%',
+          transition: 'opacity 0.3s ease, transform 0.3s ease',
+          opacity: index === currentGraphIndex ? 1 : 0,
+          zIndex: index === currentGraphIndex ? 1 : 0
+        };
         
-        // 计算每个图的样式
-          let style = {
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            transition: 'transform 0.5s ease-out, opacity 0.5s ease-out',
-            zIndex: 1
-          };
-        
-        // 当前显示的图
-        if (index === currentGraphIndex) {
-          style.zIndex = 3;
-          style.transform = 'translateY(0)';
-          style.opacity = 1;
-        }
-        // 其他图
-        else {
-          // 根据与当前图的位置关系设置初始位置
+        // 如果不是当前显示的图，将其移动到画布外
+        if (index !== currentGraphIndex) {
           if (index > currentGraphIndex) {
             // 下面的图放在画布下方
             style.transform = 'translateY(100%)';
@@ -227,7 +188,6 @@ const GraphCanvas = forwardRef(({ width = 1000, height = 600, graphCount = 1, gr
             // 上面的图放在画布上方
             style.transform = 'translateY(-100%)';
           }
-          style.opacity = 0;
         }
         
         return (
@@ -236,8 +196,7 @@ const GraphCanvas = forwardRef(({ width = 1000, height = 600, graphCount = 1, gr
             style={style}
           >
             <AnimateGraph
-              ref={el =>
-                 animateGraphRefs.current[index] = el}
+              ref={el => animateGraphRefs.current[index] = el}
               width={width}
               height={height}
               nodes={graph.nodes}

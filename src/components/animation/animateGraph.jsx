@@ -400,7 +400,7 @@ const AnimateGraph = forwardRef(({
       }
       
       const radius = options.size || options.radius || 30;
-      const color = options.color || '#ffeb3b';
+      const color = options.color || '#ff0000ff';
       
       // 根据类型调用CanvasRenderer的不同方法
       if (indicatorRendererRef.current) {
@@ -414,23 +414,17 @@ const AnimateGraph = forwardRef(({
             options.lineWidth || 3
           );
         } else if (options.type === 'pulse') {
-          // 脉冲类型使用fabric.js实现
           const duration = options.duration || 3000;
+          const repeatCount = options.repeatCount !== undefined ? options.repeatCount : 3;
           indicatorRendererRef.current.addPulseIndicator(
             indicatorId, 
             position.x, 
             position.y, 
             radius, 
             color, 
-            duration
+            duration,
+            repeatCount
           );
-          
-          // 如果设置了持续时间，自动移除
-          if (duration > 0 && duration !== Infinity) {
-            setTimeout(() => {
-              removeIndicator(indicatorId);
-            }, duration * 3); // 播放3次动画后移除
-          }
         }
       }
       
@@ -463,6 +457,107 @@ const AnimateGraph = forwardRef(({
     redrawGraph: () => {
       // 强制重新绘制整个图
       renderGraph();
+    },
+    
+    // 批量处理函数 - 处理节点相关操作
+    handleAddNode: (nodes) => {
+      if (Array.isArray(nodes)) {
+        nodes.forEach(node => {
+          getController().addNode(node);
+        });
+      }
+    },
+    
+    handleUpdateNode: (nodes) => {
+      if (Array.isArray(nodes)) {
+        nodes.forEach(node => {
+          getController().updateNode(node);
+        });
+      }
+    },
+    
+    handleDeleteNode: (nodeIds) => {
+      if (Array.isArray(nodeIds)) {
+        nodeIds.forEach(nodeId => {
+          getController().deleteNode(nodeId);
+        });
+      }
+    },
+    
+    // 批量处理函数 - 处理边相关操作
+    handleAddEdge: (edges) => {
+      if (Array.isArray(edges)) {
+        edges.forEach(edge => {
+          getController().addEdge(edge);
+        });
+      }
+    },
+    
+    handleUpdateEdge: (edges) => {
+      if (Array.isArray(edges)) {
+        edges.forEach(edge => {
+          getController().updateEdge(edge);
+        });
+      }
+    },
+    
+    handleDeleteEdge: (edgeIds) => {
+      if (Array.isArray(edgeIds)) {
+        edgeIds.forEach(edgeId => {
+          getController().deleteEdge(edgeId);
+        });
+      }
+    },
+    
+    // 批量处理函数 - 处理样式相关操作
+    handleNodesStyle: (style) => {
+      getController().setNodesStyle(style);
+    },
+    
+    handleEdgesStyle: (style) => {
+      getController().setEdgesStyle(style);
+    },
+    
+    // 处理高亮操作
+    handleHighlight: (highlightData) => {
+      if (highlightData) {
+        // 清除所有现有指示器
+        getController().clearIndicators();
+        
+        // 如果模式是highlight并且有节点需要高亮
+        if (highlightData.mode === 'highlight' && highlightData.nodes && highlightData.nodes.length > 0) {
+          // 为每个节点添加高亮指示器
+          highlightData.nodes.forEach(nodeId => {
+            getController().addIndicator({
+              id: `highlight-${nodeId}`,
+              type: 'highlight',
+              target: nodeId,
+              color: '#ff0000',
+              size: 40
+            });
+          });
+        }
+      }
+    },
+    
+    // 处理指示器操作
+    handleAddIndicator: (indicator) => {
+      if (indicator) {
+        const indicatorId = getController().addIndicator(indicator);
+        
+        // 如果设置了持续时间，自动移除
+        if (indicator.duration && indicatorId) {
+          setTimeout(() => {
+            getController().removeIndicator(indicatorId);
+          }, indicator.duration);
+        }
+      }
+    },
+    
+    handleRemoveIndicator: (indicatorId) => {
+      if (indicatorId) {
+        getController().removeIndicator(indicatorId);
+      }
     }
   });
   

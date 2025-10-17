@@ -1,56 +1,50 @@
-import { motion, AnimatePresence } from 'framer-motion'
-import { Link, useNavigate } from 'react-router-dom'
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 
-const GraphVisualization = () => {
-  const [visualizations, setVisualizations] = useState([])
-  const [loading, setLoading] = useState(true)
-  const navigate = useNavigate()
-  
-  // 自动搜索并加载图算法可视化文件
+const GraphVisualizationList = () => {
+  const [visualizations, setVisualizations] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
   useEffect(() => {
+    // 使用动态导入来获取目录中的JSON文件信息
     const loadVisualizations = async () => {
       try {
-        setLoading(true)
+        setLoading(true);
         
-        // 使用动态导入来获取目录中的文件信息
-        // 注意：在实际生产环境中，这可能需要构建工具的支持或后端API
-        // 这里我们模拟获取已知的文件列表
-        const visualizationFiles = [
-          {
-            name: 'GraphVisualizationTools',
-            displayName: '图可视化工具',
-            description: '使用交互式图可视化工具创建和探索图形数据。支持自定义节点大小、物理仿真参数调整、导出为PNG和SVG等功能。',
-            tags: ['交互式绘图', '物理仿真', '多种导出格式', '全屏模式'],
-            path: '/graph-visualization-tools'
-          },
-          {
-            name: 'GraphVisualizationTest',
-            displayName: '图可视化测试',
-            description: '测试图可视化组件的各种功能，包括动态添加节点、边、修改样式和添加视觉指示器等。',
-            tags: ['功能测试', '动态更新', '交互演示'],
-            path: '/graph-visualization-test'
-          }
-        ]
+        // 使用Vite的import.meta.globEager来静态分析和导入所有json文件
+        const jsonFiles = import.meta.glob('/src/data/graph_visualizations/*.json', { eager: true });
+        
+        // 处理每个json文件，提取配置信息
+        const visualizationData = Object.entries(jsonFiles).map(([filepath, module]) => {
+          // 从文件路径中提取ID
+          const id = filepath.split('/').pop().replace('.json', '');
+          
+          return {
+            id,
+            ...module.default
+          };
+        });
         
         // 模拟加载延迟
-        await new Promise(resolve => setTimeout(resolve, 500))
+        await new Promise(resolve => setTimeout(resolve, 500));
         
-        setVisualizations(visualizationFiles)
+        setVisualizations(visualizationData);
       } catch (error) {
-        console.error('加载可视化文件失败:', error)
+        console.error('加载可视化文件失败:', error);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
     
-    loadVisualizations()
-  }, [])
+    loadVisualizations();
+  }, []);
   
-  // 导航到指定的可视化页面
-  const navigateToVisualization = (path) => {
-    navigate(path)
-  }
+  // 导航到详情页面
+  const navigateToVisualization = (id) => {
+    navigate(`/graph-visualization/${id}`);
+  };
 
   return (
     <div className="min-h-screen pt-32 pb-20">
@@ -87,9 +81,9 @@ const GraphVisualization = () => {
               >
                 {visualizations.map((viz, index) => (
                   <motion.div
-                    key={viz.name}
+                    key={viz.id}
                     className="bg-white rounded-xl shadow-md overflow-hidden mb-8 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 cursor-pointer"
-                    onClick={() => navigateToVisualization(viz.path)}
+                    onClick={() => navigateToVisualization(viz.id)}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: index * 0.1 }}
@@ -99,20 +93,16 @@ const GraphVisualization = () => {
                     <div className="p-8 flex flex-col md:flex-row items-center gap-6">
                       <div className="flex-shrink-0">
                         <svg className="h-16 w-16 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          {viz.name.includes('Tools') ? (
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                          ) : (
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                          )}
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                         </svg>
                       </div>
                       <div className="flex-grow text-left">
-                        <h2 className="text-2xl font-bold mb-2 text-primary">{viz.displayName}</h2>
+                        <h2 className="text-2xl font-bold mb-2 text-primary">{viz.displayName || viz.title}</h2>
                         <p className="text-gray-600 mb-4">
                           {viz.description}
                         </p>
                         <div className="flex flex-wrap gap-2">
-                          {viz.tags.map((tag, tagIndex) => {
+                          {viz.tags && viz.tags.map((tag, tagIndex) => {
                             // 根据标签索引选择不同的背景色
                             const colors = ['blue', 'green', 'purple', 'yellow']
                             const colorIndex = tagIndex % colors.length
@@ -152,22 +142,10 @@ const GraphVisualization = () => {
               </motion.div>
             )}
           </AnimatePresence>
-          
-          {/* 图算法模块介绍可以添加更多内容 */}
-          
-          <div className="bg-white rounded-xl shadow-md p-8">
-            <div className="text-center py-16">
-              <svg className="h-24 w-24 text-gray-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-              <h2 className="text-2xl font-semibold text-gray-500 mb-2">内容开发中</h2>
-              <p className="text-gray-400">此页面的其他可视化内容正在开发中，敬请期待...</p>
-            </div>
-          </div>
         </motion.div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default GraphVisualization
+export default GraphVisualizationList;

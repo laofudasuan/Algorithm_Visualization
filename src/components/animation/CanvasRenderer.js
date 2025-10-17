@@ -11,7 +11,6 @@ fabric.Canvas.prototype.renderOnAddRemove = false; // 禁用添加/删除时的�
  */
 export class CanvasRenderer {
   constructor(canvas, width, height) {
-    this.ctx = canvas.getContext('2d');
     this.width = width;
     this.height = height;
     this.animations = new Map(); // 存储所有活动的动画
@@ -33,6 +32,7 @@ export class CanvasRenderer {
     });
     this.fabricCanvas.setWidth(width);
     this.fabricCanvas.setHeight(height);
+    
   }
   
   /**
@@ -44,7 +44,6 @@ export class CanvasRenderer {
       this.fabricCanvas = null;
     }
     this.animations.clear();
-    this.ctx = null;
     this.canvas = null;
   }
   
@@ -52,106 +51,15 @@ export class CanvasRenderer {
    * 清空画布
    */
   clear() {
-    this.ctx.clearRect(0, 0, this.width, this.height);
+    this.fabricCanvas.clear();
+    this.fabricCanvas.renderAll();
   }
   
   /**
    * 绘制圆形
    */
-  drawCircle(x, y, radius, style = {}) {
-    this.ctx.beginPath();
-    this.ctx.arc(x, y, radius, 0, Math.PI * 2);
-    
-    if (style.fill) {
-      this.ctx.fillStyle = style.fill;
-      this.ctx.fill();
-    }
-    
-    if (style.stroke) {
-      this.ctx.strokeStyle = style.stroke;
-      this.ctx.lineWidth = style.lineWidth || 1;
-      this.ctx.stroke();
-    }
-  }
-  
   /**
-   * 绘制矩形
-   */
-  drawRect(x, y, width, height, style = {}) {
-    this.ctx.beginPath();
-    
-    // 支持圆角矩形
-    if (style.radius && style.radius > 0) {
-      const radius = style.radius;
-      this.ctx.moveTo(x + radius, y);
-      this.ctx.lineTo(x + width - radius, y);
-      this.ctx.arcTo(x + width, y, x + width, y + radius, radius);
-      this.ctx.lineTo(x + width, y + height - radius);
-      this.ctx.arcTo(x + width, y + height, x + width - radius, y + height, radius);
-      this.ctx.lineTo(x + radius, y + height);
-      this.ctx.arcTo(x, y + height, x, y + height - radius, radius);
-      this.ctx.lineTo(x, y + radius);
-      this.ctx.arcTo(x, y, x + radius, y, radius);
-    } else {
-      this.ctx.rect(x, y, width, height);
-    }
-    
-    if (style.fill) {
-      this.ctx.fillStyle = style.fill;
-      this.ctx.fill();
-    }
-    
-    if (style.stroke) {
-      this.ctx.strokeStyle = style.stroke;
-      this.ctx.lineWidth = style.lineWidth || 1;
-      this.ctx.stroke();
-    }
-  }
-  
-  /**
-   * 绘制多边形
-   */
-  drawPolygon(points, style = {}) {
-    if (!points || points.length < 3) return;
-    
-    this.ctx.beginPath();
-    this.ctx.moveTo(points[0].x, points[0].y);
-    
-    for (let i = 1; i < points.length; i++) {
-      this.ctx.lineTo(points[i].x, points[i].y);
-    }
-    
-    this.ctx.closePath();
-    
-    if (style.fill) {
-      this.ctx.fillStyle = style.fill;
-      this.ctx.fill();
-    }
-    
-    if (style.stroke) {
-      this.ctx.strokeStyle = style.stroke;
-      this.ctx.lineWidth = style.lineWidth || 1;
-      this.ctx.stroke();
-    }
-  }
-  
-  /**
-   * 绘制线段
-   */
-  drawLine(x1, y1, x2, y2, style = {}) {
-    this.ctx.beginPath();
-    this.ctx.moveTo(x1, y1);
-    this.ctx.lineTo(x2, y2);
-    
-    if (style.stroke) {
-      this.ctx.strokeStyle = style.stroke;
-      this.ctx.lineWidth = style.lineWidth || 1;
-      this.ctx.stroke();
-    }
-  }
-  
-  /**
-   * 绘制箭头
+   * 绘制箭头 - 使用Fabric.js的Path对象实现
    */
   drawArrow(x1, y1, x2, y2, style = {}) {
     const headLength = 10;
@@ -159,75 +67,39 @@ export class CanvasRenderer {
     const dy = y2 - y1;
     const angle = Math.atan2(dy, dx);
     
-    // 绘制主线
-    this.drawLine(x1, y1, x2, y2, style);
+    // 计算箭头点
+    const arrowPoint1X = x2 - headLength * Math.cos(angle - Math.PI / 6);
+    const arrowPoint1Y = y2 - headLength * Math.sin(angle - Math.PI / 6);
+    const arrowPoint2X = x2 - headLength * Math.cos(angle + Math.PI / 6);
+    const arrowPoint2Y = y2 - headLength * Math.sin(angle + Math.PI / 6);
     
-    // 绘制箭头
-    this.ctx.beginPath();
-    this.ctx.moveTo(x2, y2);
-    this.ctx.lineTo(
-      x2 - headLength * Math.cos(angle - Math.PI / 6),
-      y2 - headLength * Math.sin(angle - Math.PI / 6)
-    );
-    this.ctx.moveTo(x2, y2);
-    this.ctx.lineTo(
-      x2 - headLength * Math.cos(angle + Math.PI / 6),
-      y2 - headLength * Math.sin(angle + Math.PI / 6)
-    );
+    // 使用Fabric.js的Path对象创建完整的箭头
+    const pathData = [
+      ['M', x1, y1],  // 移动到起点
+      ['L', x2, y2],  // 绘制主线到终点
+      ['M', x2, y2],  // 移动到箭头终点
+      ['L', arrowPoint1X, arrowPoint1Y],  // 绘制第一条箭头线
+      ['M', x2, y2],  // 移动到箭头终点
+      ['L', arrowPoint2X, arrowPoint2Y]   // 绘制第二条箭头线
+    ];
     
-    if (style.stroke) {
-      this.ctx.strokeStyle = style.stroke;
-      this.ctx.lineWidth = style.lineWidth || 1;
-      this.ctx.stroke();
-    }
-  }
-  
-  /**
-   * 绘制贝塞尔曲线
-   */
-  drawBezierCurve(x1, y1, cp1x, cp1y, cp2x, cp2y, x2, y2, style = {}) {
-    this.ctx.beginPath();
-    this.ctx.moveTo(x1, y1);
-    this.ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, x2, y2);
+    const arrow = new fabric.Path(pathData, {
+      fill: '',
+      stroke: style.stroke || 'black',
+      strokeWidth: style.lineWidth || 1
+    });
     
-    if (style.stroke) {
-      this.ctx.strokeStyle = style.stroke;
-      this.ctx.lineWidth = style.lineWidth || 1;
-      this.ctx.stroke();
-    }
-  }
-  
-  /**
-   * 绘制文本
-   */
-  drawText(text, x, y, style = {}) {
-    if (style.fontSize) {
-      this.ctx.font = `${style.fontSize}px ${style.fontFamily || 'Arial, sans-serif'}`;
-    }
+    this.fabricCanvas.add(arrow);
+    this.fabricCanvas.renderAll();
     
-    if (style.fill) {
-      this.ctx.fillStyle = style.fill;
-    }
-    
-    this.ctx.textAlign = style.textAlign || 'start';
-    this.ctx.textBaseline = style.textBaseline || 'alphabetic';
-    
-    if (style.fill) {
-      this.ctx.fillText(text, x, y);
-    }
-    
-    if (style.stroke) {
-      this.ctx.strokeStyle = style.stroke;
-      this.ctx.lineWidth = style.lineWidth || 1;
-      this.ctx.strokeText(text, x, y);
-    }
+    return arrow;
   }
   
   /**
    * 使用fabric.js添加高亮指示器
    */
   addHighlightIndicator(id, x, y, radius = 30, color = '#ffeb3b', lineWidth = 3) {
-    // 创建圆形对象
+    // 创建圆形对象，初始透明度为0
     const circle = new fabric.Circle({
       left: x,
       top: y,
@@ -238,23 +110,31 @@ export class CanvasRenderer {
       selectable: false,
       hoverCursor: 'default',
       originX: 'center',
-      originY: 'center'
+      originY: 'center',
+      opacity: 0 // 初始透明度为0
     });
     
-    // 存储指示器
+    // 添加到画布
     this.fabricCanvas.add(circle);
     
     // 保存引用以便后续移除
     this.animations.set(id, { type: 'highlight', object: circle });
     
-    // 渲染画布
-    this.fabricCanvas.renderAll();
+    // 淡入动画
+    circle.animate({
+      opacity: 1
+    }, {
+      duration: 500, // 500毫秒淡入
+      onChange: () => {
+        this.fabricCanvas.renderAll();
+      }
+    });
   }
   
   /**
    * 使用fabric.js添加脉冲动画指示器
    */
-  addPulseIndicator(id, x, y, radius = 30, color = '#ffeb3b', duration = 3000) {
+  addPulseIndicator(id, x, y, radius = 30, color = '#ffeb3b', duration = 3000, repeatCount = 3) {
     // 创建基础圆
     const baseCircle = new fabric.Circle({
       left: x,
@@ -295,11 +175,20 @@ export class CanvasRenderer {
       y: y,
       radius: radius,
       color: color,
-      duration: duration
+      duration: duration,
+      repeatCount: repeatCount,
+      currentRepeat: 0
     });
     
     // 开始脉冲动画
     this._animatePulse(id, pulseCircle, radius, duration);
+    
+    // 如果设置了持续时间和重复次数，自动移除
+    if (duration > 0 && duration !== Infinity && repeatCount > 0 && repeatCount !== Infinity) {
+      setTimeout(() => {
+        this.removeIndicator(id);
+      }, duration * repeatCount);
+    }
     
     // 渲染画布
     this.fabricCanvas.renderAll();
@@ -376,20 +265,30 @@ export class CanvasRenderer {
     const animation = this.animations.get(id);
     if (!animation) return;
     
-    // 移除所有相关的fabric对象
+    // 根据类型使用不同的移除方式
     if (animation.type === 'highlight') {
-      this.fabricCanvas.remove(animation.object);
+      // 淡出动画
+      animation.object.animate({
+        opacity: 0
+      }, {
+        duration: 500, // 500毫秒淡出
+        onChange: () => {
+          this.fabricCanvas.renderAll();
+        },
+        onComplete: () => {
+          // 动画完成后移除对象
+          this.fabricCanvas.remove(animation.object);
+          this.animations.delete(id);
+        }
+      });
     } else if (animation.type === 'pulse' && animation.objects) {
+      // 直接移除脉冲指示器
       animation.objects.forEach(obj => {
         this.fabricCanvas.remove(obj);
       });
+      this.animations.delete(id);
+      this.fabricCanvas.renderAll();
     }
-    
-    // 从动画映射中删除
-    this.animations.delete(id);
-    
-    // 渲染画布
-    this.fabricCanvas.renderAll();
   }
   
   /**
@@ -409,64 +308,6 @@ export class CanvasRenderer {
     this.fabricCanvas.renderAll();
   }
   
-  /**
-   * 创建通用动画
-   */
-  createAnimation(id, initialProps, targetProps, duration = 500, easing = 'easeOutQuad', onComplete) {
-    // 检查是否有正在进行的动画，如果有则取消
-    if (this.animations.has(id)) {
-      const currentAnim = this.animations.get(id);
-      currentAnim.pause();
-    }
-    
-    // 创建动画对象
-    const animTarget = { ...initialProps };
-    
-    // 创建anime动画 - 使用v4.0的animate API
-    const animation = animate(animTarget, {
-      ...targetProps,
-      duration,
-      easing,
-      update: () => {
-        // 更新后需要在调用方重新绘制
-      },
-      complete: () => {
-        // 动画完成后从映射中移除
-        this.animations.delete(id);
-        if (onComplete) {
-          onComplete();
-        }
-      }
-    });
-    
-    // 存储动画引用
-    this.animations.set(id, animation);
-    
-    // 返回动画对象，以便调用方可以获取当前值
-    return animTarget;
-  }
-  
-  /**
-   * 暂停所有动画
-   */
-  pauseAnimations() {
-    this.animations.forEach(anim => anim.pause());
-  }
-  
-  /**
-   * 恢复所有动画
-   */
-  resumeAnimations() {
-    this.animations.forEach(anim => anim.play());
-  }
-  
-  /**
-   * 停止所有动画
-   */
-  stopAnimations() {
-    this.animations.forEach(anim => anim.pause());
-    this.animations.clear();
-  }
 }
 
 export default CanvasRenderer;

@@ -10,8 +10,8 @@ const BasicAlgorithms = lazy(() => import('./pages/BasicAlgorithms'));
 const StringAlgorithms = lazy(() => import('./pages/StringAlgorithms'));
 const DynamicProgramming = lazy(() => import('./pages/DynamicProgramming'));
 const GraphVisualization = lazy(() => import('./pages/GraphVisualization'));
-const GraphVisualizationTools = lazy(() => import('./pages/GraphVisualizationTools'));
-const GraphVisualizationTest = lazy(() => import('./pages/GraphVisualizationTest'));
+const GraphVisualizationList = lazy(() => import('./pages/GraphVisualizationList'));
+  const GraphVisualizationDetail = lazy(() => import('./pages/GraphVisualizationDetail'));
 const KnowledgeGraphPage = lazy(() => import('./pages/KnowledgeGraphPage'));
 const CoursewareList = lazy(() => import('./pages/CoursewareList'));
 const CoursewareDetail = lazy(() => import('./pages/CoursewareDetail'));
@@ -73,9 +73,16 @@ function App() {
       <Suspense fallback={<LoadingFallback />}>
         <Routes>
           <Route path="/" element={<Home menuItems={menuItems} />} />
-          <Route path="/graph-visualization" element={<GraphVisualization />} />
-          <Route path="/graph-visualization-tools" element={<GraphVisualizationTools />} />
-          <Route path="/graph-visualization-test" element={<GraphVisualizationTest />} />
+          <Route path="/graph-visualization" element={
+            <Suspense fallback={<LoadingFallback />}>
+              <GraphVisualizationList />
+            </Suspense>
+          } />
+          <Route path="/graph-visualization/:id" element={
+            <Suspense fallback={<LoadingFallback />}>
+              <GraphVisualizationDetail />
+            </Suspense>
+          } />
           <Route path="/dynamic-programming" element={<DynamicProgramming />} />
           <Route path="/basic-algorithms" element={<BasicAlgorithms />} />
           <Route path="/string-algorithms" element={<StringAlgorithms />} />

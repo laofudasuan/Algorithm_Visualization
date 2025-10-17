@@ -1,0 +1,22 @@
+{
+  "title": "图可视化工具",
+  "displayName": "图可视化工具",
+  "description": "使用交互式图可视化工具创建和探索图形数据。支持自定义节点大小、物理仿真参数调整、导出为PNG和SVG等功能。",
+  "tags": ["交互式绘图", "物理仿真", "多种导出格式", "全屏模式"],
+  "width": 1000,
+  "height": 600,
+  "canvasWidth": "1200px",
+  "canvasHeight": "600px",
+  "graphNames": [
+    "ExampleGraph-1000-600",
+    "ExampleGraph-500-300"
+  ],
+  "info": "本工具提供了一个交互式的图可视化环境，您可以加载预定义的图结构，观察它们的布局和属性。支持物理仿真、缩放和平移操作，以及导出为多种格式的功能。",
+  "animations": {
+    "default": {
+      "name": "默认动画",
+      "description": "加载默认图结构",
+      "sequence": []
+    }
+  }
+}
