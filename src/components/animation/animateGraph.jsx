@@ -518,28 +518,6 @@ const AnimateGraph = forwardRef(({
       getController().setEdgesStyle(style);
     },
     
-    // 处理高亮操作
-    handleHighlight: (highlightData) => {
-      if (highlightData) {
-        // 清除所有现有指示器
-        getController().clearIndicators();
-        
-        // 如果模式是highlight并且有节点需要高亮
-        if (highlightData.mode === 'highlight' && highlightData.nodes && highlightData.nodes.length > 0) {
-          // 为每个节点添加高亮指示器
-          highlightData.nodes.forEach(nodeId => {
-            getController().addIndicator({
-              id: `highlight-${nodeId}`,
-              type: 'highlight',
-              target: nodeId,
-              color: '#ff0000',
-              size: 40
-            });
-          });
-        }
-      }
-    },
-    
     // 处理指示器操作
     handleAddIndicator: (indicator) => {
       if (indicator) {
@@ -558,6 +536,11 @@ const AnimateGraph = forwardRef(({
       if (indicatorId) {
         getController().removeIndicator(indicatorId);
       }
+    },
+    
+    // 清除所有指示器
+    clearIndicators: () => {
+      getController().clearIndicators();
     }
   });
   

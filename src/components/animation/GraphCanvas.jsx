@@ -93,9 +93,9 @@ const GraphCanvas = forwardRef(({ width = 1000, height = 600, graphCount = 1, gr
       'deleteEdge': 'handleDeleteEdge',
       'nodesStyle': 'handleNodesStyle',
       'edgesStyle': 'handleEdgesStyle',
-      'highlight': 'handleHighlight',
       'addIndicator': 'handleAddIndicator',
-      'removeIndicator': 'handleRemoveIndicator'
+      'removeIndicator': 'handleRemoveIndicator',
+      'clearIndicators': 'clearIndicators'
     };
 
     const handlerMethod = operationHandlers[operationType];

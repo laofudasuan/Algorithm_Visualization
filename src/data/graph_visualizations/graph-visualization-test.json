@@ -56,10 +56,33 @@
       "description": "高亮显示指定节点",
       "sequence": [
         {
-          "type": "highlight",
+          "type": "addIndicator",
           "data": {
-            "nodes": ["1", "2", "3"],
-            "mode": "highlight"
+            "id": "highlight-1",
+            "type": "highlight",
+            "target": "1",
+            "color": "#ff0000",
+            "size": 40
+          }
+        },
+        {
+          "type": "addIndicator",
+          "data": {
+            "id": "highlight-2",
+            "type": "highlight",
+            "target": "2",
+            "color": "#ff0000",
+            "size": 40
+          }
+        },
+        {
+          "type": "addIndicator",
+          "data": {
+            "id": "pulse-3",
+            "type": "pulse",
+            "target": "3",
+            "color": "#ff0000",
+            "size": 40
           }
         }
       ]
@@ -69,11 +92,16 @@
       "description": "移除节点的高亮显示",
       "sequence": [
         {
-          "type": "highlight",
-          "data": {
-            "nodes": [],
-            "mode": "normal"
-          }
+          "type": "removeIndicator",
+          "data": "highlight-1"
+        },
+        {
+          "type": "removeIndicator",
+          "data": "highlight-2"
+        },
+        {
+          "type": "removeIndicator",
+          "data": "highlight-3"
         }
       ]
     },
@@ -107,10 +135,23 @@
           ]
         },
         {
-          "type": "highlight",
+          "type": "addIndicator",
           "data": {
-            "nodes": ["demo-node", "5"],
-            "mode": "highlight"
+            "id": "highlight-demo-node",
+            "type": "highlight",
+            "target": "demo-node",
+            "color": "#ff0000",
+            "size": 40
+          }
+        },
+        {
+          "type": "addIndicator",
+          "data": {
+            "id": "highlight-5",
+            "type": "highlight",
+            "target": "5",
+            "color": "#ff0000",
+            "size": 40
           }
         },
         {
@@ -123,11 +164,12 @@
           ]
         },
         {
-          "type": "highlight",
-          "data": {
-            "nodes": [],
-            "mode": "normal"
-          }
+          "type": "removeIndicator",
+          "data": "highlight-demo-node"
+        },
+        {
+          "type": "removeIndicator",
+          "data": "highlight-5"
         }
       ]
     }
