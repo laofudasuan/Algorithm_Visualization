@@ -20,16 +20,14 @@
       "sequence": [
         {
           "type": "addNode",
-          "data": [
-            {
-              "id": "test-node-1",
-              "x": 300,
-              "y": 200,
-              "label": "New",
-              "size": 25,
-              "style": { "fill": "#ff5722" }
-            }
-          ]
+          "data": {
+            "id": "test-node-1",
+            "x": 300,
+            "y": 200,
+            "label": "New",
+            "size": 25,
+            "style": { "fill": "#ff5722" }
+          }
         }
       ]
     },
@@ -39,15 +37,13 @@
       "sequence": [
         {
           "type": "addEdge",
-          "data": [
-            {
-              "id": "test-edge-1",
-              "source": "test-node-1",
-              "target": "1",
-              "label": "新边测试",
-              "style": { "stroke": "#ff5722", "strokeWidth": 3 }
-            }
-          ]
+          "data": {
+            "id": "test-edge-1",
+            "source": "test-node-1",
+            "target": "1",
+            "label": "新边测试",
+            "style": { "stroke": "#ff5722", "strokeWidth": 3 }
+          }
         }
       ]
     },
@@ -111,28 +107,24 @@
       "sequence": [
         {
           "type": "addNode",
-          "data": [
-            {
-              "id": "demo-node",
-              "x": 400,
-              "y": 300,
-              "label": "演示",
-              "size": 30,
-              "style": { "fill": "#2196f3" }
-            }
-          ]
+          "data": {
+            "id": "demo-node",
+            "x": 400,
+            "y": 300,
+            "label": "演示",
+            "size": 30,
+            "style": { "fill": "#2196f3" }
+          }
         },
         {
           "type": "addEdge",
-          "data": [
-            {
-              "id": "demo-edge",
-              "source": "demo-node",
-              "target": "5",
-              "label": "演示边",
-              "style": { "stroke": "#2196f3", "strokeWidth": 2 }
-            }
-          ]
+          "data": {
+            "id": "demo-edge",
+            "source": "demo-node",
+            "target": "5",
+            "label": "演示边",
+            "style": { "stroke": "#2196f3", "strokeWidth": 2 }
+          }
         },
         {
           "type": "addIndicator",
@@ -156,12 +148,10 @@
         },
         {
           "type": "updateNode",
-          "data": [
-            {
-              "id": "demo-node",
-              "style": { "fill": "#ff9800" }
-            }
-          ]
+          "data": {
+            "id": "demo-node",
+            "style": { "fill": "#ff9800" }
+          }
         },
         {
           "type": "removeIndicator",

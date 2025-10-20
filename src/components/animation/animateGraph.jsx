@@ -459,54 +459,34 @@ const AnimateGraph = forwardRef(({
       renderGraph();
     },
     
-    // 批量处理函数 - 处理节点相关操作
-    handleAddNode: (nodes) => {
-      if (Array.isArray(nodes)) {
-        nodes.forEach(node => {
-          getController().addNode(node);
-        });
-      }
+    handleAddNode: (node) => {
+      // 修改为单个节点操作
+      getController().addNode(node);
     },
     
-    handleUpdateNode: (nodes) => {
-      if (Array.isArray(nodes)) {
-        nodes.forEach(node => {
-          getController().updateNode(node);
-        });
-      }
+    handleUpdateNode: (node) => {
+      // 修改为单个节点操作
+      getController().updateNode(node);
     },
     
-    handleDeleteNode: (nodeIds) => {
-      if (Array.isArray(nodeIds)) {
-        nodeIds.forEach(nodeId => {
-          getController().deleteNode(nodeId);
-        });
-      }
+    handleDeleteNode: (nodeId) => {
+      // 修改为单个节点操作
+      getController().deleteNode(nodeId);
     },
     
-    // 批量处理函数 - 处理边相关操作
-    handleAddEdge: (edges) => {
-      if (Array.isArray(edges)) {
-        edges.forEach(edge => {
-          getController().addEdge(edge);
-        });
-      }
+    handleAddEdge: (edge) => {
+      // 修改为单个边操作
+      getController().addEdge(edge);
     },
     
-    handleUpdateEdge: (edges) => {
-      if (Array.isArray(edges)) {
-        edges.forEach(edge => {
-          getController().updateEdge(edge);
-        });
-      }
+    handleUpdateEdge: (edge) => {
+      // 修改为单个边操作
+      getController().updateEdge(edge);
     },
     
-    handleDeleteEdge: (edgeIds) => {
-      if (Array.isArray(edgeIds)) {
-        edgeIds.forEach(edgeId => {
-          getController().deleteEdge(edgeId);
-        });
-      }
+    handleDeleteEdge: (edgeId) => {
+      // 修改为单个边操作
+      getController().deleteEdge(edgeId);
     },
     
     // 批量处理函数 - 处理样式相关操作
@@ -536,11 +516,6 @@ const AnimateGraph = forwardRef(({
       if (indicatorId) {
         getController().removeIndicator(indicatorId);
       }
-    },
-    
-    // 清除所有指示器
-    clearIndicators: () => {
-      getController().clearIndicators();
     }
   });
   

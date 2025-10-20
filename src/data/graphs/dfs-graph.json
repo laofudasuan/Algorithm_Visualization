@@ -1,0 +1,30 @@
+{
+  "nodes": [
+    { "id": "A", "label": "A", "x": 200, "y": 100, "size": 30, "type": "circle", "style": { "fill": "#4CAF50" } },
+    { "id": "B", "label": "B", "x": 400, "y": 100, "size": 30, "type": "circle", "style": { "fill": "#2196F3" } },
+    { "id": "C", "label": "C", "x": 100, "y": 250, "size": 30, "type": "circle", "style": { "fill": "#FF9800" } },
+    { "id": "D", "label": "D", "x": 300, "y": 250, "size": 30, "type": "circle", "style": { "fill": "#9C27B0" } },
+    { "id": "E", "label": "E", "x": 500, "y": 250, "size": 30, "type": "circle", "style": { "fill": "#F44336" } },
+    { "id": "F", "label": "F", "x": 200, "y": 400, "size": 30, "type": "circle", "style": { "fill": "#00BCD4" } },
+    { "id": "G", "label": "G", "x": 400, "y": 400, "size": 30, "type": "circle", "style": { "fill": "#8BC34A" } }
+  ],
+  "edges": [
+    { "id": "e1", "label": "", "source": "A", "target": "B", "style": { "stroke": "#333", "lineWidth": 2 } },
+    { "id": "e2", "label": "", "source": "A", "target": "C", "style": { "stroke": "#333", "lineWidth": 2 } },
+    { "id": "e3", "label": "", "source": "A", "target": "D", "style": { "stroke": "#333", "lineWidth": 2 } },
+    { "id": "e4", "label": "", "source": "B", "target": "E", "style": { "stroke": "#333", "lineWidth": 2 } },
+    { "id": "e5", "label": "", "source": "C", "target": "F", "style": { "stroke": "#333", "lineWidth": 2 } },
+    { "id": "e6", "label": "", "source": "D", "target": "G", "style": { "stroke": "#333", "lineWidth": 2 } },
+    { "id": "e7", "label": "", "source": "E", "target": "G", "style": { "stroke": "#333", "lineWidth": 2 } }
+  ],
+  "nodesStyle": {
+    "stroke": "#000000",
+    "lineWidth": 2,
+    "labelFill": "#ffffff",
+    "labelFontSize": 14
+  },
+  "edgesStyle": {
+    "stroke": "#666666",
+    "lineWidth": 2
+  }
+}

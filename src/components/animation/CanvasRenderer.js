@@ -99,6 +99,11 @@ export class CanvasRenderer {
    * 使用fabric.js添加高亮指示器
    */
   addHighlightIndicator(id, x, y, radius = 30, color = '#ffeb3b', lineWidth = 3) {
+    // 如果已存在相同ID的动画，先删除它
+    if (this.animations.has(id)) {
+      this.removeIndicator(id);
+    }
+    
     // 创建圆形对象，初始透明度为0
     const circle = new fabric.Circle({
       left: x,
@@ -135,6 +140,11 @@ export class CanvasRenderer {
    * 使用fabric.js添加脉冲动画指示器
    */
   addPulseIndicator(id, x, y, radius = 30, color = '#ffeb3b', duration = 3000, repeatCount = 3) {
+    // 如果已存在相同ID的动画，先删除它
+    if (this.animations.has(id)) {
+      this.removeIndicator(id);
+    }
+    
     // 创建基础圆
     const baseCircle = new fabric.Circle({
       left: x,
@@ -265,7 +275,7 @@ export class CanvasRenderer {
     const animation = this.animations.get(id);
     if (!animation) return;
     
-    // 根据类型使用不同的移除方式
+    this.animations.delete(id);
     if (animation.type === 'highlight') {
       // 淡出动画
       animation.object.animate({
@@ -278,7 +288,7 @@ export class CanvasRenderer {
         onComplete: () => {
           // 动画完成后移除对象
           this.fabricCanvas.remove(animation.object);
-          this.animations.delete(id);
+          this.fabricCanvas.renderAll();
         }
       });
     } else if (animation.type === 'pulse' && animation.objects) {
@@ -286,7 +296,6 @@ export class CanvasRenderer {
       animation.objects.forEach(obj => {
         this.fabricCanvas.remove(obj);
       });
-      this.animations.delete(id);
       this.fabricCanvas.renderAll();
     }
   }
@@ -294,9 +303,9 @@ export class CanvasRenderer {
   /**
    * 清除所有指示器
    */
-  clearIndicators() {
-    // 移除所有动画对象
-    this.animations.forEach((animation, id) => {
+  clearIndicators() { 
+    const idsToRemove = Array.from(this.animations.keys());
+    idsToRemove.forEach(id => {
       this.removeIndicator(id);
     });
   }

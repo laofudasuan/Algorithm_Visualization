@@ -11,10 +11,12 @@ const StringAlgorithms = lazy(() => import('./pages/StringAlgorithms'));
 const DynamicProgramming = lazy(() => import('./pages/DynamicProgramming'));
 const GraphVisualization = lazy(() => import('./pages/GraphVisualization'));
 const GraphVisualizationList = lazy(() => import('./pages/GraphVisualizationList'));
-  const GraphVisualizationDetail = lazy(() => import('./pages/GraphVisualizationDetail'));
+const GraphVisualizationDetail = lazy(() => import('./pages/GraphVisualizationDetail'));
 const KnowledgeGraphPage = lazy(() => import('./pages/KnowledgeGraphPage'));
 const CoursewareList = lazy(() => import('./pages/CoursewareList'));
 const CoursewareDetail = lazy(() => import('./pages/CoursewareDetail'));
+const VisualizationList = lazy(() => import('./pages/VisualizationList'));
+const VisualizationToolPage = lazy(() => import('./pages/VisualizationToolPage'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 function App() {
@@ -44,6 +46,7 @@ function App() {
         { name: '字符串', path: '/string-algorithms' }
       ]
     },
+    { name: '可视化工具', path: '/visualization-tools' },
     { name: '内容', path: '/courseware' },
     { name: '知识图谱', path: '/knowledge-graph' }
   ]
@@ -89,6 +92,8 @@ function App() {
           <Route path="/knowledge-graph" element={<KnowledgeGraphPage />} />
           <Route path="/courseware" element={<CoursewareList />} />
           <Route path="/courseware/:id" element={<CoursewareDetail />} />
+          <Route path="/visualization-tools" element={<VisualizationList />} />
+          <Route path="/visualization/:toolName" element={<VisualizationToolPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>

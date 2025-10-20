@@ -160,6 +160,19 @@ const CoursewareDetail = () => {
   if (showMainPage) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center container mx-auto px-4 pt-32 pb-32">
+        
+        {/* 返回按钮 */}
+        <div className="fixed top-4 left-4 z-50">
+          <button 
+            onClick={goBackToCoursewareList}
+            className="bg-white text-gray-800 p-3 rounded-full shadow-lg hover:bg-gray-100 transition-colors"
+            aria-label="返回"
+          >
+            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+        </div>
 
         {/* 课件标题和元信息 */}
         <motion.div 
@@ -184,15 +197,6 @@ const CoursewareDetail = () => {
             >
               Start
             </motion.button>
-            
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={goBackToCoursewareList}
-              className="px-10 py-4 bg-gray-200 text-gray-800 rounded-md text-lg font-medium hover:bg-gray-300 transition-all duration-300 shadow-lg"
-            >
-              返回课件列表
-            </motion.button>
           </div>
         </motion.div>
       </div>
@@ -202,11 +206,24 @@ const CoursewareDetail = () => {
   // 子页面视图
   return (
     <motion.div 
-      className="min-h-screen pt-12 pb-32 container mx-auto px-4 relative"
+      className="min-h-screen"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
+      exit={{ opacity: 0 }}
     >
+      {/* 返回按钮 */}
+      <div className="fixed top-4 left-4 z-50">
+        <button 
+          onClick={goBackToCoursewareList}
+          className="bg-white text-gray-800 p-3 rounded-full shadow-lg hover:bg-gray-100 transition-colors"
+          aria-label="返回"
+        >
+          <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+      </div>
+      
       {/* 课件内容容器 - 左右滑动结构 */}
       <div className="max-w-3xl mx-auto relative" style={{ minHeight: '500px' }}>
         <div 
@@ -239,37 +256,23 @@ const CoursewareDetail = () => {
       {/* 左右分页导航按钮 - 窗口底部两侧 */}
       {pageCount > 0 && (
         <>
-          {/* 左侧上一页按钮 */}
-          <motion.button
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: currentPage > 0 ? 1 : 0.5, x: 0 }}
-            onClick={goToPrevPage}
-            disabled={currentPage <= 0}
-            className={`fixed bottom-8 left-8 w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center shadow-lg hover:bg-primary/90 transition-all duration-300 ${currentPage <= 0 ? 'cursor-not-allowed' : ''}`}
-            aria-label="上一页"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </motion.button>
-
-          {/* 返回课件主页按钮 - 使用房子图标，放在右侧下一页按钮的左侧 */}
+          {/* 返回课件主页按钮 - 使用返回图标，放在左上角 */}
           <motion.button
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             onClick={goBackToMainPage}
-            className="fixed bottom-8 right-24 w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center shadow-lg hover:bg-primary/90 transition-all duration-300"
+            className="fixed top-4 left-4 z-50 bg-white text-gray-800 p-3 rounded-full shadow-lg hover:bg-gray-100 transition-colors"
             aria-label="返回课件主页"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </motion.button>
-
-          {/* 右侧下一页按钮 */}
+          
+          {/* 下一页按钮 - 保持在右下角 */}
           <motion.button
             initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: currentPage < pageCount - 1 ? 1 : 0.5, x: 0 }}
+            animate={{ opacity: 1, x: 0 }}
             onClick={goToNextPage}
             disabled={currentPage >= pageCount - 1}
             className={`fixed bottom-8 right-8 w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center shadow-lg hover:bg-primary/90 transition-all duration-300 ${currentPage >= pageCount - 1 ? 'cursor-not-allowed' : ''}`}

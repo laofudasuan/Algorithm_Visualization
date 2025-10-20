@@ -1,0 +1,14 @@
+{
+  "nodes": [],
+  "edges": [],
+  "nodesStyle": {
+    "stroke": "#000000",
+    "lineWidth": 2,
+    "labelFill": "#ffffff",
+    "labelFontSize": 14
+  },
+  "edgesStyle": {
+    "stroke": "#666666",
+    "lineWidth": 2
+  }
+}
