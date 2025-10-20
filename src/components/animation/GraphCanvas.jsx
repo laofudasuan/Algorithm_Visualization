@@ -3,12 +3,15 @@ import React, { useState, useRef, useEffect, forwardRef, useImperativeHandle } f
 import AnimateGraph from './animateGraph.jsx';
 import EmptyGraph from '../../data/graphs/EmptyGraph.json';
 
-const GraphCanvas = forwardRef(({ width = 1000, height = 600, graphCount = 1, graphNames = [], graphData = null, isLoading: externalIsLoading }, ref) => {
+const GraphCanvas = forwardRef(({ width = 1000, height = 600, graphData = null, isLoading: externalIsLoading }, ref) => {
   // 状态
   const [currentGraphIndex, setCurrentGraphIndex] = useState(0);
+  const [previousGraphIndex, setPreviousGraphIndex] = useState(0); // 上一个图的索引
   const [graphControllers, setGraphControllers] = useState([]);
   const [graphDataList, setGraphDataList] = useState([]);
   const [isInternalLoading, setIsInternalLoading] = useState(true); // 内部数据加载状态
+  const [isAnimating, setIsAnimating] = useState(false); // 是否正在动画中
+  const [animationDirection, setAnimationDirection] = useState('right'); // 动画方向：'left' 或 'right'
   
   // 合并外部和内部的加载状态
   // 只有当外部传入了isLoading且为true，或者内部仍然在加载时，才认为组件处于加载状态
@@ -17,67 +20,54 @@ const GraphCanvas = forwardRef(({ width = 1000, height = 600, graphCount = 1, gr
   // Refs
   const animateGraphRefs = useRef([]);
   
-  // 初始化图数据 - 只在组件挂载时执行一次
+  // 初始化图数据 - 监听graphData的变化
   useEffect(() => {
-    // 如果提供了graphData属性，则直接使用它
+    // 如果提供了graphData属性，检查它是否为数组
     if (graphData) {
-      setGraphDataList([graphData]);
-      setIsInternalLoading(false);
-      return;
-    }
-    
-    // 准备图数据数组
-    const loadGraphData = async () => {
-      const data = [];
-      
-      for (let i = 0; i < graphCount; i++) {
-        // 如果提供了graphNames数组且有对应的名称，则尝试导入对应的JSON文件
-        if (graphNames[i]) {
-          try {
-            // 动态导入JSON文件
-            const graphModule = await import(`../../data/graphs/${graphNames[i]}.json`);
-            console.log(`图(${i})：成功读取: ${graphNames[i]}`);
-            data.push(graphModule.default);
-          } catch (error) {
-            console.warn(`无法加载图数据: ${graphNames[i]}，使用空图代替`, error);
-            data.push(EmptyGraph);
-          }
-        } else {
-          // 没有提供名称或名称不足，使用空图
-          data.push(EmptyGraph);
-        }
+      if (Array.isArray(graphData)) {
+        setGraphDataList(graphData);
+      } else {
+        setGraphDataList([graphData]);
       }
-      
-      setGraphDataList(data);
-      setIsInternalLoading(false); // 数据加载完成
-    };
-    
-    loadGraphData();
-  }, []); // 空依赖数组，只在组件挂载时执行一次
+      setIsInternalLoading(false);
+    } else {
+      // 未提供数据，使用空图
+      setGraphDataList([EmptyGraph]);
+      setIsInternalLoading(false);
+    }
+  }, [graphData]); // 监听graphData的变化
   
-  // 当graphDataList更新时，检查是否所有数据都已加载完成
+  // 当graphDataList更新时，初始化所有图组件和控制器
   useEffect(() => {
     if (graphDataList.length > 0) {
       // 初始化所有图控制器
-      const controllers = [];
-      for (let i = 0; i < graphDataList.length; i++) {
-        controllers.push(null);
-      }
+      const controllers = new Array(graphDataList.length).fill(null);
       setGraphControllers(controllers);
+      
+      // 确保refs数组足够长
+      while (animateGraphRefs.current.length < graphDataList.length) {
+        animateGraphRefs.current.push(null);
+      }
     }
   }, [graphDataList]);
   
   // 初始化AnimateGraph控制器
   const initController = (index, controller) => {
-    if (index >= 0 && index < graphControllers.length) {
+    if (index >= 0) {
       setGraphControllers(prev => {
-        const newControllers = [...prev];
-        newControllers[index] = controller;
-        return newControllers;
+        // 确保数组足够长以容纳新的控制器
+        const newGraphControllers = [...prev];
+        while (newGraphControllers.length <= index) {
+          newGraphControllers.push(null);
+        }
+        
+        // 设置指定索引的控制器
+        newGraphControllers[index] = controller;
+        return newGraphControllers;
       });
       
-      // 如果这是当前显示的图，加载图数据
-      if (index === currentGraphIndex && graphDataList[index]) {
+      // 加载图数据到控制器，无论是否是当前显示的图
+      if (graphDataList[index]) {
         loadGraphDataToController(controller, graphDataList[index]);
       }
     }
@@ -117,17 +107,26 @@ const GraphCanvas = forwardRef(({ width = 1000, height = 600, graphCount = 1, gr
     }
   };
   
-  // 当当前图索引或图控制器发生变化时，加载图数据
-  useEffect(() => {
-    if (graphControllers[currentGraphIndex] && graphDataList[currentGraphIndex]) {
-      loadGraphDataToController(graphControllers[currentGraphIndex], graphDataList[currentGraphIndex]);
-    }
-  }, [currentGraphIndex, graphControllers, graphDataList]);
-  
   // 切换到指定索引的图
   const switchToGraph = (index) => {
-    if (index >= 0 && index < graphCount) {
+    if (index >= 0 && index < graphDataList.length && index !== currentGraphIndex && !isAnimating) {
+      // 保存当前索引作为上一个索引
+      setPreviousGraphIndex(currentGraphIndex);
+      
+      // 设置动画方向
+      const direction = index > currentGraphIndex ? 'right' : 'left';
+      setAnimationDirection(direction);
+      
+      // 开始动画
+      setIsAnimating(true);
+      
+      // 更新当前索引
       setCurrentGraphIndex(index);
+      
+      // 动画结束后重置状态
+      setTimeout(() => {
+        setIsAnimating(false);
+      }, 500); // 与CSS transition duration一致
     }
   };
   
@@ -155,16 +154,76 @@ const GraphCanvas = forwardRef(({ width = 1000, height = 600, graphCount = 1, gr
   
   // 渲染图列表
   const renderGraphs = () => {
-    return graphDataList.map((_, index) => (
-      <AnimateGraph
-        key={index}
-        ref={el => animateGraphRefs.current[index] = el}
-        width={width}
-        height={height}
-        onControllerReady={(controller) => initController(index, controller)}
-        style={{ display: index === currentGraphIndex ? 'block' : 'none' }}
-      />
-    ));
+    return Array.from({ length: graphDataList.length }).map((_, index) => {
+      // 确定图的位置和动画样式
+      let position = 'absolute';
+      let left = 0;
+      let transition = 'left 0.5s linear';
+      let zIndex = 0;
+      
+      // 动画期间的特殊处理
+      if (isAnimating) {
+        // 当前显示的图（新图）
+        if (index === currentGraphIndex) {
+          left = 0;
+          zIndex = 2;
+        }
+        // 上一个显示的图（旧图）
+        else if (index === previousGraphIndex) {
+          left = animationDirection === 'right' ? '-100%' : '100%';
+          zIndex = 1;
+        }
+        // 将要显示但还未显示的图
+        else if ((animationDirection === 'right' && index > currentGraphIndex) || 
+                 (animationDirection === 'left' && index < currentGraphIndex)) {
+          left = animationDirection === 'right' ? '100%' : '-100%';
+        }
+        // 其他图
+        else {
+          left = index > currentGraphIndex ? '100%' : '-100%';
+          transition = 'none';
+        }
+      }
+      // 非动画期间的常规处理
+      else {
+        // 当前显示的图
+        if (index === currentGraphIndex) {
+          left = 0;
+          zIndex = 1;
+        }
+        // 其他图
+        else {
+          left = index > currentGraphIndex ? '100%' : '-100%';
+          transition = 'none';
+        }
+      }
+      
+      return (
+        <div 
+          key={index}
+          style={{ 
+            position: position,
+            left: left,
+            top: 0,
+            width: '100%',
+            height: '100%',
+            transition: transition,
+            zIndex: zIndex
+          }}
+        >
+          <AnimateGraph
+            ref={el => {
+              if (el) {
+                animateGraphRefs.current[index] = el;
+              }
+            }}
+            width={width}
+            height={height}
+            onInit={(controller) => initController(index, controller)}
+          />
+        </div>
+      );
+    });
   };
   
   // 渲染加载状态
@@ -179,9 +238,55 @@ const GraphCanvas = forwardRef(({ width = 1000, height = 600, graphCount = 1, gr
     );
   }
   
+  // 渲染图
   return (
-    <div style={{ width, height }} className="bg-white rounded-lg overflow-hidden">
-      {renderGraphs()}
+    <div style={{ width, height, position: 'relative', overflow: 'hidden' }} className="bg-white rounded-lg">
+      {
+        renderGraphs()
+      }
+      
+      {/* 图切换按钮 */}
+      {graphDataList.length > 1 && (
+        <div 
+          style={{
+            position: 'absolute',
+            bottom: '20px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            display: 'flex',
+            gap: '10px',
+            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+            padding: '10px 15px',
+            borderRadius: '25px',
+            boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
+            zIndex: 1000,
+            pointerEvents: 'auto'
+          }}
+        >
+          {Array.from({ length: graphDataList.length }).map((_, index) => (
+            <button
+              key={index}
+              onClick={() => switchToGraph(index)}
+              style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '50%',
+                border: index === currentGraphIndex ? '3px solid #2196F3' : '1px solid #ddd',
+                backgroundColor: index === currentGraphIndex ? '#2196F3' : 'white',
+                color: index === currentGraphIndex ? 'white' : '#333',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: 'bold',
+                transition: 'all 0.5s linear',
+                boxShadow: index === currentGraphIndex ? '0 2px 8px rgba(33, 150, 243, 0.4)' : 'none'
+              }}
+              title={`切换到图 ${index + 1}`}
+            >
+              {index + 1}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 });

@@ -21,10 +21,8 @@ export class GraphRenderer {
       preserveObjectStacking: true, // 保持对象堆叠顺序
       backgroundColor: '#f5f5f5' // 设置稍微浅一点的灰色背景
     });
-    
-    // 存储当前的图状态
-    this.nodes = [];
-    this.edges = [];
+
+    this.canvas.renderAll();
     
     // 为每个节点和边创建Fabric对象引用
     this.nodeObjects = new Map(); // 存储节点Fabric对象
@@ -57,19 +55,6 @@ export class GraphRenderer {
     return this.canvasElement;
   }
 
-  /**
-   * 渲染所有节点
-   */
-  renderNodes(nodes) {
-    // 实现已移动到 animateGraph.jsx
-  }
-  
-  /**
-   * 渲染所有边
-   */
-  renderEdges(edges) {
-    // 实现已移动到 animateGraph.jsx
-  }
   
   /**
    * 清空所有节点元素
@@ -661,7 +646,7 @@ export class GraphRenderer {
   createNodeLabelElement(nodeId, node) {
     const nodeStyle = { ...this.defaultNodeStyle, ...node.style };
     
-    const labelObject = new fabric.FabricText(node.label, {
+    const labelObject = new fabric.Text(node.label, {
       left: node.x,
       top: node.y,
       fontSize: nodeStyle?.labelFontSize || 14, // 稍大一些以便更容易看到
@@ -690,7 +675,7 @@ export class GraphRenderer {
     const midX = (sourceNode.x + targetNode.x) / 2;
     const midY = (sourceNode.y + targetNode.y) / 2;
     
-    const labelObject = new fabric.FabricText(label, {
+    const labelObject = new fabric.Text(label, {
       left: midX,
       top: midY,
       fontSize: style?.labelFontSize || 14, // 稍大一些以便更容易看到

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import GraphCanvas from '../components/animation/GraphCanvas';
+import { loadMultipleGraphData } from '../components/utils/GraphDataLoader';
 
 const GraphVisualizationDetail = () => {
   const { id } = useParams();
@@ -9,6 +10,7 @@ const GraphVisualizationDetail = () => {
   const [visualization, setVisualization] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [graphData, setGraphData] = useState(null);
   const graphCanvasRef = useRef(null);
   
   // 组件加载时隐藏Navbar
@@ -28,10 +30,22 @@ const GraphVisualizationDetail = () => {
         // 动态导入对应的JSON配置文件
         const vizModule = await import(`../data/graph_visualizations/${id}.json`);
         
-        setVisualization({
+        const vizData = {
           id,
           ...vizModule.default
-        });
+        };
+        
+        setVisualization(vizData);
+        
+        // 如果有graphNames，使用GraphDataLoader加载图数据
+        if (vizData.graphNames && Array.isArray(vizData.graphNames) && vizData.graphNames.length > 0) {
+          const loadedGraphs = await loadMultipleGraphData(vizData.graphNames);
+          console.log('加载的图数据:', loadedGraphs);
+          setGraphData(loadedGraphs);
+        } else if (vizData.initialGraph) {
+          // 如果有initialGraph，直接使用
+          setGraphData(vizData.initialGraph);
+        }
       } catch (err) {
         console.error('加载可视化配置失败:', err);
         setError(err);
@@ -156,9 +170,8 @@ const GraphVisualizationDetail = () => {
                   ref={graphCanvasRef}
                   width={visualization.width || 1000}
                   height={visualization.height || 600}
-                  initialGraph={visualization.initialGraph}
-                  graphCount={visualization.graphNames?.length || 1}
-                  graphNames={visualization.graphNames}
+                  graphData={graphData}
+                  isLoading={loading}
                 />
               </div>
             </div>

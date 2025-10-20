@@ -115,7 +115,6 @@ const ArrayVisualization = forwardRef(({ height, length }, ref) => {
       ref={graphCanvasRef}
       width={width}
       height={height}
-      graphCount={1}
       isLoading={false}
     />
   );

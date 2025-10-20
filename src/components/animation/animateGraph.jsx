@@ -7,10 +7,6 @@ import AnnotationTool from './annotationTools';
 const AnimateGraph = forwardRef(({
   width = 800,
   height = 600,
-  nodes = [],
-  edges = [],
-  nodesStyle = {},
-  edgesStyle = {},
   initialMode = 'none',
   onInit
 }, ref) => {
@@ -82,13 +78,13 @@ const AnimateGraph = forwardRef(({
     // 存储GraphRenderer实例到ref
     graphRendererRef.current = graphRenderer;
     
-    // 保存初始节点和边数据
-    currentNodesRef.current = [...nodes];
-    currentEdgesRef.current = [...edges];
-    currentNodesStyleRef.current = { ...nodesStyle };
-    currentEdgesStyleRef.current = { ...edgesStyle };
+    // 初始化空的节点和边数据
+    currentNodesRef.current = [];
+    currentEdgesRef.current = [];
+    currentNodesStyleRef.current = {};
+    currentEdgesStyleRef.current = {};
     
-    // 初始渲染
+    // 初始渲染空图
     renderGraph();
     
     const controller = getController();
@@ -131,6 +127,7 @@ const AnimateGraph = forwardRef(({
     // 使用GraphRenderer分别渲染节点和边
     renderNodes();
     renderEdges();
+    
   };
   
   // 渲染所有节点
@@ -177,49 +174,6 @@ const AnimateGraph = forwardRef(({
     
     getMode: () => {
       return currentMode;
-    },
-    
-    
-    setNodesStyle: (style) => {
-      // 更新节点样式
-      currentNodesStyleRef.current = { ...style };
-      
-      // 应用样式到所有节点
-      currentNodesRef.current = currentNodesRef.current.map(node => ({
-        ...node,
-        style: {
-          ...node.style,
-          ...style
-        }
-      }));
-      
-      // 获取GraphRenderer实例
-      const graphRenderer = graphRendererRef.current;
-      if (graphRenderer) {
-        // 使用updateGraph方法更新整个图
-        graphRenderer.updateGraph(currentNodesRef.current, currentEdgesRef.current);
-      }
-    },
-    
-    setEdgesStyle: (style) => {
-      // 更新边样式
-      currentEdgesStyleRef.current = { ...style };
-      
-      // 应用样式到所有边
-      currentEdgesRef.current = currentEdgesRef.current.map(edge => ({
-        ...edge,
-        style: {
-          ...edge.style,
-          ...style
-        }
-      }));
-      
-      // 获取GraphRenderer实例
-      const graphRenderer = graphRendererRef.current;
-      if (graphRenderer) {
-        // 使用updateGraph方法更新整个图
-        graphRenderer.updateGraph(currentNodesRef.current, currentEdgesRef.current);
-      }
     },
     
     updateNode: (node) => {
@@ -487,15 +441,6 @@ const AnimateGraph = forwardRef(({
     handleDeleteEdge: (edgeId) => {
       // 修改为单个边操作
       getController().deleteEdge(edgeId);
-    },
-    
-    // 批量处理函数 - 处理样式相关操作
-    handleNodesStyle: (style) => {
-      getController().setNodesStyle(style);
-    },
-    
-    handleEdgesStyle: (style) => {
-      getController().setEdgesStyle(style);
     },
     
     // 处理指示器操作
