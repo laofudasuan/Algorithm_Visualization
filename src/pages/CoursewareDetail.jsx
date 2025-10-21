@@ -269,6 +269,20 @@ const CoursewareDetail = () => {
             </svg>
           </motion.button>
           
+          {/* 上一页按钮 - 保持在左下角 */}
+          <motion.button
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            onClick={goToPrevPage}
+            disabled={currentPage <= 0}
+            className={`fixed bottom-8 left-8 w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center shadow-lg hover:bg-primary/90 transition-all duration-300 ${currentPage <= 0 ? 'cursor-not-allowed' : ''}`}
+            aria-label="上一页"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </motion.button>
+          
           {/* 下一页按钮 - 保持在右下角 */}
           <motion.button
             initial={{ opacity: 0, x: 20 }}

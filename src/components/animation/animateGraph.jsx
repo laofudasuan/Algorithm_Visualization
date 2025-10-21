@@ -8,7 +8,8 @@ const AnimateGraph = forwardRef(({
   width = 800,
   height = 600,
   initialMode = 'none',
-  onInit
+  onInit,
+  enableDrawing = true
 }, ref) => {
   // 本地状态管理绘图模式
   const [currentMode, setCurrentMode] = useState(initialMode);
@@ -520,13 +521,14 @@ const AnimateGraph = forwardRef(({
         }}
       />
       
-      {/* 绘图工具栏 - 画布右下角 */}
+      {/* 绘图工具栏 - 画布右下角 - 仅当enableDrawing为true时显示 */}
+      {enableDrawing && (
         <div style={{
           position: 'absolute',
           left: '5px',
           top: '5px',
           display: 'flex',
-          gap: showTools ? '5px' : '0px', // 修改为与工具按钮之间相同的间距
+          gap: showTools ? '5px' : '0px',
           zIndex: 9999
         }}>
           {/* 模式切换按钮 */}
@@ -625,7 +627,8 @@ const AnimateGraph = forwardRef(({
               ❌
             </button>
           </div>
-      </div>
+        </div>
+      )}
     </div>
   );
 });

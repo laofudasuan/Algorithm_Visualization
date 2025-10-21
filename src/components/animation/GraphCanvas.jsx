@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect, forwardRef, useImperativeHandle } f
 import AnimateGraph from './animateGraph.jsx';
 import EmptyGraph from '../../data/graphs/EmptyGraph.json';
 
-const GraphCanvas = forwardRef(({ width = 1000, height = 600, graphData = null, isLoading: externalIsLoading }, ref) => {
+const GraphCanvas = forwardRef(({ width = 1000, height = 600, graphData = null, isLoading: externalIsLoading, enableDrawing = true }, ref) => {
   // 状态
   const [currentGraphIndex, setCurrentGraphIndex] = useState(0);
   const [previousGraphIndex, setPreviousGraphIndex] = useState(0); // 上一个图的索引
@@ -23,6 +23,7 @@ const GraphCanvas = forwardRef(({ width = 1000, height = 600, graphData = null, 
   // 初始化图数据 - 监听graphData的变化
   useEffect(() => {
     // 如果提供了graphData属性，检查它是否为数组
+    console.log('Canvas接收到graphData:', graphData);
     if (graphData) {
       if (Array.isArray(graphData)) {
         setGraphDataList(graphData);
@@ -220,6 +221,7 @@ const GraphCanvas = forwardRef(({ width = 1000, height = 600, graphData = null, 
             width={width}
             height={height}
             onInit={(controller) => initController(index, controller)}
+            enableDrawing={enableDrawing}
           />
         </div>
       );
@@ -240,7 +242,7 @@ const GraphCanvas = forwardRef(({ width = 1000, height = 600, graphData = null, 
   
   // 渲染图
   return (
-    <div style={{ width, height, position: 'relative', overflow: 'hidden' }} className="bg-white rounded-lg">
+    <div style={{ width, height, position: 'relative', overflow: 'hidden' }} className="bg-white rounded-lg border-2 border-gray-300">
       {
         renderGraphs()
       }

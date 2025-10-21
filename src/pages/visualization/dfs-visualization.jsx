@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import GraphCanvas from '../../components/animation/GraphCanvas.jsx';
 import ArrayVisualization from '../../components/visualizations/ArrayVisualization.jsx';
+import { loadGraphData } from '../../components/utils/GraphDataLoader.jsx';
 
 const DFSVisualizationPage = () => {
   const graphCanvasRef = useRef(null);
@@ -13,21 +14,22 @@ const DFSVisualizationPage = () => {
   
   // 从JSON文件加载图数据
   useEffect(() => {
-    const loadGraphData = async () => {
+    const fetchGraphData = async () => {
       try {
-        const graphModule = await import('../../data/graphs/dfs-graph.json');
-        setGraphData(graphModule.default);
+        // 使用GraphDataLoader加载图数据
+        const graphData = await loadGraphData('dfs-graph');
+        setGraphData(graphData);
         
         // 从节点和边数据构建邻接表
         const adjList = {};
         
         // 初始化每个节点的邻接表
-        graphModule.default.nodes.forEach(node => {
+        graphData.nodes.forEach(node => {
           adjList[node.id] = [];
         });
         
         // 填充邻接表
-        graphModule.default.edges.forEach(edge => {
+        graphData.edges.forEach(edge => {
           if (!adjList[edge.source]) adjList[edge.source] = [];
           if (!adjList[edge.target]) adjList[edge.target] = [];
           
@@ -46,173 +48,139 @@ const DFSVisualizationPage = () => {
       }
     };
     
-    loadGraphData();
+    fetchGraphData();
   }, []);
   
-  // DFS算法实现
-  const dfsAlgorithm = {
-    // 深度优先搜索
-    dfs: function(startNode) {
-      const visited = new Set();
-      const stack = [];
-      const traversalSteps = [];
+  // 延迟函数
+  const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+  // 异步DFS算法实现 - 直接进行可视化操作
+  const asyncDFS = async (startNode, delayMs = 1000) => {
+    const visited = new Set();
+    const stack = [];
+    
+    const dfsHelper = async (node) => {
       
-      const dfsHelper = (node) => {
-        // 标记节点为已访问
-        visited.add(node);
-        stack.push(node);
-        traversalSteps.push({
-          type: 'visit',
-          node: node,
-          stack: [...stack]
+      // 标记节点为已访问
+      visited.add(node);
+      stack.push(node);
+      
+      // 更新状态
+      setVisitedNodes(prev => [...prev, node]);
+      setCallStack([...stack]);
+      
+      // 使用指示器高亮访问的节点
+      if (graphCanvasRef.current) {
+        graphCanvasRef.current.dispatchOperation('addIndicator', {
+          id: `visited-${node}`,
+          type: 'highlight',
+          target: node,
+          color: '#4CAF50', // 绿色表示已访问
+          radius: 35,
+          lineWidth: 4
         });
-        
-        // 更新调用栈可视化
-        if (arrayVizRef.current) {
-          stack.forEach((stackNode, index) => {
-            arrayVizRef.current.setElement(index, stackNode);
-          });
-          // 清除栈外的元素
-          for (let i = stack.length; i < 10; i++) {
-            arrayVizRef.current.removeElement(i);
-          }
+      }
+      
+      // 更新调用栈可视化
+      if (arrayVizRef.current) {
+        // 先清空再添加，避免残留元素
+        await delay(100); // 微小延迟确保清空效果可见
+        stack.forEach((stackNode, index) => {
+          arrayVizRef.current.setElement(index, stackNode);
+        });
+        // 清除栈外的元素
+        for (let i = stack.length; i < 10; i++) {
+          arrayVizRef.current.removeElement(i);
         }
-        
-        // 访问所有未访问的邻居节点
-        const neighbors = graphAdjList[node] || [];
-        for (const neighbor of neighbors) {
-          if (!visited.has(neighbor)) {
-            traversalSteps.push({
-              type: 'explore',
-              from: node,
-              to: neighbor
+      }
+      
+      // 添加延迟以创建动画效果
+      await delay(delayMs);
+      
+      // 访问所有未访问的邻居节点
+      const neighbors = graphAdjList[node] || [];
+      for (const neighbor of neighbors) {
+        if (!visited.has(neighbor)) {
+          
+          // 为正在探索的边添加指示器
+          if (graphCanvasRef.current) {
+            graphCanvasRef.current.dispatchOperation('addIndicator', {
+              id: `explore-${node}-${neighbor}`,
+              type: 'pulse',
+              target: node, // 从源节点开始的脉冲
+              color: '#FFC107', // 黄色表示正在探索
+              radius: 40,
+              duration: 500,
+              repeatCount: 1
             });
-            dfsHelper(neighbor);
           }
+          
+          // 添加延迟以创建动画效果
+          await delay(delayMs / 2);
+          
+          // 递归调用DFS
+          await dfsHelper(neighbor);
         }
-        
-        // 回溯
-        stack.pop();
-        traversalSteps.push({
-          type: 'backtrack',
-          node: node,
-          stack: [...stack]
-        });
-        
-        // 更新调用栈可视化
-        if (arrayVizRef.current) {
-          stack.forEach((stackNode, index) => {
-            arrayVizRef.current.setElement(index, stackNode);
-          });
-          // 清除栈外的元素
-          for (let i = stack.length; i < 10; i++) {
-            arrayVizRef.current.removeElement(i);
-          }
-        }
-      };
+      }
       
-      dfsHelper(startNode);
-      return traversalSteps;
-    }
+      // 回溯
+      const currentNode = stack.pop();
+      setCallStack([...stack]);
+      
+      // 删除节点的访问指示器
+      if (graphCanvasRef.current && currentNode) {
+        graphCanvasRef.current.dispatchOperation('removeIndicator', `visited-${currentNode}`);
+      }
+      
+      // 更新调用栈可视化
+      if (arrayVizRef.current) {
+        stack.forEach((stackNode, index) => {
+          arrayVizRef.current.setElement(index, stackNode);
+        });
+        // 清除栈外的元素
+        for (let i = stack.length; i < 10; i++) {
+          arrayVizRef.current.removeElement(i);
+        }
+      }
+      
+      // 添加延迟以创建动画效果
+      await delay(delayMs / 2);
+    };
+    
+    await dfsHelper(startNode);
+    return visited;
   };
   
   // 开始执行DFS动画
   const startExecution = async () => {
-    if (isPlaying || !graphData || Object.keys(graphAdjList).length === 0) return;
+    if (isPlaying || !graphData || Object.keys(graphAdjList).length === 0 || graphData.nodes.length === 0) return;
     
     setIsPlaying(true);
     setVisitedNodes([]);
     setCallStack([]);
     
-    // 重置图的视觉状态
+    // 重置图的视觉状态 - 清除所有指示器
     if (graphCanvasRef.current) {
-      graphData.nodes.forEach(node => {
-        graphCanvasRef.current.dispatchOperation('updateNode', {
-          id: node.id,
-          style: { fill: '#CCCCCC' }
-        });
-      });
+      graphCanvasRef.current.dispatchOperation('clearIndicators', {});
     }
     
     // 重置数组可视化
     if (arrayVizRef.current) {
-      for (let i = 0; i < 10; i++) {
-        arrayVizRef.current.removeElement(i);
-      }
+      arrayVizRef.current.clearArray();
     }
     
     // 获取起始节点（第一个节点）
-    const startNode = graphData.nodes.length > 0 ? graphData.nodes[0].id : 'A';
+    const startNode = graphData.nodes[0].id;
     
-    // 执行DFS算法
-    const steps = dfsAlgorithm.dfs(startNode);
-    
-    // 动画演示每个步骤
-    for (const step of steps) {
-      if (!isPlaying) break; // 如果用户停止了执行，则中断
-      
-      switch (step.type) {
-        case 'visit':
-          setVisitedNodes(prev => [...prev, step.node]);
-          setCallStack(step.stack);
-          
-          // 高亮访问的节点
-          if (graphCanvasRef.current) {
-            graphCanvasRef.current.dispatchOperation('updateNode', {
-              id: step.node,
-              style: { fill: '#4CAF50' } // 绿色表示已访问
-            });
-          }
-          break;
-          
-        case 'explore':
-          // 高亮正在探索的边
-          if (graphCanvasRef.current) {
-            // 尝试不同的边ID格式
-            const edgeIds = [
-              `edge-${step.from}-${step.to}`,
-              `edge-${step.to}-${step.from}`,
-              `${step.from}-${step.to}`,
-              `${step.to}-${step.from}`
-            ];
-            
-            // 查找正确的边ID
-            for (const edgeId of edgeIds) {
-              try {
-                graphCanvasRef.current.dispatchOperation('updateEdge', {
-                  id: edgeId,
-                  style: { stroke: '#FFC107', lineWidth: 3 } // 黄色表示正在探索
-                });
-                break; // 找到后退出循环
-              } catch (e) {
-                // 如果这个ID不正确，继续尝试下一个
-                continue;
-              }
-            }
-          }
-          break;
-          
-        case 'backtrack':
-          setCallStack(step.stack);
-          
-          // 更新调用栈可视化
-          if (arrayVizRef.current) {
-            step.stack.forEach((stackNode, index) => {
-              arrayVizRef.current.setElement(index, stackNode);
-            });
-            // 清除栈外的元素
-            for (let i = step.stack.length; i < 10; i++) {
-              arrayVizRef.current.removeElement(i);
-            }
-          }
-          break;
-      }
-      
-      // 添加延迟以创建动画效果
-      await new Promise(resolve => setTimeout(resolve, 1000));
+    try {
+      // 直接执行异步DFS，在执行过程中实时更新可视化
+      await asyncDFS(startNode, 1000); // 1000ms延迟用于动画效果
+    } catch (error) {
+      console.error('DFS执行过程中出错:', error);
+    } finally {
+      // 确保执行状态被重置
+      setIsPlaying(false);
     }
-    
-    setIsPlaying(false);
   };
   
   // 重置可视化
@@ -221,28 +189,14 @@ const DFSVisualizationPage = () => {
     setVisitedNodes([]);
     setCallStack([]);
     
-    // 重置图的视觉状态
-    if (graphCanvasRef.current && graphData) {
-      graphData.nodes.forEach(node => {
-        graphCanvasRef.current.dispatchOperation('updateNode', {
-          id: node.id,
-          style: node.style || { fill: '#CCCCCC' }
-        });
-      });
-      
-      graphData.edges.forEach(edge => {
-        graphCanvasRef.current.dispatchOperation('updateEdge', {
-          id: edge.id,
-          style: edge.style || { stroke: '#333', lineWidth: 2 }
-        });
-      });
+    // 重置图的视觉状态 - 清除所有指示器
+    if (graphCanvasRef.current) {
+      graphCanvasRef.current.dispatchOperation('clearIndicators', {});
     }
     
     // 重置数组可视化
     if (arrayVizRef.current) {
-      for (let i = 0; i < 10; i++) {
-        arrayVizRef.current.removeElement(i);
-      }
+      arrayVizRef.current.clearArray();
     }
   };
 
@@ -283,26 +237,32 @@ const DFSVisualizationPage = () => {
           
           <div className="bg-white rounded-xl shadow-lg p-6">
             <h2 className="text-xl font-semibold mb-4 text-gray-700">调用栈可视化</h2>
-            <div className="border-2 border-gray-200 rounded-lg p-4 bg-gray-50">
               <ArrayVisualization 
                 ref={arrayVizRef}
-                height={60}
+                height={50}
                 length={10}
               />
-            </div>
           </div>
         </div>
         
         <div className="bg-white rounded-xl shadow-lg p-6">
           <h2 className="text-xl font-semibold mb-4 text-gray-700">图结构可视化</h2>
-          <div className="border-2 border-gray-200 rounded-lg p-4 bg-gray-50">
-            <GraphCanvas 
-              ref={graphCanvasRef}
-              width={600}
-              height={500}
-              graphData={graphData}
-            />
-          </div>
+            {graphData ? (
+              <GraphCanvas 
+                ref={graphCanvasRef}
+                width={600}
+                height={500}
+                graphData={graphData}
+                isLoading={false}
+              />
+            ) : (
+              <div className="w-full h-[500px] flex items-center justify-center bg-gray-50">
+                <div className="text-center">
+                  <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500 mb-2"></div>
+                  <p className="text-gray-600">加载图数据中...</p>
+                </div>
+              </div>
+            )}
         </div>
       </div>
     </div>

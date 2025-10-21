@@ -1,7 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useRef } from 'react';
 import ArrayVisualization from '../../components/visualizations/ArrayVisualization.jsx';
-import { Link } from 'react-router-dom';
 
 const ArrayVisualizationPage = () => {
   const arrayVizRef = useRef(null);

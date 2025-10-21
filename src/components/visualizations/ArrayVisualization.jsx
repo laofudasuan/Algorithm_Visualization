@@ -101,13 +101,38 @@ const ArrayVisualization = forwardRef(({ height, length }, ref) => {
     }
   };
 
+  // 清空数组
+  const clearArray = () => {
+    // 将数组中所有元素设置为 null
+    arrayData.current.fill(null);
+    
+    // 删除所有节点并清除指示器
+    if (graphCanvasRef.current) {
+      // 清除所有指示器
+      graphCanvasRef.current.dispatchOperation('clearIndicators');
+      
+      // 删除每个数组元素对应的节点
+      for (let i = 0; i < length; i++) {
+        const nodeId = `element-${i}`;
+        // 尝试删除节点（如果存在）
+        try {
+          graphCanvasRef.current.dispatchOperation('deleteNode', nodeId);
+        } catch (error) {
+          // 如果节点不存在，忽略错误
+          continue;
+        }
+      }
+    }
+  };
+
   // 暴露方法给父组件
   useImperativeHandle(ref, () => ({
     setElement,
     removeElement,
     highlightRegion,
     removeHighlight,
-    clearAllHighlights
+    clearAllHighlights,
+    clearArray
   }));
 
   return (
@@ -116,6 +141,7 @@ const ArrayVisualization = forwardRef(({ height, length }, ref) => {
       width={width}
       height={height}
       isLoading={false}
+      enableDrawing = {false}
     />
   );
 });

@@ -11,7 +11,7 @@ export class GraphRenderer {
     this.canvasElement = document.createElement('canvas');
     this.canvasElement.setAttribute('width', width);
     this.canvasElement.setAttribute('height', height);
-    this.canvasElement.setAttribute('style', 'position: relative; border: 1px solid #cccccc;');
+    this.canvasElement.setAttribute('style', 'position: relative; ');
     
     // 初始化Fabric.js画布
     this.canvas = new fabric.Canvas(this.canvasElement, {
