@@ -1,0 +1,46 @@
+{
+  "nodes": [
+    { "id": "A", "label": "A", "x": 300, "y": 50, "size": 30, "type": "circle", "style": { "fill": "#4CAF50" } },
+    { "id": "B", "label": "B", "x": 150, "y": 130, "size": 30, "type": "circle", "style": { "fill": "#2196F3" } },
+    { "id": "C", "label": "C", "x": 450, "y": 130, "size": 30, "type": "circle", "style": { "fill": "#FF9800" } },
+    { "id": "D", "label": "D", "x": 100, "y": 200, "size": 30, "type": "circle", "style": { "fill": "#9C27B0" } },
+    { "id": "E", "label": "E", "x": 250, "y": 200, "size": 30, "type": "circle", "style": { "fill": "#F44336" } },
+    { "id": "F", "label": "F", "x": 400, "y": 200, "size": 30, "type": "circle", "style": { "fill": "#00BCD4" } },
+    { "id": "G", "label": "G", "x": 550, "y": 200, "size": 30, "type": "circle", "style": { "fill": "#8BC34A" } },
+    { "id": "H", "label": "H", "x": 150, "y": 300, "size": 30, "type": "circle", "style": { "fill": "#FFEB3B" } },
+    { "id": "I", "label": "I", "x": 300, "y": 300, "size": 30, "type": "circle", "style": { "fill": "#795548" } },
+    { "id": "J", "label": "J", "x": 450, "y": 300, "size": 30, "type": "circle", "style": { "fill": "#607D8B" } },
+    { "id": "K", "label": "K", "x": 250, "y": 400, "size": 30, "type": "circle", "style": { "fill": "#3F51B5" } },
+    { "id": "L", "label": "L", "x": 400, "y": 400, "size": 30, "type": "circle", "style": { "fill": "#E91E63" } }
+  ],
+  "edges": [
+    { "id": "e1", "label": "", "source": "A", "target": "B", "style": { "stroke": "#333", "lineWidth": 2 } },
+    { "id": "e2", "label": "", "source": "A", "target": "C", "style": { "stroke": "#333", "lineWidth": 2 } },
+    { "id": "e3", "label": "", "source": "B", "target": "D", "style": { "stroke": "#333", "lineWidth": 2 } },
+    { "id": "e4", "label": "", "source": "B", "target": "E", "style": { "stroke": "#333", "lineWidth": 2 } },
+    { "id": "e5", "label": "", "source": "C", "target": "F", "style": { "stroke": "#333", "lineWidth": 2 } },
+    { "id": "e6", "label": "", "source": "C", "target": "G", "style": { "stroke": "#333", "lineWidth": 2 } },
+    { "id": "e7", "label": "", "source": "D", "target": "H", "style": { "stroke": "#333", "lineWidth": 2 } },
+    { "id": "e8", "label": "", "source": "E", "target": "H", "style": { "stroke": "#333", "lineWidth": 2 } },
+    { "id": "e9", "label": "", "source": "E", "target": "I", "style": { "stroke": "#333", "lineWidth": 2 } },
+    { "id": "e10", "label": "", "source": "F", "target": "I", "style": { "stroke": "#333", "lineWidth": 2 } },
+    { "id": "e11", "label": "", "source": "F", "target": "J", "style": { "stroke": "#333", "lineWidth": 2 } },
+    { "id": "e12", "label": "", "source": "G", "target": "J", "style": { "stroke": "#333", "lineWidth": 2 } },
+    { "id": "e13", "label": "", "source": "H", "target": "K", "style": { "stroke": "#333", "lineWidth": 2 } },
+    { "id": "e14", "label": "", "source": "I", "target": "K", "style": { "stroke": "#333", "lineWidth": 2 } },
+    { "id": "e15", "label": "", "source": "I", "target": "L", "style": { "stroke": "#333", "lineWidth": 2 } },
+    { "id": "e16", "label": "", "source": "J", "target": "L", "style": { "stroke": "#333", "lineWidth": 2 } },
+    { "id": "e17", "label": "", "source": "K", "target": "L", "style": { "stroke": "#333", "lineWidth": 2 } },
+    { "id": "e18", "label": "", "source": "L", "target": "K", "style": { "stroke": "#333", "lineWidth": 2 } }
+  ],
+  "nodesStyle": {
+    "stroke": "#000000",
+    "lineWidth": 2,
+    "labelFill": "#ffffff",
+    "labelFontSize": 14
+  },
+  "edgesStyle": {
+    "stroke": "#666666",
+    "lineWidth": 2
+  }
+}
