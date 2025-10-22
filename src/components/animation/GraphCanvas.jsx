@@ -19,11 +19,17 @@ const GraphCanvas = forwardRef(({ width = 1000, height = 600, graphData = null, 
   
   // Refs
   const animateGraphRefs = useRef([]);
+  const isInitialized = useRef(false); // 用于跟踪是否已经初始化
   
-  // 初始化图数据 - 监听graphData的变化
   useEffect(() => {
+    // 使用ref来跟踪初始化状态，避免在依赖数组中添加graphDataList
+    if (isInitialized.current) {
+      console.log('GraphDataList已加载，跳过初始化');
+      return;
+    }
+    
     // 如果提供了graphData属性，检查它是否为数组
-    console.log('Canvas接收到graphData:', graphData);
+    console.log('Canvas初始化graphData:', graphData);
     if (graphData) {
       if (Array.isArray(graphData)) {
         setGraphDataList(graphData);
@@ -36,7 +42,10 @@ const GraphCanvas = forwardRef(({ width = 1000, height = 600, graphData = null, 
       setGraphDataList([EmptyGraph]);
       setIsInternalLoading(false);
     }
-  }, [graphData]); // 监听graphData的变化
+    
+    // 标记为已初始化
+    isInitialized.current = true;
+  }, []); // 空依赖数组，只在组件初始化时调用一次
   
   // 当graphDataList更新时，初始化所有图组件和控制器
   useEffect(() => {

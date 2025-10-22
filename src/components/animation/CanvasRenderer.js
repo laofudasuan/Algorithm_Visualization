@@ -137,6 +137,97 @@ export class CanvasRenderer {
   }
   
   /**
+   * 使用fabric.js添加边的脉冲动画指示器
+   */
+  addEdgePulseIndicator(id, startX, startY, endX, endY, color = '#ffeb3b', duration = 1000) {
+    // 如果已存在相同ID的动画，先删除它
+    if (this.animations.has(id)) {
+      this.removeIndicator(id);
+    }
+    
+    // 计算边的长度
+    const dx = endX - startX;
+    const dy = endY - startY;
+    const length = Math.sqrt(dx * dx + dy * dy);
+    const angle = Math.atan2(dy, dx);
+    
+    // 创建脉冲线条对象 - 使用正确的坐标和属性
+    const pulseLine = new fabric.Line([0, 0, length, 0], {
+      left: startX,
+      top: startY,
+      stroke: color,
+      strokeWidth: 6,
+      strokeDashArray: [length, length],
+      strokeDashOffset: length,
+      selectable: false,
+      hoverCursor: 'default',
+      originX: 'left',
+      originY: 'center',
+      angle: angle * 180 / Math.PI, // 转换为角度
+      opacity: 1
+    });
+    
+    // 添加到画布
+    this.fabricCanvas.add(pulseLine);
+    this.fabricCanvas.renderAll(); // 立即渲染确保线条可见
+    
+    // 保存引用
+    this.animations.set(id, {
+      type: 'edge-pulse',
+      object: pulseLine,
+      startX: startX,
+      startY: startY,
+      endX: endX,
+      endY: endY,
+      color: color,
+      duration: duration,
+      length: length
+    });
+    
+    // 开始边脉冲动画
+    this._animateEdgePulse(id, pulseLine, length, duration);
+  }
+  
+  /**
+   * 边脉冲动画的实现
+   */
+  _animateEdgePulse(id, pulseLine, length, duration) {
+    // 动画配置
+    const startTime = Date.now();
+    
+    const animate = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      
+      // 更新虚线偏移量，创建脉冲效果
+      pulseLine.set({
+        strokeDashOffset: length - length * progress
+      });
+      
+      // 更新透明度，使动画结束时淡出
+      const opacity = 1 - progress;
+      pulseLine.set({
+        opacity: opacity
+      });
+      
+      // 应用更新
+      pulseLine.setCoords();
+      this.fabricCanvas.renderAll();
+      
+      // 继续动画或结束
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        // 动画结束后移除指示器
+        this.removeIndicator(id);
+      }
+    };
+    
+    // 开始动画
+    requestAnimationFrame(animate);
+  }
+
+  /**
    * 使用fabric.js添加脉冲动画指示器
    */
   addPulseIndicator(id, x, y, radius = 30, color = '#ffeb3b', duration = 3000, repeatCount = 3) {

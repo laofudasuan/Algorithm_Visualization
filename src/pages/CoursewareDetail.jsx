@@ -28,43 +28,57 @@ const CoursewareDetail = () => {
     };
   }, []);
   
+  // 使用Vite的import.meta.glob预加载所有可能的MDX文件
+  const coursewareFiles = import.meta.glob('../data/courseware/*.mdx', { eager: false });
+  const pageFiles = import.meta.glob('../data/courseware/pages/*.mdx', { eager: false });
+
   useEffect(() => {
     const loadCourseware = async () => {
       try {
         // 动态导入对应的MDX课件文件
-        const coursewareModule = await import(`../data/courseware/${id}.mdx`);
-        
-        // 提取frontmatter信息
-        setCourseware({
-          id,
-          ...coursewareModule.attributes
-        });
-        
-        // 检查是否有分页配置
-        if (coursewareModule.attributes.pages && Array.isArray(coursewareModule.attributes.pages)) {
-          const components = [];
-          const attributes = [];
+        const coursewarePath = `../data/courseware/${id}.mdx`;
+        if (coursewareFiles[coursewarePath]) {
+          const coursewareModule = await coursewareFiles[coursewarePath]();
           
-          // 导入所有页面组件 - 使用@vite-ignore解决动态导入警告
-          for (const pageFile of coursewareModule.attributes.pages) {
-            try {
-              // 添加 @vite-ignore 注释以抑制警告
-              const pageModule = await import(/* @vite-ignore */ `../data/courseware/pages/${pageFile}`);
-              components.push(pageModule.default);
-              attributes.push(pageModule.attributes || {});
-            } catch (pageError) {
-              console.error(`加载页面 ${pageFile} 失败:`, pageError);
+          // 提取frontmatter信息
+          setCourseware({
+            id,
+            ...coursewareModule.attributes
+          });
+          
+          // 检查是否有分页配置
+          if (coursewareModule.attributes.pages && Array.isArray(coursewareModule.attributes.pages)) {
+            const components = [];
+            const attributes = [];
+            
+            // 使用预加载的页面文件
+            for (const pageFile of coursewareModule.attributes.pages) {
+              try {
+                const pagePath = `../data/courseware/pages/${pageFile}`;
+                if (pageFiles[pagePath]) {
+                  const pageModule = await pageFiles[pagePath]();
+                  components.push(pageModule.default);
+                  attributes.push(pageModule.attributes || {});
+                } else {
+                  console.error(`页面文件不存在: ${pagePath}`);
+                }
+              } catch (pageError) {
+                console.error(`加载页面 ${pageFile} 失败:`, pageError);
+              }
             }
+            
+            setPageComponents(components);
+            setPageAttributes(attributes);
+            setPageCount(components.length);
+          } else {
+            // 兼容旧格式
+            setPageComponents([coursewareModule.default]);
+            setPageAttributes([coursewareModule.attributes]);
+            setPageCount(1);
           }
-          
-          setPageComponents(components);
-          setPageAttributes(attributes);
-          setPageCount(components.length);
         } else {
-          // 兼容旧格式
-          setPageComponents([coursewareModule.default]);
-          setPageAttributes([coursewareModule.attributes]);
-          setPageCount(1);
+          console.error(`课件文件不存在: ${coursewarePath}`);
+          setError(new Error('课件文件不存在'));
         }
       } catch (err) {
         console.error('加载课件失败:', err);

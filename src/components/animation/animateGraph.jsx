@@ -90,9 +90,11 @@ const AnimateGraph = forwardRef(({
     
     const controller = getController();
     
-    if (typeof onInit === 'function') {
-      onInit(controller);
-    }
+    setTimeout(() => {
+      if (typeof onInit === 'function') {
+        onInit(controller);
+      }
+    }, 0);
     
     // Cleanup function
     return () => {
@@ -380,6 +382,23 @@ const AnimateGraph = forwardRef(({
             duration,
             repeatCount
           );
+        } else if (options.type === 'edge-pulse') {
+          // 边脉冲动画，需要source和target节点
+          const sourceNode = currentNodesRef.current.find(node => node.id === options.source);
+          const targetNode = currentNodesRef.current.find(node => node.id === options.target);
+          
+          if (sourceNode && targetNode) {
+            const duration = options.duration || 1000;
+            indicatorRendererRef.current.addEdgePulseIndicator(
+              indicatorId,
+              sourceNode.x,
+              sourceNode.y,
+              targetNode.x,
+              targetNode.y,
+              color,
+              duration
+            );
+          }
         }
       }
       

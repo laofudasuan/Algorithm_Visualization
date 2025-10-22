@@ -1,11 +1,11 @@
 import React, { useRef, useState, useEffect } from 'react';
 import GraphCanvas from '../../components/animation/GraphCanvas.jsx';
-import ArrayVisualization from '../../components/visualizations/ArrayVisualization.jsx';
+import StackVisualization from '../../components/visualizations/StackVisualization.jsx';
 import { loadGraphData } from '../../components/utils/GraphDataLoader.jsx';
 
 const DFSVisualizationPage = () => {
   const graphCanvasRef = useRef(null);
-  const arrayVizRef = useRef(null);
+  const stackVizRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [visitedNodes, setVisitedNodes] = useState([]);
   const [callStack, setCallStack] = useState([]);
@@ -57,17 +57,25 @@ const DFSVisualizationPage = () => {
   // 异步DFS算法实现 - 直接进行可视化操作
   const asyncDFS = async (startNode, delayMs = 1000) => {
     const visited = new Set();
-    const stack = [];
+    const currentStack = []; // 用于跟踪当前栈内容
     
     const dfsHelper = async (node) => {
       
       // 标记节点为已访问
       visited.add(node);
-      stack.push(node);
+      
+      // 直接使用stackVizRef进行入栈操作
+      if (stackVizRef.current) {
+        await delay(100);
+        stackVizRef.current.push(node);
+      }
+      
+      // 更新内部栈状态
+      currentStack.push(node);
       
       // 更新状态
       setVisitedNodes(prev => [...prev, node]);
-      setCallStack([...stack]);
+      setCallStack([...currentStack]);
       
       // 使用指示器高亮访问的节点
       if (graphCanvasRef.current) {
@@ -75,23 +83,10 @@ const DFSVisualizationPage = () => {
           id: `visited-${node}`,
           type: 'highlight',
           target: node,
-          color: '#4CAF50', // 绿色表示已访问
+          color: '#29a0dcff', // 绿色表示正在递归中
           radius: 35,
           lineWidth: 4
         });
-      }
-      
-      // 更新调用栈可视化
-      if (arrayVizRef.current) {
-        // 先清空再添加，避免残留元素
-        await delay(100); // 微小延迟确保清空效果可见
-        stack.forEach((stackNode, index) => {
-          arrayVizRef.current.setElement(index, stackNode);
-        });
-        // 清除栈外的元素
-        for (let i = stack.length; i < 10; i++) {
-          arrayVizRef.current.removeElement(i);
-        }
       }
       
       // 添加延迟以创建动画效果
@@ -105,13 +100,20 @@ const DFSVisualizationPage = () => {
           // 为正在探索的边添加指示器
           if (graphCanvasRef.current) {
             graphCanvasRef.current.dispatchOperation('addIndicator', {
-              id: `explore-${node}-${neighbor}`,
-              type: 'pulse',
-              target: node, // 从源节点开始的脉冲
-              color: '#FFC107', // 黄色表示正在探索
-              radius: 40,
+              id: `explore-${node}`,
+              type: 'pulse', // 使用边脉冲动画
+              target: node,
+              color: '#ff0000ff',  // 黄色表示正在探索
               duration: 500,
               repeatCount: 1
+            });
+            graphCanvasRef.current.dispatchOperation('addIndicator', {
+              id: `explore-${node}-${neighbor}`,
+              type: 'edge-pulse', // 使用边脉冲动画
+              source: node,      // 源节点
+              target: neighbor,  // 目标节点
+              color: '#ff0000ff',  // 黄色表示正在探索
+              duration: 1000
             });
           }
           
@@ -124,23 +126,19 @@ const DFSVisualizationPage = () => {
       }
       
       // 回溯
-      const currentNode = stack.pop();
-      setCallStack([...stack]);
+      const currentNode = currentStack.pop();
+      
+      // 直接使用stackVizRef进行出栈操作
+      if (stackVizRef.current) {
+        stackVizRef.current.pop();
+      }
+      
+      // 更新状态
+      setCallStack([...currentStack]);
       
       // 删除节点的访问指示器
       if (graphCanvasRef.current && currentNode) {
         graphCanvasRef.current.dispatchOperation('removeIndicator', `visited-${currentNode}`);
-      }
-      
-      // 更新调用栈可视化
-      if (arrayVizRef.current) {
-        stack.forEach((stackNode, index) => {
-          arrayVizRef.current.setElement(index, stackNode);
-        });
-        // 清除栈外的元素
-        for (let i = stack.length; i < 10; i++) {
-          arrayVizRef.current.removeElement(i);
-        }
       }
       
       // 添加延迟以创建动画效果
@@ -164,9 +162,9 @@ const DFSVisualizationPage = () => {
       graphCanvasRef.current.dispatchOperation('clearIndicators', {});
     }
     
-    // 重置数组可视化
-    if (arrayVizRef.current) {
-      arrayVizRef.current.clearArray();
+    // 重置栈可视化 - 直接调用clear方法
+    if (stackVizRef.current) {
+      stackVizRef.current.clear();
     }
     
     // 获取起始节点（第一个节点）
@@ -194,9 +192,9 @@ const DFSVisualizationPage = () => {
       graphCanvasRef.current.dispatchOperation('clearIndicators', {});
     }
     
-    // 重置数组可视化
-    if (arrayVizRef.current) {
-      arrayVizRef.current.clearArray();
+    // 重置栈可视化 - 直接调用clear方法
+    if (stackVizRef.current) {
+      stackVizRef.current.clear();
     }
   };
 
@@ -237,10 +235,10 @@ const DFSVisualizationPage = () => {
           
           <div className="bg-white rounded-xl shadow-lg p-6">
             <h2 className="text-xl font-semibold mb-4 text-gray-700">调用栈可视化</h2>
-              <ArrayVisualization 
-                ref={arrayVizRef}
+              <StackVisualization 
+                ref={stackVizRef}
                 height={50}
-                length={10}
+                maxSize={10}
               />
           </div>
         </div>
