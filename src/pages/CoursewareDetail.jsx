@@ -51,19 +51,25 @@ const CoursewareDetail = () => {
             const components = [];
             const attributes = [];
             
-            // 使用预加载的页面文件
+            // 直接使用动态导入加载页面文件
             for (const pageFile of coursewareModule.attributes.pages) {
               try {
-                const pagePath = `../data/courseware/pages/${pageFile}`;
-                if (pageFiles[pagePath]) {
-                  const pageModule = await pageFiles[pagePath]();
-                  components.push(pageModule.default);
-                  attributes.push(pageModule.attributes || {});
-                } else {
-                  console.error(`页面文件不存在: ${pagePath}`);
-                }
-              } catch (pageError) {
-                console.error(`加载页面 ${pageFile} 失败:`, pageError);
+                console.log(`正在加载页面: ${pageFile}`);
+                // 直接使用动态导入，避免glob匹配的复杂性
+                const dynamicImport = await import(`../data/courseware/pages/${pageFile}`);
+                components.push(dynamicImport.default);
+                attributes.push(dynamicImport.attributes || {});
+                console.log(`成功加载页面: ${pageFile}`);
+              } catch (importError) {
+                console.error(`加载页面 ${pageFile} 失败:`, importError);
+                // 添加一个错误占位组件
+                components.push(() => (
+                  <div className="text-center py-12 bg-red-50 rounded-lg">
+                    <h3 className="text-xl font-bold text-red-600 mb-2">页面加载失败</h3>
+                    <p className="text-gray-600">{pageFile}</p>
+                  </div>
+                ));
+                attributes.push({});
               }
             }
             
