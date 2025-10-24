@@ -540,7 +540,7 @@ const AnimateGraph = forwardRef(({
         }}
       />
       
-      {/* 绘图工具栏 - 画布右下角 - 仅当enableDrawing为true时显示 */}
+      {/* 绘图工具栏 - 画布做上角 - 仅当enableDrawing为true时显示 */}
       {enableDrawing && (
         <div style={{
           position: 'absolute',

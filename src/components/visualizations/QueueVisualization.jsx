@@ -59,7 +59,7 @@ const QueueVisualization = forwardRef(({ height, maxSize = 10 }, ref) => {
         const newFrontIndex = front.current % maxSize;
         const newRearIndex = (rear.current - 1) % maxSize;
         arrayVizRef.current.highlightRegion('front-element', newFrontIndex, newFrontIndex, '#FF9800');
-        arrayVizRef.current.highlightRegion('rear-element', newRearIndex, newRearIndex, '#4CAF50');
+        arrayVizRef.current.highlightRegion('rear-element', newRearIndex, newRearIndex, '#ff0000ff');
       }
       
       return dequeuedValue;
@@ -129,7 +129,7 @@ const QueueVisualization = forwardRef(({ height, maxSize = 10 }, ref) => {
         length={maxSize}
       />
       {/* 队列指示器 */}
-      {queueData.current.length > 0 && (
+      {
         <div className="flex justify-between text-xs mt-1 px-4">
           <div className="flex items-center">
             <div className="w-3 h-3 bg-orange-500 mr-1"></div>
@@ -137,10 +137,10 @@ const QueueVisualization = forwardRef(({ height, maxSize = 10 }, ref) => {
           </div>
           <div className="flex items-center">
             <span>队尾</span>
-            <div className="w-3 h-3 bg-green-500 ml-1"></div>
+            <div className="w-3 h-3 bg-red-500 ml-1"></div>
           </div>
         </div>
-      )}
+      }
     </div>
   );
 });

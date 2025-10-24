@@ -181,8 +181,8 @@ const CoursewareDetail = () => {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center container mx-auto px-4 pt-32 pb-32">
         
-        {/* 返回按钮 */}
-        <div className="fixed top-4 left-4 z-50">
+        {/* 返回按钮 - 位于页面右上角 */}
+        <div className="fixed top-4 right-4">
           <button 
             onClick={goBackToCoursewareList}
             className="bg-white text-gray-800 p-3 rounded-full shadow-lg hover:bg-gray-100 transition-colors"
@@ -245,7 +245,7 @@ const CoursewareDetail = () => {
       </div>
       
       {/* 课件内容容器 - 左右滑动结构 */}
-      <div className="max-w-3xl mx-auto relative" style={{ minHeight: '500px' }}>
+      <div className="w-[80%] mx-auto relative" style={{ minHeight: '500px' }}>
         <div 
           ref={contentRef}
           className="relative overflow-hidden w-full h-full"
@@ -281,7 +281,7 @@ const CoursewareDetail = () => {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             onClick={goBackToMainPage}
-            className="fixed top-4 left-4 z-50 bg-white text-gray-800 p-3 rounded-full shadow-lg hover:bg-gray-100 transition-colors"
+            className="fixed top-4 left-4 bg-white text-gray-800 p-3 rounded-full shadow-lg hover:bg-gray-100 transition-colors"
             aria-label="返回课件主页"
           >
             <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">

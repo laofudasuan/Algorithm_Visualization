@@ -1,4 +1,6 @@
 {
+  "width": 1000,
+  "height": 600,
   "nodes": [
     { "id": "1", "label": "节点1", "x": 300, "y": 180, "size": 60, "type": "circle", "style": { "fill": "#4CAF50" } },
     { "id": "2", "label": "节点2", "x": 700, "y": 180, "size": 50, "type": "circle", "style": { "fill": "#2196F3" } },

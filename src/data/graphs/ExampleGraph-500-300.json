@@ -1,10 +1,12 @@
 {
+  "width": 500,
+  "height": 300,
   "nodes": [
-    { "id": "1", "label": "节点1", "x": 150, "y": 90, "size": 30, "type": "circle", "style": { "fill": "#4CAF50" } },
-    { "id": "2", "label": "节点2", "x": 350, "y": 90, "size": 25, "type": "circle", "style": { "fill": "#2196F3" } },
-    { "id": "3", "label": "节点3", "x": 150, "y": 210, "size": 35, "type": "square", "style": { "fill": "#FF9800" } },
-    { "id": "4", "label": "节点4", "x": 350, "y": 210, "size": 28, "type": "circle", "style": { "fill": "#9C27B0" } },
-    { "id": "5", "label": "节点5", "x": 250, "y": 150, "size": 32, "type": "square", "style": { "fill": "#F44336" } }
+    { "id": "1", "label": "节点1", "x": 80, "y": 80, "size": 60, "type": "circle", "style": { "fill": "#4CAF50" } },
+    { "id": "2", "label": "节点2", "x": 420, "y": 80, "size": 50, "type": "circle", "style": { "fill": "#2196F3" } },
+    { "id": "3", "label": "节点3", "x": 80, "y": 210, "size": 70, "type": "square", "style": { "fill": "#FF9800" } },
+    { "id": "4", "label": "节点4", "x": 420, "y": 210, "size": 56, "type": "circle", "style": { "fill": "#9C27B0" } },
+    { "id": "5", "label": "节点5", "x": 250, "y": 150, "size": 64, "type": "square", "style": { "fill": "#F44336" } }
   ],
   "edges": [
     { "id": "e1", "label": "边1", "source": "1", "target": "2", "style": { "stroke": "#333", "lineWidth": 2, "arrow": true } },

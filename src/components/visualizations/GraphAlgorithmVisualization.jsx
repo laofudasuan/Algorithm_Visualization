@@ -1,22 +1,25 @@
 import React, { useRef, useState, useEffect, forwardRef, useImperativeHandle } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import GraphCanvas from '../animation/GraphCanvas.jsx';
-import StackVisualization from './StackVisualization.jsx';
-import QueueVisualization from './QueueVisualization.jsx';
 import { loadGraphData } from '../utils/GraphDataLoader.jsx';
+import GraphAlgorithmMotion from './GraphAlgorithmMotion.jsx';
+import TwoDArrayVisualization from './TwoDArrayVisualization.jsx';
 
 const GraphAlgorithmVisualization = forwardRef(({ 
-  graphName = 'dfs-graph'
+  graphName = 'dfs-graph',
+  enableAnimation = false,
+  showAdjacencyMatrix = false
 }, ref) => {
   const graphCanvasRef = useRef(null);
-  const stackVizRef = useRef(null);
-  const queueVizRef = useRef(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [visitedNodes, setVisitedNodes] = useState([]);
-  const [dataStructure, setDataStructure] = useState([]); // 用于跟踪栈或队列内容
+  const algorithmMotionRef = useRef(null);
+  const adjacencyMatrixRef = useRef(null);
   const [graphData, setGraphData] = useState(null);
   const [graphAdjList, setGraphAdjList] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [currentAlgorithm, setCurrentAlgorithm] = useState('dfs'); // 当前选中的算法类型
+  const [showAnimationModal, setShowAnimationModal] = useState(false); // 控制动画浮动窗口显示的状态
+  const [showAlgorithmDropdown, setShowAlgorithmDropdown] = useState(false); // 控制算法选择下拉菜单的显示
+  const [adjacencyMatrix, setAdjacencyMatrix] = useState(null);
 
   // 从JSON文件加载图数据
   useEffect(() => {
@@ -50,6 +53,10 @@ const GraphAlgorithmVisualization = forwardRef(({
         });
         
         setGraphAdjList(adjList);
+        
+        // 构建邻接矩阵
+        const matrix = buildAdjacencyMatrix(graphData);
+        setAdjacencyMatrix(matrix);
       } catch (error) {
         console.error('加载图数据失败:', error);
       } finally {
@@ -60,385 +67,183 @@ const GraphAlgorithmVisualization = forwardRef(({
     fetchGraphData();
   }, [graphName]);
   
-  // 切换算法时重置数据结构和访问状态
-  const handleAlgorithmChange = (algorithm) => {
-    setCurrentAlgorithm(algorithm);
-    resetVisualization();
-  };
+  // 当邻接矩阵数据改变且showAdjacencyMatrix为true时，加载到可视化组件
+  // 现在由于组件只有在adjacencyMatrix存在时才渲染，这里主要是处理切换显示状态的情况
+  useEffect(() => {
+    if (showAdjacencyMatrix && adjacencyMatrix && adjacencyMatrixRef.current) {
+      adjacencyMatrixRef.current.loadMatrix(adjacencyMatrix);
+    }
+  }, [showAdjacencyMatrix, adjacencyMatrix]);
   
-  // 延迟函数
-  const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+  // 构建邻接矩阵
+  const buildAdjacencyMatrix = (graphData) => {
+    const nodes = graphData.nodes;
+    const edges = graphData.edges;
+    const nodeCount = nodes.length;
+    
+    // 初始化全为0的邻接矩阵
+    const matrix = Array(nodeCount).fill(null).map(() => Array(nodeCount).fill(0));
+    
+    // 填充邻接矩阵，存在边的位置设为1
+    edges.forEach(edge => {
+      // 找到节点在数组中的索引位置
+      const sourceIndex = nodes.findIndex(node => node.id === edge.source);
+      const targetIndex = nodes.findIndex(node => node.id === edge.target);
+      
+      if (sourceIndex !== -1 && targetIndex !== -1) {
+        matrix[sourceIndex][targetIndex] = 1;
+        matrix[targetIndex][sourceIndex] = 1; // 无向图，对称
+      }
+    });
+    
+    return matrix;
+  };
 
-  // 异步DFS算法实现
-  const asyncDFS = async (startNode, delayMs = 1000) => {
-    const visited = new Set();
-    const currentStack = [];
-    
-    const dfsHelper = async (node) => {
-      // 标记节点为已访问
-      visited.add(node);
-      
-      // 使用stackVizRef进行入栈操作
-      if (stackVizRef.current) {
-        await delay(100);
-        stackVizRef.current.push(node);
-      }
-      
-      // 更新内部栈状态
-      currentStack.push(node);
-      
-      // 更新状态
-      setVisitedNodes(prev => [...prev, node]);
-      setDataStructure([...currentStack]);
-      
-      // 使用指示器高亮访问的节点
-      if (graphCanvasRef.current) {
-        graphCanvasRef.current.dispatchOperation('addIndicator', {
-          id: `visited-${node}`,
-          type: 'highlight',
-          target: node,
-          color: '#29a0dcff', // 蓝色表示正在递归中
-          radius: 35,
-          lineWidth: 4
-        });
-      }
-      
-      // 添加延迟以创建动画效果
-      await delay(delayMs);
-      
-      // 访问所有未访问的邻居节点
-      const neighbors = graphAdjList[node] || [];
-      for (const neighbor of neighbors) {
-        if (!visited.has(neighbor)) {
-          // 为正在探索的边添加指示器
-          if (graphCanvasRef.current) {
-            graphCanvasRef.current.dispatchOperation('addIndicator', {
-              id: `explore-${node}`,
-              type: 'pulse',
-              target: node,
-              color: '#ff0000ff',  // 红色表示正在探索
-              duration: 500,
-              repeatCount: 1
-            });
-            graphCanvasRef.current.dispatchOperation('addIndicator', {
-              id: `explore-${node}-${neighbor}`,
-              type: 'edge-pulse',
-              source: node,
-              target: neighbor,
-              color: '#ff0000ff',
-              duration: 1000
-            });
-          }
-          
-          // 添加延迟以创建动画效果
-          await delay(delayMs / 2);
-          
-          // 递归调用DFS
-          await dfsHelper(neighbor);
-        }
-      }
-      
-      // 回溯
-      const currentNode = currentStack.pop();
-      
-      // 使用stackVizRef进行出栈操作
-      if (stackVizRef.current) {
-        stackVizRef.current.pop();
-      }
-      
-      // 更新状态
-      setDataStructure([...currentStack]);
-      
-      // 删除节点的访问指示器
-      if (graphCanvasRef.current && currentNode) {
-        graphCanvasRef.current.dispatchOperation('removeIndicator', `visited-${currentNode}`);
-      }
-      
-      // 添加延迟以创建动画效果
-      await delay(delayMs / 2);
-    };
-    
-    await dfsHelper(startNode);
-    return visited;
-  };
-  
-  // 异步BFS算法实现
-  const asyncBFS = async (startNode, delayMs = 1000) => {
-    const visited = new Set();
-    const queue = [startNode];
-    visited.add(startNode);
-    
-    // 使用queueVizRef进行入队操作
-    if (queueVizRef.current) {
-      await delay(100);
-      queueVizRef.current.enqueue(startNode);
-    }
-    
-    // 更新状态
-    setVisitedNodes(prev => [...prev, startNode]);
-    setDataStructure([...queue]);
-    
-    // 使用指示器高亮访问的节点
-    if (graphCanvasRef.current) {
-      graphCanvasRef.current.dispatchOperation('addIndicator', {
-        id: `visited-${startNode}`,
-        type: 'highlight',
-        target: startNode,
-        color: '#4CAF50', // 绿色表示已访问
-        radius: 35,
-        lineWidth: 4
-      });
-    }
-    
-    // 添加延迟以创建动画效果
-    await delay(delayMs);
-    
-    while (queue.length > 0) {
-      // 出队
-      const currentNode = queue.shift();
-      
-      // 使用queueVizRef进行出队操作
-      if (queueVizRef.current) {
-        queueVizRef.current.dequeue();
-      }
-      
-      // 更新状态
-      setDataStructure([...queue]);
-      
-      // 添加延迟
-      await delay(delayMs / 2);
-      
-      // 访问所有未访问的邻居节点
-      const neighbors = graphAdjList[currentNode] || [];
-      for (const neighbor of neighbors) {
-        if (!visited.has(neighbor)) {
-          // 标记为已访问
-          visited.add(neighbor);
-          queue.push(neighbor);
-          
-          // 使用queueVizRef进行入队操作
-          if (queueVizRef.current) {
-            queueVizRef.current.enqueue(neighbor);
-          }
-          
-          // 更新状态
-          setVisitedNodes(prev => [...prev, neighbor]);
-          setDataStructure([...queue]);
-          
-          // 为正在探索的边添加指示器
-          if (graphCanvasRef.current) {
-            graphCanvasRef.current.dispatchOperation('addIndicator', {
-              id: `explore-${currentNode}-${neighbor}`,
-              type: 'edge-pulse',
-              source: currentNode,
-              target: neighbor,
-              color: '#FF9800', // 橙色表示正在探索
-              duration: 1000
-            });
-            
-            // 高亮新访问的节点
-            graphCanvasRef.current.dispatchOperation('addIndicator', {
-              id: `visited-${neighbor}`,
-              type: 'highlight',
-              target: neighbor,
-              color: '#4CAF50',
-              radius: 35,
-              lineWidth: 4
-            });
-          }
-          
-          // 添加延迟以创建动画效果
-          await delay(delayMs / 2);
-        }
-      }
-    }
-    
-    return visited;
-  };
-  
-  // 开始执行算法动画
-  const startExecution = async () => {
-    if (isPlaying || !graphData || Object.keys(graphAdjList).length === 0 || graphData.nodes.length === 0) return;
-    
-    setIsPlaying(true);
-    setVisitedNodes([]);
-    setDataStructure([]);
-    
-    // 重置图的视觉状态 - 清除所有指示器
-    if (graphCanvasRef.current) {
-      graphCanvasRef.current.dispatchOperation('clearIndicators', {});
-    }
-    
-    // 重置数据结构可视化
-    if (currentAlgorithm === 'dfs' && stackVizRef.current) {
-      stackVizRef.current.clear();
-    } else if (currentAlgorithm === 'bfs' && queueVizRef.current) {
-      queueVizRef.current.clear();
-    }
-    
-    // 获取起始节点（第一个节点）
-    const startNode = graphData.nodes[0].id;
-    
-    try {
-      // 执行相应的算法
-      if (currentAlgorithm === 'dfs') {
-        await asyncDFS(startNode, 1000);
-      } else if (currentAlgorithm === 'bfs') {
-        await asyncBFS(startNode, 1000);
-      }
-    } catch (error) {
-      console.error(`${algorithmType.toUpperCase()}执行过程中出错:`, error);
-    } finally {
-      // 确保执行状态被重置
-      setIsPlaying(false);
+  // 打开算法选择下拉菜单
+  const toggleAlgorithmDropdown = () => {
+    if (graphData && !isLoading) {
+      setShowAlgorithmDropdown(!showAlgorithmDropdown);
     }
   };
-  
-  // 重置可视化
-  const resetVisualization = () => {
-    setIsPlaying(false);
-    setVisitedNodes([]);
-    setDataStructure([]);
-    
-    // 重置图的视觉状态 - 清除所有指示器
-    if (graphCanvasRef.current) {
-      graphCanvasRef.current.dispatchOperation('clearIndicators', {});
-    }
-    
-    // 重置数据结构可视化
-    if (currentAlgorithm === 'dfs' && stackVizRef.current) {
-      stackVizRef.current.clear();
-    } else if (currentAlgorithm === 'bfs' && queueVizRef.current) {
-      queueVizRef.current.clear();
-    }
+
+  // 选择算法并打开动画浮动窗口
+  const selectAlgorithmAndOpenModal = (algorithm) => {
+    setCurrentAlgorithm(algorithm);
+    setShowAlgorithmDropdown(false);
+    setShowAnimationModal(true);
+  };
+
+  // 关闭动画浮动窗口
+  const closeAnimationModal = () => {
+    setShowAnimationModal(false);
   };
 
   // 暴露方法给父组件
   useImperativeHandle(ref, () => ({
-    startExecution,
-    resetVisualization,
-    getVisitedNodes: () => visitedNodes,
-    getDataStructure: () => dataStructure,
-    isPlaying: isPlaying,
-    isLoading: isLoading
+    isLoading: isLoading,
+    graphData: graphData
   }));
 
-  // 获取算法标题和描述
-  const getAlgorithmInfo = () => {
-    if (currentAlgorithm === 'dfs') {
-      return {
-        title: '深度优先搜索(DFS)算法',
-        dataStructureTitle: '调用栈可视化',
-        dataStructureName: '调用栈'
-      };
-    } else if (currentAlgorithm === 'bfs') {
-      return {
-        title: '广度优先搜索(BFS)算法',
-        dataStructureTitle: '队列可视化',
-        dataStructureName: '队列'
-      };
-    }
-    return {
-      title: '图算法',
-      dataStructureTitle: '数据结构可视化',
-      dataStructureName: '数据结构'
-    };
-  };
-
-  const { title, dataStructureTitle, dataStructureName } = getAlgorithmInfo();
-
   return (
-    <div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <div className="bg-white rounded-xl shadow-lg p-6">
-          <h2 className="text-xl font-semibold mb-4 text-gray-700">图算法演示</h2>
-          <div className="flex flex-wrap gap-3 mb-4">
-            {/* 算法选择按钮 */}
-            <div className="flex border border-gray-300 rounded-md overflow-hidden">
-              <button
-                onClick={() => handleAlgorithmChange('dfs')}
-                disabled={isPlaying}
-                className={`px-4 py-2 transition-colors ${currentAlgorithm === 'dfs' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700'}`}
-              >
-                DFS
-              </button>
-              <button
-                onClick={() => handleAlgorithmChange('bfs')}
-                disabled={isPlaying}
-                className={`px-4 py-2 transition-colors ${currentAlgorithm === 'bfs' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700'}`}
-              >
-                BFS
-              </button>
+    <div className="relative">
+      {/* 初始界面 - 图的展示 */}
+      <div className="">
+        {isLoading ? (
+          <div className="w-full h-[500px] flex items-center justify-center bg-gray-50">
+            <div className="text-center">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500 mb-2"></div>
+              <p className="text-gray-600">加载图数据中...</p>
             </div>
-            
-            {/* 执行按钮 */}
-            <button 
-              onClick={startExecution}
-              disabled={isPlaying || !graphData}
-              className={`px-4 py-2 rounded-md transition-colors ${
-                isPlaying || !graphData
-                  ? 'bg-gray-400 cursor-not-allowed' 
-                  : 'bg-green-600 hover:bg-green-700 text-white'
-              }`}
-            >
-              {isPlaying ? '执行中...' : `开始执行${currentAlgorithm.toUpperCase()}`}
-            </button>
-            
-            <button 
-              onClick={resetVisualization}
-              className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
-            >
-              重置
-            </button>
           </div>
-          
-          <div className="text-gray-700 space-y-2">
-            <p><strong>已访问节点:</strong> {visitedNodes.join(', ') || '无'}</p>
-            <p><strong>{dataStructureName}:</strong> {dataStructure.join(', ') || '空'}</p>
-          </div>
-        </div>
-        
-        <div className="bg-white rounded-xl shadow-lg p-6">
-          <h2 className="text-xl font-semibold mb-4 text-gray-700">{dataStructureTitle}</h2>
-          {currentAlgorithm === 'dfs' ? (
-            <StackVisualization 
-              ref={stackVizRef}
-              height={50}
-              maxSize={10}
-            />
-          ) : (
-            <QueueVisualization 
-              ref={queueVizRef}
-              height={50}
-              maxSize={10}
-            />
-          )}
-        </div>
-      </div>
-      
-      <div className="bg-white rounded-xl shadow-lg p-6">
-        <h2 className="text-xl font-semibold mb-4 text-gray-700">图结构可视化</h2>
-          {isLoading ? (
-            <div className="w-full h-[500px] flex items-center justify-center bg-gray-50">
-              <div className="text-center">
-                <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500 mb-2"></div>
-                <p className="text-gray-600">加载图数据中...</p>
-              </div>
-            </div>
-          ) : graphData ? (
+        ) : graphData ? (
+          <div className="flex items-start">
             <GraphCanvas 
               ref={graphCanvasRef}
-              width={600}
-              height={500}
+              width={showAdjacencyMatrix ? 800 : (graphData.width || 1200)}
+              height={graphData.height || 500}
               graphData={graphData}
               isLoading={false}
             />
-          ) : (
-            <div className="w-full h-[500px] flex items-center justify-center bg-gray-50">
-              <p className="text-gray-600">图数据加载失败</p>
-            </div>
-          )}
+            {showAdjacencyMatrix && adjacencyMatrix && (
+              <div className="ml-4 mt-2">
+                <TwoDArrayVisualization
+                  ref={adjacencyMatrixRef}
+                  width={400}
+                  height={400}
+                  rows={graphData.nodes.length}
+                  cols={graphData.nodes.length}
+                />
+              </div>
+            )}
+            {(enableAnimation || showAdjacencyMatrix) && (
+              <div className="ml-4 mt-2 relative">
+                {enableAnimation && (
+                  <button 
+                    onClick={toggleAlgorithmDropdown}
+                    disabled={!graphData || isLoading}
+                    className={`px-4 py-2 rounded-md transition-colors ${(
+                      !graphData || isLoading
+                        ? 'bg-gray-400 cursor-not-allowed' 
+                        : 'bg-green-600 hover:bg-green-700 text-white'
+                    )} mb-2 block`}
+                  >
+                    播放动画
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 inline ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                )}
+                
+                {/* 算法选择下拉菜单 */}
+                {enableAnimation && showAlgorithmDropdown && (
+                  <div className="absolute mt-1 right-0 z-10 bg-white shadow-lg rounded-md overflow-hidden w-40">
+                    <button
+                      onClick={() => selectAlgorithmAndOpenModal('dfs')}
+                      className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
+                    >
+                      深度优先搜索(DFS)
+                    </button>
+                    <button
+                      onClick={() => selectAlgorithmAndOpenModal('bfs')}
+                      className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
+                    >
+                      广度优先搜索(BFS)
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="w-full h-[500px] flex items-center justify-center bg-gray-50">
+            <p className="text-gray-600">图数据加载失败</p>
+          </div>
+        )}
       </div>
+
+      {/* 动画浮动窗口 - 使用新的GraphAlgorithmMotion组件 */}
+      {enableAnimation && (
+        <AnimatePresence>
+          {showAnimationModal && (
+            <motion.div 
+              className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-0"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <motion.div 
+                className="w-full h-full overflow-hidden"
+                initial={{ scale: 0.5, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.5, opacity: 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                <div className="w-full h-full bg-white">
+                  <div className="flex justify-end p-4">
+                    <button
+                      onClick={closeAnimationModal}
+                      className="text-gray-500 hover:text-gray-700 focus:outline-none p-2 rounded-full hover:bg-gray-100 z-10"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                  <div className="w-full h-full p-4">
+                    <GraphAlgorithmMotion 
+                      ref={algorithmMotionRef}
+                      graphData={graphData}
+                      graphAdjList={graphAdjList}
+                      initialAlgorithm={currentAlgorithm}
+                    />
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      )}
     </div>
   );
 });

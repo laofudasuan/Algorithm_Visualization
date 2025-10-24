@@ -2,21 +2,20 @@
 // 此文件用于配置Markdown中不同级别的标题渲染格式
 
 export const headingConfig = {
-  // 一级标题配置
   h1: {
-    className: 'text-3xl font-bold mb-6 text-primary relative pl-6',
-    // 是否居中
-    center: false
+    className: 'text-4xl font-bold text-primary text-center my-6 border-t-2 border-b-2 border-primary pt-4 pb-4',
+    center: true
   },
-  // 二级标题配置
   h2: {
-    className: 'text-2xl font-bold mb-4 text-secondary relative',
-    // 是否居中
+    className: 'text-3xl font-bold mb-6 text-secondary relative pl-6',
     center: false
   },
-  // 其他标题级别可以在此继续添加
   h3: {
-    className: 'text-xl font-semibold mb-3 text-gray-800',
+    className: 'text-2xl font-bold mb-4 text-gray-700 relative',
+    center: false
+  },
+  h4: {
+    className: 'text-xl font-semibold mb-3 text-gray-600',
     center: false
   }
 };
@@ -29,7 +28,6 @@ export const headingComponents = {
     
     return (
       <div className={`${config.className} ${className || ''}`}>
-        <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-full"></div>
         <h1 style={{ textAlign: config.center ? 'center' : 'left' }}>
           {children}
         </h1>
@@ -46,7 +44,7 @@ export const headingComponents = {
         <h2 style={{ textAlign: config.center ? 'center' : 'left' }}>
           {children}
         </h2>
-        <div className="h-1 bg-secondary/30 w-20 mt-1 rounded-full"></div>
+        <div className="h-1 bg-secondary w-20 mt-1 rounded-full"></div>
       </div>
     );
   },
@@ -60,6 +58,19 @@ export const headingComponents = {
         <h3 style={{ textAlign: config.center ? 'center' : 'left' }}>
           {children}
         </h3>
+      </div>
+    );
+  },
+  
+  h4: (props) => {
+    const { className, children } = props;
+    const config = headingConfig.h4;
+    
+    return (
+      <div className={`${config.className} ${className || ''}`}>
+        <h4 style={{ textAlign: config.center ? 'center' : 'left' }}>
+          {children}
+        </h4>
       </div>
     );
   }
