@@ -111,17 +111,8 @@ const ArrayVisualization = forwardRef(({ height, length }, ref) => {
       // 清除所有指示器
       graphCanvasRef.current.dispatchOperation('clearIndicators');
       
-      // 删除每个数组元素对应的节点
-      for (let i = 0; i < length; i++) {
-        const nodeId = `element-${i}`;
-        // 尝试删除节点（如果存在）
-        try {
-          graphCanvasRef.current.dispatchOperation('deleteNode', nodeId);
-        } catch (error) {
-          // 如果节点不存在，忽略错误
-          continue;
-        }
-      }
+      // 调用新添加的clearGraph函数，清空所有节点和边
+      graphCanvasRef.current.dispatchOperation('clearGraph');
     }
   };
 

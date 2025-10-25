@@ -30,7 +30,7 @@ const CoursewareDetail = () => {
   
   // 使用Vite的import.meta.glob预加载所有可能的MDX文件
   const coursewareFiles = import.meta.glob('../data/courseware/*.mdx', { eager: false });
-  const pageFiles = import.meta.glob('../data/courseware/pages/*.mdx', { eager: false });
+  const pageFiles = import.meta.glob('../data/courseware/pages/**/*.mdx', { eager: false });
 
   useEffect(() => {
     const loadCourseware = async () => {
@@ -51,14 +51,27 @@ const CoursewareDetail = () => {
             const components = [];
             const attributes = [];
             
-            // 直接使用动态导入加载页面文件
+            // 使用glob导入的模块来加载页面文件
             for (const pageFile of coursewareModule.attributes.pages) {
               try {
                 console.log(`正在加载页面: ${pageFile}`);
-                // 直接使用动态导入，避免glob匹配的复杂性
-                const dynamicImport = await import(`../data/courseware/pages/${pageFile}`);
-                components.push(dynamicImport.default);
-                attributes.push(dynamicImport.attributes || {});
+                // 使用预先定义的glob导入来解决Vite警告
+                // 查找匹配的页面路径（支持嵌套目录）
+                let matchedPath = null;
+                for (const path in pageFiles) {
+                  if (path.endsWith(`/${pageFile}`)) {
+                    matchedPath = path;
+                    break;
+                  }
+                }
+                
+                if (matchedPath && pageFiles[matchedPath]) {
+                  const dynamicImport = await pageFiles[matchedPath]();
+                  components.push(dynamicImport.default);
+                  attributes.push(dynamicImport.attributes || {});
+                } else {
+                  throw new Error(`页面文件不存在: ${pageFile}`);
+                }
                 console.log(`成功加载页面: ${pageFile}`);
               } catch (importError) {
                 console.error(`加载页面 ${pageFile} 失败:`, importError);

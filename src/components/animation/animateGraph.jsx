@@ -321,6 +321,21 @@ const AnimateGraph = forwardRef(({
       }
     },
     
+    // 清除整个图
+    clearGraph: () => {
+      // 清空节点和边的引用数据
+      currentNodesRef.current = [];
+      currentEdgesRef.current = [];
+      
+      // 获取GraphRenderer实例
+      const graphRenderer = graphRendererRef.current;
+      if (graphRenderer) {
+        // 调用graphRenderer的方法清除所有节点和边
+        graphRenderer.clearAllNodes();
+        graphRenderer.clearAllEdges();
+      }
+    },
+    
     clearIndicators: () => {
       // 控制逻辑：委托给CanvasRenderer清除所有指示器
       if (indicatorRendererRef.current) {

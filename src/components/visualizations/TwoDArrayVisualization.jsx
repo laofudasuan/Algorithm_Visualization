@@ -11,8 +11,6 @@ const TwoDArrayVisualization = forwardRef(({ width, height, rows, cols }, ref) =
   useEffect(() => {
     // 初始化空二维数组
     arrayData.current = Array(rows).fill(null).map(() => Array(cols).fill(null));
-    
-    // 确保在组件加载时清除任何现有内容
     if (graphCanvasRef.current) {
       clearMatrix();
     }
@@ -55,8 +53,8 @@ const TwoDArrayVisualization = forwardRef(({ width, height, rows, cols }, ref) =
           graphCanvasRef.current.dispatchOperation('addNode', {
             id: nodeId,
             x: col * cellWidth + cellWidth / 2,
-          y: row * cellHeight + cellHeight / 2,
-          size: Math.min(cellWidth, cellHeight) * 0.8,
+            y: row * cellHeight + cellHeight / 2,
+            size: Math.min(cellWidth, cellHeight) * 0.8,
             type: 'square',
             style: {
               fill: fillColor,
@@ -87,7 +85,6 @@ const TwoDArrayVisualization = forwardRef(({ width, height, rows, cols }, ref) =
       console.error('Matrix data invalid or canvas ref not available:', { matrix, rows, cols, canvasRefAvailable: !!graphCanvasRef.current });
     }
   };
-
   // 高亮某个单元格
   const highlightCell = (row, col, color = '#FFD700') => {
     if (row >= 0 && row < rows && col >= 0 && col < cols) {
@@ -137,19 +134,8 @@ const TwoDArrayVisualization = forwardRef(({ width, height, rows, cols }, ref) =
       // 清除所有指示器
       graphCanvasRef.current.dispatchOperation('clearIndicators');
       
-      // 删除每个矩阵元素对应的节点
-      for (let i = 0; i < rows; i++) {
-        for (let j = 0; j < cols; j++) {
-          const nodeId = `element-${i}-${j}`;
-          // 尝试删除节点（如果存在）
-          try {
-            graphCanvasRef.current.dispatchOperation('deleteNode', nodeId);
-          } catch (error) {
-            // 如果节点不存在，忽略错误
-            continue;
-          }
-        }
-      }
+      // 调用新添加的clearGraph函数，清空所有节点和边
+      graphCanvasRef.current.dispatchOperation('clearGraph');
     }
   };
 
