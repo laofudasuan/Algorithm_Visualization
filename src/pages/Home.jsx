@@ -252,23 +252,13 @@ const Home = ({ menuItems }) => {
           </div>
         </div>
 
-        {/* 向下提示 */}
-        <motion.div
-          className="absolute bottom-10 left-1/2 transform -translate-x-1/2"
-          animate={{ y: [0, 10, 0] }}
-          transition={{ repeat: Infinity, duration: 1.5 }}
-        >
-          <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-          </svg>
-        </motion.div>
       </section>
 
       {/* 目录区域 */}
       <section className="py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">探索算法类别</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">可视化模块</h2>
             <p className="text-gray-600 max-w-2xl mx-auto">选择一个算法类别开始您的可视化学习之旅</p>
           </div>
 
