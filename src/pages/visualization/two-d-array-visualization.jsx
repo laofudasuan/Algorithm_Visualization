@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import TwoDArrayVisualization from '../../components/visualizations/TwoDArrayVisualization.jsx';
 
 const TwoDArrayVisualizationPage = () => {
@@ -7,6 +7,19 @@ const TwoDArrayVisualizationPage = () => {
   const [isAnimating, setIsAnimating] = useState(false);
   const [rows, setRows] = useState(5);
   const [cols, setCols] = useState(5);
+  const [initialMatrix, setInitialMatrix] = useState(null);
+
+  // 初始化一个默认的矩阵数据
+  useEffect(() => {
+    const defaultMatrix = [
+      [0, 1, 0, 1, 0],
+      [1, 0, 1, 0, 0],
+      [0, 1, 0, 1, 1],
+      [1, 0, 1, 0, 1],
+      [0, 0, 1, 1, 0]
+    ];
+    setInitialMatrix(defaultMatrix);
+  }, []);
 
   // 演示二维数组操作
   const demonstrateMatrixOperations = async () => {
@@ -173,6 +186,7 @@ const TwoDArrayVisualizationPage = () => {
               height={400}
               rows={rows}
               cols={cols}
+              initialData={initialMatrix}
             />
           </div>
           <div className="mt-4 text-sm text-gray-600">

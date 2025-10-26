@@ -67,14 +67,6 @@ const GraphAlgorithmVisualization = forwardRef(({
     fetchGraphData();
   }, [graphName]);
   
-  // 当邻接矩阵数据改变且showAdjacencyMatrix为true时，加载到可视化组件
-  // 现在由于组件只有在adjacencyMatrix存在时才渲染，这里主要是处理切换显示状态的情况
-  useEffect(() => {
-    if (showAdjacencyMatrix && adjacencyMatrix && adjacencyMatrixRef.current) {
-      adjacencyMatrixRef.current.loadMatrix(adjacencyMatrix);
-    }
-  }, [showAdjacencyMatrix, adjacencyMatrix]);
-  
   // 构建邻接矩阵
   const buildAdjacencyMatrix = (graphData) => {
     const nodes = graphData.nodes;
@@ -152,6 +144,7 @@ const GraphAlgorithmVisualization = forwardRef(({
                   height={400}
                   rows={graphData.nodes.length}
                   cols={graphData.nodes.length}
+                  initialData={adjacencyMatrix}
                 />
               </div>
             )}

@@ -1,20 +1,43 @@
-import React, { useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
+import React, { useRef, useEffect, forwardRef, useImperativeHandle, useState } from 'react';
 import GraphCanvas from '../animation/GraphCanvas.jsx';
 
-const TwoDArrayVisualization = forwardRef(({ width, height, rows, cols }, ref) => {
+const TwoDArrayVisualization = forwardRef(({ width, height, rows, cols, initialData }, ref) => {
   const graphCanvasRef = useRef(null);
   const arrayData = useRef([]);
+  const [canvasReady, setCanvasReady] = useState(false);
+  const hasLoadedInitialData = useRef(false);
   const cellHeight = height / rows;
   const cellWidth = width / cols;
   
   // 初始化二维数组数据
   useEffect(() => {
-    // 初始化空二维数组
+    // 初始化数组数据结构
     arrayData.current = Array(rows).fill(null).map(() => Array(cols).fill(null));
-    if (graphCanvasRef.current) {
-      clearMatrix();
-    }
   }, [rows, cols]);
+
+  // 当canvas准备好且有初始数据时，加载初始数据
+  useEffect(() => {
+    
+    if (canvasReady && initialData && initialData.length > 0 && initialData[0] && initialData[0].length > 0 && !hasLoadedInitialData.current) {
+      hasLoadedInitialData.current = true;
+      
+      // 使用setTimeout确保在下一个事件循环中执行
+      setTimeout(() => {
+        // 清除现有矩阵
+        clearMatrix();
+        
+        // 使用实际的初始数据维度
+        const actualRows = Math.min(initialData.length, rows);
+        const actualCols = Math.min(initialData[0].length, cols);
+        
+        for (let i = 0; i < actualRows; i++) {
+          for (let j = 0; j < actualCols; j++) {
+            setElement(i, j, initialData[i][j]);
+          }
+        }
+      }, 0);
+    }
+  }, [canvasReady, initialData, rows, cols]);
 
   // 设置二维数组元素
   const setElement = (row, col, value) => {
@@ -64,25 +87,28 @@ const TwoDArrayVisualization = forwardRef(({ width, height, rows, cols }, ref) =
             label: String(value)
           });
         }
+      } else {
+        console.warn('GraphCanvas引用未准备好，无法操作节点');
       }
     }
   };
 
   // 从二维数组数据中加载整个矩阵
   const loadMatrix = (matrix) => {
-    console.log('Loading matrix data:', matrix);
-    if (graphCanvasRef.current && matrix && matrix.length === rows && matrix[0].length === cols) {
+    if (graphCanvasRef.current && matrix && matrix.length > 0 && matrix[0] && matrix[0].length > 0) {
       // 先清除当前内容
       clearMatrix();
       
-      // 加载新的矩阵数据
-      for (let i = 0; i < rows; i++) {
-        for (let j = 0; j < cols; j++) {
-          setElement(i, j, matrix[i][j]);
+      // 加载新的矩阵数据 - 使用矩阵实际的行列数
+      const actualRows = Math.min(matrix.length, rows);
+      const actualCols = Math.min(matrix[0].length, cols);
+      
+      for (let i = 0; i < actualRows; i++) {
+        for (let j = 0; j < actualCols; j++) {
+          const value = matrix[i][j];
+          setElement(i, j, value);
         }
       }
-    } else {
-      console.error('Matrix data invalid or canvas ref not available:', { matrix, rows, cols, canvasRefAvailable: !!graphCanvasRef.current });
     }
   };
   // 高亮某个单元格
@@ -157,6 +183,9 @@ const TwoDArrayVisualization = forwardRef(({ width, height, rows, cols }, ref) =
         height={height}
         isLoading={false}
         enableDrawing={false}
+        onInit={() => {
+          setCanvasReady(true);
+        }}
       />
       {/* 行标签 */}
       <div className="absolute left-0 top-0 h-full pointer-events-none">

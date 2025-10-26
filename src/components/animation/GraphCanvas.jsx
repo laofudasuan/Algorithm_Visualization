@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect, forwardRef, useImperativeHandle } f
 import AnimateGraph from './animateGraph.jsx';
 import EmptyGraph from '../../data/graphs/EmptyGraph.json';
 
-const GraphCanvas = forwardRef(({ width = 1000, height = 600, graphData = null, isLoading: externalIsLoading, enableDrawing = true }, ref) => {
+const GraphCanvas = forwardRef(({ width = 1000, height = 600, graphData = null, isLoading: externalIsLoading, enableDrawing = true, onInit }, ref) => {
   // 状态
   const [currentGraphIndex, setCurrentGraphIndex] = useState(0);
   const [previousGraphIndex, setPreviousGraphIndex] = useState(0); // 上一个图的索引
@@ -20,6 +20,7 @@ const GraphCanvas = forwardRef(({ width = 1000, height = 600, graphData = null, 
   // Refs
   const animateGraphRefs = useRef([]);
   const isInitialized = useRef(false); // 用于跟踪是否已经初始化
+  const hasCalledOnInit = useRef(false); // 用于跟踪是否已经调用过onInit
   
   useEffect(() => {
     // 使用ref来跟踪初始化状态，避免在依赖数组中添加graphDataList
@@ -79,6 +80,13 @@ const GraphCanvas = forwardRef(({ width = 1000, height = 600, graphData = null, 
       // 加载图数据到控制器，无论是否是当前显示的图
       if (graphDataList[index]) {
         loadGraphDataToController(controller, graphDataList[index]);
+      }
+      
+      // 如果是第一个控制器且提供了onInit回调，则调用它
+      if (index === 0 && typeof onInit === 'function' && !hasCalledOnInit.current) {
+        console.log('调用onInit回调');
+        hasCalledOnInit.current = true;
+        onInit(controller);
       }
     }
   };
