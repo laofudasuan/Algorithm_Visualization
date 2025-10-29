@@ -11,7 +11,6 @@ const GraphAlgorithmVisualization = forwardRef(({
   const graphCanvasRef = useRef(null);
   const algorithmMotionRef = useRef(null);
   const [graphData, setGraphData] = useState(null);
-  const [graphAdjList, setGraphAdjList] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [currentAlgorithm, setCurrentAlgorithm] = useState('dfs'); // 当前选中的算法类型
   const [showAnimationModal, setShowAnimationModal] = useState(false); // 控制动画浮动窗口显示的状态
@@ -74,49 +73,53 @@ const GraphAlgorithmVisualization = forwardRef(({
             {animationList && animationList.length > 0 && (
               <div className="ml-4 mt-2">
                 <div className="space-y-2">
-                  {/* 根据animationList渲染所有按钮 */}
-                  {animationList.includes('dfs') && (
-                    <button
-                      onClick={() => selectAlgorithmAndOpenModal('dfs')}
-                      disabled={!graphData || isLoading}
-                      className={`px-4 py-2 rounded-md transition-colors w-full ${
-                        (!graphData || isLoading
-                          ? 'bg-gray-400 cursor-not-allowed' 
-                          : 'bg-green-600 hover:bg-green-700 text-white'
-                      )} block`}
-                    >
-                      深度优先搜索(DFS)
-                    </button>
-                  )}
-                  {animationList.includes('bfs') && (
-                    <button
-                      onClick={() => selectAlgorithmAndOpenModal('bfs')}
-                      disabled={!graphData || isLoading}
-                      className={`px-4 py-2 rounded-md transition-colors w-full ${
-                        (!graphData || isLoading
-                          ? 'bg-gray-400 cursor-not-allowed' 
-                          : 'bg-green-600 hover:bg-green-700 text-white'
-                      )} block`}
-                    >
-                      广度优先搜索(BFS)
-                    </button>
-                  )}
-                  {animationList.includes('adjacencyMatrix') && (
-                    <button
-                      onClick={() => selectAlgorithmAndOpenModal('adjacencyMatrix')}
-                      disabled={!graphData || isLoading}
-                      className={`px-4 py-2 rounded-md transition-colors w-full ${
-                        (!graphData || isLoading
-                          ? 'bg-gray-400 cursor-not-allowed' 
-                          : 'bg-blue-600 hover:bg-blue-700 text-white'
-                      )} block`}
-                    >
-                      显示邻接矩阵
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 inline ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                      </svg>
-                    </button>
-                  )}
+                  {/* 统一渲染按钮配置 */}
+                  {(() => {
+                    // 按钮配置数组
+                    const buttonConfigs = [
+                      {
+                        id: 'dfs',
+                        label: '深度优先搜索(DFS)',
+                        colorClass: 'bg-green-600 hover:bg-green-700 text-white',
+                        icon: null
+                      },
+                      {
+                        id: 'bfs',
+                        label: '广度优先搜索(BFS)',
+                        colorClass: 'bg-green-600 hover:bg-green-700 text-white',
+                        icon: null
+                      },
+                      {
+                        id: 'adjacencyMatrix',
+                        label: '邻接矩阵',
+                        colorClass: 'bg-blue-600 hover:bg-blue-700 text-white',
+                        icon: (
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 inline ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                          </svg>
+                        )
+                      }
+                    ];
+
+                    // 过滤并渲染配置的按钮
+                    return buttonConfigs
+                      .filter(config => animationList.includes(config.id))
+                      .map(config => (
+                        <button
+                          key={config.id}
+                          onClick={() => selectAlgorithmAndOpenModal(config.id)}
+                          disabled={!graphData || isLoading}
+                          className={`px-4 py-2 rounded-md transition-colors w-full ${(
+                            (!graphData || isLoading)
+                              ? 'bg-gray-400 cursor-not-allowed'
+                              : config.colorClass
+                          )} block`}
+                        >
+                          {config.label}
+                          {config.icon}
+                        </button>
+                      ));
+                  })()}
                 </div>
               </div>
             )}
@@ -161,7 +164,6 @@ const GraphAlgorithmVisualization = forwardRef(({
                     <GraphAlgorithmMotion 
                       ref={algorithmMotionRef}
                       graphData={graphData}
-                      graphAdjList={graphAdjList}
                       initialAlgorithm={currentAlgorithm}
                     />
                   </div>

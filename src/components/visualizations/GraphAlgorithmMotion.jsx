@@ -1,4 +1,4 @@
-import React, { useState, useRef, forwardRef, useImperativeHandle } from 'react';
+import React, { useState, useRef, forwardRef, useImperativeHandle, useEffect } from 'react';
 import GraphCanvas from '../animation/GraphCanvas.jsx';
 import StackVisualization from './StackVisualization.jsx';
 import QueueVisualization from './QueueVisualization.jsx';
@@ -6,7 +6,6 @@ import TwoDArrayVisualization from './TwoDArrayVisualization.jsx';
 
 const GraphAlgorithmMotion = forwardRef(({ 
   graphData, 
-  graphAdjList,
   initialAlgorithm = 'dfs'
 }, ref) => {
   const animationCanvasRef = useRef(null);
@@ -18,6 +17,44 @@ const GraphAlgorithmMotion = forwardRef(({
   const [dataStructure, setDataStructure] = useState([]); // 用于跟踪栈或队列内容
   const [currentAlgorithm, setCurrentAlgorithm] = useState(initialAlgorithm);
   const [delayMs, setDelayMs] = useState(1000); // 播放速度，默认值为1000ms
+  const [graphAdjList, setGraphAdjList] = useState({}); // 邻接表状态
+  
+  // 当graphData变化时，计算邻接表
+  useEffect(() => {
+    if (graphData && graphData.edges) {
+      const adjList = {};
+      
+      // 初始化每个节点的邻接列表
+      if (graphData.nodes) {
+        graphData.nodes.forEach(node => {
+          adjList[node.id] = [];
+        });
+      }
+      
+      // 填充邻接表
+      graphData.edges.forEach(edge => {
+        const { source, target } = edge;
+        
+        // 添加边到邻接表
+        if (adjList[source]) {
+          adjList[source].push(target);
+        } else {
+          adjList[source] = [target];
+        }
+        
+        // 对于无向图，也添加反向边
+        if (!edge.directed) {
+          if (adjList[target]) {
+            adjList[target].push(source);
+          } else {
+            adjList[target] = [source];
+          }
+        }
+      });
+      
+      setGraphAdjList(adjList);
+    }
+  }, []);
 
   // 延迟函数
   const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -217,6 +254,8 @@ const GraphAlgorithmMotion = forwardRef(({
               color: '#ff0000ff',
               duration: delayMs
             });
+          }
+          
           await delay(delayMs);
 
           // 标记为已访问
@@ -233,14 +272,15 @@ const GraphAlgorithmMotion = forwardRef(({
           setDataStructure([...queue]);
             
           // 高亮新访问的节点
-          animationCanvasRef.current.dispatchOperation('addIndicator', {
-            id: `visited-${neighbor}`,
-            type: 'highlight',
-            target: neighbor,
-            color: '#4CAF50',
-            radius: 35,
-            lineWidth: 4
-          });
+          if (animationCanvasRef.current) {
+            animationCanvasRef.current.dispatchOperation('addIndicator', {
+              id: `visited-${neighbor}`,
+              type: 'highlight',
+              target: neighbor,
+              color: '#4CAF50',
+              radius: 35,
+              lineWidth: 4
+            });
           }
 
           await delay(delayMs/2);

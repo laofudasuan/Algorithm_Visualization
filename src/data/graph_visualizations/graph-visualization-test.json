@@ -162,6 +162,56 @@
           "data": "highlight-5"
         }
       ]
+    },
+    "updateNodePosition": {
+      "name": "修改点位置",
+      "description": "更新指定节点的位置",
+      "sequence": [
+        {
+          "type": "updateNode",
+          "data": {
+            "id": "2",
+            "x": 500,
+            "y": 400
+          }
+        },
+        {
+          "type": "updateNode",
+          "data": {
+            "id": "3",
+            "x": 600,
+            "y": 200
+          }
+        },
+        {
+          "type": "addIndicator",
+          "data": {
+            "id": "position-highlight-2",
+            "type": "highlight",
+            "target": "2",
+            "color": "#4caf50",
+            "size": 40
+          }
+        },
+        {
+          "type": "addIndicator",
+          "data": {
+            "id": "position-highlight-3",
+            "type": "highlight",
+            "target": "3",
+            "color": "#4caf50",
+            "size": 40
+          }
+        },
+        {
+          "type": "removeIndicator",
+          "data": "position-highlight-2"
+        },
+        {
+          "type": "removeIndicator",
+          "data": "position-highlight-3"
+        }
+      ]
     }
   }
 }
