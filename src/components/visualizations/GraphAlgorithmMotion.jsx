@@ -2,6 +2,7 @@ import React, { useState, useRef, forwardRef, useImperativeHandle } from 'react'
 import GraphCanvas from '../animation/GraphCanvas.jsx';
 import StackVisualization from './StackVisualization.jsx';
 import QueueVisualization from './QueueVisualization.jsx';
+import TwoDArrayVisualization from './TwoDArrayVisualization.jsx';
 
 const GraphAlgorithmMotion = forwardRef(({ 
   graphData, 
@@ -11,6 +12,7 @@ const GraphAlgorithmMotion = forwardRef(({
   const animationCanvasRef = useRef(null);
   const stackVizRef = useRef(null);
   const queueVizRef = useRef(null);
+  const adjacencyMatrixRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [visitedNodes, setVisitedNodes] = useState([]);
   const [dataStructure, setDataStructure] = useState([]); // 用于跟踪栈或队列内容
@@ -273,17 +275,20 @@ const GraphAlgorithmMotion = forwardRef(({
       stackVizRef.current.clear();
     } else if (currentAlgorithm === 'bfs' && queueVizRef.current) {
       queueVizRef.current.clear();
+    } else if (currentAlgorithm === 'adjacencyMatrix' && adjacencyMatrixRef.current) {
+      // 邻接矩阵特殊处理
     }
-    
-    // 获取起始节点（第一个节点）
-    const startNode = graphData.nodes[0].id;
     
     try {
       // 执行算法
       if (currentAlgorithm === 'dfs') {
+        const startNode = graphData.nodes[0].id;
         await asyncDFS(startNode, delayMs);
       } else if (currentAlgorithm === 'bfs') {
+        const startNode = graphData.nodes[0].id;
         await asyncBFS(startNode, delayMs);
+      } else if (currentAlgorithm === 'adjacencyMatrix') {
+        await constructAdjacencyMatrix();
       }
     } catch (error) {
       console.error(`${currentAlgorithm.toUpperCase()}执行过程中出错:`, error);
@@ -309,6 +314,8 @@ const GraphAlgorithmMotion = forwardRef(({
       stackVizRef.current.clear();
     } else if (currentAlgorithm === 'bfs' && queueVizRef.current) {
       queueVizRef.current.clear();
+    } else if (currentAlgorithm === 'adjacencyMatrix' && adjacencyMatrixRef.current) {
+      adjacencyMatrixRef.current.clearMatrix();
     }
   };
 
@@ -336,12 +343,94 @@ const GraphAlgorithmMotion = forwardRef(({
         dataStructureTitle: '队列可视化',
         dataStructureName: '队列'
       };
+    } else if (currentAlgorithm === 'adjacencyMatrix') {
+      return {
+        title: '邻接矩阵构造',
+        dataStructureTitle: '邻接矩阵',
+        dataStructureName: '邻接矩阵'
+      };
     }
     return {
       title: '图算法',
       dataStructureTitle: '数据结构可视化',
       dataStructureName: '数据结构'
     };
+  };
+  
+  // 构造邻接矩阵的动画函数
+  const constructAdjacencyMatrix = async () => {
+    if (!graphData || !graphAdjList) return;
+    
+    const nodes = graphData.nodes;
+    const nodeCount = nodes.length;
+    const matrix = Array(nodeCount).fill().map(() => Array(nodeCount).fill(0));
+    
+    // 初始化邻接矩阵可视化
+    if (adjacencyMatrixRef.current) {
+      adjacencyMatrixRef.current.clearMatrix(); // 先清空现有内容
+    }
+    
+    // 为每个节点创建索引映射
+    const nodeIndexMap = {};
+    nodes.forEach((node, index) => {
+      nodeIndexMap[node.id] = index;
+    });
+    
+    // 逐个构造邻接矩阵元素
+    for (let i = 0; i < nodeCount; i++) {
+      const currentNode = nodes[i].id;
+      
+      // 在图中为当前节点添加脉冲效果
+      if (animationCanvasRef.current) {
+        animationCanvasRef.current.dispatchOperation('addIndicator', {
+          id: `pulse-${currentNode}`,
+          type: 'pulse',
+          target: currentNode,
+          color: '#ff6b6b',
+          duration: delayMs,
+        });
+      }
+      
+      await delay(delayMs);
+      
+      // 处理当前节点的所有邻居
+      const neighbors = graphAdjList[currentNode] || [];
+      for (const neighbor of neighbors) {
+        const j = nodeIndexMap[neighbor];
+        if (j !== undefined) {
+          matrix[i][j] = 1;
+          
+          // 在图中为边添加高亮效果
+          if (animationCanvasRef.current) {
+            animationCanvasRef.current.dispatchOperation('addIndicator', {
+              id: `edge-${currentNode}-${neighbor}`,
+              type: 'edge-pulse',
+              source: currentNode,
+              target: neighbor,
+              color: '#ff0000ff',
+              duration: delayMs
+            });
+          }
+          
+          await delay(delayMs);
+          
+          // 在邻接矩阵中显示当前元素
+          if (adjacencyMatrixRef.current) {
+            adjacencyMatrixRef.current.setElement(i, j, 1);
+          }
+
+          await delay(delayMs / 2);
+        }
+      }
+      
+      // 移除节点的脉冲效果
+      if (animationCanvasRef.current) {
+        animationCanvasRef.current.dispatchOperation('removeIndicator', `pulse-${currentNode}`);
+      }
+      await delay(delayMs / 2);
+    }
+    
+    return matrix;
   };
 
   const { title, dataStructureTitle, dataStructureName } = getAlgorithmInfo();
@@ -351,39 +440,71 @@ const GraphAlgorithmMotion = forwardRef(({
       {/* 标题放在页面左上角 */}
       <h2 className="fixed top-4 left-4 text-2xl font-bold text-gray-800 z-10">{title}</h2>
 
-      {/* 栈/队列可视化固定在页面底部 */}
-      <div className="fixed bottom-4 left-0 right-0 z-8">
-        <div className="container mx-auto">
-          <h3 className="text-xl font-semibold mb-2 text-gray-700 text-center"><strong>已访问节点:</strong> {visitedNodes.join(', ') || '无'}</h3>
-          <h3 className="text-xl font-semibold mb-2 text-gray-700 text-center"><strong>{dataStructureName}:</strong> {dataStructure.join(', ') || '空'}</h3>
-          <div className="flex justify-center">
-            {currentAlgorithm === 'dfs' ? (
-              <StackVisualization 
-                ref={stackVizRef}
-                height={50}
-                maxSize={10}
-              />
-            ) : (
-              <QueueVisualization 
-                ref={queueVizRef}
-                height={50}
-                maxSize={10}
-              />
-            )}
+      {/* 栈/队列可视化固定在页面底部，只有dfs和bfs才显示 */}
+      {(currentAlgorithm === 'dfs' || currentAlgorithm === 'bfs') && (
+        <div className="fixed bottom-4 left-0 right-0 z-8">
+          <div className="container mx-auto">
+            <h3 className="text-xl font-semibold mb-2 text-gray-700 text-center"><strong>已访问节点:</strong> {visitedNodes.join(', ') || '无'}</h3>
+            <h3 className="text-xl font-semibold mb-2 text-gray-700 text-center"><strong>{dataStructureName}:</strong> {dataStructure.join(', ') || '空'}</h3>
+            <div className="flex justify-center">
+              {currentAlgorithm === 'dfs' ? (
+                <StackVisualization 
+                  ref={stackVizRef}
+                  height={50}
+                  maxSize={10}
+                />
+              ) : (
+                <QueueVisualization 
+                  ref={queueVizRef}
+                  height={50}
+                  maxSize={10}
+                />
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* 主要内容区域 */}
       <div className="fixed inset-0 flex items-center justify-center p-4">
         {graphData ? (
-          <GraphCanvas 
-            ref={animationCanvasRef}
-            width={graphData.width || 800}
-            height={graphData.height || 500}
-            graphData={graphData}
-            isLoading={false}
-          />
+          currentAlgorithm === 'adjacencyMatrix' ? (
+            // 邻接矩阵布局：左侧GraphCanvas，右侧TwoDArrayVisualization
+            <div className="flex gap-4 w-full max-w-6xl">
+              <div className="flex-1">
+                <GraphCanvas 
+                  ref={animationCanvasRef}
+                  width={600}
+                  height={500}
+                  graphData={graphData}
+                  isLoading={false}
+                />
+              </div>
+              <div className="flex-1 flex items-center justify-center">
+                <div>
+                  <h3 className="text-lg font-semibold mb-2 text-gray-700 text-center">{dataStructureTitle}</h3>
+                  <TwoDArrayVisualization
+                    ref={adjacencyMatrixRef}
+                    width={400}
+                    height={400}
+                    rows={graphData.nodes ? graphData.nodes.length : 0}
+                    cols={graphData.nodes ? graphData.nodes.length : 0}
+                    rowLabels={graphData.nodes ? graphData.nodes.map(node => node.id) : 'default'}
+                    colLabels={graphData.nodes ? graphData.nodes.map(node => node.id) : 'default'}
+                  />
+                </div>
+              </div>
+            </div>
+          ) : (
+            // 常规算法布局
+            <GraphCanvas 
+              ref={animationCanvasRef}
+              width={graphData.width || 800}
+              height={graphData.height || 500}
+              graphData={graphData}
+              isLoading={false}
+            />
+          )
         ) : (
           <div className="w-full max-w-[800px] h-[500px] flex items-center justify-center bg-gray-50">
             <p className="text-gray-600">图数据加载失败</p>

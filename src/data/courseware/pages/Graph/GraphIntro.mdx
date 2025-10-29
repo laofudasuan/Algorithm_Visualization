@@ -20,7 +20,7 @@ import GraphAlgorithmVisualization from '../../../../components/visualizations/G
 
 下面是一个无向图示例：
 
-<GraphAlgorithmVisualization graphName="ExampleGraph-500-300" enableAnimation={false}/>
+<GraphAlgorithmVisualization graphName="ExampleGraph-500-300"/>
 
 ## 2. 图的存储
 
@@ -39,8 +39,7 @@ import GraphAlgorithmVisualization from '../../../../components/visualizations/G
 <div className="my-8">
   <GraphAlgorithmVisualization 
     graphName="dfs-graph" 
-    enableAnimation={false}
-    showAdjacencyMatrix={true}
+    animationList={['dfs', 'bfs', 'adjacencyMatrix']}
   />
 </div>
 
