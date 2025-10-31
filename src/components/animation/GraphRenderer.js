@@ -372,6 +372,97 @@ export class GraphRenderer {
   }
   
   /**
+   * 使用坐标插值方式实现边位置移动动画
+   */
+  animateEdgePosition(edgeId, sourceNode, targetNode, duration = 1000, easing = (progress) => progress, onComplete) {
+    // 获取边对象
+    const edgeObject = this.edgeObjects.get(edgeId);
+    if (!edgeObject) return;
+    
+    // 获取当前路径
+    const currentPath = edgeObject.path;
+    if (!currentPath || currentPath.length < 2) return;
+    
+    // 提取当前起点坐标
+    const currentStartCommand = currentPath[0];
+    if (!currentStartCommand || currentStartCommand[0] !== 'M') return;
+    const currentStartX = currentStartCommand[1];
+    const currentStartY = currentStartCommand[2];
+    
+    // 提取当前终点坐标
+    const currentEndCommand = currentPath[currentPath.length - 1];
+    if (!currentEndCommand || currentEndCommand[0] !== 'L') return;
+    const currentEndX = currentEndCommand[1];
+    const currentEndY = currentEndCommand[2];
+    
+    // 目标坐标
+    const targetStartX = sourceNode.x;
+    const targetStartY = sourceNode.y;
+    const targetEndX = targetNode.x;
+    const targetEndY = targetNode.y;
+    
+    // 确保边可见
+    edgeObject.set('opacity', 1);
+    
+    // 使用自定义动画来插值坐标
+    const startTime = Date.now();
+    const animate = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      
+      // 使用缓动函数
+      const easeProgress = easing(progress);
+      
+      // 计算当前起点和终点坐标
+      const newStartX = currentStartX + (targetStartX - currentStartX) * easeProgress;
+      const newStartY = currentStartY + (targetStartY - currentStartY) * easeProgress;
+      const newEndX = currentEndX + (targetEndX - currentEndX) * easeProgress;
+      const newEndY = currentEndY + (targetEndY - currentEndY) * easeProgress;
+      console.log('currentStartX', currentStartX);
+      console.log('currentStartY', currentStartY);
+      console.log('currentEndX', currentEndX);
+      console.log('currentEndY', currentEndY);
+      console.log('targetStartX', targetStartX);
+      console.log('targetStartY', targetStartY);
+      console.log('targetEndX', targetEndX);
+      console.log('targetEndY', targetEndY);
+      console.log('elapsed', elapsed);
+      console.log('progress', progress);
+      console.log('easeProgress', easeProgress);
+      console.log('newStartX', newStartX);
+      console.log('newStartY', newStartY);
+      console.log('newEndX', newEndX);
+      console.log('newEndY', newEndY);
+      // 更新路径
+      const newPath = [
+        ['M', newStartX, newStartY],
+        ['L', newEndX, newEndY]
+      ];
+      console.log('newPath', newPath);
+      edgeObject.set('path', newPath);
+      
+      this.canvas.renderAll();
+      
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        // 动画完成，确保精确设置最终路径
+        const finalPath = [
+          ['M', targetStartX, targetStartY],
+          ['L', targetEndX, targetEndY]
+        ];
+        edgeObject.set('path', finalPath);
+        
+        this.canvas.renderAll();
+        
+        if (onComplete) onComplete();
+      }
+    };
+    
+    requestAnimationFrame(animate);
+  }
+
+  /**
    * 更新边位置
    */
   updateEdgePosition(edgeId, sourceNode, targetNode, label) {
@@ -381,16 +472,8 @@ export class GraphRenderer {
     
     const labelObject = this.edgeLabelObjects.get(edgeId);
     
-    // 创建新的路径数据
-    const newPathData = this.createPathData(sourceNode.x, sourceNode.y, targetNode.x, targetNode.y);
-    
-    // 使用Fabric.js动画更新路径
-    const oldPath = edgeObject.path;
-    const newPathObj = new fabric.Path(newPathData);
-    const newPath = newPathObj.path;
-    
-    // 使用自定义动画来平滑过渡路径
-    this.animatePath(edgeObject, oldPath, newPath, 1000);
+    // 使用新实现的坐标插值动画函数
+    this.animateEdgePosition(edgeId, sourceNode, targetNode, 1000);
     
     // 更新或创建边标签
     if (label) {

@@ -196,6 +196,10 @@ const AnimateGraph = forwardRef(({
         updatedNode.style = {...oldNode.style, ...node.style};
       }
       
+      // 检查位置是否发生变化
+      const positionChanged = node.x !== undefined && node.x !== oldNode.x || 
+                              node.y !== undefined && node.y !== oldNode.y;
+      
       // 更新节点引用
       currentNodesRef.current[nodeIndex] = updatedNode;
       
@@ -203,6 +207,21 @@ const AnimateGraph = forwardRef(({
       const graphRenderer = graphRendererRef.current;
       if (graphRenderer) {
         graphRenderer.updateNodeElement(node.id, updatedNode);
+        
+        // 如果位置发生变化，更新所有相邻边的位置
+        if (positionChanged) {
+          const connectedEdges = currentEdgesRef.current.filter(
+            edge => edge.source === node.id || edge.target === node.id
+          );
+          
+          connectedEdges.forEach(edge => {
+            const sourceNode = currentNodesRef.current.find(n => n.id === edge.source);
+            const targetNode = currentNodesRef.current.find(n => n.id === edge.target);
+            if (sourceNode && targetNode) {
+              graphRenderer.updateEdgePosition(edge.id, sourceNode, targetNode, edge.label);
+            }
+          });
+        }
       }
     },
     
@@ -268,8 +287,6 @@ const AnimateGraph = forwardRef(({
         return;
       }
       
-      currentEdgesRef.current.push(newEdge);
-      
       // 获取GraphRenderer实例
       const graphRenderer = graphRendererRef.current;
       if (graphRenderer) {
@@ -278,7 +295,10 @@ const AnimateGraph = forwardRef(({
         const targetNode = currentNodesRef.current.find(n => n.id === edge.target);
         
         if (sourceNode && targetNode) {
+          currentEdgesRef.current.push(newEdge);
           graphRenderer.createEdgeElement(newEdge.id, sourceNode, targetNode, newEdge.style, newEdge.label);
+        } else {
+          console.warn(`Warning: Cannot create edge with id ${newEdge.id}, source or target node not found.`);
         }
       }
     },
