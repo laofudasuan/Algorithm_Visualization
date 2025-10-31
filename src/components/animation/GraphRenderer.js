@@ -149,11 +149,14 @@ export class GraphRenderer {
         const labelObject = this.edgeLabelObjects.get(edgeId);
         
         if (edgeObject) {
-          // 边淡出动画
-          edgeObject.animate('opacity', 0, {
+          // 边淡出动画 - 使用fabric.util.animate确保与fabric.Line兼容
+          fabric.util.animate({
+            startValue: 1,
+            endValue: 0,
             duration: 1000,
             easing: fabric.util.ease.easeOutQuad,
-            onChange: () => {
+            onChange: (val) => {
+              edgeObject.set('opacity', val);
               this.canvas.renderAll();
             },
             onComplete: () => {
@@ -165,10 +168,13 @@ export class GraphRenderer {
           
           // 如果有标签，也添加淡出动画
           if (labelObject) {
-            labelObject.animate('opacity', 0, {
+            fabric.util.animate({
+              startValue: 1,
+              endValue: 0,
               duration: 1000,
               easing: fabric.util.ease.easeOutQuad,
-              onChange: () => {
+              onChange: (val) => {
+                labelObject.set('opacity', val);
                 this.canvas.renderAll();
               },
               onComplete: () => {
@@ -257,12 +263,8 @@ export class GraphRenderer {
   createEdgeElement(edgeId, sourceNode, targetNode, style, label) {
     const edgeStyle = { ...this.defaultEdgeStyle, ...style };
     
-    // 创建路径数据
-    const pathData = this.createPathData(sourceNode.x, sourceNode.y, targetNode.x, targetNode.y);
-    
-    // 创建路径对象
-    const edgeObject = new fabric.Path(pathData, {
-      fill: 'none',
+    // 创建线条对象
+    const edgeObject = new fabric.Line([sourceNode.x, sourceNode.y, targetNode.x, targetNode.y], {
       stroke: edgeStyle.stroke,
       strokeWidth: edgeStyle.strokeWidth,
       selectable: false,
@@ -379,21 +381,11 @@ export class GraphRenderer {
     const edgeObject = this.edgeObjects.get(edgeId);
     if (!edgeObject) return;
     
-    // 获取当前路径
-    const currentPath = edgeObject.path;
-    if (!currentPath || currentPath.length < 2) return;
-    
-    // 提取当前起点坐标
-    const currentStartCommand = currentPath[0];
-    if (!currentStartCommand || currentStartCommand[0] !== 'M') return;
-    const currentStartX = currentStartCommand[1];
-    const currentStartY = currentStartCommand[2];
-    
-    // 提取当前终点坐标
-    const currentEndCommand = currentPath[currentPath.length - 1];
-    if (!currentEndCommand || currentEndCommand[0] !== 'L') return;
-    const currentEndX = currentEndCommand[1];
-    const currentEndY = currentEndCommand[2];
+    // 直接获取各个坐标属性
+    const currentStartX = edgeObject.x1;
+    const currentStartY = edgeObject.y1;
+    const currentEndX = edgeObject.x2;
+    const currentEndY = edgeObject.y2;
     
     // 目标坐标
     const targetStartX = sourceNode.x;
@@ -418,47 +410,33 @@ export class GraphRenderer {
       const newStartY = currentStartY + (targetStartY - currentStartY) * easeProgress;
       const newEndX = currentEndX + (targetEndX - currentEndX) * easeProgress;
       const newEndY = currentEndY + (targetEndY - currentEndY) * easeProgress;
-      console.log('currentStartX', currentStartX);
-      console.log('currentStartY', currentStartY);
-      console.log('currentEndX', currentEndX);
-      console.log('currentEndY', currentEndY);
-      console.log('targetStartX', targetStartX);
-      console.log('targetStartY', targetStartY);
-      console.log('targetEndX', targetEndX);
-      console.log('targetEndY', targetEndY);
-      console.log('elapsed', elapsed);
-      console.log('progress', progress);
-      console.log('easeProgress', easeProgress);
-      console.log('newStartX', newStartX);
-      console.log('newStartY', newStartY);
-      console.log('newEndX', newEndX);
-      console.log('newEndY', newEndY);
-      // 更新路径
-      const newPath = [
-        ['M', newStartX, newStartY],
-        ['L', newEndX, newEndY]
-      ];
-      console.log('newPath', newPath);
-      edgeObject.set('path', newPath);
+     
+      // 更新线条坐标
+      edgeObject.set({
+        x1: newStartX,
+        y1: newStartY,
+        x2: newEndX,
+        y2: newEndY
+      });
       
       this.canvas.renderAll();
       
       if (progress < 1) {
         requestAnimationFrame(animate);
       } else {
-        // 动画完成，确保精确设置最终路径
-        const finalPath = [
-          ['M', targetStartX, targetStartY],
-          ['L', targetEndX, targetEndY]
-        ];
-        edgeObject.set('path', finalPath);
+        // 动画完成，确保精确设置最终坐标
+        edgeObject.set({
+          x1: targetStartX,
+          y1: targetStartY,
+          x2: targetEndX,
+          y2: targetEndY
+        });
         
         this.canvas.renderAll();
         
         if (onComplete) onComplete();
       }
     };
-    
     requestAnimationFrame(animate);
   }
 
@@ -522,9 +500,9 @@ export class GraphRenderer {
   }
   
   /**
-   * 路径动画辅助方法
+   * 线条动画辅助方法
    */
-  animatePath(pathObject, fromPath, toPath, duration) {
+  animateLine(lineObject, fromPoints, toPoints, duration) {
     const startTime = Date.now();
     const animate = () => {
       const elapsed = Date.now() - startTime;
@@ -533,19 +511,16 @@ export class GraphRenderer {
       // 使用缓动函数
       const easeProgress = fabric.util.ease.easeOutQuad(progress);
       
-      // 计算插值路径
-      const interpolatedPath = fromPath.map((segment, i) => {
-        if (!toPath[i]) return segment;
-        const type = segment[0];
-        const interpolatedPoints = segment.slice(1).map((point, j) => {
-          const toPoint = toPath[i][j + 1] || 0;
-          return point + (toPoint - point) * easeProgress;
-        });
-        return [type, ...interpolatedPoints];
-      });
+      // 计算插值坐标
+      const interpolatedPoints = {
+        x1: fromPoints.x1 + (toPoints.x1 - fromPoints.x1) * easeProgress,
+        y1: fromPoints.y1 + (toPoints.y1 - fromPoints.y1) * easeProgress,
+        x2: fromPoints.x2 + (toPoints.x2 - fromPoints.x2) * easeProgress,
+        y2: fromPoints.y2 + (toPoints.y2 - fromPoints.y2) * easeProgress
+      };
       
-      // 更新路径
-      pathObject.set('path', interpolatedPath);
+      // 更新线条坐标
+      lineObject.set(interpolatedPoints);
       this.canvas.renderAll();
       
       if (progress < 1) {
@@ -603,37 +578,18 @@ export class GraphRenderer {
     const edgeObject = this.edgeObjects.get(edgeId);
     if (!edgeObject) return;
     
-    // 保存原始路径数据，用于动画完成后恢复
-    const originalPath = edgeObject.path;
+    // 获取起点和终点坐标
+    const startX = edgeObject.x1;
+    const startY = edgeObject.y1;
+    const targetEndX = edgeObject.x2;
+    const targetEndY = edgeObject.y2;
     
-    // 分析路径数据，提取起点和终点坐标
-    // 假设路径是从一个点到另一个点的简单路径
-    const pathCommands = originalPath;
-    if (!pathCommands || pathCommands.length < 2) return;
-    
-    // 获取起点坐标（假设是M命令的坐标）
-    const startCommand = pathCommands[0];
-    if (!startCommand || startCommand[0] !== 'M') return;
-    const startX = startCommand[1];
-    const startY = startCommand[2];
-    
-    // 获取终点坐标（假设是L命令的坐标）
-    const endCommand = pathCommands[pathCommands.length - 1];
-    if (!endCommand || endCommand[0] !== 'L') return;
-    const targetEndX = endCommand[1];
-    const targetEndY = endCommand[2];
-    
-    // 创建初始路径：从起点到起点（长度为0）
-    const initialPath = [
-      ['M', startX, startY],
-      ['L', startX, startY]
-    ];
-    
-    // 设置初始状态
-    edgeObject.set('opacity', 1);
-    edgeObject.set('path', initialPath);
-    edgeObject.set('strokeDashArray', null); // 确保没有虚线效果
-    edgeObject.set('strokeDashOffset', 0);
+    // 设置初始状态：从起点到起点（长度为0）
+    edgeObject.set({
+      opacity: 1,
+      x2: startX,
+      y2: startY
+    });
     
     // 强制渲染一次以应用初始状态
     this.canvas.renderAll();
@@ -651,13 +607,11 @@ export class GraphRenderer {
       const currentEndX = startX + (targetEndX - startX) * easeProgress;
       const currentEndY = startY + (targetEndY - startY) * easeProgress;
       
-      // 更新路径
-      const currentPath = [
-        ['M', startX, startY],
-        ['L', currentEndX, currentEndY]
-      ];
-      
-      edgeObject.set('path', currentPath);
+      // 更新线条终点坐标
+      edgeObject.set({
+        x2: currentEndX,
+        y2: currentEndY
+      });
       
       // 当进度达到70%时开始显示标签
       if (progress >= 0.7) {
@@ -674,8 +628,11 @@ export class GraphRenderer {
       if (progress < 1) {
         requestAnimationFrame(animate);
       } else {
-        // 动画完成，恢复原始路径以确保精确匹配
-        edgeObject.set('path', originalPath);
+        // 动画完成，确保精确设置最终坐标
+        edgeObject.set({
+          x2: targetEndX,
+          y2: targetEndY
+        });
         
         // 确保动画结束时标签完全显示
         const labelObject = this.edgeLabelObjects.get(edgeId);
@@ -693,34 +650,13 @@ export class GraphRenderer {
   }
   
   /**
-   * 计算路径长度
+   * 计算线条长度
    */
-  getPathLength(path) {
-    // 简化的路径长度计算
-    let length = 0;
-    let prevX, prevY;
-    
-    for (let i = 0; i < path.length; i++) {
-      const segment = path[i];
-      const type = segment[0];
-      
-      switch (type) {
-        case 'M': // Move to
-          prevX = segment[1];
-          prevY = segment[2];
-          break;
-        case 'L': // Line to
-          const dx = segment[1] - prevX;
-          const dy = segment[2] - prevY;
-          length += Math.sqrt(dx * dx + dy * dy);
-          prevX = segment[1];
-          prevY = segment[2];
-          break;
-        // 可以添加其他路径类型的处理
-      }
-    }
-    
-    return length;
+  getLineLength(line) {
+    // 计算两点之间的距离
+    const dx = line.x2 - line.x1;
+    const dy = line.y2 - line.y1;
+    return Math.sqrt(dx * dx + dy * dy);
   }
   
   /**
@@ -781,11 +717,12 @@ export class GraphRenderer {
   }
   
   /**
-   * 创建路径数据
+   * 计算两点之间的距离
    */
-  createPathData(x1, y1, x2, y2) {
-    // 简单的直线路径
-    return `M ${x1} ${y1} L ${x2} ${y2}`;
+  getDistance(x1, y1, x2, y2) {
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    return Math.sqrt(dx * dx + dy * dy);
   }
   
   /**
@@ -854,79 +791,42 @@ export class GraphRenderer {
           if (onComplete) onComplete();
         }
       });
-    } else if (labelObject) {
-      // 单独处理标签
-      labelObject.animate('opacity', 0, {
-        duration: 800,
-        easing: fabric.util.ease.easeOutQuad,
-        onChange: () => {
-          this.canvas.renderAll();
-        },
-        onComplete: () => {
-          this.canvas.remove(labelObject);
-          this.nodeLabelObjects.delete(nodeId);
-          
-          // 从existingNodeIds集合中删除节点ID
-          this.existingNodeIds.delete(nodeId);
-          
-          if (onComplete) onComplete();
-        }
-      });
-    }
+    } 
   }
   
   /**
    * 删除边动画
    */
   removeEdgeElement(edgeId, onComplete) {
-    const edgeObject = this.edgeObjects.get(edgeId);
-    const labelObject = this.edgeLabelObjects.get(edgeId);
-    
-    if (edgeObject) {
-      // 边淡出动画
-      edgeObject.animate('opacity', 0, {
-        duration: 1000,
-        easing: fabric.util.ease.easeOutQuad,
-        onChange: () => {
-          this.canvas.renderAll();
-        },
-        onComplete: () => {
-          // 动画完成后移除边元素
-          this.canvas.remove(edgeObject);
-          this.edgeObjects.delete(edgeId);
-          
-          // 从existingEdgeIds集合中删除边ID
-          this.existingEdgeIds.delete(edgeId);
-          
-          // 如果有标签，也移除标签
-          if (labelObject) {
-            this.canvas.remove(labelObject);
-            this.edgeLabelObjects.delete(edgeId);
-          }
-          
-          if (onComplete) onComplete();
-        }
-      });
-    } else if (labelObject) {
-      // 单独处理标签
-      labelObject.animate('opacity', 0, {
-        duration: 1000,
-        easing: fabric.util.ease.easeOutQuad,
-        onChange: () => {
-          this.canvas.renderAll();
-        },
-        onComplete: () => {
-          this.canvas.remove(labelObject);
-          this.edgeLabelObjects.delete(edgeId);
-          
-          // 从existingEdgeIds集合中删除边ID
-          this.existingEdgeIds.delete(edgeId);
-          
-          if (onComplete) onComplete();
-        }
-      });
+  const edgeObject = this.edgeObjects.get(edgeId);
+  const labelObject = this.edgeLabelObjects.get(edgeId);
+
+  if (!edgeObject) return;
+
+  console.log('Removing edge via fabric.util.animate...');
+
+  fabric.util.animate({
+    startValue: 1,
+    endValue: 0,
+    duration: 1000,
+    easing: fabric.util.ease.easeOutQuad,
+    onChange: (val) => {
+      edgeObject.set('opacity', val);
+      this.canvas.requestRenderAll();
+    },
+    onComplete: () => {
+      this.canvas.remove(edgeObject);
+      this.edgeObjects.delete(edgeId);
+      this.existingEdgeIds.delete(edgeId);
+
+      if (labelObject) {
+        this.canvas.remove(labelObject);
+        this.edgeLabelObjects.delete(edgeId);
+      }
+      if (onComplete) onComplete();
     }
-  }
+  });
+}
 }
 
 export default GraphRenderer;

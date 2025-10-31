@@ -52,14 +52,14 @@
             "id": "test-edge-1",
             "source": "test-node-1",
             "target": "test-node-2",
-            "label": "新边测试",
+            "label": "New",
             "style": { "stroke": "#ff5722", "strokeWidth": 3 }
           }
         }
       ]
     },
-    "updateNodePosition": {
-      "name": "修改点位置",
+    "updateNodePosition1": {
+      "name": "修改点位置1",
       "description": "更新指定节点的位置",
       "sequence": [
         {
@@ -69,6 +69,40 @@
             "x": 100,
             "y": 200
           }
+        }
+      ]
+    },
+    "updateNodePosition2": {
+      "name": "修改点位置2",
+      "description": "更新指定节点的位置",
+      "sequence": [
+        {
+          "type": "updateNode",
+          "data": {
+            "id": "test-node-1",
+            "x": 100,
+            "y": 500
+          }
+        }
+      ]
+    },
+    "delete": {
+      "name": "删除边",
+      "description": "删除指定的边",
+      "sequence": [
+        {
+          "type": "deleteEdge",
+          "data": "test-edge-1"
+        }
+      ]
+    },
+    "clear": {
+      "name": "清除图",
+      "description": "清除图中的所有节点和边",
+      "sequence": [
+        {
+          "type": "clearGraph",
+          "data": {}
         }
       ]
     }
