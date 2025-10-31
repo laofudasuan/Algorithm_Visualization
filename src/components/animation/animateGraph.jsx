@@ -317,6 +317,16 @@ const AnimateGraph = forwardRef(({
         return;
       }
       
+      // 找出所有与要删除节点相连的边
+      const edgesToDelete = currentEdgesRef.current.filter(
+        edge => edge.source === nodeId || edge.target === nodeId
+      );
+      
+      // 从边数组中移除这些边
+      currentEdgesRef.current = currentEdgesRef.current.filter(
+        edge => edge.source !== nodeId && edge.target !== nodeId
+      );
+      
       // 从节点数组中移除节点
       currentNodesRef.current = currentNodesRef.current.filter(n => n.id !== nodeId);
       
@@ -325,6 +335,11 @@ const AnimateGraph = forwardRef(({
       if (graphRenderer) {
         // 删除单个节点
         graphRenderer.removeNodeElement(nodeId);
+        
+        // 删除所有相关边
+        edgesToDelete.forEach(edge => {
+          graphRenderer.removeEdgeElement(edge.id);
+        });
       }
     },
     

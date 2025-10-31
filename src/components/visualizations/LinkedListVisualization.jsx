@@ -76,20 +76,6 @@ const LinkedListVisualization = forwardRef(({ radius = 30, maxSize = 10 }, ref) 
     listData.current = [newNode, ...oldList];
     nodeCount.current++;
     
-    // 计算新节点位置和样式
-    const newNodePosition = calculateNodePosition(0);
-    const newNodeStyle = createNodeStyle(true, nodeCount.current === 1);
-    
-    // 添加新节点
-    graphCanvasRef.current.dispatchOperation('addNode', {
-      id: nodeId,
-      x: newNodePosition.x,
-      y: newNodePosition.y,
-      size: radius,
-      style: newNodeStyle,
-      label: value.toString()
-    });
-    
     // 更新现有节点的位置和样式
     for (let i = 0; i < oldList.length; i++) {
       const newPosition = calculateNodePosition(i + 1);
@@ -105,9 +91,22 @@ const LinkedListVisualization = forwardRef(({ radius = 30, maxSize = 10 }, ref) 
       });
     }
     
-    // 手动更新边 - 只添加新边
+    // 计算新节点位置和样式
+    const newNodePosition = calculateNodePosition(0);
+    const newNodeStyle = createNodeStyle(true, nodeCount.current === 1);
+
+    // 添加新节点
+    graphCanvasRef.current.dispatchOperation('addNode', {
+      id: nodeId,
+      x: newNodePosition.x,
+      y: newNodePosition.y,
+      size: radius,
+      style: newNodeStyle,
+      label: value.toString()
+    });
+    
+    // 添加新边
     if (nodeCount.current >= 2) {
-      // 只添加从新头节点到原头节点的边
       graphCanvasRef.current.dispatchOperation('addEdge', {
         id: `edge-${listData.current[0].id}-${listData.current[1].id}`,
         source: listData.current[0].id,
@@ -162,7 +161,7 @@ const LinkedListVisualization = forwardRef(({ radius = 30, maxSize = 10 }, ref) 
       
       // 添加新的边
       graphCanvasRef.current.dispatchOperation('addEdge', {
-        id: `edge-${newIndex - 1}-${newIndex}`,
+        id: `edge-${prevNodeId}-${nodeId}`,
         source: prevNodeId,
         target: nodeId,
         style: createEdgeStyle()
@@ -191,40 +190,22 @@ const LinkedListVisualization = forwardRef(({ radius = 30, maxSize = 10 }, ref) 
     // 删除头节点
     graphCanvasRef.current.dispatchOperation('deleteNode', removedId);
     
-    // 更新剩余节点的位置和ID
-    for (let i = 1; i < oldCount; i++) {
-      const newPosition = calculateNodePosition(i - 1);
-      const isHead = i - 1 === 0;
-      const isTail = i - 1 === nodeCount.current - 1;
+    // 更新剩余节点的位置和样式
+    for (let i = 0; i < listData.current.length; i++) {
+      const newPosition = calculateNodePosition(i);
+      const isHead = i === 0;
+      const isTail = i === nodeCount.current - 1;
       
-      // 删除旧节点
-      const oldNodeId = listData.current[i - 1].id;
-      graphCanvasRef.current.dispatchOperation('deleteNode', oldNodeId);
-      
-      // 添加更新位置后的节点
-      const newNodeId = oldNodeId;
-      graphCanvasRef.current.dispatchOperation('addNode', {
-        id: newNodeId,
+      // 使用updateNode更新节点位置和样式，保持ID不变
+      const nodeId = listData.current[i].id;
+      graphCanvasRef.current.dispatchOperation('updateNode', {
+        id: nodeId,
         x: newPosition.x,
         y: newPosition.y,
-        size: radius,
-        style: createNodeStyle(isHead, isTail),
-        label: listData.current[i - 1].value.toString()
+        style: createNodeStyle(isHead, isTail)
       });
     }
-    
-    // 手动更新边 - 只添加必要的边
-    if (nodeCount.current >= 2) {
-      // 在removeFromHead后，重新添加所有相邻节点间的边
-      for (let i = 0; i < nodeCount.current - 1; i++) {
-        graphCanvasRef.current.dispatchOperation('addEdge', {
-          id: `edge-${listData.current[i].id}-${listData.current[i + 1].id}`,
-          source: listData.current[i].id,
-          target: listData.current[i + 1].id,
-          style: createEdgeStyle()
-        });
-      }
-    }
+    // 不需要手动更新边，GraphCanvas会自动调整边的位置
     
     return removedValue;
   };
@@ -254,7 +235,6 @@ const LinkedListVisualization = forwardRef(({ radius = 30, maxSize = 10 }, ref) 
       
       // 删除连接到尾节点的边
       const prevNodeId = listData.current[tailIndex - 1].id;
-      graphCanvasRef.current.dispatchOperation('deleteEdge', `edge-${tailIndex - 1}-${tailIndex}`);
       
       // 更新倒数第二个节点为尾节点
       graphCanvasRef.current.dispatchOperation('updateNode', {
@@ -306,17 +286,6 @@ const LinkedListVisualization = forwardRef(({ radius = 30, maxSize = 10 }, ref) 
     const isTail = index === nodeCount.current - 1;
     const newNodeStyle = createNodeStyle(isHead, isTail);
     
-    // 删除插入位置及之后的节点和边
-    for (let i = index; i < nodeCount.current - 1; i++) {
-      graphCanvasRef.current.dispatchOperation('deleteEdge', `edge-${listData.current[i].id}-${listData.current[i + 1].id}`);
-    }
-    
-    // 获取要删除的节点ID
-    const nodesToDelete = listData.current.slice(index + 1).map(node => node.id);
-    for (let i = 0; i < nodesToDelete.length; i++) {
-      graphCanvasRef.current.dispatchOperation('deleteNode', nodesToDelete[i]);
-    }
-    
     // 添加新节点
     graphCanvasRef.current.dispatchOperation('addNode', {
       id: nodeId,
@@ -327,44 +296,22 @@ const LinkedListVisualization = forwardRef(({ radius = 30, maxSize = 10 }, ref) 
       label: value.toString()
     });
     
-    // 重新添加插入位置后的节点
+    // 使用updateNode更新插入位置后节点的位置和样式
     for (let i = 0; i < nodesAfterInsert.length; i++) {
-      const newPosition = calculateNodePosition(index + i + 1);
-      const nodeIsTail = index + i + 1 === nodeCount.current - 1;
-      const nodeToAdd = nodesAfterInsert[i];
-      graphCanvasRef.current.dispatchOperation('addNode', {
-        id: nodeToAdd.id,
+      const nodeIndex = index + i + 1;
+      const newPosition = calculateNodePosition(nodeIndex);
+      const isHead = nodeIndex === 0;
+      const isTail = nodeIndex === nodeCount.current - 1;
+      
+      const nodeToUpdate = nodesAfterInsert[i];
+      graphCanvasRef.current.dispatchOperation('updateNode', {
+        id: nodeToUpdate.id,
         x: newPosition.x,
         y: newPosition.y,
-        size: radius,
-        style: createNodeStyle(false, nodeIsTail),
-        label: nodeToAdd.value.toString()
+        style: createNodeStyle(isHead, isTail)
       });
     }
-    
-    // 手动更新边 - 只添加必要的边
-    if (nodeCount.current >= 2) {
-      // 在insertAt后，只需添加插入位置相关的边
-      // 如果不是头部，添加前一个节点到新节点的边
-      if (index > 0) {
-        graphCanvasRef.current.dispatchOperation('addEdge', {
-            id: `edge-${listData.current[index - 1].id}-${listData.current[index].id}`,
-            source: listData.current[index - 1].id,
-            target: listData.current[index].id,
-            style: createEdgeStyle()
-          });
-      }
-      
-      // 如果不是尾部，添加新节点到下一个节点的边
-      if (index < nodeCount.current - 1) {
-        graphCanvasRef.current.dispatchOperation('addEdge', {
-            id: `edge-${listData.current[index].id}-${listData.current[index + 1].id}`,
-            source: listData.current[index].id,
-            target: listData.current[index + 1].id,
-            style: createEdgeStyle()
-          });
-      }
-    }
+    // 不需要手动更新边，GraphCanvas会自动调整边的位置
     
     return true;
   };
@@ -396,50 +343,25 @@ const LinkedListVisualization = forwardRef(({ radius = 30, maxSize = 10 }, ref) 
     const oldCount = nodeCount.current;
     nodeCount.current--;
     
-    // 删除指定位置的节点和相关边
-    const prevNodeId = listData.current[index - 1].id;
-    const nextNodeId = listData.current[index].id;
-    graphCanvasRef.current.dispatchOperation('deleteEdge', `edge-${prevNodeId}-${removedId}`);
-    graphCanvasRef.current.dispatchOperation('deleteEdge', `edge-${removedId}-${nextNodeId}`);
+    // 删除指定位置的节点
     graphCanvasRef.current.dispatchOperation('deleteNode', removedId);
     
-    // 删除删除位置之后的节点
-    const nodesToDelete = listData.current.slice(index).map(node => node.id);
-    for (let i = 0; i < nodesToDelete.length; i++) {
-      graphCanvasRef.current.dispatchOperation('deleteNode', nodesToDelete[i]);
-      if (i < nodesToDelete.length - 1) {
-        graphCanvasRef.current.dispatchOperation('deleteEdge', `edge-${nodesToDelete[i]}-${nodesToDelete[i + 1]}`);
-      }
-    }
-    
-    // 重新添加删除位置之后的节点，更新位置
+    // 使用updateNode更新删除位置后节点的位置和样式
     for (let i = 0; i < nodesAfterDelete.length; i++) {
-      const newPosition = calculateNodePosition(index + i);
-      const isHead = index + i === 0;
-      const isTail = index + i === nodeCount.current - 1;
-      const nodeToAdd = nodesAfterDelete[i];
-      graphCanvasRef.current.dispatchOperation('addNode', {
-        id: nodeToAdd.id,
+      const nodeIndex = index + i;
+      const newPosition = calculateNodePosition(nodeIndex);
+      const isHead = nodeIndex === 0;
+      const isTail = nodeIndex === nodeCount.current - 1;
+      
+      const nodeToUpdate = nodesAfterDelete[i];
+      graphCanvasRef.current.dispatchOperation('updateNode', {
+        id: nodeToUpdate.id,
         x: newPosition.x,
         y: newPosition.y,
-        size: radius,
-        style: createNodeStyle(isHead, isTail),
-        label: nodeToAdd.value.toString()
+        style: createNodeStyle(isHead, isTail)
       });
     }
-    
-    // 手动更新边 - 只添加必要的边
-    if (nodeCount.current >= 2) {
-      // 在removeAt后，只需添加删除位置前后节点之间的新边
-      if (index > 0 && index < nodeCount.current) {
-        graphCanvasRef.current.dispatchOperation('addEdge', {
-            id: `edge-${listData.current[index - 1].id}-${listData.current[index].id}`,
-            source: listData.current[index - 1].id,
-            target: listData.current[index].id,
-            style: createEdgeStyle()
-          });
-      }
-    }
+    // 不需要手动更新边，GraphCanvas会自动调整边的位置
     
     return removedValue;
   };
@@ -457,14 +379,8 @@ const LinkedListVisualization = forwardRef(({ radius = 30, maxSize = 10 }, ref) 
   // 清空链表
   const clear = () => {
     if (graphCanvasRef.current) {
-      // 删除所有边
-      for (let i = 0; i < nodeCount.current - 1; i++) {
-        graphCanvasRef.current.dispatchOperation('deleteEdge', `edge-${i}-${i + 1}`);
-      }
-      // 删除所有节点，使用节点的实际ID
-      for (let i = 0; i < listData.current.length; i++) {
-        graphCanvasRef.current.dispatchOperation('deleteNode', listData.current[i].id);
-      }
+      // 使用专门的清空操作，比循环删除更高效
+      graphCanvasRef.current.dispatchOperation('clearGraph');
     }
     listData.current = [];
     nodeCount.current = 0;
@@ -509,7 +425,7 @@ const LinkedListVisualization = forwardRef(({ radius = 30, maxSize = 10 }, ref) 
         if (index > 0) {
           const prevNodeId = nodes[index - 1].id;
           graphCanvasRef.current.dispatchOperation('addEdge', {
-            id: `edge-${index - 1}-${index}`,
+            id: `edge-${prevNodeId}-${nodeId}`,
             source: prevNodeId,
             target: nodeId,
             style: createEdgeStyle()
