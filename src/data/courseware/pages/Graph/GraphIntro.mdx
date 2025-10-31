@@ -39,7 +39,7 @@ import GraphAlgorithmVisualization from '../../../../components/visualizations/G
 <div className="my-8">
   <GraphAlgorithmVisualization 
     graphName="dfs-graph" 
-    animationList={['dfs', 'adjacencyMatrix', 'bfs']}
+    animationList={['adjacencyMatrix']}
   />
 </div>
 
@@ -59,7 +59,7 @@ import GraphAlgorithmVisualization from '../../../../components/visualizations/G
 <div className="my-8">
   <GraphAlgorithmVisualization 
     graphName="dfs-graph" 
-    animationList={['dfs', 'bfs', 'adjacencyMatrix']}
+    animationList={['adjacencyList']}
   />
 </div>
 
@@ -93,7 +93,12 @@ import GraphAlgorithmVisualization from '../../../../components/visualizations/G
 
 下面是图遍历算法的可视化演示：
 
-<GraphAlgorithmVisualization graphName="dfs-graph" enableAnimation={true}/>
+<div className="my-8">
+  <GraphAlgorithmVisualization 
+    graphName="dfs-graph" 
+    animationList={['dfs','bfs']}
+  />
+</div>
 
 **DFS与BFS的比较**：
 - **数据结构**：DFS使用栈（递归调用栈或显式栈），BFS使用队列

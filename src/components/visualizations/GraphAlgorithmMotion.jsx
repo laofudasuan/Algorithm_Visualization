@@ -3,6 +3,7 @@ import GraphCanvas from '../animation/GraphCanvas.jsx';
 import StackVisualization from './StackVisualization.jsx';
 import QueueVisualization from './QueueVisualization.jsx';
 import TwoDArrayVisualization from './TwoDArrayVisualization.jsx';
+import LinkedListVisualization from './LinkedListVisualization.jsx';
 
 const GraphAlgorithmMotion = forwardRef(({ 
   graphData, 
@@ -12,12 +13,14 @@ const GraphAlgorithmMotion = forwardRef(({
   const stackVizRef = useRef(null);
   const queueVizRef = useRef(null);
   const adjacencyMatrixRef = useRef(null);
+  const adjacencyListRefs = useRef({}); // 存储每个节点的邻接表可视化引用
   const [isPlaying, setIsPlaying] = useState(false);
   const [visitedNodes, setVisitedNodes] = useState([]);
   const [dataStructure, setDataStructure] = useState([]); // 用于跟踪栈或队列内容
   const [currentAlgorithm, setCurrentAlgorithm] = useState(initialAlgorithm);
   const [delayMs, setDelayMs] = useState(1000); // 播放速度，默认值为1000ms
   const [graphAdjList, setGraphAdjList] = useState({}); // 邻接表状态
+  const [linkedListRefs, setLinkedListRefs] = useState({}); // 用于存储LinkedListVisualization引用
   
   // 当graphData变化时，计算邻接表
   useEffect(() => {
@@ -311,13 +314,20 @@ const GraphAlgorithmMotion = forwardRef(({
     }
     
     // 重置数据结构可视化
-    if (currentAlgorithm === 'dfs' && stackVizRef.current) {
-      stackVizRef.current.clear();
-    } else if (currentAlgorithm === 'bfs' && queueVizRef.current) {
-      queueVizRef.current.clear();
-    } else if (currentAlgorithm === 'adjacencyMatrix' && adjacencyMatrixRef.current) {
-      // 邻接矩阵特殊处理
-    }
+      if (currentAlgorithm === 'dfs' && stackVizRef.current) {
+        stackVizRef.current.clear();
+      } else if (currentAlgorithm === 'bfs' && queueVizRef.current) {
+        queueVizRef.current.clear();
+      } else if (currentAlgorithm === 'adjacencyMatrix' && adjacencyMatrixRef.current) {
+        // 邻接矩阵特殊处理
+      } else if (currentAlgorithm === 'adjacencyList') {
+        // 清空所有邻接表可视化
+        Object.values(adjacencyListRefs.current).forEach(ref => {
+          if (ref && ref.clear) {
+            ref.clear();
+          }
+        });
+      }
     
     try {
       // 执行算法
@@ -329,6 +339,8 @@ const GraphAlgorithmMotion = forwardRef(({
         await asyncBFS(startNode, delayMs);
       } else if (currentAlgorithm === 'adjacencyMatrix') {
         await constructAdjacencyMatrix();
+      } else if (currentAlgorithm === 'adjacencyList') {
+        await constructAdjacencyList();
       }
     } catch (error) {
       console.error(`${currentAlgorithm.toUpperCase()}执行过程中出错:`, error);
@@ -356,6 +368,12 @@ const GraphAlgorithmMotion = forwardRef(({
       queueVizRef.current.clear();
     } else if (currentAlgorithm === 'adjacencyMatrix' && adjacencyMatrixRef.current) {
       adjacencyMatrixRef.current.clearMatrix();
+    } else if (currentAlgorithm === 'adjacencyList') {
+      Object.values(adjacencyListRefs.current).forEach(ref => {
+        if (ref && ref.clear) {
+          ref.clear();
+        }
+      });
     }
   };
 
@@ -388,6 +406,12 @@ const GraphAlgorithmMotion = forwardRef(({
         title: '邻接矩阵构造',
         dataStructureTitle: '邻接矩阵',
         dataStructureName: '邻接矩阵'
+      }
+    } else if (currentAlgorithm === 'adjacencyList') {
+      return {
+        title: '邻接表构造',
+        dataStructureTitle: '邻接表',
+        dataStructureName: '邻接表'
       };
     }
     return {
@@ -395,6 +419,69 @@ const GraphAlgorithmMotion = forwardRef(({
       dataStructureTitle: '数据结构可视化',
       dataStructureName: '数据结构'
     };
+  };
+  
+  // 构造邻接表的动画函数
+  const constructAdjacencyList = async () => {
+    if (!graphData || !graphAdjList) return;
+    
+    const nodes = graphData.nodes;
+    
+    // 逐个处理每个节点的邻接表
+    for (const node of nodes) {
+      const currentNode = node.id;
+      console.log(`正在处理节点 ${currentNode}`);
+      // 在图中为当前节点添加脉冲效果
+      if (animationCanvasRef.current) {
+        animationCanvasRef.current.dispatchOperation('addIndicator', {
+          id: `pulse-${currentNode}`,
+          type: 'pulse',
+          target: currentNode,
+          color: '#ff6b6b',
+          duration: delayMs,
+        });
+      }
+      
+      await delay(delayMs);
+      
+      // 获取当前节点的邻居
+      const neighbors = graphAdjList[currentNode] || [];
+      
+      // 获取当前节点的链表可视化引用
+      const listRef = adjacencyListRefs.current[currentNode];
+      if (listRef) {
+        listRef.clear(); // 先清空链表
+        
+        // 逐个添加邻居节点
+        for (const neighbor of neighbors) {
+          // 在图中为边添加高亮效果
+          if (animationCanvasRef.current) {
+            animationCanvasRef.current.dispatchOperation('addIndicator', {
+              id: `edge-${currentNode}-${neighbor}`,
+              type: 'edge-pulse',
+              source: currentNode,
+              target: neighbor,
+              color: '#ff0000ff',
+              duration: delayMs
+            });
+          }
+          
+          await delay(delayMs);
+          
+          // 在链表中插入邻居节点
+          listRef.addToHead(neighbor);
+          await delay(delayMs / 2);
+        }
+      }
+      
+      // 移除节点的脉冲效果
+      if (animationCanvasRef.current) {
+        animationCanvasRef.current.dispatchOperation('removeIndicator', `pulse-${currentNode}`);
+      }
+      await delay(delayMs / 2);
+    }
+    
+    return graphAdjList;
   };
   
   // 构造邻接矩阵的动画函数
@@ -506,7 +593,7 @@ const GraphAlgorithmMotion = forwardRef(({
       )}
 
       {/* 主要内容区域 */}
-      <div className="fixed inset-0 flex items-center justify-center p-4">
+      <div className="fixed inset-0 flex items-center justify-center p-4 overflow-auto">
         {graphData ? (
           currentAlgorithm === 'adjacencyMatrix' ? (
             // 邻接矩阵布局：左侧GraphCanvas，右侧TwoDArrayVisualization
@@ -532,6 +619,33 @@ const GraphAlgorithmMotion = forwardRef(({
                     rowLabels={graphData.nodes ? graphData.nodes.map(node => node.id) : 'default'}
                     colLabels={graphData.nodes ? graphData.nodes.map(node => node.id) : 'default'}
                   />
+                </div>
+              </div>
+            </div>
+          ) : currentAlgorithm === 'adjacencyList' ? (
+            // 邻接表布局：左侧GraphCanvas，右侧邻接表集合
+            <div className="flex gap-4 w-full max-w-6xl">
+              <div className="flex-1">
+                <GraphCanvas 
+                  ref={animationCanvasRef}
+                  width={600}
+                  height={500}
+                  graphData={graphData}
+                  isLoading={false}
+                />
+              </div>
+              <div className="flex-1 ml-6">
+                <div className="grid grid-cols-1 gap-4 overflow-y-auto max-h-[500px]">
+                  {graphData.nodes && graphData.nodes.map(node => (
+                    <div key={node.id} className="flex items-center">
+                      <div className="font-medium mr-2">点{node.id}</div>
+                      <LinkedListVisualization
+                        ref={el => adjacencyListRefs.current[node.id] = el}
+                        radius={30}
+                        maxSize={graphData.nodes?.length || 0}
+                      />
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
