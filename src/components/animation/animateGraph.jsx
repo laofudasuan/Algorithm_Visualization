@@ -200,27 +200,38 @@ const AnimateGraph = forwardRef(({
       const positionChanged = node.x !== undefined && node.x !== oldNode.x || 
                               node.y !== undefined && node.y !== oldNode.y;
       
+      // 检查样式是否发生变化
+      const styleChanged = node.style !== undefined || node.size !== undefined || node.label !== undefined;
+      
       // 更新节点引用
       currentNodesRef.current[nodeIndex] = updatedNode;
       
       // 获取GraphRenderer实例
       const graphRenderer = graphRendererRef.current;
       if (graphRenderer) {
-        graphRenderer.updateNodeElement(node.id, updatedNode);
+        // 如果样式发生变化，调用updateNodeStyle
+        if (styleChanged) {
+          graphRenderer.updateNodeStyle(node.id, updatedNode);
+        }
         
-        // 如果位置发生变化，更新所有相邻边的位置
+        // 如果位置发生变化，调用updateNodePosition并传递相关边
         if (positionChanged) {
-          const connectedEdges = currentEdgesRef.current.filter(
-            edge => edge.source === node.id || edge.target === node.id
-          );
+          // 获取所有相邻边的信息
+          const connectedEdges = currentEdgesRef.current
+            .filter(edge => edge.source === node.id || edge.target === node.id)
+            .map(edge => {
+              const sourceNode = currentNodesRef.current.find(n => n.id === edge.source);
+              const targetNode = currentNodesRef.current.find(n => n.id === edge.target);
+              return {
+                edgeId: edge.id,
+                sourceNode: sourceNode,
+                targetNode: targetNode
+              };
+            })
+            .filter(edgeInfo => edgeInfo.sourceNode && edgeInfo.targetNode); // 确保节点存在
           
-          connectedEdges.forEach(edge => {
-            const sourceNode = currentNodesRef.current.find(n => n.id === edge.source);
-            const targetNode = currentNodesRef.current.find(n => n.id === edge.target);
-            if (sourceNode && targetNode) {
-              graphRenderer.updateEdgePosition(edge.id, sourceNode, targetNode, edge.label);
-            }
-          });
+          // 调用updateNodePosition，传递节点和相关边信息
+          graphRenderer.updateNodePosition(node.id, updatedNode, connectedEdges);
         }
       }
     },
@@ -248,13 +259,8 @@ const AnimateGraph = forwardRef(({
       // 获取GraphRenderer实例
       const graphRenderer = graphRendererRef.current;
       if (graphRenderer) {
-        // 更新单个边
-        const sourceNode = currentNodesRef.current.find(n => n.id === updatedEdge.source);
-        const targetNode = currentNodesRef.current.find(n => n.id === updatedEdge.target);
-        
-        if (sourceNode && targetNode) {
-          graphRenderer.updateEdgePosition(updatedEdge.id, sourceNode, targetNode, updatedEdge.label);
-        }
+        // 只处理边的样式修改，不处理位置修改
+        graphRenderer.updateEdgeStyle(updatedEdge.id, updatedEdge.style, updatedEdge.label);
       }
     },
     

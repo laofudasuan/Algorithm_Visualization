@@ -293,9 +293,9 @@ export class GraphRenderer {
   }
   
   /**
-   * 更新节点元素
+   * 更新节点样式
    */
-  updateNodeElement(nodeId, node) {
+  updateNodeStyle(nodeId, node) {
     const nodeObject = this.nodeObjects.get(nodeId);
     if (!nodeObject) return;
     
@@ -320,39 +320,15 @@ export class GraphRenderer {
       });
     }
     
-    // 使用Fabric.js动画
-    nodeObject.animate({
-      left: node.x,
-      top: node.y
-    }, {
-      duration: 1000,
-      easing: fabric.util.ease.easeOutQuad,
-      onChange: () => {
-        this.canvas.renderAll();
-      }
-    });
-    
     // 更新或创建节点标签
     if (node.label) {
       const labelObject = this.nodeLabelObjects.get(nodeId);
       if (labelObject) {
-        // 更新标签位置和内容
+        // 更新标签内容和样式
         labelObject.set({
           text: node.label,
           fill: nodeStyle?.labelFill || '#ffffff',
-          fontSize: nodeStyle?.labelFontSize || 12
-        });
-        
-        // 同步标签动画
-        labelObject.animate({
-          left: node.x,
-          top: node.y
-        }, {
-          duration: 1000,
-          easing: fabric.util.ease.easeOutQuad,
-          onChange: () => {
-            this.canvas.renderAll();
-          }
+          fontSize: nodeStyle?.labelFontSize || 14
         });
       } else {
         this.createNodeLabelElement(nodeId, node);
@@ -371,6 +347,143 @@ export class GraphRenderer {
         }
       });
     }
+    
+    this.canvas.renderAll();
+  }
+  
+  /**
+   * 更新节点位置，并同时更新相邻的边位置
+   */
+  updateNodePosition(nodeId, node, connectedEdges = [],easing = (progress) => progress) {
+    const nodeObject = this.nodeObjects.get(nodeId);
+    if (!nodeObject) return;
+    
+    // 记录开始时间，用于所有动画同步
+    const startTime = Date.now();
+    const duration = 1000;
+    
+    // 节点当前位置
+    const startX = nodeObject.left;
+    const startY = nodeObject.top;
+    
+    // 目标位置
+    const targetX = node.x;
+    const targetY = node.y;
+    
+    // 更新节点标签位置
+    const labelObject = this.nodeLabelObjects.get(nodeId);
+    
+    // 执行动画
+    const animate = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const easeProgress = easing(progress);
+      
+      // 更新节点位置
+      const currentX = startX + (targetX - startX) * easeProgress;
+      const currentY = startY + (targetY - startY) * easeProgress;
+      
+      nodeObject.set({
+        left: currentX,
+        top: currentY
+      });
+      
+      // 更新标签位置
+      if (labelObject) {
+        labelObject.set({
+          left: currentX,
+          top: currentY
+        });
+      }
+      
+      // 更新相关边的位置
+      connectedEdges.forEach(({ edgeId, sourceNode, targetNode }) => {
+        const edgeObject = this.edgeObjects.get(edgeId);
+        if (!edgeObject) return;
+        
+        const isSource = sourceNode.id === nodeId;
+        const isTarget = targetNode.id === nodeId;
+
+        edgeObject.set({
+          x1: isSource ? currentX : edgeObject.x1,
+          y1: isSource ? currentY : edgeObject.y1,
+          x2: isTarget ? currentX : edgeObject.x2,
+          y2: isTarget ? currentY : edgeObject.y2
+        });
+        edgeObject.setCoords();
+        
+        // 更新边标签位置
+        const edgeLabelObject = this.edgeLabelObjects.get(edgeId);
+        if (edgeLabelObject) {
+          // 计算新的边中点
+          const midX = (edgeObject.x1 + edgeObject.x2) / 2;
+          const midY = (edgeObject.y1 + edgeObject.y2) / 2;
+          edgeLabelObject.set({
+            left: midX,
+            top: midY
+          });
+          edgeLabelObject.setCoords();
+        }
+      });
+      
+      // 确保在渲染前所有对象都有有效的尺寸
+      this.canvas.requestRenderAll();
+      
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      }
+    };
+    
+    requestAnimationFrame(animate);
+  }
+  
+  /**
+   * 更新边样式
+   */
+  updateEdgeStyle(edgeId, style, label) {
+    const edgeObject = this.edgeObjects.get(edgeId);
+    if (!edgeObject) return;
+    
+    const edgeStyle = { ...this.defaultEdgeStyle, ...style };
+    
+    // 更新边样式
+    edgeObject.set({
+      stroke: edgeStyle.stroke,
+      strokeWidth: edgeStyle.strokeWidth
+    });
+    
+    // 更新或创建边标签
+    if (label) {
+      const labelObject = this.edgeLabelObjects.get(edgeId);
+      if (labelObject) {
+        // 更新标签内容和样式
+        labelObject.set({
+          text: label,
+          fill: edgeStyle?.labelFill || '#000000',
+          fontSize: edgeStyle?.labelFontSize || 14,
+          opacity: 1
+        });
+      } else {
+        // 如果标签不存在，但有边和节点信息，创建新标签
+        // 注意：这里需要节点信息才能创建标签，可能需要在调用时传入
+        console.warn('Cannot create edge label without node information');
+      }
+    } else if (this.edgeLabelObjects.has(edgeId)) {
+      const labelObject = this.edgeLabelObjects.get(edgeId);
+      // 淡出并移除标签
+      labelObject.animate('opacity', 0, {
+        duration: 300,
+        onChange: () => {
+          this.canvas.renderAll();
+        },
+        onComplete: () => {
+          this.canvas.remove(labelObject);
+          this.edgeLabelObjects.delete(edgeId);
+        }
+      });
+    }
+    
+    this.canvas.renderAll();
   }
   
   /**
@@ -441,55 +554,57 @@ export class GraphRenderer {
   }
 
   /**
-   * 更新边位置
+   * 更新边位置（保留此方法以保持兼容性，但主要功能已移至updateNodePosition）
    */
   updateEdgePosition(edgeId, sourceNode, targetNode, label) {
-    // 直接获取边对象，与其他方法保持一致
+    // 直接获取边对象
     const edgeObject = this.edgeObjects.get(edgeId);
     if (!edgeObject) return;
     
-    const labelObject = this.edgeLabelObjects.get(edgeId);
-    
-    // 使用新实现的坐标插值动画函数
-    this.animateEdgePosition(edgeId, sourceNode, targetNode, 1000);
+    // 安全地设置边的位置 - 使用points数组
+    const points = [sourceNode.x, sourceNode.y, targetNode.x, targetNode.y];
+    edgeObject.set('points', points);
+    edgeObject.setCoords(); // 确保坐标缓存正确更新
     
     // 更新或创建边标签
     if (label) {
+      const labelObject = this.edgeLabelObjects.get(edgeId);
       if (labelObject) {
         // 更新标签内容
         labelObject.set('text', label);
         labelObject.set('opacity', 1);
         
-        // 移动标签到新位置
-        labelObject.animate({
-          left: (sourceNode.x + targetNode.x) / 2,
-          top: (sourceNode.y + targetNode.y) / 2
-        }, {
-          duration: 1000,
-          easing: fabric.util.ease.easeOutQuad,
-          onChange: () => {
-            this.canvas.renderAll();
-          }
+        // 计算中点位置
+        const midX = (sourceNode.x + targetNode.x) / 2;
+        const midY = (sourceNode.y + targetNode.y) / 2;
+        
+        labelObject.set({
+          left: midX,
+          top: midY
         });
+        labelObject.setCoords(); // 确保坐标缓存正确更新
       } else {
         // 使用默认样式创建新标签
         const defaultStyle = { ...this.defaultEdgeStyle };
         this.createEdgeLabelElement(edgeId, sourceNode, targetNode, label, defaultStyle);
         // 淡入新标签
         const newLabelObject = this.edgeLabelObjects.get(edgeId);
-        newLabelObject.animate('opacity', 1, {
-          duration: 300,
-          onChange: () => {
-            this.canvas.renderAll();
-          }
-        });
+        if (newLabelObject) {
+          newLabelObject.animate('opacity', 1, {
+            duration: 300,
+            onChange: () => {
+              this.canvas.requestRenderAll();
+            }
+          });
+        }
       }
-    } else if (labelObject) {
+    } else if (this.edgeLabelObjects.has(edgeId)) {
+      const labelObject = this.edgeLabelObjects.get(edgeId);
       // 淡出并移除标签
       labelObject.animate('opacity', 0, {
         duration: 300,
         onChange: () => {
-          this.canvas.renderAll();
+          this.canvas.requestRenderAll();
         },
         onComplete: () => {
           this.canvas.remove(labelObject);
@@ -497,6 +612,9 @@ export class GraphRenderer {
         }
       });
     }
+    
+    // 确保在渲染前所有对象都有有效的尺寸
+    this.canvas.requestRenderAll();
   }
   
   /**
