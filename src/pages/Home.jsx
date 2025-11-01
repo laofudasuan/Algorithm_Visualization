@@ -225,7 +225,7 @@ const Home = ({ menuItems }) => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8 }}
               >
-                欢迎来到<span className="text-primary">算法动画</span>播放厅
+                欢迎来到<span className="text-primary">算法世界</span>
               </motion.h1>
               <motion.p
                 className="hero-subtitle text-xl text-gray-600 mb-10 max-w-md mx-auto md:mx-0"

@@ -37,7 +37,7 @@ function App() {
   const menuItems = [
     { name: '主页', path: '/' },
     { 
-      name: '可视化模块', 
+      name: '可视化应用', 
       path: '/visualization', // 作为下拉菜单的触发点
       children: [
         { name: '图', path: '/graph-visualization' },

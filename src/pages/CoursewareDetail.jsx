@@ -2,7 +2,7 @@ import React, { useState, useEffect, lazy, Suspense, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import 'katex/dist/katex.min.css';
-import { headingComponents } from '../data/courseware/markdownConfig.jsx';
+import { headingComponents, tableComponents, listComponents } from '../data/courseware/markdownConfig.jsx';
 const CoursewareDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -277,7 +277,7 @@ const CoursewareDetail = () => {
               {pageComponents[currentPage] && (
                 <div className="bg-white rounded-lg shadow-lg p-6 md:p-8 relative overflow-hidden text-lg md:text-xl font-medium">
                   <Suspense fallback={<div className="text-center py-8">正在渲染内容...</div>}>
-                    {React.createElement(pageComponents[currentPage], { components: headingComponents })}
+                    {React.createElement(pageComponents[currentPage], { components: { ...headingComponents, ...tableComponents, ...listComponents } })}
                   </Suspense>
                 </div>
               )}

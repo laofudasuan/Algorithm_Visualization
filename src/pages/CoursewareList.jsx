@@ -113,7 +113,7 @@ const CoursewareList = () => {
                 <motion.div
                   key={courseware.id}
                   variants={itemVariants}
-                  className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
+                  className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer"
                   whileHover={{ y: -5 }}
                   onClick={() => navigate(`/courseware/${courseware.id}`)}
                 >

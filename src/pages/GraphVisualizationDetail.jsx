@@ -115,7 +115,7 @@ const GraphVisualizationDetail = () => {
   return (
     <div className="min-h-screen">
       {/* 返回按钮 */}
-      <div className="fixed top-4 left-4 z-50">
+      <div className="fixed top-4 right-4 z-50">
         <button 
           onClick={handleBack}
           className="bg-white text-gray-800 p-3 rounded-full shadow-lg hover:bg-gray-100 transition-colors"
