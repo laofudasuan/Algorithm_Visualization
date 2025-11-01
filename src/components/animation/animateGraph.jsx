@@ -1,7 +1,7 @@
 // animateGraph.jsx - 图的动画组件
 import { useRef, useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { GraphRenderer } from './GraphRenderer';
-import { CanvasRenderer } from './CanvasRenderer';
+import { IndicatorRenderer } from './IndicatorRenderer';
 import AnnotationTool from './annotationTools';
 
 const AnimateGraph = forwardRef(({
@@ -67,8 +67,8 @@ const AnimateGraph = forwardRef(({
     
     if (!indicatorCanvas || !svgContainer) return;
     
-    // 初始化CanvasRenderer用于指示器图层
-    indicatorRendererRef.current = new CanvasRenderer(indicatorCanvas, width, height);
+    // 初始化IndicatorRenderer用于指示器图层
+    indicatorRendererRef.current = new IndicatorRenderer(indicatorCanvas, width, height);
     
     const graphRenderer = new GraphRenderer(width, height);
     

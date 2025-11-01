@@ -1,15 +1,10 @@
-// CanvasRenderer.js - 负责在Canvas上绘制各种图形元素
 import * as fabric from 'fabric';
 
 // 配置Fabric.js以提高动画性能
 fabric.Object.prototype.objectCaching = false; // ✅ 全局关闭缓存
 fabric.Canvas.prototype.renderOnAddRemove = false; // 禁用添加/删除时的自动渲染
 
-/**
- * Canvas渲染器类
- * 负责在Canvas上绘制各种图形元素
- */
-export class CanvasRenderer {
+export class IndicatorRenderer {
   constructor(canvas, width, height) {
     this.width = width;
     this.height = height;
