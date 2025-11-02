@@ -31,7 +31,7 @@ export class IndicatorRenderer {
   }
   
   /**
-   * 销毁CanvasRenderer实例，清理资源
+   * 销毁实例，清理资源
    */
   dispose() {
     if (this.fabricCanvas) {
@@ -405,4 +405,4 @@ export class IndicatorRenderer {
   
 }
 
-export default CanvasRenderer;
+export default IndicatorRenderer;

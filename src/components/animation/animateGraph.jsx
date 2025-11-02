@@ -113,7 +113,7 @@ const AnimateGraph = forwardRef(({
         graphRendererRef.current.clearAnimations?.();
       }
       
-      // 销毁CanvasRenderer实例，释放资源
+      // 销毁实例，释放资源
       if (indicatorRendererRef.current) {
         indicatorRendererRef.current.dispose();
         indicatorRendererRef.current = null;
@@ -378,7 +378,6 @@ const AnimateGraph = forwardRef(({
     },
     
     clearIndicators: () => {
-      // 控制逻辑：委托给CanvasRenderer清除所有指示器
       if (indicatorRendererRef.current) {
         indicatorRendererRef.current.clearIndicators();
       }
@@ -388,7 +387,6 @@ const AnimateGraph = forwardRef(({
     },
     
     addIndicator: (options) => {
-      // 控制逻辑：创建指示器并委托给CanvasRenderer进行渲染
       // 支持格式：{id, type, target, position, color, size, duration}
       
       // 如果没有id，则生成一个
@@ -415,7 +413,6 @@ const AnimateGraph = forwardRef(({
       const radius = options.size || options.radius || 30;
       const color = options.color || '#ff0000ff';
       
-      // 根据类型调用CanvasRenderer的不同方法
       if (indicatorRendererRef.current) {
         if (options.type === 'highlight') {
           indicatorRendererRef.current.addHighlightIndicator(
@@ -475,7 +472,6 @@ const AnimateGraph = forwardRef(({
     },
     
     removeIndicator: (indicatorId) => {
-      // 控制逻辑：委托给CanvasRenderer移除指示器
       if (indicatorRendererRef.current) {
         indicatorRendererRef.current.removeIndicator(indicatorId);
       }
