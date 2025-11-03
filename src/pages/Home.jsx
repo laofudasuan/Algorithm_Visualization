@@ -77,20 +77,6 @@ const Home = ({ menuItems }) => {
     }
   ]
 
-  const scrollToCatalog = () => {
-    try {
-      const el = document.querySelector('.py-20')
-      if (el) {
-        const top = el.getBoundingClientRect().top + window.pageYOffset
-        window.scrollTo({ top, behavior: 'smooth' })
-      } else {
-        window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })
-      }
-    } catch {
-      window.scrollTo(0, window.innerHeight)
-    }
-  }
-
   const dotVariants = {
     hidden: { opacity: 0 },
     visible: i => ({
@@ -200,7 +186,6 @@ const Home = ({ menuItems }) => {
                 className="absolute w-full h-full flex items-center justify-center text-white text-lg md:text-xl font-bold text-center"
                 style={{ 
                   backgroundColor: face.bgColor,
-                  borderRadius: '0.5rem',
                   backfaceVisibility: 'hidden',
                   transform: face.transform
                 }}

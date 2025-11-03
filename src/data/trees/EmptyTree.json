@@ -1,0 +1,17 @@
+{
+  "width": 800,
+  "height": 500,
+  "nodes": [],
+  "edges": [],
+  "rootNode": null,
+  "nodesStyle": {
+    "stroke": "#000000",
+    "lineWidth": 2,
+    "labelFill": "#ffffff",
+    "labelFontSize": 14
+  },
+  "edgesStyle": {
+    "stroke": "#666666",
+    "lineWidth": 2
+  }
+}

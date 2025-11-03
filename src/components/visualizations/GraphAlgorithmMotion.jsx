@@ -4,10 +4,14 @@ import StackVisualization from './StackVisualization.jsx';
 import QueueVisualization from './QueueVisualization.jsx';
 import TwoDArrayVisualization from './TwoDArrayVisualization.jsx';
 import LinkedListVisualization from './LinkedListVisualization.jsx';
+import { DFSAlgorithm } from './graphAlgorithms/DFSAlgorithm.jsx';
+import { BFSAlgorithm } from './graphAlgorithms/BFSAlgorithm.jsx';
+import { AdjacencyMatrixAlgorithm } from './graphAlgorithms/AdjacencyMatrixAlgorithm.jsx';
+import { AdjacencyListAlgorithm } from './graphAlgorithms/AdjacencyListAlgorithm.jsx';
 
 const GraphAlgorithmMotion = forwardRef(({ 
   graphData, 
-  initialAlgorithm = 'dfs'
+  Algorithm = 'dfs'
 }, ref) => {
   const animationCanvasRef = useRef(null);
   const stackVizRef = useRef(null);
@@ -16,11 +20,9 @@ const GraphAlgorithmMotion = forwardRef(({
   const adjacencyListRefs = useRef({}); // 存储每个节点的邻接表可视化引用
   const [isPlaying, setIsPlaying] = useState(false);
   const [visitedNodes, setVisitedNodes] = useState([]);
-  const [dataStructure, setDataStructure] = useState([]); // 用于跟踪栈或队列内容
-  const [currentAlgorithm, setCurrentAlgorithm] = useState(initialAlgorithm);
+  const [currentAlgorithm, setCurrentAlgorithm] = useState(Algorithm);
   const [delayMs, setDelayMs] = useState(1000); // 播放速度，默认值为1000ms
   const [graphAdjList, setGraphAdjList] = useState({}); // 邻接表状态
-  const [linkedListRefs, setLinkedListRefs] = useState({}); // 用于存储LinkedListVisualization引用
   
   // 当graphData变化时，计算邻接表
   useEffect(() => {
@@ -59,254 +61,13 @@ const GraphAlgorithmMotion = forwardRef(({
     }
   }, []);
 
-  // 延迟函数
-  const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
-  // 异步DFS算法实现
-  const asyncDFS = async (startNode, delayMs = 1000) => {
-    const visited = new Set();
-    const currentStack = [];
-    
-    const dfsHelper = async (node) => {
-      // 标记节点为已访问
-      visited.add(node);
-      
-      // 使用stackVizRef进行入栈操作
-      if (stackVizRef.current) {
-        await delay(100);
-        stackVizRef.current.push(node);
-      }
-      
-      // 更新内部栈状态
-      currentStack.push(node);
-      
-      // 更新状态
-      setVisitedNodes(prev => [...prev, node]);
-      setDataStructure([...currentStack]);
-      
-      // 使用指示器高亮递归栈中的点
-      if (animationCanvasRef.current) {
-        animationCanvasRef.current.dispatchOperation('addIndicator', {
-          id: `visited-${node}`,
-          type: 'highlight',
-          target: node,
-          color: '#29a0dcff', // 蓝色表示正在递归中
-          radius: 35,
-          lineWidth: 4
-        });
-        
-        animationCanvasRef.current.dispatchOperation('addIndicator', {
-          id: `pulseNode`,
-          type: 'pulse',
-          target: node,
-          color: '#29a0dcff',
-          duration: delayMs/2,
-          repeatCount: Infinity
-        });
-      }
-      
-      // 添加延迟以创建动画效果
-      await delay(delayMs);
-      
-      // 访问所有未访问的邻居节点
-      const neighbors = graphAdjList[node] || [];
-      for (const neighbor of neighbors) {
-        if (!visited.has(neighbor)) {
-          if (animationCanvasRef.current) {
-            animationCanvasRef.current.dispatchOperation('removeIndicator', `pulseNode`);
-          }
-          // 为正在探索的边添加指示器
-          if (animationCanvasRef.current) {
-            animationCanvasRef.current.dispatchOperation('addIndicator', {
-              id: `explore-${node}-${neighbor}`,
-              type: 'edge-pulse',
-              source: node,
-              target: neighbor,
-              color: '#ff0000ff',
-              duration: delayMs
-            });
-          }
-          
-          // 添加延迟以创建动画效果
-          await delay(delayMs);
-          
-          // 递归调用DFS
-          await dfsHelper(neighbor);
-
-
-          if (animationCanvasRef.current) {
-            animationCanvasRef.current.dispatchOperation('addIndicator', {
-              id: `explore-${node}-${neighbor}`,
-              type: 'edge-pulse',
-              source: neighbor,
-              target: node,
-              color: '#ff0000ff',
-              duration: delayMs
-            });
-          }
-          
-          // 添加延迟以创建动画效果
-          await delay(delayMs);
-
-          animationCanvasRef.current.dispatchOperation('addIndicator', {
-            id: `pulseNode`,
-            type: 'pulse',
-            target: node,
-            color: '#29a0dcff',
-            duration: delayMs/2,
-            repeatCount: Infinity
-          });
-
-          // 添加延迟以创建动画效果
-          await delay(delayMs / 2);
-        }
-      }
-      
-      // 退出节点时移除脉冲指示器
-      if (animationCanvasRef.current) {
-        animationCanvasRef.current.dispatchOperation('removeIndicator', `pulseNode`);
-      }
-      
-      // 回溯
-      const currentNode = currentStack.pop();
-      
-      // 使用stackVizRef进行出栈操作
-      if (stackVizRef.current) {
-        stackVizRef.current.pop();
-      }
-      
-      // 更新状态
-      setDataStructure([...currentStack]);
-      
-      // 删除节点的访问指示器
-      if (animationCanvasRef.current && currentNode) {
-        animationCanvasRef.current.dispatchOperation('removeIndicator', `visited-${currentNode}`);
-      }
-      
-      // 添加延迟以创建动画效果
-      await delay(delayMs / 2);
-    };
-    
-    await dfsHelper(startNode);
-    return visited;
-  };
-  
-  // 异步BFS算法实现
-  const asyncBFS = async (startNode, delayMs = 1000) => {
-    const visited = new Set();
-    const queue = [startNode];
-    visited.add(startNode);
-    
-    // 使用queueVizRef进行入队操作
-    if (queueVizRef.current) {
-      queueVizRef.current.enqueue(startNode);
-    }
-    
-    // 更新状态
-    setVisitedNodes(prev => [...prev, startNode]);
-    setDataStructure([...queue]);
-    
-    // 使用指示器高亮访问的节点
-    if (animationCanvasRef.current) {
-      animationCanvasRef.current.dispatchOperation('addIndicator', {
-        id: `visited-${startNode}`,
-        type: 'highlight',
-        target: startNode,
-        color: '#4CAF50', // 绿色表示已访问
-        radius: 35,
-        lineWidth: 4
-      });
-    }
-    
-    await delay(delayMs);
-    
-    while (queue.length > 0) {
-      // 出队
-      const currentNode = queue.shift();
-      
-      // 使用queueVizRef进行出队操作
-      if (queueVizRef.current) {
-        queueVizRef.current.dequeue();
-      }
-
-      animationCanvasRef.current.dispatchOperation('addIndicator', {
-        id: `pulseNode`,
-        type: 'pulse',
-        target: currentNode,
-        color: '#29a0dcff',
-        duration: delayMs/2,
-        repeatCount: Infinity
-      });
-      
-      await delay(delayMs/2);
-      setDataStructure([...queue]);
-      await delay(delayMs/2);
-      
-      // 访问所有未访问的邻居节点
-      const neighbors = graphAdjList[currentNode] || [];
-      for (const neighbor of neighbors) {
-        if (!visited.has(neighbor)) {
-          
-          // 为正在探索的边添加指示器
-          if (animationCanvasRef.current) {
-            animationCanvasRef.current.dispatchOperation('addIndicator', {
-              id: `explore-${currentNode}-${neighbor}`,
-              type: 'edge-pulse',
-              source: currentNode,
-              target: neighbor,
-              color: '#ff0000ff',
-              duration: delayMs
-            });
-          }
-          
-          await delay(delayMs);
-
-          // 标记为已访问
-          visited.add(neighbor);
-          queue.push(neighbor);
-          
-          // 使用queueVizRef进行入队操作
-          if (queueVizRef.current) {
-            queueVizRef.current.enqueue(neighbor);
-          }
-          
-          // 更新状态
-          setVisitedNodes(prev => [...prev, neighbor]);
-          setDataStructure([...queue]);
-            
-          // 高亮新访问的节点
-          if (animationCanvasRef.current) {
-            animationCanvasRef.current.dispatchOperation('addIndicator', {
-              id: `visited-${neighbor}`,
-              type: 'highlight',
-              target: neighbor,
-              color: '#4CAF50',
-              radius: 35,
-              lineWidth: 4
-            });
-          }
-
-          await delay(delayMs/2);
-        }
-      }
-
-      // 退出节点时移除脉冲指示器
-      if (animationCanvasRef.current) {
-        animationCanvasRef.current.dispatchOperation('removeIndicator', `pulseNode`);
-      }
-      await delay(delayMs / 2);
-    }
-    
-    return visited;
-  };
-
   // 开始执行算法动画
   const startExecution = async () => {
     if (isPlaying || !graphData || Object.keys(graphAdjList).length === 0 || graphData.nodes.length === 0) return;
     
     setIsPlaying(true);
     setVisitedNodes([]);
-    setDataStructure([]);
+    // 移除dataStructure重置
     
     // 重置图的视觉状态 - 清除所有指示器
     if (animationCanvasRef.current) {
@@ -314,34 +75,71 @@ const GraphAlgorithmMotion = forwardRef(({
     }
     
     // 重置数据结构可视化
-      if (currentAlgorithm === 'dfs' && stackVizRef.current) {
-        stackVizRef.current.clear();
-      } else if (currentAlgorithm === 'bfs' && queueVizRef.current) {
-        queueVizRef.current.clear();
-      } else if (currentAlgorithm === 'adjacencyMatrix' && adjacencyMatrixRef.current) {
-        // 邻接矩阵特殊处理
-      } else if (currentAlgorithm === 'adjacencyList') {
-        // 清空所有邻接表可视化
-        Object.values(adjacencyListRefs.current).forEach(ref => {
-          if (ref && ref.clear) {
-            ref.clear();
-          }
-        });
-      }
+    if (currentAlgorithm === 'dfs' && stackVizRef.current) {
+      stackVizRef.current.clear();
+    } else if (currentAlgorithm === 'bfs' && queueVizRef.current) {
+      queueVizRef.current.clear();
+    } else if (currentAlgorithm === 'adjacencyMatrix' && adjacencyMatrixRef.current) {
+      // 邻接矩阵特殊处理
+    } else if (currentAlgorithm === 'adjacencyList') {
+      // 清空所有邻接表可视化
+      Object.values(adjacencyListRefs.current).forEach(ref => {
+        if (ref && ref.clear) {
+          ref.clear();
+        }
+      });
+    }
     
     try {
-      // 执行算法
-      if (currentAlgorithm === 'dfs') {
-        const startNode = graphData.nodes[0].id;
-        await asyncDFS(startNode, delayMs);
-      } else if (currentAlgorithm === 'bfs') {
-        const startNode = graphData.nodes[0].id;
-        await asyncBFS(startNode, delayMs);
-      } else if (currentAlgorithm === 'adjacencyMatrix') {
-        await constructAdjacencyMatrix();
-      } else if (currentAlgorithm === 'adjacencyList') {
-        await constructAdjacencyList();
+      // 根据当前算法选择并执行对应的算法模块
+      let algorithmInstance;
+      
+      switch (currentAlgorithm) {
+        case 'dfs':
+          algorithmInstance = DFSAlgorithm({
+            graphData,
+            graphAdjList,
+            delayMs,
+            animationCanvasRef,
+            stackVizRef,
+            setVisitedNodes
+          });
+          break;
+        case 'bfs':
+          algorithmInstance = BFSAlgorithm({
+            graphData,
+            graphAdjList,
+            delayMs,
+            animationCanvasRef,
+            queueVizRef,
+            setVisitedNodes
+          });
+          break;
+        case 'adjacencyMatrix':
+          algorithmInstance = AdjacencyMatrixAlgorithm({
+            graphData,
+            graphAdjList,
+            delayMs,
+            animationCanvasRef,
+            adjacencyMatrixRef
+          });
+          break;
+        case 'adjacencyList':
+          algorithmInstance = AdjacencyListAlgorithm({
+            graphData,
+            graphAdjList,
+            delayMs,
+            animationCanvasRef,
+            adjacencyListRefs
+          });
+          break;
+        default:
+          console.error('未知算法类型:', currentAlgorithm);
+          return;
       }
+      
+      // 执行算法
+      await algorithmInstance.execute();
     } catch (error) {
       console.error(`${currentAlgorithm.toUpperCase()}执行过程中出错:`, error);
     } finally {
@@ -354,7 +152,7 @@ const GraphAlgorithmMotion = forwardRef(({
   const resetVisualization = () => {
     setIsPlaying(false);
     setVisitedNodes([]);
-    setDataStructure([]);
+    // 移除dataStructure重置
     
     // 重置画布的视觉状态 - 清除所有指示器
     if (animationCanvasRef.current) {
@@ -383,184 +181,67 @@ const GraphAlgorithmMotion = forwardRef(({
     resetVisualization,
     setCurrentAlgorithm,
     getVisitedNodes: () => visitedNodes,
-    getDataStructure: () => dataStructure,
+    // getDataStructure方法已移除
     isPlaying: isPlaying
   }));
 
   // 获取算法标题和描述
   const getAlgorithmInfo = () => {
-    if (currentAlgorithm === 'dfs') {
-      return {
-        title: '深度优先搜索(DFS)算法',
-        dataStructureTitle: '递归栈可视化',
-        dataStructureName: '递归栈'
-      };
-    } else if (currentAlgorithm === 'bfs') {
-      return {
-        title: '广度优先搜索(BFS)算法',
-        dataStructureTitle: '队列可视化',
-        dataStructureName: '队列'
-      };
-    } else if (currentAlgorithm === 'adjacencyMatrix') {
-      return {
-        title: '邻接矩阵构造',
-        dataStructureTitle: '邻接矩阵',
-        dataStructureName: '邻接矩阵'
-      }
-    } else if (currentAlgorithm === 'adjacencyList') {
-      return {
-        title: '邻接表构造',
-        dataStructureTitle: '邻接表',
-        dataStructureName: '邻接表'
-      };
+    // 创建临时的算法实例来获取信息
+    let algorithmInstance;
+    
+    switch (currentAlgorithm) {
+      case 'dfs':
+        algorithmInstance = DFSAlgorithm({
+          graphData,
+          graphAdjList,
+          delayMs,
+          animationCanvasRef,
+          stackVizRef,
+          setVisitedNodes
+        });
+        break;
+      case 'bfs':
+        algorithmInstance = BFSAlgorithm({
+          graphData,
+          graphAdjList,
+          delayMs,
+          animationCanvasRef,
+          queueVizRef,
+          setVisitedNodes
+        });
+        break;
+      case 'adjacencyMatrix':
+          algorithmInstance = AdjacencyMatrixAlgorithm({
+            graphData,
+            graphAdjList,
+            delayMs,
+            animationCanvasRef,
+            adjacencyMatrixRef
+          });
+          break;
+        case 'adjacencyList':
+          algorithmInstance = AdjacencyListAlgorithm({
+            graphData,
+            graphAdjList,
+            delayMs,
+            animationCanvasRef,
+            adjacencyListRefs
+          });
+          break;
+      default:
+        return {
+          title: '图算法',
+          dataStructureTitle: '数据结构'
+        };
     }
-    return {
-      title: '图算法',
-      dataStructureTitle: '数据结构可视化',
-      dataStructureName: '数据结构'
-    };
+    
+    return algorithmInstance.getAlgorithmInfo();
   };
   
-  // 构造邻接表的动画函数
-  const constructAdjacencyList = async () => {
-    if (!graphData || !graphAdjList) return;
-    
-    const nodes = graphData.nodes;
-    
-    // 逐个处理每个节点的邻接表
-    for (const node of nodes) {
-      const currentNode = node.id;
-      console.log(`正在处理节点 ${currentNode}`);
-      // 在图中为当前节点添加脉冲效果
-      if (animationCanvasRef.current) {
-        animationCanvasRef.current.dispatchOperation('addIndicator', {
-          id: `pulse-${currentNode}`,
-          type: 'pulse',
-          target: currentNode,
-          color: '#ff6b6b',
-          duration: delayMs,
-        });
-      }
-      
-      await delay(delayMs);
-      
-      // 获取当前节点的邻居
-      const neighbors = graphAdjList[currentNode] || [];
-      
-      // 获取当前节点的链表可视化引用
-      const listRef = adjacencyListRefs.current[currentNode];
-      if (listRef) {
-        listRef.clear(); // 先清空链表
-        
-        // 逐个添加邻居节点
-        for (const neighbor of neighbors) {
-          // 在图中为边添加高亮效果
-          if (animationCanvasRef.current) {
-            animationCanvasRef.current.dispatchOperation('addIndicator', {
-              id: `edge-${currentNode}-${neighbor}`,
-              type: 'edge-pulse',
-              source: currentNode,
-              target: neighbor,
-              color: '#ff0000ff',
-              duration: delayMs
-            });
-          }
-          
-          await delay(delayMs);
-          
-          // 在链表中插入邻居节点
-          listRef.addToHead(neighbor);
-          await delay(delayMs / 2);
-        }
-      }
-      
-      // 移除节点的脉冲效果
-      if (animationCanvasRef.current) {
-        animationCanvasRef.current.dispatchOperation('removeIndicator', `pulse-${currentNode}`);
-      }
-      await delay(delayMs / 2);
-    }
-    
-    return graphAdjList;
-  };
-  
-  // 构造邻接矩阵的动画函数
-  const constructAdjacencyMatrix = async () => {
-    if (!graphData || !graphAdjList) return;
-    
-    const nodes = graphData.nodes;
-    const nodeCount = nodes.length;
-    const matrix = Array(nodeCount).fill().map(() => Array(nodeCount).fill(0));
-    
-    // 初始化邻接矩阵可视化
-    if (adjacencyMatrixRef.current) {
-      adjacencyMatrixRef.current.clearMatrix(); // 先清空现有内容
-    }
-    
-    // 为每个节点创建索引映射
-    const nodeIndexMap = {};
-    nodes.forEach((node, index) => {
-      nodeIndexMap[node.id] = index;
-    });
-    
-    // 逐个构造邻接矩阵元素
-    for (let i = 0; i < nodeCount; i++) {
-      const currentNode = nodes[i].id;
-      
-      // 在图中为当前节点添加脉冲效果
-      if (animationCanvasRef.current) {
-        animationCanvasRef.current.dispatchOperation('addIndicator', {
-          id: `pulse-${currentNode}`,
-          type: 'pulse',
-          target: currentNode,
-          color: '#ff6b6b',
-          duration: delayMs,
-        });
-      }
-      
-      await delay(delayMs);
-      
-      // 处理当前节点的所有邻居
-      const neighbors = graphAdjList[currentNode] || [];
-      for (const neighbor of neighbors) {
-        const j = nodeIndexMap[neighbor];
-        if (j !== undefined) {
-          matrix[i][j] = 1;
-          
-          // 在图中为边添加高亮效果
-          if (animationCanvasRef.current) {
-            animationCanvasRef.current.dispatchOperation('addIndicator', {
-              id: `edge-${currentNode}-${neighbor}`,
-              type: 'edge-pulse',
-              source: currentNode,
-              target: neighbor,
-              color: '#ff0000ff',
-              duration: delayMs
-            });
-          }
-          
-          await delay(delayMs);
-          
-          // 在邻接矩阵中显示当前元素
-          if (adjacencyMatrixRef.current) {
-            adjacencyMatrixRef.current.setElement(i, j, 1);
-          }
+  // 构造邻接表和邻接矩阵的函数已移至单独的文件中
 
-          await delay(delayMs / 2);
-        }
-      }
-      
-      // 移除节点的脉冲效果
-      if (animationCanvasRef.current) {
-        animationCanvasRef.current.dispatchOperation('removeIndicator', `pulse-${currentNode}`);
-      }
-      await delay(delayMs / 2);
-    }
-    
-    return matrix;
-  };
-
-  const { title, dataStructureTitle, dataStructureName } = getAlgorithmInfo();
+  const { title, dataStructureTitle } = getAlgorithmInfo();
 
   return (
     <div className="relative min-h-screen">
@@ -572,7 +253,7 @@ const GraphAlgorithmMotion = forwardRef(({
         <div className="fixed bottom-4 left-0 right-0 z-8">
           <div className="container mx-auto">
             <h3 className="text-xl font-semibold mb-2 text-gray-700 text-center"><strong>已访问节点:</strong> {visitedNodes.join(', ') || '无'}</h3>
-            <h3 className="text-xl font-semibold mb-2 text-gray-700 text-center"><strong>{dataStructureName}:</strong> {dataStructure.join(', ') || '空'}</h3>
+            {dataStructureTitle}
             <div className="flex justify-center">
               {currentAlgorithm === 'dfs' ? (
                 <StackVisualization 

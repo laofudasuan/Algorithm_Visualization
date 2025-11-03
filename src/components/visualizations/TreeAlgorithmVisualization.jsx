@@ -1,39 +1,49 @@
 import React, { useRef, useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import GraphCanvas from '../animation/GraphCanvas.jsx';
-import { loadGraphData } from '../utils/GraphDataLoader.jsx';
+import { loadTreeData } from '../utils/TreeDataLoader.jsx';
+import { rearrangeTreeNodes } from '../utils/TreeLayoutUtils.jsx';
 import GraphAlgorithmMotion from './GraphAlgorithmMotion.jsx';
 
-const GraphAlgorithmVisualization = forwardRef(({ 
-  graphName = 'dfs-graph',
-  animationList = []
+const TreeAlgorithmVisualization = forwardRef(({ 
+  treeName = 'binary-tree',
+  animationList = [],
+  enableRootChange = false
 }, ref) => {
   const graphCanvasRef = useRef(null);
   const algorithmMotionRef = useRef(null);
-  const [graphData, setGraphData] = useState(null);
+  const [treeData, setTreeData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [currentAlgorithm, setCurrentAlgorithm] = useState('dfs'); // 当前选中的算法类型
   const [showAnimationModal, setShowAnimationModal] = useState(false); // 控制动画浮动窗口显示的状态
-  // 移除下拉菜单相关状态
+  const [selectedRootNode, setSelectedRootNode] = useState(''); // 用于存储用户选择的根节点
 
-  // 从JSON文件加载图数据
+  // 从JSON文件加载树数据
   useEffect(() => {
-    const fetchGraphData = async () => {
+    const fetchTreeData = async () => {
       try {
         setIsLoading(true);
-        // 使用GraphDataLoader加载图数据
-        const graphData = await loadGraphData(graphName);
-        setGraphData(graphData);
+        // 使用TreeDataLoader加载树数据
+        const treeData = await loadTreeData(treeName);
+        
+        // 如果初始有根节点，先重新排列节点位置
+        if (treeData && treeData.rootNode) {
+          const rearrangedData = rearrangeTreeNodes(treeData, treeData.rootNode);
+          setTreeData(rearrangedData || treeData);
+        } else {
+          setTreeData(treeData);
+        }
       } catch (error) {
-        console.error('加载图数据失败:', error);
+        console.error('加载树数据失败:', error);
       } finally {
         setIsLoading(false);
       }
     };
     
-    fetchGraphData();
+    fetchTreeData();
   }, []);
-    // 选择算法并打开动画浮动窗口
+  
+  // 选择算法并打开动画浮动窗口
   const selectAlgorithmAndOpenModal = (algorithm) => {
     setCurrentAlgorithm(algorithm);
     setShowAnimationModal(true);
@@ -44,32 +54,74 @@ const GraphAlgorithmVisualization = forwardRef(({
     setShowAnimationModal(false);
   };
 
+
+
+  // 设置新的根节点并重排树
+  const setRootNode = (newRootId) => {
+    try {
+      // 检查新根节点是否存在
+      const nodeExists = treeData?.nodes.some(node => node.id === newRootId);
+      if (!nodeExists) {
+        console.error('指定的根节点不存在');
+        return false;
+      }
+      
+      // 重新排列树
+      const rearrangedData = rearrangeTreeNodes(treeData, newRootId);
+      if (rearrangedData) {
+        setTreeData(rearrangedData);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('设置根节点失败:', error);
+      return false;
+    }
+  };
+
   // 暴露方法给父组件
   useImperativeHandle(ref, () => ({
     isLoading: isLoading,
-    graphData: graphData
+    treeData: treeData,
+    setRootNode: setRootNode
   }));
+
+  // 当树数据加载完成后，设置默认选中的根节点
+  useEffect(() => {
+    if (treeData && treeData.rootNode) {
+      setSelectedRootNode(treeData.rootNode);
+    }
+  }, [treeData]);
+
+  // 处理换根操作
+  const handleRootChange = () => {
+    if (selectedRootNode) {
+      setRootNode(selectedRootNode);
+    }
+  };
 
   return (
     <div className="relative">
-      {/* 初始界面 - 图的展示 */}
+      {/* 初始界面 - 树的展示 */}
       <div className="">
         {isLoading ? (
           <div className="w-full h-[500px] flex items-center justify-center bg-gray-50">
             <div className="text-center">
               <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500 mb-2"></div>
-              <p className="text-gray-600">加载图数据中...</p>
+              <p className="text-gray-600">加载树数据中...</p>
             </div>
           </div>
-        ) : graphData ? (
-          <div className="flex items-start">
-            <GraphCanvas 
-              ref={graphCanvasRef}
-              width={graphData.width || 1200}
-              height={graphData.height || 500}
-              graphData={graphData}
-              isLoading={false}
-            />
+        ) : treeData ? (
+          <div className="flex flex-col items-start">
+            <div className="flex items-start">
+              <GraphCanvas 
+                ref={graphCanvasRef}
+                key={`graph-${treeData.rootNode}`}
+                width={treeData.width || 1200}
+                height={treeData.height || 500}
+                graphData={treeData}
+                isLoading={false}
+              />
             {animationList && animationList.length > 0 && (
               <div className="ml-4 mt-2">
                 <div className="space-y-2">
@@ -118,9 +170,9 @@ const GraphAlgorithmVisualization = forwardRef(({
                         <button
                           key={config.id}
                           onClick={() => selectAlgorithmAndOpenModal(config.id)}
-                          disabled={!graphData || isLoading}
+                          disabled={!treeData || isLoading}
                           className={`px-4 py-2 rounded-md transition-colors w-full ${(
-                            (!graphData || isLoading)
+                            (!treeData || isLoading)
                               ? 'bg-gray-400 cursor-not-allowed'
                               : config.colorClass
                           )} block`}
@@ -134,14 +186,47 @@ const GraphAlgorithmVisualization = forwardRef(({
               </div>
             )}
           </div>
+            
+            {/* 换根选项框 */}
+            {enableRootChange && (
+              <div className="mt-4">
+                <div className="flex items-center space-x-4">
+                  <label htmlFor="rootNodeSelect" className="text-gray-700 font-medium">选择根节点：</label>
+                  <select
+                    id="rootNodeSelect"
+                    value={selectedRootNode}
+                    onChange={(e) => setSelectedRootNode(e.target.value)}
+                    className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    {treeData.nodes.map(node => (
+                      <option key={node.id} value={node.id}>
+                        {node.label || node.id}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    onClick={handleRootChange}
+                    disabled={!selectedRootNode || isLoading}
+                    className={`px-4 py-2 rounded-md transition-colors ${(
+                      (!selectedRootNode || isLoading)
+                        ? 'bg-gray-400 cursor-not-allowed text-white'
+                        : 'bg-blue-600 hover:bg-blue-700 text-white'
+                    )}`}
+                  >
+                    设置为根节点
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         ) : (
           <div className="w-full h-[500px] flex items-center justify-center bg-gray-50">
-            <p className="text-gray-600">图数据加载失败</p>
+            <p className="text-gray-600">树数据加载失败</p>
           </div>
         )}
       </div>
 
-      {/* 动画浮动窗口 - 使用新的GraphAlgorithmMotion组件 */}
+      {/* 动画浮动窗口 - 使用GraphAlgorithmMotion组件 */}
       {animationList && animationList.length > 0 && (
         <AnimatePresence>
           {showAnimationModal && (
@@ -173,7 +258,7 @@ const GraphAlgorithmVisualization = forwardRef(({
                   <div className="w-full h-full p-4">
                     <GraphAlgorithmMotion 
                       ref={algorithmMotionRef}
-                      graphData={graphData}
+                      graphData={treeData}
                       Algorithm={currentAlgorithm}
                     />
                   </div>
@@ -187,6 +272,6 @@ const GraphAlgorithmVisualization = forwardRef(({
   );
 });
 
-GraphAlgorithmVisualization.displayName = 'GraphAlgorithmVisualization';
+TreeAlgorithmVisualization.displayName = 'TreeAlgorithmVisualization';
 
-export default GraphAlgorithmVisualization;
+export default TreeAlgorithmVisualization;
