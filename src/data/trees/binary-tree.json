@@ -2,7 +2,7 @@
   "width": 800,
   "height": 400,
   "nodes": [
-    { "id": "1", "label": "1", "size": 60, "type": "circle", "style": { "fill": "#4CAF50" } },
+    { "id": "1", "label": "1", "size": 60, "type": "house", "style": { "fill": "#4CAF50" } },
     { "id": "2", "label": "2", "size": 60, "type": "circle", "style": { "fill": "#2196F3" } },
     { "id": "3", "label": "3", "size": 60, "type": "circle", "style": { "fill": "#FF9800" } },
     { "id": "4", "label": "4", "size": 60, "type": "circle", "style": { "fill": "#9C27B0" } },
@@ -18,7 +18,7 @@
     { "id": "e5", "label": "L", "source": "3", "target": "6", "style": { "stroke": "#333", "lineWidth": 2 } },
     { "id": "e6", "label": "R", "source": "3", "target": "7", "style": { "stroke": "#333", "lineWidth": 2 } }
   ],
-  "rootNode": "2",
+  "rootNode": "1",
   "nodesStyle": {
     "stroke": "#000000",
     "lineWidth": 2,

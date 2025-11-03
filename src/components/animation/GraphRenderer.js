@@ -218,7 +218,7 @@ export class GraphRenderer {
         originX: 'center', // 设置原点为中心
         originY: 'center'  // 设置原点为中心
       });
-    } else {
+    } else if (node.type == 'circle') {
       // 创建圆形节点
       nodeObject = new fabric.Circle({
         left: node.x,
@@ -235,6 +235,9 @@ export class GraphRenderer {
         originX: 'center', // 设置原点为中心
         originY: 'center'  // 设置原点为中心
       });
+    } else {
+      
+      return;
     }
     
     // 添加到画布

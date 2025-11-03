@@ -195,7 +195,14 @@ const TreeAlgorithmVisualization = forwardRef(({
                   <select
                     id="rootNodeSelect"
                     value={selectedRootNode}
-                    onChange={(e) => setSelectedRootNode(e.target.value)}
+                    onChange={(e) => {
+                      const newValue = e.target.value;
+                      setSelectedRootNode(newValue);
+                      if (!isLoading && newValue) {
+                        setRootNode(newValue); // 直接调用setRootNode而不是通过handleRootChange
+                      }
+                    }}
+                    disabled={isLoading}
                     className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
                     {treeData.nodes.map(node => (
@@ -204,17 +211,6 @@ const TreeAlgorithmVisualization = forwardRef(({
                       </option>
                     ))}
                   </select>
-                  <button
-                    onClick={handleRootChange}
-                    disabled={!selectedRootNode || isLoading}
-                    className={`px-4 py-2 rounded-md transition-colors ${(
-                      (!selectedRootNode || isLoading)
-                        ? 'bg-gray-400 cursor-not-allowed text-white'
-                        : 'bg-blue-600 hover:bg-blue-700 text-white'
-                    )}`}
-                  >
-                    设置为根节点
-                  </button>
                 </div>
               </div>
             )}
