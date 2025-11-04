@@ -19,7 +19,7 @@
       "x": 400,
       "y": 100,
       "size": 60,
-      "type": "planet1",
+      "type": "planet2",
       "style": {
         "fill": "#2196F3"
       }
@@ -30,7 +30,7 @@
       "x": 100,
       "y": 250,
       "size": 60,
-      "type": "planet1",
+      "type": "planet3",
       "style": {
         "fill": "#FF9800"
       }
@@ -41,7 +41,7 @@
       "x": 300,
       "y": 250,
       "size": 60,
-      "type": "planet1",
+      "type": "planet4",
       "style": {
         "fill": "#9C27B0"
       }
@@ -87,9 +87,9 @@
       "source": "1",
       "target": "2",
       "style": {
-        "stroke": "#333",
-        "lineWidth": 2
-      }
+          "stroke": "#ffffff",
+          "lineWidth": 20
+        }
     },
     {
       "id": "e2",
@@ -97,8 +97,8 @@
       "source": "1",
       "target": "3",
       "style": {
-        "stroke": "#333",
-        "lineWidth": 2
+        "stroke": "#ffffff",
+        "lineWidth": 20
       }
     },
     {
@@ -107,9 +107,9 @@
       "source": "1",
       "target": "4",
       "style": {
-        "stroke": "#333",
-        "lineWidth": 2
-      }
+          "stroke": "#ffffff",
+          "lineWidth": 20
+        }
     },
     {
       "id": "e4",
@@ -117,8 +117,8 @@
       "source": "2",
       "target": "5",
       "style": {
-        "stroke": "#333",
-        "lineWidth": 2
+        "stroke": "#ffffff",
+        "lineWidth": 20
       }
     },
     {
@@ -127,8 +127,8 @@
       "source": "3",
       "target": "6",
       "style": {
-        "stroke": "#333",
-        "lineWidth": 2
+        "stroke": "#ffffff",
+        "lineWidth": 20
       }
     },
     {
@@ -137,8 +137,8 @@
       "source": "4",
       "target": "7",
       "style": {
-        "stroke": "#333",
-        "lineWidth": 2
+        "stroke": "#ffffff",
+        "lineWidth": 20
       }
     },
     {
@@ -147,8 +147,8 @@
       "source": "5",
       "target": "7",
       "style": {
-        "stroke": "#333",
-        "lineWidth": 2
+        "stroke": "#ffffff",
+        "lineWidth": 20
       }
     }
   ],
@@ -158,8 +158,5 @@
     "labelFill": "#ffffff",
     "labelFontSize": 14
   },
-  "edgesStyle": {
-    "stroke": "#666666",
-    "lineWidth": 2
-  }
+  "edgesStyle": { "stroke": "#ffffff", "lineWidth": 20 }
 }

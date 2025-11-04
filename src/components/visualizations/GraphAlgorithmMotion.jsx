@@ -286,6 +286,7 @@ const GraphAlgorithmMotion = forwardRef(({
                   height={500}
                   graphData={graphData}
                   isLoading={false}
+                  backgroundImage={'background'}
                 />
               </div>
               <div className="flex-1 flex items-center justify-center">
@@ -313,6 +314,7 @@ const GraphAlgorithmMotion = forwardRef(({
                   height={500}
                   graphData={graphData}
                   isLoading={false}
+                  backgroundImage={'background'}
                 />
               </div>
               <div className="flex-1 ml-6">
@@ -338,6 +340,7 @@ const GraphAlgorithmMotion = forwardRef(({
               height={graphData.height || 500}
               graphData={graphData}
               isLoading={false}
+              backgroundImage={'background'}
             />
           )
         ) : (

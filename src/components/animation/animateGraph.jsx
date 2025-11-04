@@ -9,7 +9,8 @@ const AnimateGraph = forwardRef(({
   height = 600,
   initialMode = 'none',
   onInit,
-  enableDrawing = true
+  enableDrawing = true,
+  backgroundImage = null
 }, ref) => {
   // 本地状态管理绘图模式
   const [currentMode, setCurrentMode] = useState(initialMode);
@@ -68,41 +69,35 @@ const AnimateGraph = forwardRef(({
     if (!indicatorCanvas || !svgContainer) return;
     
     // 初始化IndicatorRenderer用于指示器图层
-    indicatorRendererRef.current = new IndicatorRenderer(indicatorCanvas, width, height);
-    
-    const graphRenderer = new PixiGraphRenderer(width, height);
-    
-    // 等待PixiJS应用初始化完成后再获取元素并添加到容器中
-    const initializeRenderer = async () => {
-      // 等待PixiJS初始化完成
-      await new Promise(resolve => setTimeout(resolve, 100)); // 给一点时间初始化
+      indicatorRendererRef.current = new IndicatorRenderer(indicatorCanvas, width, height);
       
-      // 获取SVG元素并添加到容器中
-      const svgElement = graphRenderer.getSVGElement();
-      svgContainer.appendChild(svgElement);
-      
-      // 存储PixiGraphRenderer实例到ref
-      graphRendererRef.current = graphRenderer;
-      
-      // 初始化空的节点和边数据
-      currentNodesRef.current = [];
-      currentEdgesRef.current = [];
-      currentNodesStyleRef.current = {};
-      currentEdgesStyleRef.current = {};
-      
-      // 初始渲染空图
-      renderGraph();
-      
-      const controller = getController();
-      
-      setTimeout(() => {
+      // 创建PixiGraphRenderer实例，并传入回调函数替代setTimeout初始化
+      const graphRenderer = new PixiGraphRenderer(width, height, backgroundImage, (renderer) => {
+        // 获取SVG元素并添加到容器中
+        const svgElement = renderer.getSVGElement();
+        if (svgElement && svgContainer) {
+          svgContainer.appendChild(svgElement);
+        }
+        
+        // 存储PixiGraphRenderer实例到ref
+        graphRendererRef.current = renderer;
+        
+        // 初始化空的节点和边数据
+        currentNodesRef.current = [];
+        currentEdgesRef.current = [];
+        currentNodesStyleRef.current = {};
+        currentEdgesStyleRef.current = {};
+        
+        // 初始渲染空图
+        renderGraph();
+        
+        const controller = getController();
+        
+        // 调用外部onInit回调
         if (typeof onInit === 'function') {
           onInit(controller);
         }
-      }, 0);
-    };
-    
-    initializeRenderer();
+      });
     
     // Cleanup function
     return () => {

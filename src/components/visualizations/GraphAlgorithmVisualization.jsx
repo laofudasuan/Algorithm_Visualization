@@ -69,6 +69,7 @@ const GraphAlgorithmVisualization = forwardRef(({
               height={graphData.height || 500}
               graphData={graphData}
               isLoading={false}
+              backgroundImage={'background'}
             />
             {animationList && animationList.length > 0 && (
               <div className="ml-4 mt-2">

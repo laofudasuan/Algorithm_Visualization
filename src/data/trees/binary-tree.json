@@ -11,12 +11,12 @@
     { "id": "7", "label": "7", "size": 60, "type": "planet1", "style": { "fill": "#8BC34A" } }
   ],
   "edges": [
-    { "id": "e1", "label": "L", "source": "1", "target": "2", "style": { "stroke": "#333", "lineWidth": 2 } },
-    { "id": "e2", "label": "R", "source": "1", "target": "3", "style": { "stroke": "#333", "lineWidth": 2 } },
-    { "id": "e3", "label": "L", "source": "2", "target": "4", "style": { "stroke": "#333", "lineWidth": 2 } },
-    { "id": "e4", "label": "R", "source": "2", "target": "5", "style": { "stroke": "#333", "lineWidth": 2 } },
-    { "id": "e5", "label": "L", "source": "3", "target": "6", "style": { "stroke": "#333", "lineWidth": 2 } },
-    { "id": "e6", "label": "R", "source": "3", "target": "7", "style": { "stroke": "#333", "lineWidth": 2 } }
+    { "id": "e1", "label": "L", "source": "1", "target": "2", "style": { "stroke": "#ffffff", "lineWidth": 20 } },
+    { "id": "e2", "label": "R", "source": "1", "target": "3", "style": { "stroke": "#ffffff", "lineWidth": 20 } },
+    { "id": "e3", "label": "L", "source": "2", "target": "4", "style": { "stroke": "#ffffff", "lineWidth": 20 } },
+    { "id": "e4", "label": "R", "source": "2", "target": "5", "style": { "stroke": "#ffffff", "lineWidth": 20 } },
+    { "id": "e5", "label": "L", "source": "3", "target": "6", "style": { "stroke": "#ffffff", "lineWidth": 20 } },
+    { "id": "e6", "label": "R", "source": "3", "target": "7", "style": { "stroke": "#ffffff", "lineWidth": 20 } }
   ],
   "rootNode": "1",
   "nodesStyle": {
@@ -27,6 +27,6 @@
   },
   "edgesStyle": {
     "stroke": "#666666",
-    "lineWidth": 2
+    "lineWidth": 20
   }
 }

@@ -65,8 +65,8 @@
       "source": "1",
       "target": "2",
       "style": {
-        "stroke": "#333",
-        "lineWidth": 2,
+        "stroke": "#ffffff",
+        "lineWidth": 20,
         "arrow": true
       }
     },
@@ -76,8 +76,8 @@
       "source": "2",
       "target": "4",
       "style": {
-        "stroke": "#555",
-        "lineWidth": 1.5,
+        "stroke": "#ffffff",
+        "lineWidth": 20,
         "arrow": true
       }
     },
@@ -87,8 +87,8 @@
       "source": "4",
       "target": "3",
       "style": {
-        "stroke": "#777",
-        "lineWidth": 1.5,
+        "stroke": "#ffffff",
+        "lineWidth": 20,
         "arrow": true
       }
     },
@@ -98,8 +98,8 @@
       "source": "3",
       "target": "1",
       "style": {
-        "stroke": "#999",
-        "lineWidth": 1.5,
+        "stroke": "#ffffff",
+        "lineWidth": 20,
         "arrow": true
       }
     },
@@ -109,8 +109,8 @@
       "source": "1",
       "target": "5",
       "style": {
-        "stroke": "#000",
-        "lineWidth": 2,
+        "stroke": "#ffffff",
+        "lineWidth": 20,
         "arrow": true
       }
     },
@@ -131,8 +131,8 @@
       "source": "5",
       "target": "3",
       "style": {
-        "stroke": "#000",
-        "lineWidth": 5,
+        "stroke": "#ffffff",
+        "lineWidth": 20,
         "arrow": true
       }
     },
@@ -155,8 +155,8 @@
     "labelFontSize": 14
   },
   "edgesStyle": {
-    "stroke": "#666666",
-    "lineWidth": 2,
+    "stroke": "#ffffff",
+    "lineWidth": 20,
     "arrow": true
   }
 }

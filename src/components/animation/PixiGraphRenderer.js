@@ -8,7 +8,7 @@ import * as PIXI from 'pixi.js';
 export class PixiGraphRenderer {
   static preloadedIcons = {};
   
-  constructor(width, height, backgroundImage = null) {
+  constructor(width, height, backgroundImage = null, onInit = null) {
     // 创建canvas元素
     this.canvasElement = document.createElement('canvas');
     this.canvasElement.width = width;
@@ -17,7 +17,8 @@ export class PixiGraphRenderer {
     
     // 保存背景图片参数
     this.backgroundImage = backgroundImage;
-    console.log('backgroundImage:', backgroundImage);
+    // 保存回调函数
+    this.onInitCallback = onInit;
     // 初始化容器
     this.initContainers();
     
@@ -25,7 +26,12 @@ export class PixiGraphRenderer {
     this.app = new PIXI.Application();
     
     // 初始化应用
-    this.initApp(width, height);
+    this.initApp(width, height).then(() => {
+      // 初始化完成后调用回调函数
+      if (this.onInitCallback) {
+        this.onInitCallback(this);
+      }
+    });
   }
 
   /**
@@ -46,17 +52,18 @@ export class PixiGraphRenderer {
     this.defaultNodeStyle = {
       fill: 0x3f51b5,
       stroke: 0x000000,
-      strokeWidth: 2
+      lineWidth: 2
     };
 
     this.defaultEdgeStyle = {
       stroke: 0x999999,
-      strokeWidth: 2
+      lineWidth: 2
     };
   }
 
   /**
    * 异步初始化PIXI应用
+   * @returns {Promise<void>} 初始化完成的Promise
    */
   async initApp(width, height) {
     // 根据backgroundImage参数决定初始化配置
@@ -306,7 +313,7 @@ export class PixiGraphRenderer {
       nodeObject = new PIXI.Graphics();
       nodeObject.rect(-size/2, -size/2, size, size);
       nodeObject.fill({color: nodeStyle.fill});
-      nodeObject.stroke({width: nodeStyle.strokeWidth, color: nodeStyle.stroke});
+      nodeObject.stroke({width: nodeStyle.lineWidth, color: nodeStyle.stroke});
       nodeObject.x = node.x;
       nodeObject.y = node.y;
     } else if (node.type === 'circle') {
@@ -314,12 +321,11 @@ export class PixiGraphRenderer {
       nodeObject = new PIXI.Graphics();
       nodeObject.circle(0, 0, size/2);
       nodeObject.fill({color: nodeStyle.fill});
-      nodeObject.stroke({width: nodeStyle.strokeWidth, color: nodeStyle.stroke});
+      nodeObject.stroke({width: nodeStyle.lineWidth, color: nodeStyle.stroke});
       nodeObject.x = node.x;
       nodeObject.y = node.y;
     } else {
       // PIXI v8 正确写法：先加载纹理，再创建 Sprite
-      console.log('node type = ',node.type);
       PIXI.Assets.load(`/icons/`+node.type+`.png`).then((texture) => {
         // 纹理加载完成后，创建 Sprite
         const nodeObject = new PIXI.Sprite(texture);
@@ -393,15 +399,15 @@ export class PixiGraphRenderer {
   createEdgeElement(edgeId, sourceNode, targetNode, style, label) {
     // 检查应用是否已初始化
     if (!this.app || !this.app.stage || !this.edgeContainer) return;
-    
     const edgeStyle = { ...this.defaultEdgeStyle, ...style };
 
     // 创建线条对象
     const edgeObject = new PIXI.Graphics();
     edgeObject.moveTo(sourceNode.x, sourceNode.y);
     edgeObject.lineTo(targetNode.x, targetNode.y);
-    edgeObject.stroke({width: edgeStyle.strokeWidth, color: edgeStyle.stroke});
+    edgeObject.stroke({width: edgeStyle.lineWidth, color: edgeStyle.stroke});
     edgeObject.alpha = 1; // 确保边默认可见
+    edgeObject.style = edgeStyle; // 保存合并后的样式，以便后续更新时使用
 
     // 记录坐标
     edgeObject.startX = sourceNode.x;
@@ -450,7 +456,7 @@ export class PixiGraphRenderer {
     }
     
     nodeObject.fill({color: nodeStyle.fill});
-    nodeObject.stroke({width: nodeStyle.strokeWidth, color: nodeStyle.stroke});
+    nodeObject.stroke({width: nodeStyle.lineWidth, color: nodeStyle.stroke});
 
     // 更新或创建节点标签
     if (node.label) {
@@ -542,7 +548,7 @@ export class PixiGraphRenderer {
         const edgeStyle = { ...this.defaultEdgeStyle, ...(edgeObject.style || {}) };
         edgeObject.moveTo(isSource ? currentX : (edgeObject.startX || 0), isSource ? currentY : (edgeObject.startY || 0));
         edgeObject.lineTo(isTarget ? currentX : (edgeObject.endX || 0), isTarget ? currentY : (edgeObject.endY || 0));
-        edgeObject.stroke({width: edgeStyle.strokeWidth, color: edgeStyle.stroke});
+        edgeObject.stroke({width: edgeStyle.lineWidth, color: edgeStyle.stroke});
         
         // 更新坐标记录
         if (isSource) {
@@ -602,7 +608,7 @@ export class PixiGraphRenderer {
       edgeObject.moveTo(edgeObject.startX, edgeObject.startY);
       edgeObject.lineTo(edgeObject.endX, edgeObject.endY);
     }
-    edgeObject.stroke({width: edgeStyle.strokeWidth, color: edgeStyle.stroke});
+    edgeObject.stroke({width: edgeStyle.lineWidth, color: edgeStyle.stroke});
     edgeObject.alpha = 1; // 确保边可见
 
     // 更新或创建边标签
@@ -688,7 +694,7 @@ export class PixiGraphRenderer {
       const edgeStyle = { ...this.defaultEdgeStyle, ...(edgeObject.style || {}) };
       edgeObject.moveTo(newStartX, newStartY);
       edgeObject.lineTo(newEndX, newEndY);
-      edgeObject.stroke({width: edgeStyle.strokeWidth, color: edgeStyle.stroke});
+      edgeObject.stroke({width: edgeStyle.lineWidth, color: edgeStyle.stroke});
       
       // 更新坐标记录
       edgeObject.startX = newStartX;
@@ -703,7 +709,7 @@ export class PixiGraphRenderer {
         edgeObject.clear();
         edgeObject.moveTo(targetStartX, targetStartY);
         edgeObject.lineTo(targetEndX, targetEndY);
-        edgeObject.stroke({width: edgeStyle.strokeWidth, color: edgeStyle.stroke});
+        edgeObject.stroke({width: edgeStyle.lineWidth, color: edgeStyle.stroke});
         
         edgeObject.startX = targetStartX;
         edgeObject.startY = targetStartY;
@@ -732,7 +738,7 @@ export class PixiGraphRenderer {
     const edgeStyle = { ...this.defaultEdgeStyle, ...(edgeObject.style || {}) };
     edgeObject.moveTo(sourceNode.x, sourceNode.y);
     edgeObject.lineTo(targetNode.x, targetNode.y);
-    edgeObject.stroke({width: edgeStyle.strokeWidth, color: edgeStyle.stroke});
+    edgeObject.stroke({width: edgeStyle.lineWidth, color: edgeStyle.stroke});
     
     // 更新坐标记录
     edgeObject.startX = sourceNode.x;
@@ -852,7 +858,7 @@ export class PixiGraphRenderer {
     const edgeStyle = { ...this.defaultEdgeStyle, ...(edgeObject.style || {}) };
     edgeObject.moveTo(startX, startY);
     edgeObject.lineTo(startX, startY);
-    edgeObject.stroke({width: edgeStyle.strokeWidth, color: edgeStyle.stroke});
+    edgeObject.stroke({width: edgeStyle.lineWidth, color: edgeStyle.stroke});
 
     // 使用自定义动画来插值终点坐标
     const startTime = Date.now();
@@ -871,7 +877,7 @@ export class PixiGraphRenderer {
       edgeObject.clear();
       edgeObject.moveTo(startX, startY);
       edgeObject.lineTo(currentEndX, currentEndY);
-      edgeObject.stroke({width: edgeStyle.strokeWidth, color: edgeStyle.stroke});
+      edgeObject.stroke({width: edgeStyle.lineWidth, color: edgeStyle.stroke});
 
       // 当进度达到70%时开始显示标签
       if (progress >= 0.7) {
@@ -890,7 +896,7 @@ export class PixiGraphRenderer {
         edgeObject.clear();
         edgeObject.moveTo(startX, startY);
         edgeObject.lineTo(targetEndX, targetEndY);
-        edgeObject.stroke({width: edgeStyle.strokeWidth, color: edgeStyle.stroke});
+        edgeObject.stroke({width: edgeStyle.lineWidth, color: edgeStyle.stroke});
 
         // 确保动画结束时标签完全显示
         const labelObject = this.edgeLabelObjects.get(edgeId);
