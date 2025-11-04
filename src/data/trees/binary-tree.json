@@ -2,13 +2,13 @@
   "width": 800,
   "height": 400,
   "nodes": [
-    { "id": "1", "label": "1", "size": 60, "type": "house", "style": { "fill": "#4CAF50" } },
-    { "id": "2", "label": "2", "size": 60, "type": "house2", "style": { "fill": "#2196F3" } },
-    { "id": "3", "label": "3", "size": 60, "type": "house3", "style": { "fill": "#FF9800" } },
-    { "id": "4", "label": "4", "size": 60, "type": "house4", "style": { "fill": "#9C27B0" } },
-    { "id": "5", "label": "5", "size": 60, "type": "house", "style": { "fill": "#F44336" } },
-    { "id": "6", "label": "6", "size": 60, "type": "house", "style": { "fill": "#00BCD4" } },
-    { "id": "7", "label": "7", "size": 60, "type": "house", "style": { "fill": "#8BC34A" } }
+    { "id": "1", "label": "1", "size": 60, "type": "planet1", "style": { "fill": "#4CAF50" } },
+    { "id": "2", "label": "2", "size": 60, "type": "planet2", "style": { "fill": "#2196F3" } },
+    { "id": "3", "label": "3", "size": 60, "type": "planet3", "style": { "fill": "#FF9800" } },
+    { "id": "4", "label": "4", "size": 60, "type": "planet4", "style": { "fill": "#9C27B0" } },
+    { "id": "5", "label": "5", "size": 60, "type": "planet1", "style": { "fill": "#F44336" } },
+    { "id": "6", "label": "6", "size": 60, "type": "planet1", "style": { "fill": "#00BCD4" } },
+    { "id": "7", "label": "7", "size": 60, "type": "planet1", "style": { "fill": "#8BC34A" } }
   ],
   "edges": [
     { "id": "e1", "label": "L", "source": "1", "target": "2", "style": { "stroke": "#333", "lineWidth": 2 } },

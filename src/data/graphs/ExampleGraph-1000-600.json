@@ -10,7 +10,7 @@
       "size": 60,
       "type": "circle",
       "style": {
-        "fill": "#5ca65f"
+        "fill": "#4CAF50"
       }
     },
     {
@@ -43,7 +43,7 @@
       "size": 56,
       "type": "circle",
       "style": {
-        "fill": "#b951ca"
+        "fill": "#9C27B0"
       }
     },
     {

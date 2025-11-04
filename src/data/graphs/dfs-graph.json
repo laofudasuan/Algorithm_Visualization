@@ -8,9 +8,9 @@
       "x": 200,
       "y": 100,
       "size": 60,
-      "type": "circle",
+      "type": "planet1",
       "style": {
-        "fill": "#5ca65f"
+        "fill": "#4CAF50"
       }
     },
     {
@@ -19,7 +19,7 @@
       "x": 400,
       "y": 100,
       "size": 60,
-      "type": "circle",
+      "type": "planet1",
       "style": {
         "fill": "#2196F3"
       }
@@ -30,7 +30,7 @@
       "x": 100,
       "y": 250,
       "size": 60,
-      "type": "circle",
+      "type": "planet1",
       "style": {
         "fill": "#FF9800"
       }
@@ -41,9 +41,9 @@
       "x": 300,
       "y": 250,
       "size": 60,
-      "type": "circle",
+      "type": "planet1",
       "style": {
-        "fill": "#b951ca"
+        "fill": "#9C27B0"
       }
     },
     {
@@ -52,7 +52,7 @@
       "x": 500,
       "y": 250,
       "size": 60,
-      "type": "circle",
+      "type": "planet1",
       "style": {
         "fill": "#F44336"
       }
@@ -63,9 +63,9 @@
       "x": 200,
       "y": 400,
       "size": 60,
-      "type": "circle",
+      "type": "planet1",
       "style": {
-        "fill": "#29ddf4"
+        "fill": "#00BCD4"
       }
     },
     {
@@ -74,7 +74,7 @@
       "x": 400,
       "y": 400,
       "size": 60,
-      "type": "circle",
+      "type": "planet1",
       "style": {
         "fill": "#8BC34A"
       }

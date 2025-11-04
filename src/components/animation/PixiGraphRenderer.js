@@ -1,6 +1,5 @@
 // PixiGraphRenderer.js - 使用PixiJS渲染图并实现动画效果
 import * as PIXI from 'pixi.js';
-import { SVGScene } from '@pixi-essentials/svg';   // ← 新增
 
 /**
  * PixiGraphRenderer类
@@ -9,13 +8,16 @@ import { SVGScene } from '@pixi-essentials/svg';   // ← 新增
 export class PixiGraphRenderer {
   static preloadedIcons = {};
   
-  constructor(width, height) {
+  constructor(width, height, backgroundImage = null) {
     // 创建canvas元素
     this.canvasElement = document.createElement('canvas');
     this.canvasElement.width = width;
     this.canvasElement.height = height;
     this.canvasElement.style.display = 'block';
     
+    // 保存背景图片参数
+    this.backgroundImage = backgroundImage;
+    console.log('backgroundImage:', backgroundImage);
     // 初始化容器
     this.initContainers();
     
@@ -43,7 +45,7 @@ export class PixiGraphRenderer {
     // 默认样式
     this.defaultNodeStyle = {
       fill: 0x3f51b5,
-      stroke: 0xffffff,
+      stroke: 0x000000,
       strokeWidth: 2
     };
 
@@ -57,15 +59,26 @@ export class PixiGraphRenderer {
    * 异步初始化PIXI应用
    */
   async initApp(width, height) {
-    await this.app.init({
+    // 根据backgroundImage参数决定初始化配置
+    const initConfig = {
       width: width,
       height: height,
-      backgroundColor: 0xf5f5f5,
       antialias: true,
       resolution: window.devicePixelRatio || 1,
       autoDensity: true,
       canvas: this.canvasElement
-    });
+    };
+    
+    if (this.backgroundImage === null) {
+      initConfig.backgroundColor = 0xE6E6E6;
+    }
+    
+    await this.app.init(initConfig);
+    
+    // 当backgroundImage不为null时，创建背景图像
+    if (this.backgroundImage !== null) {
+      await this.createBackgroundImage();
+    }
 
     // 创建容器用于分层渲染
     this.edgeContainer = new PIXI.Container();
@@ -79,6 +92,39 @@ export class PixiGraphRenderer {
     this.app.stage.addChild(this.nodeContainer);
     this.app.stage.addChild(this.labelContainer);
   }
+
+  /**
+   * 创建背景图像
+   */
+  async createBackgroundImage() {
+      try {
+        // 加载指定的背景图片
+        const imagePath = `/icons/${this.backgroundImage}.png`;
+        
+        // 加载背景图像
+        const texture = await PIXI.Assets.load(imagePath);
+        
+        // 创建背景精灵
+        this.backgroundSprite = new PIXI.Sprite(texture);
+        
+        // 设置背景精灵的位置和缩放，使其适应canvas
+        this.backgroundSprite.anchor.set(0, 0);
+        
+        // 计算缩放比例以适应canvas尺寸
+        const scaleX = this.app.screen.width / texture.width;
+        const scaleY = this.app.screen.height / texture.height;
+        const scale = Math.max(scaleX, scaleY); // 选择较大的缩放比例以完全覆盖
+        
+        this.backgroundSprite.scale.set(scale);
+        
+        // 将背景精灵添加到舞台的最底层
+        this.app.stage.addChildAt(this.backgroundSprite, 0);
+      } catch (error) {
+        console.error('Failed to load background image:', error);
+        // 如果加载失败，使用0x7CFC00背景色
+        this.app.renderer.backgroundColor = 0x7CFC00;
+      }
+    }
 
   /**
    * 获取DOM元素，用于在React组件中渲染
