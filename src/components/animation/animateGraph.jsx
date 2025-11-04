@@ -1,6 +1,6 @@
 // animateGraph.jsx - 图的动画组件
 import { useRef, useState, useEffect, forwardRef, useImperativeHandle } from 'react';
-import { GraphRenderer } from './GraphRenderer';
+import { PixiGraphRenderer } from './PixiGraphRenderer';
 import { IndicatorRenderer } from './IndicatorRenderer';
 import AnnotationTool from './annotationTools';
 
@@ -70,35 +70,44 @@ const AnimateGraph = forwardRef(({
     // 初始化IndicatorRenderer用于指示器图层
     indicatorRendererRef.current = new IndicatorRenderer(indicatorCanvas, width, height);
     
-    const graphRenderer = new GraphRenderer(width, height);
+    const graphRenderer = new PixiGraphRenderer(width, height);
     
-    // 获取SVG元素并添加到容器中
-    const svgElement = graphRenderer.getSVGElement();
-    svgContainer.appendChild(svgElement);
+    // 等待PixiJS应用初始化完成后再获取元素并添加到容器中
+    const initializeRenderer = async () => {
+      // 等待PixiJS初始化完成
+      await new Promise(resolve => setTimeout(resolve, 100)); // 给一点时间初始化
+      
+      // 获取SVG元素并添加到容器中
+      const svgElement = graphRenderer.getSVGElement();
+      svgContainer.appendChild(svgElement);
+      
+      // 存储PixiGraphRenderer实例到ref
+      graphRendererRef.current = graphRenderer;
+      
+      // 初始化空的节点和边数据
+      currentNodesRef.current = [];
+      currentEdgesRef.current = [];
+      currentNodesStyleRef.current = {};
+      currentEdgesStyleRef.current = {};
+      
+      // 初始渲染空图
+      renderGraph();
+      
+      const controller = getController();
+      
+      setTimeout(() => {
+        if (typeof onInit === 'function') {
+          onInit(controller);
+        }
+      }, 0);
+    };
     
-    // 存储GraphRenderer实例到ref
-    graphRendererRef.current = graphRenderer;
-    
-    // 初始化空的节点和边数据
-    currentNodesRef.current = [];
-    currentEdgesRef.current = [];
-    currentNodesStyleRef.current = {};
-    currentEdgesStyleRef.current = {};
-    
-    // 初始渲染空图
-    renderGraph();
-    
-    const controller = getController();
-    
-    setTimeout(() => {
-      if (typeof onInit === 'function') {
-        onInit(controller);
-      }
-    }, 0);
+    initializeRenderer();
     
     // Cleanup function
     return () => {
       // 移除SVG元素
+      const svgElement = graphRendererRef.current?.getSVGElement();
       if (svgElement && svgContainer.contains(svgElement)) {
         svgContainer.removeChild(svgElement);
       }
@@ -123,11 +132,11 @@ const AnimateGraph = forwardRef(({
   
   // 重新画整张图
   const renderGraph = () => {
-    // 获取GraphRenderer实例
+    // 获取PixiGraphRenderer实例
     const graphRenderer = graphRendererRef.current;
     if (!graphRenderer) return;
     
-    // 使用GraphRenderer分别渲染节点和边
+    // 使用PixiGraphRenderer分别渲染节点和边
     renderNodes();
     renderEdges();
     
@@ -135,7 +144,7 @@ const AnimateGraph = forwardRef(({
   
   // 渲染所有节点
   const renderNodes = () => {
-    // 获取GraphRenderer实例
+    // 获取PixiGraphRenderer实例
     const graphRenderer = graphRendererRef.current;
     if (!graphRenderer) return;
     
@@ -149,7 +158,7 @@ const AnimateGraph = forwardRef(({
   
   // 渲染所有边
   const renderEdges = () => {
-    // 获取GraphRenderer实例
+    // 获取PixiGraphRenderer实例
     const graphRenderer = graphRendererRef.current;
     if (!graphRenderer) return;
     
@@ -206,7 +215,7 @@ const AnimateGraph = forwardRef(({
       // 更新节点引用
       currentNodesRef.current[nodeIndex] = updatedNode;
       
-      // 获取GraphRenderer实例
+      // 获取PixiGraphRenderer实例
       const graphRenderer = graphRendererRef.current;
       if (graphRenderer) {
         // 如果样式发生变化，调用updateNodeStyle
@@ -256,7 +265,7 @@ const AnimateGraph = forwardRef(({
       // 更新边引用
       currentEdgesRef.current[edgeIndex] = updatedEdge;
       
-      // 获取GraphRenderer实例
+      // 获取PixiGraphRenderer实例
       const graphRenderer = graphRendererRef.current;
       if (graphRenderer) {
         // 只处理边的样式修改，不处理位置修改
@@ -293,7 +302,7 @@ const AnimateGraph = forwardRef(({
         return;
       }
       
-      // 获取GraphRenderer实例
+      // 获取PixiGraphRenderer实例
       const graphRenderer = graphRendererRef.current;
       if (graphRenderer) {
         // 添加单个边
@@ -330,7 +339,7 @@ const AnimateGraph = forwardRef(({
       // 从节点数组中移除节点
       currentNodesRef.current = currentNodesRef.current.filter(n => n.id !== nodeId);
       
-      // 获取GraphRenderer实例
+      // 获取PixiGraphRenderer实例
       const graphRenderer = graphRendererRef.current;
       if (graphRenderer) {
         // 删除单个节点
@@ -354,7 +363,7 @@ const AnimateGraph = forwardRef(({
       // 从边数组中移除边
       currentEdgesRef.current = currentEdgesRef.current.filter(e => e.id !== edgeId);
       
-      // 获取GraphRenderer实例
+      // 获取PixiGraphRenderer实例
       const graphRenderer = graphRendererRef.current;
       if (graphRenderer) {
         // 删除单个边
@@ -368,7 +377,7 @@ const AnimateGraph = forwardRef(({
       currentNodesRef.current = [];
       currentEdgesRef.current = [];
       
-      // 获取GraphRenderer实例
+      // 获取PixiGraphRenderer实例
       const graphRenderer = graphRendererRef.current;
       if (graphRenderer) {
         // 调用graphRenderer的方法清除所有节点和边
@@ -557,7 +566,7 @@ const AnimateGraph = forwardRef(({
   
   return (
     <div className="relative w-full h-full">
-      {/* SVG容器 - 用于放置GraphRenderer生成的SVG元素 */}
+      {/* SVG容器 - 用于放置PixiGraphRenderer生成的SVG元素 */}
       <div
         ref={refSvgContainer}
         className="absolute top-0 left-0 w-full h-full"
