@@ -2,22 +2,155 @@
   "width": 800,
   "height": 500,
   "nodes": [
-    { "id": "1", "label": "1", "x": 200, "y": 100, "size": 60, "type": "circle", "style": { "fill": "#4CAF50" } },
-    { "id": "2", "label": "2", "x": 400, "y": 100, "size": 60, "type": "circle", "style": { "fill": "#2196F3" } },
-    { "id": "3", "label": "3", "x": 100, "y": 250, "size": 60, "type": "circle", "style": { "fill": "#FF9800" } },
-    { "id": "4", "label": "4", "x": 300, "y": 250, "size": 60, "type": "circle", "style": { "fill": "#9C27B0" } },
-    { "id": "5", "label": "5", "x": 500, "y": 250, "size": 60, "type": "circle", "style": { "fill": "#F44336" } },
-    { "id": "6", "label": "6", "x": 200, "y": 400, "size": 60, "type": "circle", "style": { "fill": "#00BCD4" } },
-    { "id": "7", "label": "7", "x": 400, "y": 400, "size": 60, "type": "circle", "style": { "fill": "#8BC34A" } }
+    {
+      "id": "1",
+      "label": "1",
+      "x": 200,
+      "y": 100,
+      "size": 60,
+      "type": "circle",
+      "style": {
+        "fill": "#5ca65f"
+      }
+    },
+    {
+      "id": "2",
+      "label": "2",
+      "x": 400,
+      "y": 100,
+      "size": 60,
+      "type": "circle",
+      "style": {
+        "fill": "#2196F3"
+      }
+    },
+    {
+      "id": "3",
+      "label": "3",
+      "x": 100,
+      "y": 250,
+      "size": 60,
+      "type": "circle",
+      "style": {
+        "fill": "#FF9800"
+      }
+    },
+    {
+      "id": "4",
+      "label": "4",
+      "x": 300,
+      "y": 250,
+      "size": 60,
+      "type": "circle",
+      "style": {
+        "fill": "#b951ca"
+      }
+    },
+    {
+      "id": "5",
+      "label": "5",
+      "x": 500,
+      "y": 250,
+      "size": 60,
+      "type": "circle",
+      "style": {
+        "fill": "#F44336"
+      }
+    },
+    {
+      "id": "6",
+      "label": "6",
+      "x": 200,
+      "y": 400,
+      "size": 60,
+      "type": "circle",
+      "style": {
+        "fill": "#29ddf4"
+      }
+    },
+    {
+      "id": "7",
+      "label": "7",
+      "x": 400,
+      "y": 400,
+      "size": 60,
+      "type": "circle",
+      "style": {
+        "fill": "#8BC34A"
+      }
+    }
   ],
   "edges": [
-    { "id": "e1", "label": "", "source": "1", "target": "2", "style": { "stroke": "#333", "lineWidth": 2 } },
-    { "id": "e2", "label": "", "source": "1", "target": "3", "style": { "stroke": "#333", "lineWidth": 2 } },
-    { "id": "e3", "label": "", "source": "1", "target": "4", "style": { "stroke": "#333", "lineWidth": 2 } },
-    { "id": "e4", "label": "", "source": "2", "target": "5", "style": { "stroke": "#333", "lineWidth": 2 } },
-    { "id": "e5", "label": "", "source": "3", "target": "6", "style": { "stroke": "#333", "lineWidth": 2 } },
-    { "id": "e6", "label": "", "source": "4", "target": "7", "style": { "stroke": "#333", "lineWidth": 2 } },
-    { "id": "e7", "label": "", "source": "5", "target": "7", "style": { "stroke": "#333", "lineWidth": 2 } }
+    {
+      "id": "e1",
+      "label": "",
+      "source": "1",
+      "target": "2",
+      "style": {
+        "stroke": "#333",
+        "lineWidth": 2
+      }
+    },
+    {
+      "id": "e2",
+      "label": "",
+      "source": "1",
+      "target": "3",
+      "style": {
+        "stroke": "#333",
+        "lineWidth": 2
+      }
+    },
+    {
+      "id": "e3",
+      "label": "",
+      "source": "1",
+      "target": "4",
+      "style": {
+        "stroke": "#333",
+        "lineWidth": 2
+      }
+    },
+    {
+      "id": "e4",
+      "label": "",
+      "source": "2",
+      "target": "5",
+      "style": {
+        "stroke": "#333",
+        "lineWidth": 2
+      }
+    },
+    {
+      "id": "e5",
+      "label": "",
+      "source": "3",
+      "target": "6",
+      "style": {
+        "stroke": "#333",
+        "lineWidth": 2
+      }
+    },
+    {
+      "id": "e6",
+      "label": "",
+      "source": "4",
+      "target": "7",
+      "style": {
+        "stroke": "#333",
+        "lineWidth": 2
+      }
+    },
+    {
+      "id": "e7",
+      "label": "",
+      "source": "5",
+      "target": "7",
+      "style": {
+        "stroke": "#333",
+        "lineWidth": 2
+      }
+    }
   ],
   "nodesStyle": {
     "stroke": "#000000",
