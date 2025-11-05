@@ -7,10 +7,10 @@
       "label": "节点1",
       "x": 80,
       "y": 80,
-      "size": 60,
-      "type": "circle",
       "style": {
-        "fill": "#4CAF50"
+        "fill": "#4CAF50",
+        "size": 60,
+        "type": "circle"
       }
     },
     {
@@ -18,10 +18,10 @@
       "label": "节点2",
       "x": 420,
       "y": 80,
-      "size": 50,
-      "type": "circle",
       "style": {
-        "fill": "#2196F3"
+        "fill": "#2196F3",
+        "size": 50,
+        "type": "circle"
       }
     },
     {
@@ -29,10 +29,10 @@
       "label": "节点3",
       "x": 80,
       "y": 210,
-      "size": 70,
-      "type": "square",
       "style": {
-        "fill": "#FF9800"
+        "fill": "#FF9800",
+        "size": 70,
+        "type": "square"
       }
     },
     {
@@ -40,10 +40,10 @@
       "label": "节点4",
       "x": 420,
       "y": 210,
-      "size": 56,
-      "type": "circle",
       "style": {
-        "fill": "#9C27B0"
+        "fill": "#9C27B0",
+        "size": 56,
+        "type": "circle"
       }
     },
     {
@@ -51,10 +51,10 @@
       "label": "节点5",
       "x": 250,
       "y": 150,
-      "size": 64,
-      "type": "square",
       "style": {
-        "fill": "#F44336"
+        "fill": "#F44336",
+        "size": 64,
+        "type": "square"
       }
     }
   ],
@@ -148,15 +148,17 @@
       }
     }
   ],
+  
   "nodesStyle": {
+    "size" : 100,
+    "type" : "planet1",
     "stroke": "#000000",
     "lineWidth": 2,
-    "labelFill": "#ffffff",
-    "labelFontSize": 14
+    "labelFill": "#000000",
+    "labelFontSize": 20
   },
   "edgesStyle": {
     "stroke": "#ffffff",
-    "lineWidth": 20,
-    "arrow": true
+    "lineWidth": 15
   }
 }

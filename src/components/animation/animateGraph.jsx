@@ -10,7 +10,9 @@ const AnimateGraph = forwardRef(({
   initialMode = 'none',
   onInit,
   enableDrawing = true,
-  backgroundImage = null
+  backgroundImage = null,
+  nodesStyle = {},
+  edgesStyle = {}
 }, ref) => {
   // 本地状态管理绘图模式
   const [currentMode, setCurrentMode] = useState(initialMode);
@@ -72,7 +74,7 @@ const AnimateGraph = forwardRef(({
       indicatorRendererRef.current = new IndicatorRenderer(indicatorCanvas, width, height);
       
       // 创建PixiGraphRenderer实例，并传入回调函数替代setTimeout初始化
-      const graphRenderer = new PixiGraphRenderer(width, height, backgroundImage, (renderer) => {
+      const graphRenderer = new PixiGraphRenderer(width, height, backgroundImage, nodesStyle, edgesStyle, (renderer) => {
         // 获取SVG元素并添加到容器中
         const svgElement = renderer.getSVGElement();
         if (svgElement && svgContainer) {
@@ -85,8 +87,8 @@ const AnimateGraph = forwardRef(({
         // 初始化空的节点和边数据
         currentNodesRef.current = [];
         currentEdgesRef.current = [];
-        currentNodesStyleRef.current = {};
-        currentEdgesStyleRef.current = {};
+        currentNodesStyleRef.current = nodesStyle || {};
+        currentEdgesStyleRef.current = edgesStyle || {};
         
         // 初始渲染空图
         renderGraph();
@@ -398,6 +400,7 @@ const AnimateGraph = forwardRef(({
       
       // 获取位置信息
       let position;
+      let radius = options.size || options.radius || nodesStyle.size/2 || 30;
       if (options.position) {
         // 如果直接提供了位置
         position = options.position;
@@ -409,12 +412,12 @@ const AnimateGraph = forwardRef(({
           return;
         }
         position = { x: targetNode.x, y: targetNode.y };
+        radius = options.size || options.radius || targetNode.style.size/2 || nodesStyle.size/2 || 30;
       } else {
         console.warn('Warning: No position or target provided for indicator.');
         return;
       }
-      
-      const radius = options.size || options.radius || 30;
+      console.log('radius = ', radius);
       const color = options.color || '#ff0000ff';
       
       if (indicatorRendererRef.current) {

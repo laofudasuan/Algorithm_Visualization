@@ -40,8 +40,7 @@ export const DFSAlgorithm = ({
           id: `visited-${node}`,
           type: 'highlight',
           target: node,
-          color: '#29a0dcff', // 蓝色表示正在递归中
-          radius: 35,
+          color: '#29a0dcff',
           lineWidth: 4
         });
         

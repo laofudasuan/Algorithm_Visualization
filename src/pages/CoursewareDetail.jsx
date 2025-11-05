@@ -245,7 +245,7 @@ const CoursewareDetail = () => {
       exit={{ opacity: 0 }}
     >
       {/* 返回按钮 */}
-      <div className="fixed top-4 left-4 z-50">
+      <div className="fixed top-4 right-4 z-50">
         <button 
           onClick={goBackToCoursewareList}
           className="bg-white text-gray-800 p-3 rounded-full shadow-lg hover:bg-gray-100 transition-colors"
@@ -289,18 +289,6 @@ const CoursewareDetail = () => {
       {/* 左右分页导航按钮 - 窗口底部两侧 */}
       {pageCount > 0 && (
         <>
-          {/* 返回课件主页按钮 - 使用返回图标，放在左上角 */}
-          <motion.button
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            onClick={goBackToMainPage}
-            className="fixed top-4 left-4 bg-white text-gray-800 p-3 rounded-full shadow-lg hover:bg-gray-100 transition-colors"
-            aria-label="返回课件主页"
-          >
-            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </motion.button>
           
           {/* 上一页按钮 - 保持在左下角 */}
           <motion.button

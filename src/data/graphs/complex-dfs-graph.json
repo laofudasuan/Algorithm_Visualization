@@ -7,10 +7,10 @@
       "label": "1",
       "x": 300,
       "y": 50,
-      "size": 30,
-      "type": "circle",
       "style": {
-        "fill": "#4CAF50"
+        "fill": "#4CAF50",
+        "size": 30,
+        "type": "circle"
       }
     },
     {
@@ -18,10 +18,10 @@
       "label": "2",
       "x": 150,
       "y": 130,
-      "size": 30,
-      "type": "circle",
       "style": {
-        "fill": "#2196F3"
+        "fill": "#2196F3",
+        "size": 30,
+        "type": "circle"
       }
     },
     {
@@ -29,10 +29,10 @@
       "label": "3",
       "x": 450,
       "y": 130,
-      "size": 30,
-      "type": "circle",
       "style": {
-        "fill": "#FF9800"
+        "fill": "#FF9800",
+        "size": 30,
+        "type": "circle"
       }
     },
     {
@@ -40,10 +40,10 @@
       "label": "4",
       "x": 100,
       "y": 200,
-      "size": 30,
-      "type": "circle",
       "style": {
-        "fill": "#9C27B0"
+        "fill": "#9C27B0",
+        "size": 30,
+        "type": "circle"
       }
     },
     {
@@ -51,10 +51,10 @@
       "label": "5",
       "x": 250,
       "y": 200,
-      "size": 30,
-      "type": "circle",
       "style": {
-        "fill": "#F44336"
+        "fill": "#F44336",
+        "size": 30,
+        "type": "circle"
       }
     },
     {
@@ -62,10 +62,10 @@
       "label": "6",
       "x": 400,
       "y": 200,
-      "size": 30,
-      "type": "circle",
       "style": {
-        "fill": "#00BCD4"
+        "fill": "#00BCD4",
+        "size": 30,
+        "type": "circle"
       }
     },
     {
@@ -73,10 +73,10 @@
       "label": "7",
       "x": 550,
       "y": 200,
-      "size": 30,
-      "type": "circle",
       "style": {
-        "fill": "#8BC34A"
+        "fill": "#8BC34A",
+        "size": 30,
+        "type": "circle"
       }
     },
     {
@@ -84,10 +84,10 @@
       "label": "8",
       "x": 150,
       "y": 300,
-      "size": 30,
-      "type": "circle",
       "style": {
-        "fill": "#FFC107"
+        "fill": "#FFC107",
+        "size": 30,
+        "type": "circle"
       }
     },
     {
@@ -95,10 +95,10 @@
       "label": "9",
       "x": 300,
       "y": 300,
-      "size": 30,
-      "type": "circle",
       "style": {
-        "fill": "#E91E63"
+        "fill": "#E91E63",
+        "size": 30,
+        "type": "circle"
       }
     },
     {
@@ -106,10 +106,10 @@
       "label": "10",
       "x": 450,
       "y": 300,
-      "size": 30,
-      "type": "circle",
       "style": {
-        "fill": "#3F51B5"
+        "fill": "#3F51B5",
+        "size": 30,
+        "type": "circle"
       }
     },
     {
@@ -117,10 +117,10 @@
       "label": "11",
       "x": 250,
       "y": 400,
-      "size": 30,
-      "type": "circle",
       "style": {
-        "fill": "#4CAF50"
+        "fill": "#4CAF50",
+        "size": 30,
+        "type": "circle"
       }
     },
     {
@@ -128,10 +128,10 @@
       "label": "12",
       "x": 400,
       "y": 400,
-      "size": 30,
-      "type": "circle",
       "style": {
-        "fill": "#2196F3"
+        "fill": "#2196F3",
+        "size": 30,
+        "type": "circle"
       }
     }
   ],
@@ -318,13 +318,15 @@
     }
   ],
   "nodesStyle": {
+    "size" : 100,
+    "type" : "planet1",
     "stroke": "#000000",
     "lineWidth": 2,
-    "labelFill": "#ffffff",
-    "labelFontSize": 14
+    "labelFill": "#000000",
+    "labelFontSize": 20
   },
   "edgesStyle": {
     "stroke": "#ffffff",
-    "lineWidth": 20
+    "lineWidth": 15
   }
 }

@@ -28,9 +28,7 @@ const GraphCanvas = forwardRef(({ width = 1000, height = 600, graphData = null, 
       console.log('GraphDataList已加载，跳过初始化');
       return;
     }
-    console.log('backgroundImage in graphcanvas:', backgroundImage);
     // 如果提供了graphData属性，检查它是否为数组
-    console.log('Canvas初始化graphData:', graphData);
     if (graphData) {
       if (Array.isArray(graphData)) {
         setGraphDataList(graphData);
@@ -240,6 +238,8 @@ const GraphCanvas = forwardRef(({ width = 1000, height = 600, graphData = null, 
             onInit={(controller) => initController(index, controller)}
             enableDrawing={enableDrawing}
             backgroundImage={backgroundImage}
+            nodesStyle={graphData?.nodesStyle}
+            edgesStyle={graphData?.edgesStyle}
           />
         </div>
       );

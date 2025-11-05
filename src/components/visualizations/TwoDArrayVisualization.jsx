@@ -30,6 +30,8 @@ const TwoDArrayVisualization = forwardRef(({ width, height, rows, cols, rowLabel
           graphCanvasRef.current.dispatchOperation('updateNode', {
             id: nodeId,
             style: {
+              size: Math.min(cellWidth, cellHeight) * 0.8,
+              type: 'square',
               fill: fillColor,
               stroke: strokeColor,
               strokeWidth: 2,
@@ -42,9 +44,9 @@ const TwoDArrayVisualization = forwardRef(({ width, height, rows, cols, rowLabel
             id: nodeId,
             x: col * cellWidth + cellWidth / 2,
             y: row * cellHeight + cellHeight / 2,
-            size: Math.min(cellWidth, cellHeight) * 0.8,
-            type: 'square',
             style: {
+              size: Math.min(cellWidth, cellHeight) * 0.8,
+              type: 'square',
               fill: fillColor,
               stroke: strokeColor,
               strokeWidth: 2,

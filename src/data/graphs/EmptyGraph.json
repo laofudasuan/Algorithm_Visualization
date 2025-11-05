@@ -3,14 +3,17 @@
   "height": 500,
   "nodes": [],
   "edges": [],
+  
   "nodesStyle": {
+    "size" : 100,
+    "type" : "planet1",
     "stroke": "#000000",
     "lineWidth": 2,
-    "labelFill": "#ffffff",
-    "labelFontSize": 14
+    "labelFill": "#000000",
+    "labelFontSize": 20
   },
   "edgesStyle": {
-    "stroke": "#666666",
-    "lineWidth": 2
+    "stroke": "#ffffff",
+    "lineWidth": 15
   }
 }

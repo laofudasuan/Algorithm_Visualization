@@ -282,8 +282,8 @@ const GraphAlgorithmMotion = forwardRef(({
               <div className="flex-1">
                 <GraphCanvas 
                   ref={animationCanvasRef}
-                  width={600}
-                  height={500}
+                  width={graphData.width || 800}
+                  height={graphData.height || 500}
                   graphData={graphData}
                   isLoading={false}
                   backgroundImage={'background'}
@@ -294,8 +294,8 @@ const GraphAlgorithmMotion = forwardRef(({
                   <h3 className="text-lg font-semibold mb-2 text-gray-700 text-center">{dataStructureTitle}</h3>
                   <TwoDArrayVisualization
                     ref={adjacencyMatrixRef}
-                    width={400}
-                    height={400}
+                    width={graphData.width || 800}
+                    height={graphData.height || 500}
                     rows={graphData.nodes ? graphData.nodes.length : 0}
                     cols={graphData.nodes ? graphData.nodes.length : 0}
                     rowLabels={graphData.nodes ? graphData.nodes.map(node => node.id) : 'default'}

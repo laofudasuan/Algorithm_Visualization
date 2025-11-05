@@ -39,12 +39,12 @@ const ArrayVisualization = forwardRef(({ height, length }, ref) => {
             id: nodeId,
             x: index * height + height / 2,
             y: height / 2,
-            size: height,
-            type: 'square',
             style: {
               fill: '#4CAF50',
               stroke: '#4CAF50',
-              strokeWidth: 2
+              strokeWidth: 2,
+              size: height,
+              type: 'square',
             },
             label: String(value)
           });

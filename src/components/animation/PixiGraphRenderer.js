@@ -8,7 +8,7 @@ import * as PIXI from 'pixi.js';
 export class PixiGraphRenderer {
   static preloadedIcons = {};
   
-  constructor(width, height, backgroundImage = null, onInit = null) {
+  constructor(width, height, backgroundImage = null, nodesStyle = {}, edgesStyle = {}, onInit = null) {
     // 创建canvas元素
     this.canvasElement = document.createElement('canvas');
     this.canvasElement.width = width;
@@ -19,6 +19,9 @@ export class PixiGraphRenderer {
     this.backgroundImage = backgroundImage;
     // 保存回调函数
     this.onInitCallback = onInit;
+    // 保存全局样式参数
+    this.globalNodesStyle = nodesStyle || {};
+    this.globalEdgesStyle = edgesStyle || {};
     // 初始化容器
     this.initContainers();
     
@@ -50,6 +53,7 @@ export class PixiGraphRenderer {
 
     // 默认样式
     this.defaultNodeStyle = {
+      type: 'circle',
       fill: 0x3f51b5,
       stroke: 0x000000,
       lineWidth: 2
@@ -58,6 +62,15 @@ export class PixiGraphRenderer {
     this.defaultEdgeStyle = {
       stroke: 0x999999,
       lineWidth: 2
+    };
+    
+    // 合并全局样式到默认样式
+    if (this.globalNodesStyle) {
+      this.defaultNodeStyle = { ...this.defaultNodeStyle, ...this.globalNodesStyle };
+    }
+    
+    if (this.globalEdgesStyle) {
+      this.defaultEdgeStyle = { ...this.defaultEdgeStyle, ...this.globalEdgesStyle };
     };
   }
 
@@ -302,13 +315,13 @@ export class PixiGraphRenderer {
     // 检查应用是否已初始化
     if (!this.app || !this.app.stage || !this.nodeContainer) return;
     
-    const size = node.size || 20;
     const nodeStyle = { ...this.defaultNodeStyle, ...node.style };
+    const size = nodeStyle.size || 20;
     
     let nodeObject;
 
     // 根据节点类型创建不同的PIXI对象
-    if (node.type === 'square') {
+    if (nodeStyle.type === 'square') {
       // 创建矩形节点
       nodeObject = new PIXI.Graphics();
       nodeObject.rect(-size/2, -size/2, size, size);
@@ -316,7 +329,7 @@ export class PixiGraphRenderer {
       nodeObject.stroke({width: nodeStyle.lineWidth, color: nodeStyle.stroke});
       nodeObject.x = node.x;
       nodeObject.y = node.y;
-    } else if (node.type === 'circle') {
+    } else if (nodeStyle.type === 'circle') {
       // 创建圆形节点
       nodeObject = new PIXI.Graphics();
       nodeObject.circle(0, 0, size/2);
@@ -326,7 +339,7 @@ export class PixiGraphRenderer {
       nodeObject.y = node.y;
     } else {
       // PIXI v8 正确写法：先加载纹理，再创建 Sprite
-      PIXI.Assets.load(`/icons/`+node.type+`.png`).then((texture) => {
+      PIXI.Assets.load(`/icons/`+nodeStyle.type+`.png`).then((texture) => {
         // 纹理加载完成后，创建 Sprite
         const nodeObject = new PIXI.Sprite(texture);
 
@@ -406,8 +419,8 @@ export class PixiGraphRenderer {
     edgeObject.moveTo(sourceNode.x, sourceNode.y);
     edgeObject.lineTo(targetNode.x, targetNode.y);
     edgeObject.stroke({width: edgeStyle.lineWidth, color: edgeStyle.stroke});
-    edgeObject.alpha = 1; // 确保边默认可见
-    edgeObject.style = edgeStyle; // 保存合并后的样式，以便后续更新时使用
+    edgeObject.alpha = 1;
+    edgeObject.style = edgeStyle;
 
     // 记录坐标
     edgeObject.startX = sourceNode.x;
@@ -418,12 +431,16 @@ export class PixiGraphRenderer {
     // 添加到边容器
     this.edgeContainer.addChild(edgeObject);
 
+    // 如果是有向边，绘制箭头
+    if (edgeStyle.directional) {
+      this.drawArrow(edgeObject, sourceNode, targetNode, edgeStyle);
+    }
+
     // 存储边对象引用
     this.edgeObjects.set(edgeId, edgeObject);
 
     // 添加边ID到existingEdgeIds集合
     this.existingEdgeIds.add(edgeId);
-
     // 创建边标签
     if (label) {
       this.createEdgeLabelElement(edgeId, sourceNode, targetNode, label, style);
@@ -443,13 +460,13 @@ export class PixiGraphRenderer {
     const nodeObject = this.nodeObjects.get(nodeId);
     if (!nodeObject) return;
 
-    const size = node.size || 20;
     const nodeStyle = { ...this.defaultNodeStyle, ...node.style };
+    const size = nodeStyle.size || 20;
 
     // 重新绘制节点
     nodeObject.clear();
     
-    if (node.type === 'square') {
+    if (nodeStyle.type === 'square') {
       nodeObject.rect(-size/2, -size/2, size, size);
     } else {
       nodeObject.circle(0, 0, size/2);
@@ -559,6 +576,14 @@ export class PixiGraphRenderer {
           edgeObject.endX = currentX;
           edgeObject.endY = currentY;
         }
+        
+        // 如果是有向边，直接在边对象上绘制箭头（与animateEdgeAppearance保持一致）
+        if (edgeStyle.directional) {
+          // 创建临时节点对象传递给drawArrow
+          const startNode = { x: edgeObject.startX, y: edgeObject.startY };
+          const endNode = { x: edgeObject.endX, y: edgeObject.endY };
+          this.drawArrow(edgeObject, startNode, endNode, edgeStyle);
+        }
 
         // 更新边标签位置
         const edgeLabelObject = this.edgeLabelObjects.get(edgeId);
@@ -611,6 +636,19 @@ export class PixiGraphRenderer {
     edgeObject.stroke({width: edgeStyle.lineWidth, color: edgeStyle.stroke});
     edgeObject.alpha = 1; // 确保边可见
 
+    // 如果是有向边，绘制箭头
+    if (edgeStyle.directional) {
+      // 需要获取节点信息来绘制箭头
+      const edgeData = this.edges?.find(e => e.id === edgeId);
+      if (edgeData) {
+        const sourceNode = this.nodes?.find(n => n.id === edgeData.source);
+        const targetNode = this.nodes?.find(n => n.id === edgeData.target);
+        if (sourceNode && targetNode) {
+          this.drawArrow(edgeObject, sourceNode, targetNode, edgeStyle);
+        }
+      }
+    }
+
     // 更新或创建边标签
     if (label) {
       const labelObject = this.edgeLabelObjects.get(edgeId);
@@ -623,6 +661,93 @@ export class PixiGraphRenderer {
       } else {
         // 如果标签不存在，但有边和节点信息，创建新标签
         console.warn('Cannot create edge label without node information');
+      }
+    } else if (this.edgeLabelObjects.has(edgeId)) {
+      const labelObject = this.edgeLabelObjects.get(edgeId);
+      // 淡出并移除标签
+      this.animate({
+        target: labelObject,
+        properties: {
+          alpha: 0
+        },
+        duration: 300,
+        onUpdate: () => {
+          // 更新渲染
+        },
+        onComplete: () => {
+          if (this.edgeLabelContainer) {
+            this.edgeLabelContainer.removeChild(labelObject);
+          }
+          this.edgeLabelObjects.delete(edgeId);
+        }
+      });
+    }
+
+    this.app.renderer.render(this.app.stage);
+  }
+
+  /**
+   * 更新边位置（保留此方法以保持兼容性，但主要功能已移至updateNodePosition）
+   */
+  updateEdgePosition(edgeId, sourceNode, targetNode, label) {
+    // 检查应用是否已初始化
+    if (!this.app || !this.app.stage) return;
+    
+    // 直接获取边对象
+    const edgeObject = this.edgeObjects.get(edgeId);
+    if (!edgeObject) return;
+
+    // 重新绘制边
+    edgeObject.clear();
+    const edgeStyle = { ...this.defaultEdgeStyle, ...(edgeObject.style || {}) };
+    edgeObject.moveTo(sourceNode.x, sourceNode.y);
+    edgeObject.lineTo(targetNode.x, targetNode.y);
+    edgeObject.stroke({width: edgeStyle.lineWidth, color: edgeStyle.stroke});
+    
+    // 如果是有向边，绘制箭头
+    if (edgeStyle.directional) {
+      this.drawArrow(edgeObject, sourceNode, targetNode, edgeStyle);
+    }
+    
+    // 更新坐标记录
+    edgeObject.startX = sourceNode.x;
+    edgeObject.startY = sourceNode.y;
+    edgeObject.endX = targetNode.x;
+    edgeObject.endY = targetNode.y;
+    edgeObject.alpha = 1; // 确保边可见
+
+    // 更新或创建边标签
+    if (label) {
+      const labelObject = this.edgeLabelObjects.get(edgeId);
+      if (labelObject) {
+        // 更新标签内容
+        labelObject.text = label;
+        labelObject.alpha = 1;
+
+        // 计算中点位置
+        const midX = (sourceNode.x + targetNode.x) / 2;
+        const midY = (sourceNode.y + targetNode.y) / 2;
+
+        labelObject.x = midX;
+        labelObject.y = midY;
+      } else {
+        // 使用默认样式创建新标签
+        const defaultStyle = { ...this.defaultEdgeStyle };
+        this.createEdgeLabelElement(edgeId, sourceNode, targetNode, label, defaultStyle);
+        // 淡入新标签
+        const newLabelObject = this.edgeLabelObjects.get(edgeId);
+        if (newLabelObject) {
+          this.animate({
+            target: newLabelObject,
+            properties: {
+              alpha: 1
+            },
+            duration: 300,
+            onUpdate: () => {
+              // 更新渲染
+            }
+          });
+        }
       }
     } else if (this.edgeLabelObjects.has(edgeId)) {
       const labelObject = this.edgeLabelObjects.get(edgeId);
@@ -696,6 +821,14 @@ export class PixiGraphRenderer {
       edgeObject.lineTo(newEndX, newEndY);
       edgeObject.stroke({width: edgeStyle.lineWidth, color: edgeStyle.stroke});
       
+      // 如果是有向边，绘制箭头
+      if (edgeStyle.directional) {
+        this.drawArrow(edgeObject, 
+          {x: newStartX, y: newStartY}, 
+          {x: newEndX, y: newEndY}, 
+          edgeStyle);
+      }
+      
       // 更新坐标记录
       edgeObject.startX = newStartX;
       edgeObject.startY = newStartY;
@@ -711,6 +844,11 @@ export class PixiGraphRenderer {
         edgeObject.lineTo(targetEndX, targetEndY);
         edgeObject.stroke({width: edgeStyle.lineWidth, color: edgeStyle.stroke});
         
+        // 如果是有向边，绘制箭头
+        if (edgeStyle.directional) {
+          this.drawArrow(edgeObject, sourceNode, targetNode, edgeStyle);
+        }
+        
         edgeObject.startX = targetStartX;
         edgeObject.startY = targetStartY;
         edgeObject.endX = targetEndX;
@@ -720,88 +858,6 @@ export class PixiGraphRenderer {
       }
     };
     requestAnimationFrame(animate);
-  }
-
-  /**
-   * 更新边位置（保留此方法以保持兼容性，但主要功能已移至updateNodePosition）
-   */
-  updateEdgePosition(edgeId, sourceNode, targetNode, label) {
-    // 检查应用是否已初始化
-    if (!this.app || !this.app.stage) return;
-    
-    // 直接获取边对象
-    const edgeObject = this.edgeObjects.get(edgeId);
-    if (!edgeObject) return;
-
-    // 重新绘制边
-    edgeObject.clear();
-    const edgeStyle = { ...this.defaultEdgeStyle, ...(edgeObject.style || {}) };
-    edgeObject.moveTo(sourceNode.x, sourceNode.y);
-    edgeObject.lineTo(targetNode.x, targetNode.y);
-    edgeObject.stroke({width: edgeStyle.lineWidth, color: edgeStyle.stroke});
-    
-    // 更新坐标记录
-    edgeObject.startX = sourceNode.x;
-    edgeObject.startY = sourceNode.y;
-    edgeObject.endX = targetNode.x;
-    edgeObject.endY = targetNode.y;
-    edgeObject.alpha = 1; // 确保边可见
-
-    // 更新或创建边标签
-    if (label) {
-      const labelObject = this.edgeLabelObjects.get(edgeId);
-      if (labelObject) {
-        // 更新标签内容
-        labelObject.text = label;
-        labelObject.alpha = 1;
-
-        // 计算中点位置
-        const midX = (sourceNode.x + targetNode.x) / 2;
-        const midY = (sourceNode.y + targetNode.y) / 2;
-
-        labelObject.x = midX;
-        labelObject.y = midY;
-      } else {
-        // 使用默认样式创建新标签
-        const defaultStyle = { ...this.defaultEdgeStyle };
-        this.createEdgeLabelElement(edgeId, sourceNode, targetNode, label, defaultStyle);
-        // 淡入新标签
-        const newLabelObject = this.edgeLabelObjects.get(edgeId);
-        if (newLabelObject) {
-          this.animate({
-            target: newLabelObject,
-            properties: {
-              alpha: 1
-            },
-            duration: 300,
-            onUpdate: () => {
-              // 更新渲染
-            }
-          });
-        }
-      }
-    } else if (this.edgeLabelObjects.has(edgeId)) {
-      const labelObject = this.edgeLabelObjects.get(edgeId);
-      // 淡出并移除标签
-      this.animate({
-        target: labelObject,
-        properties: {
-          alpha: 0
-        },
-        duration: 300,
-        onUpdate: () => {
-          // 更新渲染
-        },
-        onComplete: () => {
-          if (this.edgeLabelContainer) {
-            this.edgeLabelContainer.removeChild(labelObject);
-          }
-          this.edgeLabelObjects.delete(edgeId);
-        }
-      });
-    }
-
-    this.app.renderer.render(this.app.stage);
   }
 
   /**
@@ -897,6 +953,14 @@ export class PixiGraphRenderer {
         edgeObject.moveTo(startX, startY);
         edgeObject.lineTo(targetEndX, targetEndY);
         edgeObject.stroke({width: edgeStyle.lineWidth, color: edgeStyle.stroke});
+
+        // 如果是有向边，在动画完成后绘制箭头
+        if (edgeStyle.directional) {
+          // 创建临时节点对象传递给drawArrow
+          const startNode = { x: startX, y: startY };
+          const endNode = { x: targetEndX, y: targetEndY };
+          this.drawArrow(edgeObject, startNode, endNode, edgeStyle);
+        }
 
         // 确保动画结束时标签完全显示
         const labelObject = this.edgeLabelObjects.get(edgeId);
@@ -1117,6 +1181,46 @@ export class PixiGraphRenderer {
   easeOutElastic(t) {
     const p = 0.3;
     return Math.pow(2, -10 * t) * Math.sin((t - p / 4) * (2 * Math.PI) / p) + 1;
+  }
+
+  /**
+   * 绘制箭头
+   * @param {PIXI.Graphics} graphics - PIXI图形对象
+   * @param {Object} startNode - 起始节点 {x, y}
+   * @param {Object} endNode - 终止节点 {x, y}
+   * @param {Object} style - 边样式
+   */
+  drawArrow(graphics, startNode, endNode, style) {
+    const dx = endNode.x - startNode.x;
+    const dy = endNode.y - startNode.y;
+    const angle = Math.atan2(dy, dx);
+    
+    const headLength = style.lineWidth*2/3 || 10;
+
+    // 定义四个箭头位置的比例
+    const positions = [3/10+1/40, 4/10+1/40, 6/10+1/40, 7/10+1/40];
+    
+    // 绘制四个箭头
+    positions.forEach(ratio => {
+      // 计算箭头尖端位置
+      const tipX = startNode.x + dx * ratio;
+      const tipY = startNode.y + dy * ratio;
+
+      // 计算箭头左右两个点
+      const leftX = tipX - Math.cos(angle - Math.PI / 6) * headLength;
+      const leftY = tipY - Math.sin(angle - Math.PI / 6) * headLength;
+
+      const rightX = tipX - Math.cos(angle + Math.PI / 6) * headLength;
+      const rightY = tipY - Math.sin(angle + Math.PI / 6) * headLength;
+
+      // 绘制箭头
+      graphics.moveTo(leftX, leftY);
+      graphics.lineTo(tipX, tipY);
+      graphics.lineTo(rightX, rightY);
+    });
+
+    // 设置箭头样式
+    graphics.stroke({ width: style.lineWidth/4 || 3, color: style.color || 0x4FC3F7 });
   }
 
   /**

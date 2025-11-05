@@ -100,8 +100,7 @@ const LinkedListVisualization = forwardRef(({ radius = 30, maxSize = 10 }, ref) 
       id: nodeId,
       x: newNodePosition.x,
       y: newNodePosition.y,
-      size: radius,
-      style: newNodeStyle,
+      style: { ...newNodeStyle, size: radius },
       label: value.toString()
     });
     
@@ -146,8 +145,7 @@ const LinkedListVisualization = forwardRef(({ radius = 30, maxSize = 10 }, ref) 
       id: nodeId,
       x: newNodePosition.x,
       y: newNodePosition.y,
-      size: radius,
-      style: newNodeStyle,
+      style: { ...newNodeStyle, size: radius },
       label: value.toString()
     });
     
@@ -291,8 +289,7 @@ const LinkedListVisualization = forwardRef(({ radius = 30, maxSize = 10 }, ref) 
       id: nodeId,
       x: newNodePosition.x,
       y: newNodePosition.y,
-      size: radius,
-      style: newNodeStyle,
+      style: { ...newNodeStyle, size: radius },
       label: value.toString()
     });
     
@@ -416,8 +413,7 @@ const LinkedListVisualization = forwardRef(({ radius = 30, maxSize = 10 }, ref) 
           id: nodeId,
           x: position.x,
           y: position.y,
-          size: radius,
-          style: nodeStyle,
+          style: { ...nodeStyle, size: radius },
           label: value.toString()
         });
         
