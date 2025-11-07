@@ -6,7 +6,8 @@ import GraphAlgorithmMotion from './GraphAlgorithmMotion.jsx';
 
 const GraphAlgorithmVisualization = forwardRef(({ 
   graphName = 'dfs-graph',
-  animationList = []
+  animationList = [],
+  enableDrawing = true
 }, ref) => {
   const graphCanvasRef = useRef(null);
   const algorithmMotionRef = useRef(null);
@@ -70,6 +71,7 @@ const GraphAlgorithmVisualization = forwardRef(({
               graphData={graphData}
               isLoading={false}
               backgroundImage={'background'}
+              enableDrawing={enableDrawing}
             />
             {animationList && animationList.length > 0 && (
               <div className="ml-4 mt-2">
@@ -81,36 +83,65 @@ const GraphAlgorithmVisualization = forwardRef(({
                       {
                         id: 'dfs',
                         label: '深度优先搜索(DFS)',
-                        colorClass: 'bg-green-600 hover:bg-green-700 text-white',
-                        icon: null
+                        icon: null,
+                        type: 'modal'
                       },
                       {
                         id: 'bfs',
                         label: '广度优先搜索(BFS)',
-                        colorClass: 'bg-green-600 hover:bg-green-700 text-white',
-                        icon: null
+                        icon: null,
+                        type: 'modal'
                       },
                       {
                         id: 'adjacencyMatrix',
                         label: '邻接矩阵',
-                        colorClass: 'bg-blue-600 hover:bg-blue-700 text-white',
                         icon: (
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 inline ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                           </svg>
-                        )
+                        ),
+                        type: 'modal'
                       },
                       {
                         id: 'adjacencyList',
                         label: '邻接表',
-                        colorClass: 'bg-purple-600 hover:bg-purple-700 text-white',
                         icon: (
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 inline ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16l2.879-2.879m0 0a3 3 0 104.243-4.242 3 3 0 00-4.243 4.242zM21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
-                        )
+                        ),
+                        type: 'modal'
+                      },
+                      {
+                        id: 'ShowScc',
+                        label: '展示强连通分量',
+                        icon: (
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 inline ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                          </svg>
+                        ),
+                        type: 'canvas'
                       }
                     ];
+
+                    // 处理按钮点击事件
+                    const handleButtonClick = (config) => {
+                      if (config.type === 'modal') {
+                        selectAlgorithmAndOpenModal(config.id);
+                      } else if (config.type === 'canvas') {
+                        if (config.id === 'ShowScc') {
+                          console.log('展示强连通分量');
+                          if (graphData.Sccs && Array.isArray(graphData.Sccs) && graphCanvasRef.current && graphCanvasRef.current.dispatchOperation) {
+                            // 使用GraphCanvas直接暴露的dispatchOperation方法
+                            graphData.Sccs.forEach(scc => {
+                              graphCanvasRef.current.dispatchOperation('addIndicator',scc);
+                            });
+                          } else {
+                            console.warn('无法访问画布的dispatchOperation方法');
+                          }
+                        }
+                      }
+                    };
 
                     // 过滤并渲染配置的按钮
                     return buttonConfigs
@@ -118,13 +149,16 @@ const GraphAlgorithmVisualization = forwardRef(({
                       .map(config => (
                         <button
                           key={config.id}
-                          onClick={() => selectAlgorithmAndOpenModal(config.id)}
+                          onClick={() => handleButtonClick(config)}
                           disabled={!graphData || isLoading}
                           className={`px-4 py-2 rounded-md transition-colors w-full ${(
                             (!graphData || isLoading)
                               ? 'bg-gray-400 cursor-not-allowed'
-                              : config.colorClass
-                          )} block`}
+                              : config.type === 'modal' 
+                                ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                                : 'bg-green-600 hover:bg-green-700 text-white'
+                          )} block relative overflow-hidden group`}
+                          title={config.type === 'modal' ? '点击打开模态框' : '直接操作当前画布'}
                         >
                           {config.label}
                           {config.icon}

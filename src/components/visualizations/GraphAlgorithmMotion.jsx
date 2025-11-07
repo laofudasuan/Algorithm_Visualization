@@ -48,7 +48,9 @@ const GraphAlgorithmMotion = forwardRef(({
         }
         
         // 对于无向图，也添加反向边
-        if (!edge.directed) {
+        // 首先检查边的style中是否有directional属性，如果不存在，则检查全局的edgeStyle
+        const isDirected = (edge.style && 'directional' in edge.style ? edge.style.directional : this.edgeStyle?.directional) || (edge.style && edge.style.arrow);
+        if (!isDirected) {
           if (adjList[target]) {
             adjList[target].push(source);
           } else {

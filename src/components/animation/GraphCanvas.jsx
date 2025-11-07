@@ -121,6 +121,14 @@ const GraphCanvas = forwardRef(({ width = 1000, height = 600, graphData = null, 
         });
       });
     }
+
+    // 添加指示器
+    if (data.indicators && Array.isArray(data.indicators)) {
+      data.indicators.forEach(indicator => {
+        controller.addIndicator(indicator);
+      });
+    }
+
   };
   
   // 切换到指定索引的图

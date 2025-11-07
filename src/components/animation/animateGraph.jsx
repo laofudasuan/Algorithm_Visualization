@@ -393,7 +393,7 @@ const AnimateGraph = forwardRef(({
     },
     
     addIndicator: (options) => {
-      // 支持格式：{id, type, target, position, color, size, duration}
+      // 支持格式：{id, type, target, position, color, size, width , height , duration}
       
       // 如果没有id，则生成一个
       const indicatorId = options.id || Date.now().toString();
@@ -417,19 +417,32 @@ const AnimateGraph = forwardRef(({
         console.warn('Warning: No position or target provided for indicator.');
         return;
       }
-      console.log('radius = ', radius);
       const color = options.color || '#ff0000ff';
       
       if (indicatorRendererRef.current) {
         if (options.type === 'highlight') {
-          indicatorRendererRef.current.addHighlightIndicator(
-            indicatorId, 
-            position.x, 
-            position.y, 
-            radius, 
-            color, 
-            options.lineWidth || 3
-          );
+            if (options.width !== undefined && options.height !== undefined) {
+              // 调用矩形高亮
+              indicatorRendererRef.current.addRectangleHighlight(
+                indicatorId, 
+                position.x, 
+                position.y, 
+                options.width, 
+                options.height, 
+                color, 
+                options.lineWidth || 3
+              );
+            } else {
+              // 调用圆形高亮
+              indicatorRendererRef.current.addCircleHighlight(
+                indicatorId, 
+                position.x, 
+                position.y, 
+                radius, 
+                color, 
+                options.lineWidth || 3
+              );
+            }
         } else if (options.type === 'pulse') {
           const duration = options.duration || 3000;
           const repeatCount = options.repeatCount !== undefined ? options.repeatCount : 3;
@@ -459,6 +472,54 @@ const AnimateGraph = forwardRef(({
               duration
             );
           }
+        } else if (options.type === 'text') {
+          // 文字指示器
+          if (options.text === undefined) {
+            console.warn('Warning: Text content is required for text indicator.');
+            return;
+          }
+          
+          // 获取文字属性
+          const textSize = options.size || 14;
+          const fontWeight = options.fontWeight || 'normal';
+          const fontFamily = options.fontFamily || 'Arial';
+          
+          // 计算文字位置：如果是由target给出的，则放在target旁边防止遮挡
+          let textPosition = { ...position };
+          let textAlign = options.textAlign || 'center';
+          let verticalAlign = options.verticalAlign || 'middle';
+          
+          if (options.target) {
+            // 获取画布宽度信息（从canvas或width属性获取）
+            const canvasWidth = width; // 默认800px
+            const safetyMargin = 50; // 右侧安全边距
+            
+            // 检查节点是否靠近右侧边界
+            if (position.x + radius + 10 + safetyMargin > canvasWidth) {
+              // 如果节点靠右，将文字放在左侧
+              textPosition.x -= radius + 10; // 放在节点左侧，距离节点半径+10像素
+              textAlign = 'right';
+            } else {
+              // 否则放在右侧
+              textPosition.x += radius + 10; // 放在节点右侧，距离节点半径+10像素
+              textAlign = 'left';
+            }
+          }
+          
+          indicatorRendererRef.current.addTextIndicator(
+            indicatorId,
+            textPosition.x,
+            textPosition.y,
+            options.text,
+            color,
+            {
+              textSize,
+              fontWeight,
+              fontFamily,
+              textAlign,
+              verticalAlign
+            }
+          );
         }
       }
       

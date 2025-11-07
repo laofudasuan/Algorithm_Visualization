@@ -91,9 +91,9 @@ export class IndicatorRenderer {
   }
   
   /**
-   * 使用fabric.js添加高亮指示器
+   * 使用fabric.js添加圆形高亮指示器
    */
-  addHighlightIndicator(id, x, y, radius = 30, color = '#ffeb3b', lineWidth = 3) {
+  addCircleHighlight(id, x, y, radius = 30, color = '#ffeb3b', lineWidth = 3) {
     // 如果已存在相同ID的动画，先删除它
     if (this.animations.has(id)) {
       this.removeIndicator(id);
@@ -118,10 +118,52 @@ export class IndicatorRenderer {
     this.fabricCanvas.add(circle);
     
     // 保存引用以便后续移除
-    this.animations.set(id, { type: 'highlight', object: circle });
+    this.animations.set(id, { type: 'circle-highlight', object: circle });
     
     // 淡入动画
     circle.animate({
+      opacity: 1
+    }, {
+      duration: 500, // 500毫秒淡入
+      onChange: () => {
+        this.fabricCanvas.renderAll();
+      }
+    });
+  }
+  
+  /**
+   * 使用fabric.js添加矩形高亮指示器
+   */
+  addRectangleHighlight(id, x, y, width = 60, height = 40, color = '#ffeb3b', lineWidth = 3) {
+    // 如果已存在相同ID的动画，先删除它
+    if (this.animations.has(id)) {
+      this.removeIndicator(id);
+    }
+    
+    // 创建矩形对象，初始透明度为0
+    const rectangle = new fabric.Rect({
+      left: x,
+      top: y,
+      width: width,
+      height: height,
+      stroke: color,
+      strokeWidth: lineWidth,
+      fill: 'transparent',
+      selectable: false,
+      hoverCursor: 'default',
+      originX: 'center',
+      originY: 'center',
+      opacity: 0 // 初始透明度为0
+    });
+    
+    // 添加到画布
+    this.fabricCanvas.add(rectangle);
+    
+    // 保存引用以便后续移除
+    this.animations.set(id, { type: 'rectangle-highlight', object: rectangle });
+    
+    // 淡入动画
+    rectangle.animate({
       opacity: 1
     }, {
       duration: 500, // 500毫秒淡入
@@ -355,6 +397,42 @@ export class IndicatorRenderer {
   }
   
   /**
+   * 使用fabric.js添加文字指示器
+   */
+  addTextIndicator(id, x, y, text, color = '#000000', options = {}) {
+    // 如果已存在相同ID的动画，先删除它
+    if (this.animations.has(id)) {
+      this.removeIndicator(id);
+    }
+    console.log('addTextIndicator', id, x, y, text, color, options);
+    
+    // 修复：使用更简单的方式创建文字对象，避免对齐问题
+    const textObj = new fabric.Text(text, {
+      left: x,
+      top: y,
+      fill: color,
+      fontSize: options.textSize || options.size || 14, // 同时支持textSize和size参数
+      fontWeight: options.fontWeight || 'normal',
+      fontFamily: options.fontFamily || 'Arial',
+      textAlign: options.textAlign || 'center',
+      originX: 'center',
+      originY: 'center',
+      selectable: false,
+      hoverCursor: 'default',
+      opacity: 1 // 暂时去掉淡入，确保文字可见
+    });
+    
+    // 添加到画布
+    this.fabricCanvas.add(textObj);
+    
+    // 保存引用以便后续移除
+    this.animations.set(id, { type: 'text', object: textObj });
+    
+    // 强制立即渲染
+    this.fabricCanvas.renderAll();
+  }
+
+  /**
    * 移除指示器
    */
   removeIndicator(id) {
@@ -362,7 +440,7 @@ export class IndicatorRenderer {
     if (!animation) return;
     
     this.animations.delete(id);
-    if (animation.type === 'highlight') {
+    if (animation.type === 'highlight' || animation.type === 'text') {
       // 淡出动画
       animation.object.animate({
         opacity: 0

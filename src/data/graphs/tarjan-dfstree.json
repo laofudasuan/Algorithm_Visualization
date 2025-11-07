@@ -1,32 +1,32 @@
 {
-  "width": 800,
-  "height": 400,
+  "width": 400,
+  "height": 700,
   "nodes": [
-    { "id": "1", "label": "1", "x": 50, "y": 200, "style": { "type": "planet1" } },
-    { "id": "2", "label": "2", "x": 160, "y": 50, "style": { "type": "planet1" } },
-    { "id": "3", "label": "3", "x": 130, "y": 330, "style": { "type": "planet1" } },
-    { "id": "4", "label": "4", "x": 450, "y": 80, "style": { "type": "planet1" } },
-    { "id": "5", "label": "5", "x": 650, "y": 150, "style": { "type": "planet1" } },
-    { "id": "6", "label": "6", "x": 500, "y": 250, "style": { "type": "planet1" } },
-    { "id": "7", "label": "7", "x": 720, "y": 300, "style": { "type": "planet1" } },
-    { "id": "8", "label": "8", "x": 720, "y": 50, "style": { "type": "planet1" } },
-    { "id": "9", "label": "9", "x": 370, "y": 350, "style": { "type": "planet1" } },
-    { "id": "10", "label": "10", "x": 260, "y": 200, "style": { "type": "planet1" } }
+    { "id": "1", "label": "1", "x": 200, "y": 50, "style": { "type": "planet1" } },
+    { "id": "2", "label": "2", "x": 200, "y": 150, "style": { "type": "planet1" } },
+    { "id": "3", "label": "3", "x": 100, "y": 350, "style": { "type": "planet1" } },
+    { "id": "4", "label": "4", "x": 300, "y": 250, "style": { "type": "planet3" } },
+    { "id": "5", "label": "5", "x": 300, "y": 350, "style": { "type": "planet3" } },
+    { "id": "6", "label": "6", "x": 100, "y": 450, "style": { "type": "planet2" } },
+    { "id": "7", "label": "7", "x": 100, "y": 550, "style": { "type": "planet2" } },
+    { "id": "8", "label": "8", "x": 300, "y": 450, "style": { "type": "planet3" } },
+    { "id": "9", "label": "9", "x": 100, "y": 650, "style": { "type": "planet2" } },
+    { "id": "10", "label": "10", "x": 100, "y": 250, "style": { "type": "planet1" } }
   ],
   "edges": [
     { "id": "e1", "source": "1", "target": "2", "style": { "directional": true } },
     { "id": "e2", "source": "2", "target": "10", "style": { "directional": true } },
-    { "id": "e3", "source": "3", "target": "1", "style": { "directional": true } },
+    { "id": "e3", "source": "3", "target": "1", "style": { "directional": true, "curvature": -0.6, "stroke": "#ffcdd2" } },
     { "id": "e4", "source": "4", "target": "5", "style": { "directional": true } },
     { "id": "e5", "source": "5", "target": "8", "style": { "directional": true } },
     { "id": "e6", "source": "6", "target": "7", "style": { "directional": true } },
     { "id": "e7", "source": "7", "target": "9", "style": { "directional": true } },
     { "id": "e8", "source": "2", "target": "4", "style": { "directional": true } },
     { "id": "e9", "source": "3", "target": "6", "style": { "directional": true } },
-    { "id": "e10", "source": "5", "target": "7", "style": { "directional": true } },
+    { "id": "e10", "source": "5", "target": "7", "style": { "directional": true, "stroke": "#b0d7d9" } },
     { "id": "e11", "source": "10", "target": "3", "style": { "directional": true } },
-    { "id": "e12", "source": "8", "target": "4", "style": { "directional": true } },
-    { "id": "e13", "source": "9", "target": "6", "style": { "directional": true } }
+    { "id": "e12", "source": "8", "target": "4", "style": { "directional": true, "curvature": 0.5, "stroke": "#ffcdd2" } },
+    { "id": "e13", "source": "9", "target": "6", "style": { "directional": true, "curvature": -0.5, "stroke": "#ffcdd2" } }
   ],
   "Sccs": [
     { "id": "Scc1", "type": "highlight", "position": { "x": 160, "y": 190 }, "width": 300, "height": 360, "color": "#ff00ff" },
