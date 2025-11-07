@@ -1,0 +1,143 @@
+---
+title: 定向问题专题
+---
+
+# 专题：定向问题
+
+import GraphAlgorithmVisualization from '../../../../components/visualizations/GraphAlgorithmVisualization';
+
+##### 例题
+
+给定一张无向图，你需要给每条边定一个方向，变成有向图
+
+要求，使得有相同强连通，求任意一个合法方案。如果无解输出$-1$。
+
+###### 数据范围
+
+- 部分分：$n,m \le 100$
+- 满分：$n,m \le 10^6$
+
+###### 样例
+
+<div className="my-8 flex justify-center gap-4">
+  <div className="w-1/3">
+      <GraphAlgorithmVisualization 
+        graphName="orientation1" 
+        enableDrawing={false}
+      />
+    <p className="text-center">原图</p>
+  </div>
+  <div className="w-1/3 ml-4">
+    <GraphAlgorithmVisualization 
+      graphName="orientation1-1" 
+      enableDrawing={false}
+    />
+    <p className="text-center">方案1</p>
+  </div>
+  <div className="w-1/3">
+    <GraphAlgorithmVisualization 
+      graphName="orientation1-2" 
+      enableDrawing={false}
+    />
+    <p className="text-center">方案2</p>
+  </div>
+</div>
+
+###### 想法1
+
+- 每次在图中找一个环，把环上所有边朝一个方向定向，然后缩起来
+- 重复这个过程直到只剩下一个点
+
+###### 想法2
+
+- 直接按照DFS的顺序定向
+  - DFS的树边朝下
+  - DFS的非树边朝上
+
+<BoxWithTag tag="证明">
+所有点一定能通过返祖边会到根
+
+（如果不能回到根说明有桥，有桥的图一定无解）
+</BoxWithTag>
+
+##### 例题完整版（提交链接可以看UOJ134 App 管理器）
+
+给定一张混合向图（初始既有有向边也有无向边），你需要给每条无向边定一个方向，变成有向图
+
+要求，使得有相同强连通，求任意一个合法方案。如果无解输出$-1$。
+
+数据范围:
+
+- 部分分：$n,m \le 100$
+- 满分：$n,m \le 10^6$
+
+
+###### 样例
+
+<div className="my-8 flex justify-center gap-4">
+  <div className="w-1/3">
+      <GraphAlgorithmVisualization 
+        graphName="orientation2" 
+        enableDrawing={false}
+      />
+    <p className="text-center">原图</p>
+  </div>
+  <div className="w-1/3 ml-4">
+    <GraphAlgorithmVisualization 
+      graphName="orientation1-1" 
+      enableDrawing={false}
+    />
+    <p className="text-center">唯一方案</p>
+  </div>
+</div>
+
+###### 想法1
+暴力做法可以延续
+- 每次在图中找一个环，把换上所有边朝一个方向定向，然后缩起来
+- 重复这个过程直到只剩下一个点
+---
+<div className="my-8 flex gap-4">
+  <div className="w-3/5">
+
+###### 想法2
+
+直接按照 DFS 的顺序定向
+- DFS 的树边朝下（可能有问题，例如右图如果 $2 \to 1$ 朝下就完蛋啦！）
+  - 如果子树内有非树边往上，则树边往下是对的，因为形成环了  
+  - 如果子树内没有非树边往上，则树边只能往上，否则就无解了  
+- DFS 的非树边朝上(一定正确，因为可以和树边形成环)
+---
+
+  </div>
+
+  <div className="w-2/5">
+    <GraphAlgorithmVisualization 
+      graphName="orientation3" 
+      enableDrawing={false}
+    />
+  </div>
+</div>
+
+  
+
+##### C. Economic One-way Roads XXI Open Cup, Grand Prix of Korea
+
+给出一张$n$个点的无向连通图
+
+将所有道路定向，每条道路定为两个方向有各自的花费
+
+最终要使得定向后的图为强连通图，求最小花费
+
+$n \le 18$，时间限制$5S$
+
+---
+
+###### 想法
+
+- 还是可以沿用缩环法的思路，每次找一个环锁起来，直到只剩一个点
+- 但是因为要求最最优解，所以不能随便找一个环，而是需要DP
+- $dp[S]$表示把$S$内的点缩成起来的最小代价
+
+## 拓展阅读
+
+耳分解例题：P5776 [SNOI2013] Quare

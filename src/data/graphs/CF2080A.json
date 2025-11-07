@@ -1,0 +1,33 @@
+{
+  "width": 400,
+  "height": 300,
+  "nodes": [
+    { "id": "1", "label": "T", "x": 50, "y": 50, "style": { "type": "planet1" } },
+    { "id": "2", "label": "1", "x": 50, "y": 150, "style": { "type": "planet1" } },
+    { "id": "3", "label": "S", "x": 50, "y": 250, "style": { "type": "planet1" } },
+    { "id": "4", "label": "T", "x": 300, "y": 50, "style": { "type": "planet1" } },
+    { "id": "5", "label": "2", "x": 250, "y": 150, "style": { "type": "planet1" } },
+    { "id": "6", "label": "3", "x": 350, "y": 150, "style": { "type": "planet1" } },
+    { "id": "7", "label": "S", "x": 300, "y": 250, "style": { "type": "planet1" } }
+  ],
+  "edges": [
+    { "id": "e1", "source": "1", "target": "2", "style": { "directional": true } },
+    { "id": "e2", "source": "2", "target": "3", "style": { "directional": true } },
+    { "id": "e3", "source": "4", "target": "5", "style": { "directional": true } },
+    { "id": "e4", "source": "4", "target": "6", "style": { "directional": true } },
+    { "id": "e5", "source": "5", "target": "7", "style": { "directional": true } },
+    { "id": "e6", "source": "6", "target": "7", "style": { "directional": true } }
+  ],
+  "nodesStyle": {
+    "size" : 100,
+    "type" : "planet1",
+    "stroke": "#000000",
+    "lineWidth": 2,
+    "labelFill": "#000000",
+    "labelFontSize": 20
+  },
+  "edgesStyle": {
+    "stroke": "#ffffff",
+    "lineWidth": 15
+  }
+}

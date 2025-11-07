@@ -15,6 +15,7 @@ const GraphAlgorithmVisualization = forwardRef(({
   const [isLoading, setIsLoading] = useState(true);
   const [currentAlgorithm, setCurrentAlgorithm] = useState('dfs'); // 当前选中的算法类型
   const [showAnimationModal, setShowAnimationModal] = useState(false); // 控制动画浮动窗口显示的状态
+  const [clickedButtons, setClickedButtons] = useState(new Set()); // 跟踪已点击的一次性按钮
   // 移除下拉菜单相关状态
 
   // 从JSON文件加载图数据
@@ -121,25 +122,89 @@ const GraphAlgorithmVisualization = forwardRef(({
                           </svg>
                         ),
                         type: 'canvas'
-                      }
+                      },
+                      {
+                        id: 'ShowBcc',
+                        label: '展示边双连通分量',
+                        icon: (
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 inline ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                          </svg>
+                        ),
+                        type: 'canvas'
+                      },
+                      {
+                        id: 'ShowPbcc',
+                        label: '展示点双连通分量',
+                        icon: (
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 inline ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                          </svg>
+                        ),
+                        type: 'canvas'
+                      },
+                      {id: 'BuildRST',
+                        label: '构建圆方树',
+                        icon: (
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 inline ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                          </svg>
+                        ),
+                        type: 'canvas',
+                        isOneTime: true}
                     ];
 
                     // 处理按钮点击事件
                     const handleButtonClick = (config) => {
+                      // 如果是一次性按钮且已被点击，则不执行任何操作
+                      if (config.isOneTime && clickedButtons.has(config.id)) {
+                        return;
+                      }
+
                       if (config.type === 'modal') {
                         selectAlgorithmAndOpenModal(config.id);
                       } else if (config.type === 'canvas') {
-                        if (config.id === 'ShowScc') {
-                          console.log('展示强连通分量');
-                          if (graphData.Sccs && Array.isArray(graphData.Sccs) && graphCanvasRef.current && graphCanvasRef.current.dispatchOperation) {
+                        if (config.id === 'ShowScc' || config.id === 'ShowPbcc' || config.id === 'ShowBcc') {
+                          if (graphData.Indicators && Array.isArray(graphData.Indicators) && graphCanvasRef.current && graphCanvasRef.current.dispatchOperation) {
                             // 使用GraphCanvas直接暴露的dispatchOperation方法
-                            graphData.Sccs.forEach(scc => {
-                              graphCanvasRef.current.dispatchOperation('addIndicator',scc);
+                            const indicatorsToAdd = [...graphData.Indicators];
+                            indicatorsToAdd.forEach(indicator => {
+                              graphCanvasRef.current.dispatchOperation('addIndicator', indicator);
                             });
+                            
+                            // 等待10秒后移除所有指示器
+                            setTimeout(() => {
+                              indicatorsToAdd.forEach(indicator => {
+                                graphCanvasRef.current.dispatchOperation('removeIndicator', indicator.id);
+                              });
+                            }, 10000);
                           } else {
                             console.warn('无法访问画布的dispatchOperation方法');
                           }
+                        } else if (config.id === 'BuildRST') {
+                          if (graphCanvasRef.current && graphCanvasRef.current.dispatchOperation) {
+                            const nodesToAdd = [...graphData.PbccAddNodes];
+                            nodesToAdd.forEach(node => {
+                              graphCanvasRef.current.dispatchOperation('addNode', node);
+                            });
+                            const edgesToDelete = [...graphData.PbccDeleteEdges];
+                            setTimeout(() => {
+                              edgesToDelete.forEach(edge => {
+                                graphCanvasRef.current.dispatchOperation('deleteEdge', edge.data);
+                              });
+                              const edgesToAdd = [...graphData.PbccAddEdges];
+                              setTimeout(() => {
+                                edgesToAdd.forEach(edge => {
+                                  graphCanvasRef.current.dispatchOperation('addEdge', edge);
+                                });
+                              }, 3000); // 可以根据需要调整这个延迟时间
+                            }, 3000); 
                         }
+                      }
+                    }
+                      // 如果是一次性按钮，记录已点击
+                      if (config.isOneTime) {
+                        setClickedButtons(prev => new Set(prev).add(config.id));
                       }
                     };
 
@@ -150,15 +215,17 @@ const GraphAlgorithmVisualization = forwardRef(({
                         <button
                           key={config.id}
                           onClick={() => handleButtonClick(config)}
-                          disabled={!graphData || isLoading}
+                          disabled={!graphData || isLoading || (config.isOneTime && clickedButtons.has(config.id))}
                           className={`px-4 py-2 rounded-md transition-colors w-full ${(
                             (!graphData || isLoading)
                               ? 'bg-gray-400 cursor-not-allowed'
-                              : config.type === 'modal' 
-                                ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                                : 'bg-green-600 hover:bg-green-700 text-white'
+                              : config.isOneTime && clickedButtons.has(config.id)
+                                ? 'bg-gray-900 text-white cursor-not-allowed'
+                                : config.type === 'modal' 
+                                  ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                                  : 'bg-green-600 hover:bg-green-700 text-white'
                           )} block relative overflow-hidden group`}
-                          title={config.type === 'modal' ? '点击打开模态框' : '直接操作当前画布'}
+                          title={config.type === 'modal' ? '点击打开模态框' : config.isOneTime ? '一次性操作，点击后变为黑色且不可再点击' : '直接操作当前画布'}
                         >
                           {config.label}
                           {config.icon}

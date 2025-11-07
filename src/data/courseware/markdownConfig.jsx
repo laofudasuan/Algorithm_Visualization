@@ -1,5 +1,6 @@
 // markdown标题渲染配置
 // 此文件用于配置Markdown中不同级别的标题渲染格式
+import React from 'react';
 
 // H3标题计数器
 let h3Counter = 0;
@@ -79,6 +80,14 @@ export const headingConfig = {
   },
   h4: {
     className: 'text-xl font-semibold my-3 text-black-700',
+    center: false
+  },
+  h5: {
+    className: 'text-lg font-bold my-4 text-black bg-blue-100 border-l-4 border-blue-500 p-2 rounded-r-md',
+    center: false
+  },
+  h6: {
+    className: 'text-base font-medium my-2 inline-block text-black bg-purple-100 border border-purple-500 px-3 py-1 rounded-xl',
     center: false
   }
 };
@@ -162,11 +171,66 @@ export const headingComponents = {
         </h4>
       </div>
     );
+  },
+  
+  h5: (props) => {
+    const { className, children } = props;
+    const config = headingConfig.h5;
+    
+    return (
+      <div className={`${config.className} ${className || ''}`}>
+        <h5 style={{ textAlign: config.center ? 'center' : 'left' }}>
+          {children}
+        </h5>
+      </div>
+    );
+  },
+  
+  h6: (props) => {
+    const { className, children } = props;
+    const config = headingConfig.h6;
+    
+    return (
+      <div className="my-2">
+        <h6 style={{ textAlign: config.center ? 'center' : 'left' }} className={`${config.className} ${className || ''}`}>
+          {children}
+        </h6>
+      </div>
+    );
   }
 };
 
-// 表格组件配置
+// 带标签的框配置
+export const boxWithTagConfig = {
+  // 框的默认样式 - 使用inline-block使其只包裹文字，增加更多内边距
+  box: {
+    className: 'inline-block relative border border-gray-300 rounded-lg p-4 my-1 bg-gray-50 shadow-sm', // 改为浅灰色背景
+  },
+  // 标签的默认样式 - 调整定位和大小以适应inline-block
+  tag: {
+    className: 'absolute -top-2 -left-2 bg-primary text-white text-xs font-bold px-1.5 py-0.5 rounded',
+    defaultText: '提示'
+  }
+};
 
+// 带标签的框组件配置
+export const boxWithTagComponent = (props) => {
+  const { className, children, tag } = props;
+  const boxConfig = boxWithTagConfig.box;
+  const tagConfig = boxWithTagConfig.tag;
+  
+  // 使用传入的标签文本或默认文本
+  const tagText = tag || tagConfig.defaultText;
+  
+  return (
+    <span className={`${boxConfig.className} ${className || ''}`}>
+      <span className={tagConfig.className}>{tagText}</span>
+      <span className="pt-1">{children}</span>
+    </span>
+  );
+};
+
+// 表格组件配置
 export const tableComponents = {
   table: (props) => {
     const { className, children } = props;
@@ -198,4 +262,57 @@ export const tableComponents = {
       </td>
     );
   }
+};
+
+// 折叠内容组件 - 默认隐藏内容，点击按钮后显示，不使用单独的配置对象
+export const CollapsibleComponent = (props) => {
+  // 使用React内部状态管理展开/折叠
+  const [isOpen, setIsOpen] = React.useState(false);
+  const { className, children, title = '点击展开' } = props;
+  
+  const toggleCollapse = () => {
+    setIsOpen(!isOpen);
+  };
+  
+  return (
+    <div className={`my-4 ${className || ''}`}>
+      <div 
+        className="text-base font-medium my-2 inline-block text-black bg-purple-100 border border-purple-500 px-3 py-1 rounded-xl cursor-pointer inline-flex items-center hover:bg-purple-200 transition-colors"
+        onClick={toggleCollapse}
+      >
+        <span>{title}</span>
+        <span className={`ml-2 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
+          ▼
+        </span>
+      </div>
+      {isOpen && (
+        <div>
+          {children}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// 确保React被正确使用
+if (typeof React === 'undefined') {
+  console.error('React is not available. CollapsibleComponent requires React.');
+}
+
+// 导出所有组件，方便在Markdown中使用
+export default {
+  // 标题相关
+  headingConfig,
+  headingComponents,
+  // 列表相关
+  listConfig,
+  listComponents,
+  // 表格相关
+  tableConfig,
+  tableComponents,
+  // 带标签的框
+  boxWithTagConfig,
+  boxWithTagComponent,
+  // 折叠内容组件
+  CollapsibleComponent
 };

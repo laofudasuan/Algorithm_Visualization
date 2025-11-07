@@ -28,7 +28,7 @@
     { "id": "e12", "source": "8", "target": "4", "style": { "directional": true } },
     { "id": "e13", "source": "9", "target": "6", "style": { "directional": true } }
   ],
-  "Sccs": [
+  "Indicators": [
     { "id": "Scc1", "type": "highlight", "position": { "x": 160, "y": 190 }, "width": 300, "height": 360, "color": "#ff00ff" },
     { "id": "Scc2", "type": "highlight", "position": { "x": 550, "y": 300 }, "width": 450, "height": 180, "color": "#ff00ff" },
     { "id": "Scc3", "type": "highlight", "position": { "x": 590, "y": 100 }, "width": 380, "height": 180, "color": "#ff00ff" }

@@ -438,9 +438,9 @@ export class IndicatorRenderer {
   removeIndicator(id) {
     const animation = this.animations.get(id);
     if (!animation) return;
-    
+    console.log('removeIndicator', id, animation);
     this.animations.delete(id);
-    if (animation.type === 'highlight' || animation.type === 'text') {
+    if (animation.type === 'rectangle-highlight' || animation.type === 'circle-highlight' || animation.type === 'text') {
       // 淡出动画
       animation.object.animate({
         opacity: 0
