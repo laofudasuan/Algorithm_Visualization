@@ -89,6 +89,8 @@ export const headingComponents = {
     const { className, children } = props;
     const config = headingConfig.h1;
     
+    h3Counter = 0;
+    h4Counter = 0;
     return (
       <div className={`${config.className} ${className || ''}`}>
         <h1 style={{ textAlign: config.center ? 'center' : 'left' }}>
