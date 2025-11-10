@@ -202,9 +202,9 @@ export const headingComponents = {
 
 // 带标签的框配置
 export const boxWithTagConfig = {
-  // 框的默认样式 - 使用inline-block使其只包裹文字，增加更多内边距
+  // 框的默认样式 - 使用inline-block使其只包裹文字，增加更多内边距和更大的上下文间距
   box: {
-    className: 'inline-block relative border border-gray-300 rounded-lg p-4 my-1 bg-gray-50 shadow-sm', // 改为浅灰色背景
+    className: 'inline-block relative border border-gray-300 rounded-lg p-4 my-4 bg-gray-50 shadow-sm', // 增加上下边距到my-4
   },
   // 标签的默认样式 - 调整定位和大小以适应inline-block
   tag: {
