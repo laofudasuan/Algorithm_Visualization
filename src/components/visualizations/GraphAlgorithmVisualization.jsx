@@ -143,7 +143,8 @@ const GraphAlgorithmVisualization = forwardRef(({
                         ),
                         type: 'canvas'
                       },
-                      {id: 'BuildRST',
+                      {
+                        id: 'BuildRST',
                         label: '构建圆方树',
                         icon: (
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 inline ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -151,7 +152,19 @@ const GraphAlgorithmVisualization = forwardRef(({
                           </svg>
                         ),
                         type: 'canvas',
-                        isOneTime: true}
+                        isOneTime: true
+                      },
+                      {
+                        id: 'ShowAugmentingPath',
+                        label: '展示增广路径',
+                        icon: (
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 inline ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                          </svg>
+                        ),
+                        type: 'canvas',
+                        isOneTime: true
+                      }
                     ];
 
                     // 处理按钮点击事件
@@ -199,6 +212,28 @@ const GraphAlgorithmVisualization = forwardRef(({
                                 });
                               }, 3000); // 可以根据需要调整这个延迟时间
                             }, 3000); 
+                        }
+                      } else if (config.id === 'ShowAugmentingPath') {
+                        if (graphCanvasRef.current && graphCanvasRef.current.dispatchOperation) {
+                          graphData.OldIndicators.forEach(indicator => {
+                            graphCanvasRef.current.dispatchOperation('addIndicator', indicator);
+                          });
+                          setTimeout(() => {
+                            // 每隔1秒显示一条边
+                            graphData.AugmentingPathEdges.forEach((edge, index) => {
+                              setTimeout(() => {
+                                graphCanvasRef.current.dispatchOperation('addIndicator', edge);
+                              }, index * 500); // 每条边延时递增0.5秒
+                            });
+                            setTimeout(() => {
+                              graphData.NewIndicators.forEach(indicator => {
+                                graphCanvasRef.current.dispatchOperation('addIndicator', indicator);
+                              });
+                              graphData.OldIndicators.forEach(indicator => {
+                                graphCanvasRef.current.dispatchOperation('removeIndicator', indicator.id);
+                              });
+                            }, 500 * graphData.AugmentingPathEdges.length);
+                          }, 3000);
                         }
                       }
                     }

@@ -24,7 +24,7 @@ const GraphAlgorithmMotion = forwardRef(({
   const [delayMs, setDelayMs] = useState(1000); // 播放速度，默认值为1000ms
   const [graphAdjList, setGraphAdjList] = useState({}); // 邻接表状态
   
-  // 当graphData变化时，计算邻接表
+  // 初始化，计算邻接表
   useEffect(() => {
     if (graphData && graphData.edges) {
       const adjList = {};
@@ -49,7 +49,7 @@ const GraphAlgorithmMotion = forwardRef(({
         
         // 对于无向图，也添加反向边
         // 首先检查边的style中是否有directional属性，如果不存在，则检查全局的edgeStyle
-        const isDirected = (edge.style && 'directional' in edge.style ? edge.style.directional : this.edgeStyle?.directional) || (edge.style && edge.style.arrow);
+        const isDirected = (edge.style && 'directional' in edge.style ? edge.style.directional : graphData.edgeStyle?.directional);
         if (!isDirected) {
           if (adjList[target]) {
             adjList[target].push(source);

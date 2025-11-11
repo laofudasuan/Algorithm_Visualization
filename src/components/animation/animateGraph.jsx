@@ -455,6 +455,25 @@ const AnimateGraph = forwardRef(({
             duration,
             repeatCount
           );
+        } else if (options.type === 'edge-highlight') {
+          // 边高亮，需要source和target节点
+          const sourceNode = currentNodesRef.current.find(node => node.id === options.source);
+          const targetNode = currentNodesRef.current.find(node => node.id === options.target);
+          
+          if (!sourceNode || !targetNode) {
+            console.warn(`Warning: Source node ${options.source} or target node ${options.target} not found.`);
+            return;
+          }
+          
+          indicatorRendererRef.current.addEdgeHighlight(
+            indicatorId,
+            sourceNode.x,
+            sourceNode.y,
+            targetNode.x,
+            targetNode.y,
+            color,
+            options.lineWidth || 3
+          );
         } else if (options.type === 'edge-pulse') {
           // 边脉冲动画，需要source和target节点
           const sourceNode = currentNodesRef.current.find(node => node.id === options.source);

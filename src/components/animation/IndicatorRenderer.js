@@ -174,6 +174,41 @@ export class IndicatorRenderer {
   }
   
   /**
+   * 使用fabric.js添加边的高亮指示器
+   */
+  addEdgeHighlight(id, startX, startY, endX, endY, color = '#ffeb3b', lineWidth = 3) {
+    // 如果已存在相同ID的动画，先删除它
+    if (this.animations.has(id)) {
+      this.removeIndicator(id);
+    }
+    
+    // 创建线条对象，初始透明度为0
+    const line = new fabric.Line([startX, startY, endX, endY], {
+      stroke: color,
+      strokeWidth: lineWidth,
+      selectable: false,
+      hoverCursor: 'default',
+      opacity: 0 // 初始透明度为0
+    });
+    
+    // 添加到画布
+    this.fabricCanvas.add(line);
+    
+    // 保存引用以便后续移除
+    this.animations.set(id, { type: 'edge-highlight', object: line });
+    
+    // 淡入动画
+    line.animate({
+      opacity: 1
+    }, {
+      duration: 500, // 500毫秒淡入
+      onChange: () => {
+        this.fabricCanvas.renderAll();
+      }
+    });
+  }
+
+  /**
    * 使用fabric.js添加边的脉冲动画指示器
    */
   addEdgePulseIndicator(id, startX, startY, endX, endY, color = '#ffeb3b', duration = 1000) {
@@ -440,7 +475,7 @@ export class IndicatorRenderer {
     if (!animation) return;
     console.log('removeIndicator', id, animation);
     this.animations.delete(id);
-    if (animation.type === 'rectangle-highlight' || animation.type === 'circle-highlight' || animation.type === 'text') {
+    if (animation.type === 'rectangle-highlight' || animation.type === 'circle-highlight' || animation.type === 'text' || animation.type === 'edge-highlight') {
       // 淡出动画
       animation.object.animate({
         opacity: 0
