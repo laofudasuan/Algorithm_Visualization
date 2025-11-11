@@ -93,6 +93,8 @@ const CoursewareList = () => {
             <h1 className="text-4xl font-bold mb-4">内容区</h1>
             <p className="text-gray-600">
               探索算法世界的精彩内容，包含详细的概念讲解、数学公式和实例演示
+
+              提示：目前网站架构的复杂度还比较高，打开页面需要加载一定时间，请耐心等待。（图比较多的内容可能要加载几分钟，刚开始打开是空的）
             </p>
           </div>
 

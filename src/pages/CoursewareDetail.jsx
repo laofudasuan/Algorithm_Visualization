@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import 'katex/dist/katex.min.css';
 import { headingComponents, tableComponents, listComponents, boxWithTagComponent } from '../data/courseware/markdownConfig.jsx';
+
 const CoursewareDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -15,8 +16,11 @@ const CoursewareDetail = () => {
   const [pageCount, setPageCount] = useState(0);
   const [direction, setDirection] = useState('right'); // 'left' or 'right' to control animation direction
   const [showMainPage, setShowMainPage] = useState(true); // 控制显示主页还是子页面
+  const [toc, setToc] = useState([]); // 存储目录信息
+  const [showToc, setShowToc] = useState(true); // 控制目录显示/隐藏
   const contentRef = useRef(null);
-  
+  const tocRef = useRef(null);
+
   // 组件加载时隐藏Navbar
   useEffect(() => {
     // 添加类到body或html来隐藏Navbar
@@ -31,6 +35,67 @@ const CoursewareDetail = () => {
   // 使用Vite的import.meta.glob预加载所有可能的MDX文件
   const coursewareFiles = import.meta.glob('../data/courseware/*.mdx', { eager: false });
   const pageFiles = import.meta.glob('../data/courseware/pages/**/*.mdx', { eager: false });
+
+  // 提取页面中的标题信息，构建目录
+  const extractHeadingsFromPage = (pageIndex) => {
+    // 这里会在页面渲染后通过DOM操作提取标题
+    setTimeout(() => {
+      const pageContent = contentRef.current;
+      if (!pageContent) return;
+
+      const headings = pageContent.querySelectorAll('h1, h2, h3, h4');
+      const tocItems = [];
+
+      headings.forEach(heading => {
+        // 获取标题级别
+        const level = parseInt(heading.tagName.charAt(1));
+        
+        // 获取标题文本
+        const text = heading.textContent.trim();
+        
+        // 为标题生成ID（如果没有的话）
+        if (!heading.id) {
+          heading.id = `heading-${pageIndex}-${tocItems.length}`;
+        }
+        
+        tocItems.push({
+          id: heading.id,
+          text,
+          level,
+          pageIndex
+        });
+      });
+
+      // 更新目录状态
+      setToc(prevToc => {
+        const newToc = [...prevToc];
+        newToc[pageIndex] = tocItems;
+        return newToc;
+      });
+    }, 1000); // 增加延迟确保页面渲染完成
+  };
+
+  // 滚动到指定标题
+  const scrollToHeading = (headingId) => {
+    const element = document.getElementById(headingId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  };
+
+  // 切换到指定页面
+  const goToPage = (pageIndex) => {
+    if (pageIndex === currentPage) return;
+    
+    // 根据目标页面设置动画方向
+    setDirection(pageIndex > currentPage ? 'right' : 'left');
+    setCurrentPage(pageIndex);
+  };
+
+  // 切换目录显示/隐藏
+  const toggleToc = () => {
+    setShowToc(!showToc);
+  };
 
   useEffect(() => {
     const loadCourseware = async () => {
@@ -89,11 +154,13 @@ const CoursewareDetail = () => {
             setPageComponents(components);
             setPageAttributes(attributes);
             setPageCount(components.length);
+            setToc(new Array(components.length)); // 初始化目录数组
           } else {
             // 兼容旧格式
             setPageComponents([coursewareModule.default]);
             setPageAttributes([coursewareModule.attributes]);
             setPageCount(1);
+            setToc(new Array(1)); // 初始化目录数组
           }
         } else {
           console.error(`课件文件不存在: ${coursewarePath}`);
@@ -109,6 +176,14 @@ const CoursewareDetail = () => {
 
     loadCourseware();
   }, [id]);
+
+  // 当页面改变时提取标题
+  useEffect(() => {
+    if (!showMainPage && pageComponents[currentPage]) {
+      // 总是尝试提取当前页面的标题，确保目录是最新的
+      extractHeadingsFromPage(currentPage);
+    }
+  }, [currentPage, showMainPage, pageComponents]);
 
   // 处理上一页导航
   const goToPrevPage = () => {
@@ -257,6 +332,84 @@ const CoursewareDetail = () => {
         </button>
       </div>
       
+      {/* 目录切换按钮 */}
+      <div className="fixed top-4 left-4 z-50">
+        <button 
+          onClick={toggleToc}
+          className="bg-white text-gray-800 p-3 rounded-full shadow-lg hover:bg-gray-100 transition-colors"
+          aria-label={showToc ? "隐藏目录" : "显示目录"}
+        >
+          <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      </div>
+      
+      {/* 目录面板 */}
+      {showToc && (
+        <motion.div 
+          ref={tocRef}
+          className="fixed top-20 left-4 bottom-20 w-64 bg-white rounded-lg shadow-lg z-40 overflow-y-auto hidden lg:block"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <div className="p-4 border-b border-gray-200">
+            <h3 className="font-bold text-lg text-gray-800">目录</h3>
+          </div>
+          <div className="p-2">
+            {/* 页面导航 */}
+            {pageCount > 1 && (
+              <div className="mb-3">
+                <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  页面导航
+                </div>
+                <ul className="space-y-1">
+                  {pageAttributes.map((pageAttr, index) => (
+                    <li key={index}>
+                      <button
+                        onClick={() => goToPage(index)}
+                        className={`w-full text-left px-3 py-2 rounded transition-colors text-sm ${
+                          currentPage === index 
+                            ? 'bg-primary/10 text-primary font-medium' 
+                            : 'hover:bg-gray-100 text-gray-700'
+                        }`}
+                      >
+                        {pageAttr.title || `页面 ${index + 1}`}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+                <div className="border-t border-gray-200 my-2"></div>
+              </div>
+            )}
+            
+            {/* 当前页面的标题导航 */}
+            {toc[currentPage] && toc[currentPage].length > 0 ? (
+              <ul className="space-y-1">
+                {toc[currentPage].map((item, index) => (
+                  <li key={index} className={`${item.level > 1 ? `pl-${(item.level - 1) * 4}` : ''}`}>
+                    <button
+                      onClick={() => scrollToHeading(item.id)}
+                      className={`w-full text-left px-3 py-2 rounded hover:bg-gray-100 transition-colors text-sm ${
+                        item.level === 1 ? 'font-bold text-gray-900' :
+                        item.level === 2 ? 'font-semibold text-gray-800' :
+                        item.level === 3 ? 'text-gray-700' :
+                        'text-gray-600'
+                      }`}
+                    >
+                      {item.text}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-gray-500 text-sm p-3">暂无目录信息</p>
+            )}
+          </div>
+        </motion.div>
+      )}
+      
       {/* 课件内容容器 - 左右滑动结构 */}
       <div className="w-[80%] mx-auto relative" style={{ minHeight: '500px' }}>
         <div 
@@ -277,7 +430,14 @@ const CoursewareDetail = () => {
               {pageComponents[currentPage] && (
                 <div className="bg-white rounded-lg shadow-lg p-6 md:p-8 relative overflow-hidden text-lg md:text-xl font-medium">
                   <Suspense fallback={<div className="text-center py-8">正在渲染内容...</div>}>
-                    {React.createElement(pageComponents[currentPage], { components: { ...headingComponents, ...tableComponents, ...listComponents, BoxWithTag: boxWithTagComponent } })}
+                    {React.createElement(pageComponents[currentPage], { 
+                      components: { 
+                        ...headingComponents, 
+                        ...tableComponents, 
+                        ...listComponents, 
+                        BoxWithTag: boxWithTagComponent 
+                      } 
+                    })}
                   </Suspense>
                 </div>
               )}
