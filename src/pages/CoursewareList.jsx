@@ -120,8 +120,7 @@ const CoursewareList = () => {
                   onClick={() => navigate(`/courseware/${courseware.id}`)}
                 >
                   <div className="h-48 bg-gray-200 overflow-hidden">
-                    // 先不加载图片，速度太慢
-                    {false && courseware.cover ? (
+                    {courseware.cover ? (
                       <img 
                         src={courseware.cover} 
                         alt={courseware.title} 
