@@ -388,7 +388,7 @@ const CoursewareDetail = () => {
             {toc[currentPage] && toc[currentPage].length > 0 ? (
               <ul className="space-y-1">
                 {toc[currentPage].map((item, index) => (
-                  <li key={index} className={`pl-${item.level * 3}`}>
+                  <li key={index} className={item.level === 1 ? 'pl-3' : item.level === 2 ? 'pl-6' : 'pl-9'}>
                     <button
                       onClick={() => scrollToHeading(item.id)}
                       className={`w-full text-left py-2 rounded hover:bg-gray-100 transition-colors text-sm ${item.level === 1 ? 'text-lg font-bold text-gray-900' : item.level === 2 ? 'font-semibold text-gray-800' : item.level === 3 ? 'text-gray-700' : 'text-gray-600'}`}
