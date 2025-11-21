@@ -100,6 +100,9 @@ export class PixiGraphRenderer {
       await this.createBackgroundImage();
     }
 
+    const commonIcons = ['planet1', 'planet2', 'planet3', 'planet4', 'house'];
+    await Promise.all(commonIcons.map((t) => this.getTextureForType(t)));
+
     // 创建容器用于分层渲染
     this.edgeContainer = new PIXI.Container();
     this.nodeContainer = new PIXI.Container();
@@ -249,6 +252,17 @@ export class PixiGraphRenderer {
     }
   }
 
+  getTextureForType(type) {
+    const cached = PixiGraphRenderer.preloadedIcons[type];
+    if (cached) {
+      return Promise.resolve(cached);
+    }
+    return PIXI.Assets.load(`/icons/${type}.png`).then((texture) => {
+      PixiGraphRenderer.preloadedIcons[type] = texture;
+      return texture;
+    });
+  }
+
   /**
    * 清理不再使用的边元素
    */
@@ -338,9 +352,7 @@ export class PixiGraphRenderer {
       nodeObject.x = node.x;
       nodeObject.y = node.y;
     } else {
-      // PIXI v8 正确写法：先加载纹理，再创建 Sprite
-      PIXI.Assets.load(`/icons/`+nodeStyle.type+`.png`).then((texture) => {
-        // 纹理加载完成后，创建 Sprite
+      this.getTextureForType(nodeStyle.type).then((texture) => {
         const nodeObject = new PIXI.Sprite(texture);
 
         // 1. 获取图片原始尺寸（从纹理获取，准确且可靠）

@@ -36,8 +36,8 @@ function App() {
 
   const menuItems = [
     { name: '主页', path: '/' },
-    { name: '可视化工具', path: '/visualization-tools' },
     { name: '内容', path: '/courseware' },
+    { name: '可视化工具', path: '/visualization-tools' },
     { name: '知识图谱', path: '/knowledge-graph' },
     { 
       name: '可视化应用', 
