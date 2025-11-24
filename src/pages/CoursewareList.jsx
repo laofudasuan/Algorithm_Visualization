@@ -10,6 +10,8 @@ const CoursewareList = () => {
   const [loading, setLoading] = useState(true);
   const [mapConfig, setMapConfig] = useState(null);
   const [openCards, setOpenCards] = useState([]);
+  const [viewOffset, setViewOffset] = useState({ x: 0, y: 0 });
+  const [viewScale, setViewScale] = useState(1);
   const pixiContainerRef = useRef(null);
   const pixiCanvasHostRef = useRef(null);
   const pixiAppRef = useRef(null);
@@ -75,10 +77,9 @@ const CoursewareList = () => {
 
     const app = new PIXI.Application();
     pixiAppRef.current = app;
-    const { width, height } = mapConfig;
     app.init({
-      width: width,
-      height: height,
+      width: typeof window !== 'undefined' ? window.innerWidth : 1280,
+      height: typeof window !== 'undefined' ? window.innerHeight : 720,
       antialias: true,
       // 修改背景颜色为透明，以便显示页面背景
       backgroundAlpha: 0,
@@ -89,10 +90,132 @@ const CoursewareList = () => {
       host.innerHTML = '';
       host.appendChild(app.canvas);
 
+      const world = new PIXI.Container();
+      app.stage.addChild(world);
       const edgeLayer = new PIXI.Container();
       const nodeLayer = new PIXI.Container();
-      app.stage.addChild(edgeLayer);
-      app.stage.addChild(nodeLayer);
+      world.addChild(edgeLayer);
+      world.addChild(nodeLayer);
+
+      const dragRect = new PIXI.Graphics();
+      dragRect.rect(0, 0, app.renderer.width, app.renderer.height).fill({ color: 0x000000, alpha: 0 });
+      dragRect.eventMode = 'static';
+      app.stage.addChildAt(dragRect, 0);
+
+      let isDragging = false;
+      let dragStart = { x: 0, y: 0 };
+      let worldStart = { x: 0, y: 0 };
+      let scale = 1;
+      const minScale = 0.2;
+      const maxScale = 4;
+      const pointers = new Map();
+      let pinchStartDist = null;
+      let pinchStartScale = 1;
+      let vx = 0;
+      let vy = 0;
+      let lastMoveTime = 0;
+      let lastMovePos = { x: 0, y: 0 };
+      let inertiaActive = false;
+      const applyScaleAtPoint = (newScale, px, py) => {
+        newScale = Math.max(minScale, Math.min(maxScale, newScale));
+        const anchorX = (px - world.position.x) / scale;
+        const anchorY = (py - world.position.y) / scale;
+        world.position.set(px - anchorX * newScale, py - anchorY * newScale);
+        world.scale.set(newScale);
+        scale = newScale;
+        setViewScale(scale);
+        setViewOffset({ x: world.position.x, y: world.position.y });
+      };
+      app.stage.cursor = 'grab';
+      dragRect.on('pointerdown', (e) => {
+        isDragging = true;
+        app.stage.cursor = 'grabbing';
+        dragStart = { x: e.global.x, y: e.global.y };
+        worldStart = { x: world.position.x, y: world.position.y };
+        pointers.set(e.pointerId, { x: e.global.x, y: e.global.y });
+        if (pointers.size === 2) {
+          const vals = Array.from(pointers.values());
+          const dx = vals[1].x - vals[0].x;
+          const dy = vals[1].y - vals[0].y;
+          pinchStartDist = Math.hypot(dx, dy);
+          pinchStartScale = scale;
+          isDragging = false;
+        }
+        inertiaActive = false;
+      });
+      dragRect.on('pointermove', (e) => {
+        pointers.set(e.pointerId, { x: e.global.x, y: e.global.y });
+        if (pointers.size === 2 && pinchStartDist) {
+          const vals = Array.from(pointers.values());
+          const dx = vals[1].x - vals[0].x;
+          const dy = vals[1].y - vals[0].y;
+          const dist = Math.hypot(dx, dy);
+          const mpx = (vals[0].x + vals[1].x) / 2;
+          const mpy = (vals[0].y + vals[1].y) / 2;
+          const ns = pinchStartScale * (dist / pinchStartDist);
+          applyScaleAtPoint(ns, mpx, mpy);
+          return;
+        }
+        if (!isDragging) return;
+        const dx = e.global.x - dragStart.x;
+        const dy = e.global.y - dragStart.y;
+        world.position.set(worldStart.x + dx, worldStart.y + dy);
+        setViewOffset({ x: world.position.x, y: world.position.y });
+        const now = performance.now();
+        const dt = now - lastMoveTime;
+        if (dt > 0) {
+          vx = (e.global.x - lastMovePos.x) / dt * 16;
+          vy = (e.global.y - lastMovePos.y) / dt * 16;
+          lastMoveTime = now;
+          lastMovePos = { x: e.global.x, y: e.global.y };
+        }
+      });
+      const endDrag = () => {
+        isDragging = false;
+        app.stage.cursor = 'grab';
+        if (!pinchStartDist) inertiaActive = true;
+      };
+      dragRect.on('pointerup', endDrag);
+      dragRect.on('pointerupoutside', endDrag);
+      dragRect.on('pointerup', (e) => {
+        pointers.delete(e.pointerId);
+        if (pointers.size < 2) pinchStartDist = null;
+      });
+      dragRect.on('pointerupoutside', (e) => {
+        pointers.delete(e.pointerId);
+        if (pointers.size < 2) pinchStartDist = null;
+      });
+
+      app.ticker.add(() => {
+        if (inertiaActive) {
+          world.position.x += vx;
+          world.position.y += vy;
+          vx *= 0.95;
+          vy *= 0.95;
+          setViewOffset({ x: world.position.x, y: world.position.y });
+          if (Math.hypot(vx, vy) < 0.1) inertiaActive = false;
+        }
+      });
+
+      const rect = app.canvas.getBoundingClientRect();
+      app.canvas.addEventListener('wheel', (ev) => {
+        ev.preventDefault();
+        const px = ev.clientX - rect.left;
+        const py = ev.clientY - rect.top;
+        const factor = ev.deltaY < 0 ? 1.1 : 0.9;
+        applyScaleAtPoint(scale * factor, px, py);
+      }, { passive: false });
+
+      const onResize = () => {
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        app.renderer.resize(w, h);
+        dragRect.clear();
+        dragRect.rect(0, 0, w, h).fill({ color: 0x000000, alpha: 0 });
+      };
+      if (typeof window !== 'undefined') {
+        window.addEventListener('resize', onResize);
+      }
 
       if (Array.isArray(mapConfig.edges)) {
         mapConfig.edges.forEach(edge => {
@@ -269,23 +392,21 @@ const CoursewareList = () => {
   };
 
   return (
-    <div className="min-h-screen pt-32 pb-20">
-      <div className="w-screen px-0">
+    <div className="fixed inset-0 overflow-hidden">
+      <div className="w-full h-full px-0">
         <motion.div 
-          className="page-content w-screen max-w-none"
+          className="page-content w-full h-full max-w-none"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
         >
 
           {loading ? (
-            <div className="bg-white rounded-xl shadow-md p-8">
-              <div className="flex justify-center items-center h-40">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-              </div>
+            <div className="flex items-center justify-center w-full h-full">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
             </div>
           ) : (
-            <div ref={pixiContainerRef} className="w-full overflow-auto relative" style={{ height: mapConfig.height, width: mapConfig.width }}>
+            <div ref={pixiContainerRef} className="w-full h-full overflow-hidden relative">
                 <div ref={pixiCanvasHostRef} />
                 <AnimatePresence>
                   {openCards.map(card => (
@@ -296,7 +417,7 @@ const CoursewareList = () => {
                       exit={{ scale: 0, opacity: 0 }}
                       transition={{ type: 'spring', stiffness: 260, damping: 22 }}
                       className="absolute z-50"
-                      style={{ left: (card.nodeX || 0) - 180, top: (card.nodeY || 0) - 100 }}
+                      style={{ left: (card.nodeX || 0) * (viewScale || 1) + (viewOffset.x || 0) - 180, top: (card.nodeY || 0) * (viewScale || 1) + (viewOffset.y || 0) - 100 }}
                     >
                       <div className="bg-white rounded-xl shadow-2xl w-[360px] border">
                         <div className="p-4">

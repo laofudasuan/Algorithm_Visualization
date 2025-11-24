@@ -279,6 +279,11 @@ const Home = ({ menuItems }) => {
           </div>
         </div>
       </section>
+      <footer className="py-6 border-t">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm text-gray-600">
+          湘ICP备2025147087号
+        </div>
+      </footer>
     </div>
   )
 }
