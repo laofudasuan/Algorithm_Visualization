@@ -5,11 +5,9 @@ title: 2-SAT
 import GraphAlgorithmVisualization from '../../../../components/visualizations/GraphAlgorithmVisualization';
 import { CollapsibleComponent } from '../../../courseware/markdownConfig';
 
-## 2-SAT
+# 2-SAT
 
-### 2-SAT求解方法
-
-#### 2-SAT问题
+## 2-SAT问题
 
 2-sat是一类布尔变量的取值问题，给定一些布尔变量的逻辑关系，求满足这些逻辑关系的一组方案
 
@@ -27,7 +25,7 @@ Example:
 
 要求$a$必须为False: 连边$a_1 \to a_0$
 
-#### 2-SAT求解 Tarjan算法
+## 2-SAT求解算法-Tarjan
 
 如果图中存在一个环，则只要有一个点选了，则剩下的点都会选，只要有一个点不选，则其他点都不能选
 
@@ -37,15 +35,11 @@ Example:
 
 复杂度为线性。
 
-#### CF1971H ±
+##### CF1971H±
 
 Bob 有一个 $3$行 $n$ 列的网格，每个格子中包含$a_i$或$-a_i$，其中$1 \leq i \leq n$,$a_i$是某个整数。例如，当$n = 4$时，可能的一个网格如下：
 
-$$\begin{bmatrix}
-a_1 & -a_2 & -a_3 & -a_2 \\
--a_4 & a_4 & -a_1 & -a_3 \\
-a_1 & a_2 & -a_2 & a_4 \\
-\end{bmatrix}$$
+$$\begin{bmatrix} a_1 & -a_2 & -a_3 & -a_2 \\ -a_4 & a_4 & -a_1 & -a_3 \\ a_1 & a_2 & -a_2 & a_4 \\ \end{bmatrix}$$
 
 Alice 和 Bob 玩如下的游戏:
 
@@ -57,23 +51,7 @@ Alice 和 Bob 玩如下的游戏:
 
 例如，对于上面的网格，假设 Alice 给出数组 $ [1, -1, -1, 1] $，则过程如下（为便于理解添加了颜色）
 
-$$\begin{bmatrix}
-a_1 & -a_2 & -a_3 & -a_2 \\
--a_4 & a_4 & -a_1 & -a_3 \\
-a_1 & a_2 & -a_2 & a_4 \\
-\end{bmatrix}
-\stackrel{[1, -1, -1, 1]}{\longrightarrow}
-\begin{bmatrix}
-1 & 1 & 1 & 1 \\
--1 & 1 & -1 & 1 \\
-1 & -1 & 1 & 1 \\
-\end{bmatrix}
-\stackrel{\text{对每一列排序}}{\longrightarrow}
-\begin{bmatrix}
--1 & -1 & -1 & -1 \\
-1 & 1 & 1 & 1 \\
-1 & 1 & 1 & 1 \\
-\end{bmatrix}$$
+$$\begin{bmatrix} a_1 & -a_2 & -a_3 & -a_2 \\ -a_4 & a_4 & -a_1 & -a_3 \\ a_1 & a_2 & -a_2 & a_4 \\ \end{bmatrix} \stackrel{[1, -1, -1, 1]}{\longrightarrow} \begin{bmatrix} 1 & 1 & 1 & 1 \\ -1 & 1 & -1 & 1 \\ 1 & -1 & 1 & 1 \\ \end{bmatrix} \stackrel{\text{对每一列排序}}{\longrightarrow} \begin{bmatrix} -1 & -1 & -1 & -1 \\ 1 & 1 & 1 & 1 \\ 1 & 1 & 1 & 1 \\ \end{bmatrix}$$
 
 由于中间一行全为 $1$，所以 Alice 获胜。给定Bob的网格，判断 Alice 是否可以选择数组$a$使自己获胜。
 
@@ -83,15 +61,13 @@ a_1 & a_2 & -a_2 & a_4 \\
 
 每一列排序以后中间是$1$，其实就是说每一列最多有一个$-1$，因此同一列的两个变量之间就会有连边限制，如果一个选了$-1$另一个就不能选$-1$
 
-### 输出方案
-
-#### 2-SAT输出方案
+## 2-SAT输出方案
 
 每次找一个没有出度的点，把它作为选，然后把它相反的点作为不选。(在2-sat的图中，一条边$a \to b$的含义为选了a就必须选b，所以选择一个没有入度的点不会对其它点造成限制，而由于图是对称的，所以与没有出度的点相反的点一定没有入度，既然没有入度，那么不选这个点也不会对指向它的点造成限制)
 
 小技巧: 可以不需要拓扑排序来寻找没有出度的点，由于在dfs树中没有出度的点是叶子节点，而tarjan算法一般会从下往上给每个强连通分量标号，所以我们按照标号从小往大扫描就一定是一个合法的拓扑序。
 
-#### 例题
+##### 例题
 
 求一组字典序最小的2-SAT解
 
@@ -101,16 +77,16 @@ a_1 & a_2 & -a_2 & a_4 \\
 
 判断一次的复杂度是O(m)的，有n个变量，所以总复杂度为O(nm)。
 
-#### 2-SAT建模注意事项
+## 2-SAT建模注意事项
 
 需要注意的是，不是所有的图都满足2-SAT条件，2-SAT的图必须为对称图，即如果存在边$a_p \to b_q$，则必然存在边$b_{1-q} \to a_{1-p}$
 
 解释一下就是如果选了a就必须选b，则没选b就不可能选a。两个命题互为逆否命题。
 如果图满足这个条件，则它就无法用逻辑意义描述。
 
-#### P3825 [NOI2017] 游戏
+##### P3825 [NOI2017] 游戏
 
-#### 自己YY的一个题
+##### 自己YY的一个题
 
 有一棵$n$个点的树，现在你需要构造一个长度为$m$、每个数在$[1,n]$范围内的数组$h[1 \ldots m]$
 
@@ -135,13 +111,13 @@ $n,m,k \le 1000$
 
 暴力建边是 $O(n^3)$ 的，注意到复杂度堆在不存在祖孙关系的节点中，简单优化就能做到 $O(n^2)$。
 
-#### 2-SAT计数
+## 2-SAT计数
 
-P3513 [POI 2011] KON-Conspiracy
+##### P3513 [POI 2011] KON-Conspiracy
 
 一般来说，2-SAT 问题是不能计数的，只有一些特殊的题目能做
 
-#### B. Dev, Please Add This! - XIX Open Cup, Grand Prix of Korea
+##### B. Dev, Please Add This! - XIX Open Cup, Grand Prix of Korea
 
 给一个$n \times m$的二维矩阵，每个位置可以是空地，可以是障碍物。某些空地上有星星
 
@@ -172,7 +148,7 @@ $\neg l_1 \to l_2, \neg l_2 \to l_1$
 
 最后用2-SAT判定，复杂度$O(n^2m^2)$
 
-#### uoj985 滑冰
+##### uoj985 滑冰
 
 跳蚤王国的滑冰比赛 UNR（Universal Navigation on Rink）正在进行中。冰场被抽象为一个 $n \times m$ 的网格，其中.表示可通行的冰面，\#表示障碍，无法进入。
 
@@ -190,13 +166,13 @@ $\neg l_1 \to l_2, \neg l_2 \to l_1$
 
 多组数据，$n \times m \le 2 \times 10^6,\sum n \times m \le 5 \times 10^6$
 
-#### AT_acl1_f Center Rearranging
+##### AT_acl1_f Center Rearranging
 
 给定一个 $n$ 和 $A$、$B$ 两个长度为 $3n$ 的序列，保证任意 $x \in [1, n]$ 都在每个序列中出现 3 次。对 $A$ 每一次操作选择一个 $x$ 并将 3 个中的位于中间的 $x$ 放到序列最前或最后。问是否能经过操作后使 $A$ 与 $B$ 相等。若可以，则输出最小操作次数，否则输出 $-1$
 
 $n \le 33$
 
-#### P6898 [ICPC 2014 WF] Metal Processing Plant
+##### P6898 [ICPC 2014 WF] Metal Processing Plant
 
 题意：有一张 $ n $ 个节点的完全图。请将 $ n $ 个点划分为两个集合 $ A、B $，使得两个集合内部边权最大值之和最小。（记 $ D(A) $ 为集合 $ A $ 内部最大权值）
 
@@ -214,7 +190,7 @@ $ n \leq 1000 $。
 
 总复杂度为 $ O(n^2 \log n + \frac{n^3}{w}) $，非常厉害。
 
-#### [ABC277Ex] Constrained Sums
+##### [ABC277Ex] Constrained Sums
 
 题目简述：给定正整数 $ n $ 和 $ m $，请求出一组 $ (X_1, X_2, \cdots, X_n) $ 满足：
 

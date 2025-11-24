@@ -135,12 +135,7 @@ export const headingComponents = {
     
     // 获取带圈数字
     const getCircledNumber = (num) => {
-      // 使用Unicode带圈数字，支持1-10
-      const circledNumbers = ['①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', '⑩'];
-      if (num <= 10) {
-        return circledNumbers[num - 1];
-      }
-      return `(${num})`; // 对于10以上的数字使用括号
+      return `(${num})`;
     };
     
     return (
