@@ -17,7 +17,7 @@ const CoursewareDetail = () => {
   const [direction, setDirection] = useState('right'); // 'left' or 'right' to control animation direction
   const [showMainPage, setShowMainPage] = useState(true); // 控制显示主页还是子页面
   const [toc, setToc] = useState([]); // 存储目录信息
-  const [showToc, setShowToc] = useState(true); // 控制目录显示/隐藏
+  const [showToc, setShowToc] = useState(false); // 控制目录显示/隐藏
   const contentRef = useRef(null);
   const tocRef = useRef(null);
 

@@ -6,17 +6,12 @@ import './index.css';
 
 // 懒加载组件
 const Home = lazy(() => import('./pages/Home'));
-const BasicAlgorithms = lazy(() => import('./pages/BasicAlgorithms'));
-const StringAlgorithms = lazy(() => import('./pages/StringAlgorithms'));
-const DynamicProgramming = lazy(() => import('./pages/DynamicProgramming'));
-const GraphVisualization = lazy(() => import('./pages/GraphVisualization'));
-const GraphVisualizationList = lazy(() => import('./pages/GraphVisualizationList'));
-const GraphVisualizationDetail = lazy(() => import('./pages/GraphVisualizationDetail'));
+ 
 const KnowledgeGraphPage = lazy(() => import('./pages/KnowledgeGraphPage'));
 const CoursewareList = lazy(() => import('./pages/CoursewareList'));
 const CoursewareDetail = lazy(() => import('./pages/CoursewareDetail'));
-const VisualizationList = lazy(() => import('./pages/VisualizationList'));
-const VisualizationToolPage = lazy(() => import('./pages/VisualizationToolPage'));
+const VisualizationsIndex = lazy(() => import('./pages/VisualizationsIndex'));
+const VisualizationsDetail = lazy(() => import('./pages/VisualizationsDetail'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 function App() {
@@ -37,18 +32,8 @@ function App() {
   const menuItems = [
     { name: '主页', path: '/' },
     { name: '内容', path: '/courseware' },
-    { name: '可视化工具', path: '/visualization-tools' },
     { name: '知识图谱', path: '/knowledge-graph' },
-    { 
-      name: '可视化应用', 
-      path: '/visualization', // 作为下拉菜单的触发点
-      children: [
-        { name: '图', path: '/graph-visualization' },
-        { name: '动态规划', path: '/dynamic-programming' },
-        { name: '基础算法', path: '/basic-algorithms' },
-        { name: '字符串', path: '/string-algorithms' }
-      ]
-    }
+    { name: '可视化模块', path: '/visualizations' },
   ]
 
   // 加载中的占位组件
@@ -76,24 +61,12 @@ function App() {
       <Suspense fallback={<LoadingFallback />}>
         <Routes>
           <Route path="/" element={<Home menuItems={menuItems} />} />
-          <Route path="/graph-visualization" element={
-            <Suspense fallback={<LoadingFallback />}>
-              <GraphVisualizationList />
-            </Suspense>
-          } />
-          <Route path="/graph-visualization/:id" element={
-            <Suspense fallback={<LoadingFallback />}>
-              <GraphVisualizationDetail />
-            </Suspense>
-          } />
-          <Route path="/dynamic-programming" element={<DynamicProgramming />} />
-          <Route path="/basic-algorithms" element={<BasicAlgorithms />} />
-          <Route path="/string-algorithms" element={<StringAlgorithms />} />
+          
           <Route path="/knowledge-graph" element={<KnowledgeGraphPage />} />
           <Route path="/courseware" element={<CoursewareList />} />
           <Route path="/courseware/:id" element={<CoursewareDetail />} />
-          <Route path="/visualization-tools" element={<VisualizationList />} />
-          <Route path="/visualization/:toolName" element={<VisualizationToolPage />} />
+          <Route path="/visualizations" element={<VisualizationsIndex />} />
+          <Route path="/visualizations/:slug" element={<VisualizationsDetail />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>

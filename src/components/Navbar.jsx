@@ -33,16 +33,11 @@ const Navbar = ({ menuItems, isMenuOpen, setIsMenuOpen, hasScrolled, currentPath
   // 处理下拉菜单的显示/隐藏
   const toggleDropdown = (index, event) => {
     event.preventDefault()
-    // 简单的状态切换，不再使用anime动画
     setOpenDropdown(openDropdown === index ? null : index)
   }
 
   // 检查某个路径是否为当前活动路径或其子路径
   const isActivePath = (path) => {
-    // 特殊处理：排除可视化工具页面（/visualization/:toolName）不激活可视化模块
-    if (path === '/visualization' && currentPath.startsWith('/visualization/') && !currentPath.startsWith('/visualization-tools')) {
-      return false;
-    }
     
     return currentPath === path || (currentPath.startsWith(path + '/') && path !== '/visualization-tools')
   }

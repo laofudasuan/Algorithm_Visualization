@@ -39,7 +39,7 @@
     { "id": "AugEdge5", "type": "edge-pulse", "source": "8", "target": "3", "duration": 500, "color": "#0000FF" }
   ],
   "nodesStyle": {
-    "size" : 100,
+    "size" : 50,
     "type" : "planet1",
     "stroke": "#000000",
     "lineWidth": 2,

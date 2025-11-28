@@ -121,7 +121,7 @@ const TreeAlgorithmVisualization = forwardRef(({
                 height={treeData.height || 500}
                 graphData={treeData}
                 isLoading={false}
-                backgroundImage={'background'}
+                backgroundImage={null}
               />
             {animationList && animationList.length > 0 && (
               <div className="ml-4 mt-2">

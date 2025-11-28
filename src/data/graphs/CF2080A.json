@@ -19,7 +19,7 @@
     { "id": "e6", "source": "6", "target": "7", "style": { "directional": true } }
   ],
   "nodesStyle": {
-    "size" : 100,
+    "size" : 50,
     "type" : "planet1",
     "stroke": "#000000",
     "lineWidth": 2,

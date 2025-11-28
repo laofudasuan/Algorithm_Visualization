@@ -44,8 +44,6 @@ const CoursewareList = () => {
           const createdAt = module.attributes?.createdAt || module.frontmatter?.createdAt || '未知时间';
           const cover = module.attributes?.cover || module.frontmatter?.cover;
           
-          console.log(`处理文件 ${filepath}:`, { id, title, description });
-          
           return {
             id,
             title,
@@ -206,7 +204,10 @@ const CoursewareList = () => {
         applyScaleAtPoint(scale * factor, px, py);
       }, { passive: false });
 
-      const onResize = () => {
+      let resizeHandler = null;
+      let wheelHandler = null;
+      resizeHandler = () => {
+        if (!app || !app.renderer) return;
         const w = window.innerWidth;
         const h = window.innerHeight;
         app.renderer.resize(w, h);
@@ -214,8 +215,18 @@ const CoursewareList = () => {
         dragRect.rect(0, 0, w, h).fill({ color: 0x000000, alpha: 0 });
       };
       if (typeof window !== 'undefined') {
-        window.addEventListener('resize', onResize);
+        window.addEventListener('resize', resizeHandler);
       }
+      wheelHandler = (ev) => {
+        ev.preventDefault();
+        if (!app || !app.canvas) return;
+        const rectNow = app.canvas.getBoundingClientRect();
+        const px = ev.clientX - rectNow.left;
+        const py = ev.clientY - rectNow.top;
+        const factor = ev.deltaY < 0 ? 1.1 : 0.9;
+        applyScaleAtPoint(scale * factor, px, py);
+      };
+      app.canvas.addEventListener('wheel', wheelHandler, { passive: false });
 
       if (Array.isArray(mapConfig.edges)) {
         mapConfig.edges.forEach(edge => {
@@ -360,6 +371,12 @@ const CoursewareList = () => {
 
     return () => {
       try {
+        if (typeof window !== 'undefined' && resizeHandler) {
+          window.removeEventListener('resize', resizeHandler);
+        }
+        if (pixiAppRef.current && pixiAppRef.current.canvas && wheelHandler) {
+          pixiAppRef.current.canvas.removeEventListener('wheel', wheelHandler);
+        }
         if (pixiAppRef.current) {
           pixiAppRef.current.destroy(true);
           pixiAppRef.current = null;

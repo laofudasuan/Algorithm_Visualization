@@ -34,7 +34,7 @@
     { "id": "Scc3", "type": "highlight", "position": { "x": 590, "y": 100 }, "width": 380, "height": 180, "color": "#ff00ff" }
   ],
   "nodesStyle": {
-    "size" : 100,
+    "size" : 50,
     "type" : "planet1",
     "stroke": "#000000",
     "lineWidth": 2,

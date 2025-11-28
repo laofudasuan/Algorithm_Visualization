@@ -71,7 +71,7 @@ const GraphAlgorithmVisualization = forwardRef(({
               height={graphData.height || 500}
               graphData={graphData}
               isLoading={false}
-              backgroundImage={'background'}
+              backgroundImage={null}
               enableDrawing={enableDrawing}
             />
             {animationList && animationList.length > 0 && (

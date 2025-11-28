@@ -90,18 +90,13 @@ export class PixiGraphRenderer {
     };
     
     if (this.backgroundImage === null) {
-      initConfig.backgroundColor = 0xE6E6E6;
+      console.log('初始化PixiGraphRenderer时，backgroundImage为null');
+      initConfig.backgroundColor = 0xE5E5E5;
     }
     
     await this.app.init(initConfig);
     
-    // 当backgroundImage不为null时，创建背景图像
-    if (this.backgroundImage !== null) {
-      await this.createBackgroundImage();
-    }
-
-    const commonIcons = ['planet1', 'planet2', 'planet3', 'planet4', 'house'];
-    await Promise.all(commonIcons.map((t) => this.getTextureForType(t)));
+    
 
     // 创建容器用于分层渲染
     this.edgeContainer = new PIXI.Container();
@@ -352,48 +347,20 @@ export class PixiGraphRenderer {
       nodeObject.x = node.x;
       nodeObject.y = node.y;
     } else {
-      this.getTextureForType(nodeStyle.type).then((texture) => {
-        const nodeObject = new PIXI.Sprite(texture);
-
-        // 1. 获取图片原始尺寸（从纹理获取，准确且可靠）
-        const originalWidth = texture.width;
-
-        // 2. 设置中心点（基于原始尺寸）
-        nodeObject.anchor.set(0.5);
-        nodeObject.position.set(node.x, node.y);
-
-        // 添加到容器
-        this.nodeContainer.addChild(nodeObject);
-        this.nodeObjects.set(nodeId, nodeObject);
-        this.existingNodeIds.add(nodeId);
-
-        // 初始状态（透明 + 极小缩放）
-        nodeObject.alpha = 0;
-        nodeObject.scale.set(0.01);
-
-        // 3. 计算目标缩放比例
-        const scaleRatio = size / originalWidth;
-
-        // 4. 执行淡入放大动画（保持原逻辑）
-        this.animate({
-          target: nodeObject,
-          properties: {
-            alpha: 1,
-            scale: {
-              x: scaleRatio,
-              y: scaleRatio
-            }
-          },
-          duration: 1000,
-          easing: this.easeOutElastic,
-          onUpdate: () => {}
-        });
-        // 添加节点标签
-        if (node.label) {
-          this.createNodeLabelElement(nodeId, node);
-        }
-      });
-      return;   // 异步加载，后续逻辑已放在 then 里
+      const typeColor = {
+        planet1: 0x99CCFF,
+        planet2: 0xB2F1DC,
+        planet3: 0xFFE0A3,
+        planet4: 0xFFB3B3,
+        house: 0xC3C8FF
+      };
+      const fillColor = typeColor[nodeStyle.type] ?? this.defaultNodeStyle.fill;
+      nodeObject = new PIXI.Graphics();
+      nodeObject.circle(0, 0, size/2);
+      nodeObject.fill({ color: fillColor });
+      nodeObject.stroke({ width: nodeStyle.lineWidth, color: nodeStyle.stroke });
+      nodeObject.x = node.x;
+      nodeObject.y = node.y;
     }
 
     // 设置初始透明度为0
