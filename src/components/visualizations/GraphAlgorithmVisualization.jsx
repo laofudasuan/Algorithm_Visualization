@@ -2,7 +2,10 @@ import React, { useRef, useState, useEffect, forwardRef, useImperativeHandle } f
 import { AnimatePresence, motion } from 'framer-motion';
 import GraphCanvas from '../animation/GraphCanvas.jsx';
 import { loadGraphData } from '../utils/GraphDataLoader.jsx';
-import GraphAlgorithmMotion from './GraphAlgorithmMotion.jsx';
+import DfsMotion from './graphAlgorithms/DfsMotion.jsx';
+import BfsMotion from './graphAlgorithms/BfsMotion.jsx';
+import AdjacencyMatrixMotion from './graphAlgorithms/AdjacencyMatrixMotion.jsx';
+import AdjacencyListMotion from './graphAlgorithms/AdjacencyListMotion.jsx';
 
 const GraphAlgorithmVisualization = forwardRef(({ 
   graphName = 'dfs-graph',
@@ -308,11 +311,18 @@ const GraphAlgorithmVisualization = forwardRef(({
                     </button>
                   </div>
                   <div className="w-full h-full p-4">
-                    <GraphAlgorithmMotion 
-                      ref={algorithmMotionRef}
-                      graphData={graphData}
-                      Algorithm={currentAlgorithm}
-                    />
+                    {currentAlgorithm === 'dfs' && (
+                      <DfsMotion ref={algorithmMotionRef} graphData={graphData} />
+                    )}
+                    {currentAlgorithm === 'bfs' && (
+                      <BfsMotion ref={algorithmMotionRef} graphData={graphData} />
+                    )}
+                    {currentAlgorithm === 'adjacencyMatrix' && (
+                      <AdjacencyMatrixMotion ref={algorithmMotionRef} graphData={graphData} />
+                    )}
+                    {currentAlgorithm === 'adjacencyList' && (
+                      <AdjacencyListMotion ref={algorithmMotionRef} graphData={graphData} />
+                    )}
                   </div>
                 </div>
               </motion.div>

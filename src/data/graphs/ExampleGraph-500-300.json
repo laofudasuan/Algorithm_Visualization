@@ -142,8 +142,8 @@
       "source": "5",
       "target": "4",
       "style": {
-        "stroke": "#000",
-        "lineWidth": 2,
+        "stroke": "#ffffff",
+        "lineWidth": 5,
         "arrow": true
       }
     }
