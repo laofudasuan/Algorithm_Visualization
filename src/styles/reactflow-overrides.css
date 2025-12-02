@@ -1,0 +1,21 @@
+.react-flow__node.courseware-node {
+  transition: transform 160ms ease, box-shadow 160ms ease;
+  will-change: transform, box-shadow;
+  cursor: pointer !important;
+}
+
+.react-flow__node.courseware-node:hover {
+  transform: scale(1.06);
+  box-shadow: 0 12px 24px rgba(59, 130, 246, 0.22), 0 8px 10px rgba(59, 130, 246, 0.16);
+  cursor: pointer !important;
+}
+
+.react-flow__node.courseware-node:active {
+  cursor: pointer !important;
+}
+.react-flow__controls {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+}

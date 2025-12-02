@@ -1,0 +1,71 @@
+---
+title: 传递闭包问题
+---
+
+import GraphAlgorithmVisualization from '../../../../components/visualizations/GraphAlgorithmVisualization';
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+
+
+## 传递闭包
+
+##### 洛谷B3611
+给定一张n个点的有向图的邻接矩阵，求出传递闭包
+
+邻接矩阵定义为
+
+$$a_{i,j}=\left\{\begin{aligned} 1 \ \ i\text{到}j\text{有边} \\ 0 \ \ i\text{到}j\text{没有边} \end{aligned} \right.$$
+
+传递闭包定义为矩阵
+
+$$b_{i,j}= \left\{ \begin{aligned} 1 \ \ i\text{可以直接或间接到达}j \\ 0 \ \ i\text{无法直接或间接到达}j \end{aligned} \right.$$
+
+<CollapsibleComponent title="做法"> 
+和Floyd算法一样的思路
+
+枚举每个点$k$作为中转点，然后更新任意两点之间的可达性
+
+如果$i$能到$k$，$k$能到$j$，那么$i$就可以通过$k$中转到达$j$
+
+代码和Floyd算法也很像
+</CollapsibleComponent>
+
+##### 洛谷P4306
+给一张图，求这张图的联通数
+
+联通数指的是有多少对$(x,y)$，满足$x$可以到达$y$
+
+点数$ \le 2000$
+
+<CollapsibleComponent title="做法"> 
+
+###### 想法
+
+BFS
+
+从任意一个点开始，bfs所有点，如果某个点被访问过，则说明有环
+
+实际上，就是问传递闭包的数组有多少个1
+
+数据范围太大
+
+###### 技巧
+
+Bitset: 压位
+
+把32个01变量压到一个unsigned int中
+
+或者把64个01变量压倒一个unsigned long long中
+
+更新：
+
+枚举每个点$k$作为中转点，然后更新任意两点之间的可达性
+
+如果$i$能到$k$，$k$能到$j$，那么$i$就可以通过$k$中转到达$j$
+
+Bitset更新：
+
+如果a[i][k]=True
+
+那么所有a[i][j]可以或上a[k][j]
+
+</CollapsibleComponent>
