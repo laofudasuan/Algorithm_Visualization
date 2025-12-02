@@ -69,6 +69,7 @@ function KnowledgeGraphPage() {
               variants={titleVariants}
             >
               3D 知识图谱可视化
+              （内容还没做，先搭了个框架）
             </motion.h1>
             <motion.p 
               className="text-xl text-gray-300 max-w-3xl section-description mx-auto"

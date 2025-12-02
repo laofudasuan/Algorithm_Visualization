@@ -50,19 +50,8 @@ const Navbar = ({ menuItems, isMenuOpen, setIsMenuOpen, hasScrolled, currentPath
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center">
-          <div className="flex-shrink-0">
-            <Link to="/" className="flex items-center space-x-2">
-              <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center">
-                <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
-                </svg>
-              </div>
-              <span className="font-bold text-xl tracking-tight">算法可视化</span>
-            </Link>
-          </div>
-          
           {/* 桌面导航 */}
-          <div className="hidden md:flex space-x-8">
+          <div className="hidden md:flex ml-auto justify-end space-x-8">
             {menuItems.map((item, index) => {
               // 检查菜单项是否有子菜单
               if (item.children && item.children.length > 0) {

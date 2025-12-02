@@ -1,0 +1,153 @@
+---
+title: 生成函数与线性递推
+---
+
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+
+# 用生成函数来表示线性递推
+
+生成函数可以用来表示一个线性递推的序列
+
+对于一个序列$A_{0 \ldots \infty}$，如果存在线性递推公式$A_n = \sum_{i=1}^{m} c_iA_{n-i}$
+
+则序列$A$的生成函数$f(x)=\sum_{i=0}^{\infty}A_ix^i$可以表示为除法的形式：
+
+$$\frac{\sum_{i=0}^{m-1}A_ix^i}{ 1-\sum_{i=1}^{m} c_ix^i }$$
+
+## 举例
+
+比如，斐波那契数列$A_n=A_{n-1}+A_{n-2}$
+
+则$A$的生成函数为$ \frac{x}{1-x-x^2} = 0+1x+1x^2+2x^3+3x^4+5x^5+\ldots $
+
+##### bzoj3625 小朋友与二叉树
+给一棵含有$n$个正整数的集合$C$和一个正整数$m$
+
+一棵带权二叉树是合法的当且仅当树中每一个结点的权值都在集合$C$内
+
+定义二叉树的权值是二叉树中所有结点的权值的和
+
+对于$\forall 1 \le s \le m$，询问有多少棵不同权值为$s$的二叉树
+
+两棵二叉树是相同的，当且仅当结构相同且相同位置上的结点权值相同
+
+所有数字均不超过$10^5$
+
+<CollapsibleComponent title="做法"> 
+用$G$表示单个节点是否合法的生成函数，$[x^i]G(x) = [i \in C]$
+
+用$F$表示答案的生成函数
+
+列出方程$F(x)=F(x)^2G(x)+1$
+
+移项得到$G(x)F(x)^2-F(x)+1=0$
+
+解方程得到
+
+$$
+F(x) = \frac{1 \pm \sqrt{1-4G(x)}}{2G(x)} = \frac{2}{1 \mp \sqrt{1-4G(x)}}
+$$
+
+分母的常数项不能为$0$，所以
+
+$$
+F(x)=\frac{2}{1+\sqrt{4-4G(x)}}
+$$
+
+</CollapsibleComponent>
+
+##### P4451 整数的lqp拆分
+	题面略
+
+<CollapsibleComponent title="做法"> 
+斐波那契的生成函数为$F(x) = \frac{x}{1-x-x^2}$
+
+拆分成$k$个数的方案数就是生成函数的$k$次方$F(x)^k$
+
+所以，答案就为
+
+$$
+\sum_{i=0}^{\infty} F(x)^i=\frac{1}{1-F(x)} = \frac{1-x-x^2}{1-2x-x^2}
+$$
+
+这样，得到递推式$f_i = 2f_{i-1}+f_{i-2}$，矩阵乘法即可
+</CollapsibleComponent>
+
+##### uoj424 集训队作业2018 count
+
+如果一个序列长度为$n$，每个数的范围都是$[1,m]$的整数，并且每个整数都出现过，就叫做好的序列
+
+对于一个序列$A$，定义$f_A(l,r)$为$A$的区间$[l,r]$的最小值的下标（有多个取下标最小的）
+
+两个序列$A,B$同构，当且仅当对于任意$l \le r$都有$f_A(l,r)=f_B(l,r)$
+
+给定$n,m$，求有多少种不同的好的序列
+
+$n \le 10^5$
+
+<CollapsibleComponent title="做法"> 
+同构的意思就是笛卡尔树相同
+
+进一步分析可以得到，题目就是问深度不超过$m$的$n$个点的笛卡尔树的数量
+
+令$f_i(x)$表示深度不超过$i$的生成函数
+
+所以$f_i(x) = f_{i-1}(x)xf_i(x)+1$
+
+得到$f_i(x)=\frac{1}{1-xf_{i-1}(x)}$
+
+直接求解似乎有点困难，但是注意到，如果把$f_i$表示成$\frac{a_i}{b_i}$，则
+
+$$
+\frac{a_i}{b_i}=\frac{1}{1-\frac{a_{i-1}}{b_{i-1}}x}=\frac{b_{i-1}}{b_{i-1}-a_{i-1}x}
+$$
+
+这样就能表示成矩阵乘法的形式。直接在矩阵里套多项式比较麻烦，可以用插值法。
+</CollapsibleComponent>
+
+##### 子序列
+对于一个序列$a[1 \ldots n]$，我们定义它的权值$f(a)$如下：
+
+- $n=1:f(a)=a_1$
+- $n>1:$如果$a$的子序列$b$满足$b$不会同时包含$a$中相邻元素，则称$b$是$a$的稀疏子序列。$f(a)$为$a$的所有稀疏子序列$b$的权值$f(b)$之和
+
+现在给你$a$，求出$f(a)$
+
+$n \le 2 \times 10^5$
+
+<CollapsibleComponent title="做法"> 
+求和问题，可以考虑每一个$a[i]$对最终答案的贡献
+
+$a[i]$贡献的系数为：每次操作保留$a[i]$在$1 \sim i-1$中保留一个稀疏子序列并且不能选$a[i-1]$、在$i+1 \sim n$中保留一个稀疏子序列并且不能选$a[i+1]$，直到$a[i]$左右两侧都为空的方案数
+
+用$s_n$表示一个长度为$n$的序列，每次保留一个稀疏子序列并且不能选末尾，直到序列为空的方案数，	转移是一个经典的插板法
+
+$$s_n = \sum_{m=0}^{\lfloor \frac{n}{2} \rfloor} \binom{n-m}{m} s_m$$
+
+接下来把$s_n$构造生成函数$S(x)$
+
+$$
+\begin{aligned}
+	S(x) = \sum_{n=1}^{\infty}s_nx^n &= \sum_{n=1}^{\infty} \sum_{m=0}^{\lfloor \frac{n}{2} \rfloor} \binom{n-m}{m}S_m x^mx^{n-m}\\
+	&= \sum_{m=0}^{\infty} S_mx^m \sum_{n=m}^{\infty} \binom{n-m}{m} x^{n-m} \\
+	&= \sum_{m=0}^{\infty} S_mx^m \sum_{p=m}^{\infty} \binom{p}{m} x^p = \sum_{m=0}^{\infty} S_mx^m \frac{x^m}{(1-x)^{m+1}} \\
+	&= \sum_{m=0}^{\infty} S_m\frac{x^{2m}}{(1-x)^{m+1}} = \frac{1}{1-x} S(\frac{x^2}{1-x})
+\end{aligned}
+$$
+
+注意到，$s_n$每次转移至少减半，因此可以考虑倍增求出$s$
+
+定义$S_R(x)$表示把$S(x)$的系数翻转。假设已经求出了$s_{0 \ldots n-1}$，考虑如何求出$s_{0 \ldots 2n-1}$
+
+$$
+\begin{aligned}
+	S(\frac{x^2}{1-x})&=(\frac{x^2}{1-x})^n S_R(\frac{1-x}{x^2}) \\
+	&= (\frac{x^2}{1-x})^n S_R(\frac{1}{x^2}-\frac{1}{x}) \\
+	(u=x^{-1})&= (\frac{x^2}{1-x})^nS_R(u^2-u) = (\frac{x^2}{1-x})^nS_R((u-\frac{1}{2})^2-\frac{1}{4})  \\
+	&= (\frac{x^2}{1-x})^nS_R \circ (u-\frac{1}{4}) \circ u^2 \circ (u-\frac{1}{2})
+\end{aligned}
+$$
+
+每次倍增可以$O(n \log n)$计算
+
+</CollapsibleComponent>

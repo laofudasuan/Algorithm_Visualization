@@ -22,13 +22,12 @@ function CoursewareNode({ data }) {
             top: -10,
             left: '50%',
             transform: 'translateX(-50%)',
-            width: 12,
-            height: 12,
-            borderRadius: '50%',
-            background: CATEGORY_COLORS[data?.category] || '#9CA3AF',
-            border: '2px solid #ffffff',
-            pointerEvents: 'none',
-          }}
+        width: 12,
+        height: 12,
+        borderRadius: '50%',
+        background: CATEGORY_COLORS[data?.category] || '#9CA3AF',
+        pointerEvents: 'none',
+      }}
         />
         <div>{data?.label}</div>
       </div>

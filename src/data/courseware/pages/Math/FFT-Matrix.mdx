@@ -1,0 +1,39 @@
+---
+title: 矩阵多项式乘法
+---
+
+# 矩阵乘法套多项式
+
+给定多项式$f(x)$，$f(x)$的每一项系数是一个矩阵，如何进行多项式乘法
+
+如果直接按照FFT的方法思考，我们会试图寻找一个矩阵的单位根
+
+但实际上多项式套矩阵等价于矩阵套多项式
+
+我们可以把原多项式变成一个大矩阵，矩阵的每个位置的数就是把原多项式这一个位置的系数拿出来	
+
+### 例子
+
+$$
+f(x)=\begin{pmatrix} 1 & 2 \\ 3 & 4 \end{pmatrix} + \begin{pmatrix} 5 & 6 \\ 7 & 8 \end{pmatrix} x
+$$
+
+如果直接计算多项式乘法，则
+
+$$
+\begin{aligned}
+    &f^2(x) \\
+    & \begin{pmatrix} 5 & 6 \\ 7 & 8 \end{pmatrix}^2 x^2 + \begin{pmatrix} 5 & 6 \\ 7 & 8 \end{pmatrix}\begin{pmatrix} 1 & 2 \\ 3 & 4 \end{pmatrix} x + \begin{pmatrix} 1 & 2 \\ 3 & 4 \end{pmatrix}\begin{pmatrix} 5 & 6 \\ 7 & 8 \end{pmatrix}x + \begin{pmatrix} 1 & 2 \\ 3 & 4 \end{pmatrix} \\
+    & \begin{pmatrix} 67 & 78 \\ 91 & 106 \end{pmatrix} x^2 + \begin{pmatrix} 42 & 56 \\ 74 & 96 \end{pmatrix} x + \begin{pmatrix} 7 & 10 \\ 15 & 22 \end{pmatrix}^2
+\end{aligned}
+$$
+
+换一种理解方式
+
+$$
+\begin{aligned}
+    &\begin{pmatrix} 1+5x&2+6x\\3+7x&4+8x \end{pmatrix}^2 \\
+    =&\begin{pmatrix}25x^2+10x+1+42x^2+32x+6&30x^2+16x+2+48x^2+40x+8\\35x^2+22x+3+56x^2+52x+12&42x^2+32x+6+64x^2+64x+16\end{pmatrix} \\
+    =&\begin{pmatrix}67x^2+42x+7&78x^2+56x+10\\91x^2+74x+15&106x^2+96x+22\end{pmatrix}
+\end{aligned}
+$$

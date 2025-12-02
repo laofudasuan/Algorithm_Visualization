@@ -1,0 +1,67 @@
+---
+title: 多元生成函数
+---
+
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+
+# 多元生成函数
+
+指有多个变量的生成函数
+
+##### P5401 CTS2019 珍珠
+有$n$个$[1,D]$的均匀随机整数变量
+
+求有多大概率，能选出至少$m$个不相交的相同数对
+
+$D \le 10^5, m \le n \le 10^9$
+
+<CollapsibleComponent title="做法">
+考虑一个权值如果出现了$k$次，则能形成$\lfloor \frac{k}{2} \rfloor$个Pair.
+
+至少能选出$m$个Pair，即至多选出$n-2m$个出现奇数次的权值。
+
+在没有次数限制的情况下，一个权值的指数生成函数为$\sum_{i \ge 0} \frac{1}{i!}x^i=e^x$。
+
+一个权值有偶数个数的生成函数为$\frac{e^x+e^{-x}}{2}$。一个权值有奇数个数的生成函数为$\frac{e^x-e^{-x}}{2}$.
+
+我们要求的答案即$n!\sum_{k=0}^{n-2m}(\frac{e^x+e^{-x}}{2}+y\frac{e^x-e^{-x}}{2})^D[x^n][y^k]$
+
+$$
+\begin{aligned}
+&n!\sum_{k=0}^{n-2m}(\frac{e^x+e^{-x}}{2}+y\frac{e^x-e^{-x}}{2})^D[x^n][y^k] \\
+=& n!\frac{1}{2^D}\sum_{k=0}^{n-2m}((e^x+e^{-x})+y(e^x-e^{-x}))^D[x^n][y^k] \\
+=& n!\frac{1}{2^D}\sum_{k=0}^{n-2m}(e^x(1+y)+e^{-x}(1-y))^D[x^n][y^k] \\
+=& n!\frac{1}{2^D}\sum_{k=0}^{n-2m}\sum_{i=0}^{D}\binom{D}{i}e^{(2i-D)x}(1+y)^i(1-y)^{D-i}[x^n][y^k] \\
+%&= n!\frac{1}{2^D}\sum_{k=0}^{n-2m}\sum_{i=0}^{D}\binom{D}{i}\frac{(2i-D)^n}{n!}(1+y)^i(1-y)^{n-i}[y^k] \\
+=& \frac{1}{2^D}\sum_{i=0}^{D}\binom{D}{i}(2i-D)^n\sum_{k=0}^{n-2m}((1+y)^i(1-y)^{D-i})[y^k]
+\end{aligned}
+$$
+	
+令$\frac{1}{2^D}\sum_{i=0}^{D}\binom{D}{i}(2i-D)^n\sum_{k=0}^{n-2m}((1+y)^i(1-y)^{D-i})[y^k]$，则
+
+$$
+\begin{aligned}
+& F(i,D) \\
+=& \sum_{k=0}^{n-2m}((1+y)^i(1-y)^{D-i})[y^k] \\
+=& \sum_{k=0}^{n-2m}((1+y)^{i-1}(-(1-y)+2)(1-y)^{D-i})[y^k] \\
+=& \sum_{k=0}^{n-2m}(-(1+y)^{i-1}(1-y)^{D-i+1})[y^k] + \sum_{k=0}^{D-2m}(2(1+y)^{i-1}(1-y)^{D-i})[y^k] \\
+=& -F(i-1,D)+2F(i-1,D-1)
+\end{aligned}
+$$
+
+$$
+\begin{aligned}
+F(0,D)&=\sum_{k=0}^{n-2m}((1-y)^{D})[y^k] =\sum_{k=0}^{n-2m}\binom{D}{k}(-1)^k \\
+&=\sum_{k=0}^{n-2m}(\binom{D-1}{k}+\binom{D-1}{k-1})(-1)^k \\
+&=\sum_{k=0}^{n-2m}\binom{D-1}{k}(-1)^k-\sum_{k=0}^{n-2m-1}\binom{D-1}{k}(-1)^k \\
+&=(-1)^{n-2m}\binom{D-1}{n-2m}
+\end{aligned}
+$$
+
+我们要求所有$F(i,D), i \in [0,D]$。
+
+转移的$F$函数是一个类杨辉三角，可以用FFT优化。
+
+复杂度$O(D\log D)$.
+
+</CollapsibleComponent>

@@ -168,21 +168,21 @@ const CoursewareList = () => {
                   maxZoom={4}
                   proOptions={{ hideAttribution: true }}
                 >
-                  <MiniMap pannable zoomable style={{ right: 16, bottom: 16, width: 180, height: 120 }} />
-                  <Controls position="bottom-right" showInteractive={false} showZoom={true} showFitView={true} style={{ right: 16, bottom: 136 }} />
+                  <MiniMap pannable zoomable style={{ right: 0, bottom: 0, width: 180, height: 120 }} />
+                  <Controls position="bottom-right" showInteractive={false} showZoom={true} showFitView={true} style={{ right: 16, bottom: 116 }} />
                   <Background color="#f3f4f6" variant="dots" gap={16} size={1} />
                   <div
                     style={{
                       position: 'absolute',
-                      right: 16,
-                      bottom: 192,
+                      left: 4,
+                      top: 4,
                       background: '#ffffff',
                       borderRadius: 8,
                       boxShadow: '0 8px 16px rgba(0,0,0,0.12)',
                       border: '1px solid #e5e7eb',
                       padding: '8px 10px',
                       display: 'flex',
-                      flexDirection: 'column',
+                      flexDirection: 'row',
                       gap: 8,
                       alignItems: 'flex-start',
                       zIndex: 10,
@@ -196,8 +196,6 @@ const CoursewareList = () => {
                             height: 10,
                             borderRadius: '50%',
                             background: color,
-                            border: '2px solid #ffffff',
-                            boxShadow: '0 0 0 1px rgba(0,0,0,0.08)',
                             display: 'inline-block',
                           }}
                         />

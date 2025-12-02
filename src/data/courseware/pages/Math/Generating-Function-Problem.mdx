@@ -1,0 +1,166 @@
+---
+title: 生成函数例题
+---
+
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+
+# 生成函数例题
+
+##### P6189 整数拆分问题
+
+	求把整数$n$拆分成若干个无序正整数的和的方案数
+
+<CollapsibleComponent title="DP做法"> 	
+
+- DP方法一：$f[i][j]$表示把$i$拆分成$j$个正整数的和的方案数
+- DP方法二：$f[i][j]$表示把$i$拆分成若干个$\le j$的正整数的和的方案数
+
+把数分成$\le \sqrt{n}$和$> \sqrt{n}$两类
+
+小于的部分用方法二，大于的部分用方法一
+
+总复杂度$n\sqrt{n}$
+
+</CollapsibleComponent>
+<CollapsibleComponent title="生成函数做法"> 
+	
+整数拆分的生成函数为
+	
+$$ 
+f(x)=\prod_{i=1}^{n}\sum_{j=0}^{n}x^{ij} = \prod_{i=1}^{n} \frac{1}{1-x^i} 
+$$
+	
+那么
+	
+$$
+\ln(f(x))=\sum_{i=1}^{n} \ln(\frac{1}{1-x^i})=-\sum_{i=1}^{\infty}\ln(1-x^i)
+$$
+	
+同时我们有
+	
+$$
+\ln'(1-x^i)=(-x^i)'\frac{1}{1-x^i}=(-x^i)'\sum_{j=0}^{n}x^{ij}=-i\sum_{j=0}^{\infty}x^{i(j+1)-1}
+$$
+	
+$$
+\ln(1-x^i)=-\sum_{j=1}^{n}\frac{x^{ij}}{j}
+$$
+	
+所以
+	
+$$
+\ln(f(x))=\sum_{i=1}^{n}\sum_{j=1}^{n}\frac{x^{ij}}{j},f(x)=e^{\sum_{i=1}^{n}x^i\sum_{j|i}\frac{1}{j}}
+$$
+	
+先用调和级数预处理，然后多项式exp即可
+</CollapsibleComponent>
+<CollapsibleComponent title="画图做法"> 
+考虑从Ferrers diagram的原点引出一条$y=x$的直线，直线离开这个图形的位置就框出一个$h \times h$的正方形，然后剩下的部分分成了两个子问题
+
+用生成函数形式表示就为：
+
+$$\prod_{k=1}^{n} \frac{1}{1-x^k} = \prod_{h \ge 0} x^{h^2} (\prod_{k=1}^{h} \frac{1}{1-x^k})^2$$
+
+注意到因为$h^2 \le n$，所以$h$的范围不超过$\sqrt{n}$，DP的复杂度就为$n\sqrt{n}$
+</CollapsibleComponent>
+
+##### loj6077 逆序对
+
+求长度为$n$的逆序对数量为$k$的排列数量
+
+$n \le 10^5, k \le min(10^5,\binom{n}{2})$
+
+<CollapsibleComponent title="做法"> 
+	考虑从小往大把$1$到$n$一个一个插入到排列当中
+
+	插入数$i$时，根据插入的位置，可以新形成$0,1,2,\ldots,i-1$个逆序对
+
+	插入$i$的生成函数为$1+x+x^2+\ldots+x^{i-1}=\frac{1-x^i}{1-x}$，所以答案为
+
+	$$[x^k] \frac{\prod_{i=1}^{n} (1-x^i)}{(1-x)^n} = [x^k] (\prod_{i=1}^{n}(1-x^i))(\sum_{i=0}^{n} \binom{i+n-1}{i} x^i)$$
+
+	接下来需要求左边这个多项式的每一项系数
+
+	注意到，$\prod_{i=1}^{n} (1-x^i)$组合意义就是选若干个不重复的自然数，和为$k$的方案数
+
+	这个就可以用动态规划了，$f[i][j]$表示选$j$个不同的数和为$i$的方案数
+</CollapsibleComponent>
+
+##### CF1515E Phoenix and Computers
+	有$n$台电脑排成一排
+  
+	你可以手动开启一台电脑。在任意时刻，若电脑$i-1$与电脑$i+1$都已经开启$(1<i<n)$，电脑$i$将立刻被自动开启。你不能再开启已经开启的电脑。
+  
+	求你有多少种开启电脑的方案。两个方案不同当且仅当你手动开启的电脑的集合不同，或是手动开启电脑的顺序不同。
+  
+	$n \le 400$
+
+<CollapsibleComponent title="做法"> 
+最终的序列会是若干段手动点亮，每两段手动点亮中间夹一个自动点亮
+
+如果单单只考虑手动点亮一段，一定是从中间某一个点出发往两侧点亮
+
+所以，长度为$i$的段的方案数是$2^i$。把若干段组合在一起需要用指数生成函数
+
+$$
+\sum_{i=1}^{n} \frac{2^{i-1}}{i!}x^i = \frac{1}{2}(e^{2x}-1)
+$$
+
+枚举有$k$个自动点亮的，这样就有$k+1$段手动点亮，答案就为
+
+$$
+\sum_{k=0}^{n} [x^{n-k}] (\frac{e^{2x}-1}{2})^{k+1}
+$$
+
+先用exp求出$2^{2x}$，然后做$n$次卷积，复杂度$O(n^3)$
+
+想做到更快可以用二项式展开
+
+$$
+\sum_{k=0}^{n} [x^{n-k}] (\frac{e^{2x}-1}{2})^{k+1} = \sum_{k=1}^{n} \frac{1}{2^{k}} \sum_{i=0}^{k}\binom{k}{i}(-1)^{k-i}e^{2ix}[x^{n-k+1}]
+$$
+</CollapsibleComponent>
+
+##### ARC102E Stop. Otherwise...
+有$n$个骰子，每个骰子有$k$个面，上面有$1 \sim k$
+
+对于$[2,2k]$中的每一个数$x$，求任意投这$n$个骰子，使得不存在任意两个骰子的点数和为$x$的方案数
+
+骰子之间本质相同（无标号）
+
+$n,k \le 2000$
+
+<CollapsibleComponent title="做法"> 
+只考虑$x \le k+1$的情况，另一侧的方案数是对称的
+
+对于一个给定的$x$，将$i,x-i$两两配对，两者只能出现一个。只有一个特例是$x/2$只能出现一次。
+
+其余的数没有限制。
+
+对子的个数是$\lfloor \frac{x-1}{2} \rfloor$，没有配对的个数是$k-x+1$
+
+无标号计数，使用OBF。
+
+$x/2$最多出现一次，$F_1=1+x$
+
+对于一个对子$F_2=1+\sum_{i=1}^{\infty} 2x^i = \frac{1+x}{1-x}$
+
+对于一个没有配对的数，$F_0=\sum_{i=0}^{\infty} x^i=\frac{1}{1-x}$
+
+把所有生成函数相乘得到答案为
+
+$$
+[x^n] \frac{ (1+x)^{k-x+1+[x \bmod 2 = 0]} }{(1-x)^{k-x+1+\lfloor (x-1)/2 \rfloor}}
+$$
+
+考虑如何求$[x^n]\frac{(1+x)^a}{(1-x)^b}$
+
+$$
+\begin{aligned}
+	[x^n]\frac{(1+x)^a}{(1-x)^b}& = \sum_{i=0}^{n} [x^i](1+x)^a [x^{n-i}](1-x)^{-b} \\
+	&= \sum_{i=0}^{n} \binom{a}{i} \binom{b+(n-i)-1}{n-i}
+\end{aligned}
+$$
+
+复杂度$O(nk)$
+</CollapsibleComponent>

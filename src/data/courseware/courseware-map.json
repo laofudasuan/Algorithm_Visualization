@@ -1,7 +1,7 @@
 {
   "nodes": [
     { "id": "Graph-Basic", "x": 400, "y": 450, "category": "概念" },
-    { "id": "Tree-Basic", "x": 300, "y": 200, "category": "概念" },
+    { "id": "Tree-Basic", "x": 300, "y": 100, "category": "概念" },
     { "id": "Connectivity", "x": 150, "y": 420, "category": "概念" },
     { "id": "Bipartite", "x": 130, "y": 500, "category": "概念" },
     { "id": "2-SAT", "x": 150, "y": 600, "category": "问题" },
@@ -9,20 +9,28 @@
     { "id": "Shortest-Path", "x": 330, "y": 350, "category": "问题" },
     { "id": "Transitive-Closure", "x": 200, "y": 300, "category": "问题" },
     { "id": "Dijkstra", "x": 500, "y": 350, "category": "算法" },
+    { "id": "Congruence-SSP", "x": 330, "y": 270, "category": "模型" },
     { "id": "Counting", "x": 1000, "y": 200, "category": "问题" },
-    { "id": "string", "x": 1200, "y": 400, "category": "概念" },
+    { "id": "String", "x": 1200, "y": 200, "category": "概念" },
     { "id": "paged-courseware", "x": 700, "y": 80, "category": "概念" },
     { "id": "Data-Structure", "x": 700, "y": 300, "category": "概念" },
     { "id": "Dynamic-Programming", "x": 700, "y": 500, "category": "概念" },
     { "id": "Search", "x": 1300, "y": 700, "category": "概念" },
-    { "id": "Game-Theory", "x": 300, "y": 800, "category": "概念" },
-    { "id": "Geometry", "x": 900, "y": 700, "category": "概念" },
-    { "id": "Greedy", "x": 600, "y": 700, "category": "概念" },
+    { "id": "Game-Theory", "x": 100, "y": 860, "category": "概念" },
+    { "id": "Geometry", "x": 200, "y": 860, "category": "概念" },
+    { "id": "Greedy", "x": 600, "y": 700, "category": "思想" },
     { "id": "Regret-Greedy", "x": 500, "y": 600, "category": "思想" },
-    { "id": "Interactive", "x": 950, "y": 800, "category": "问题" },
-    { "id": "Construction", "x": 1000, "y": 500, "category": "问题" },
+    { "id": "Interactive", "x": 200, "y": 800, "category": "问题" },
+    { "id": "Construction", "x": 100, "y": 800, "category": "问题" },
     { "id": "Convex-Optimization", "x": 1400, "y": 200, "category": "概念" },
-    { "id": "Divide-and-Conquer", "x": 1400, "y": 800, "category": "概念" }
+    { "id": "Divide-and-Conquer", "x": 1200, "y": 800, "category": "概念" },
+    { "id": "Generating-Function", "x": 1200, "y": 600, "category": "模型" },
+    { "id": "Generating-Function-Recurrence", "x": 900, "y": 600, "category": "模型" },
+    { "id": "Generating-Function-Bivariate", "x": 1350, "y": 600, "category": "模型" },
+    { "id": "Polynomial", "x": 1200, "y": 500, "category": "模型" },
+    { "id": "FFT", "x": 1350, "y": 480, "category": "算法" },
+    { "id": "FWT", "x": 1000, "y": 400, "category": "算法" },
+    { "id": "Generating-Function-Set", "x": 1040, "y": 500, "category": "模型" }
   ],
   "edges": [
     { "source": "Graph-Basic", "target": "Bipartite", "sourceSide": "left", "targetSide": "right" },
@@ -33,6 +41,13 @@
     { "source": "Regret-Greedy", "target": "Network-Flow", "sourceSide": "left", "targetSide": "right", "label": "算法思想" },
     { "source": "Greedy", "target": "Regret-Greedy", "sourceSide": "top", "targetSide": "bottom"},
     { "source": "Dijkstra", "target": "Shortest-Path", "sourceSide": "left", "targetSide": "right"},
-    { "source": "Connectivity", "target": "Transitive-Closure", "sourceSide": "top", "targetSide": "bottom", "label": "有向图可达性问题" }
+    { "source": "Shortest-Path", "target": "Congruence-SSP", "sourceSide": "top", "targetSide": "bottom" },
+    { "source": "Connectivity", "target": "Transitive-Closure", "sourceSide": "top", "targetSide": "bottom", "label": "有向图可达性问题" },
+    { "source": "Polynomial", "target": "Generating-Function", "sourceSide": "bottom", "targetSide": "top" },
+    { "source": "FFT", "target": "Polynomial", "sourceSide": "left", "targetSide": "right" },
+    { "source": "Generating-Function", "target": "Generating-Function-Recurrence", "sourceSide": "left", "targetSide": "right" },
+    { "source": "Generating-Function", "target": "Generating-Function-Bivariate", "sourceSide": "right", "targetSide": "left" },
+    { "source": "Generating-Function", "target": "Generating-Function-Set", "sourceSide": "left", "targetSide": "bottom" },
+    { "source": "FWT", "target": "Generating-Function-Set", "sourceSide": "bottom", "targetSide": "top" }
   ]
 }

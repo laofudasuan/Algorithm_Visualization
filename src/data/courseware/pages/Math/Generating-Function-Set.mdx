@@ -1,0 +1,372 @@
+---
+title: 集合幂级数
+---
+
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+
+# 集合幂级数
+
+定义：集合的生成函数
+
+# 集合幂级数运算
+
+## 定义
+
+集合幂级数与卷积的形式非常类似，但是它的下标之间的运算不再是加法，而是集合的操作，与、或、非
+
+问题形如求
+
+$$f(n)=\sum_{i\& j=n} a(i)b(j)$$
+
+我们默认n是2的整数次幂，即可以用一个长度为$2^n$的序列表示一个集合幂级数
+
+（可以先学习FWT算法）
+
+##### CF449D（Jzzhu and Numbers）
+给定$n$个数$a_{1 \ldots n}$，你需要从中找一个子集，使得这个子集所有数的按位与为$0$，求方案数
+
+$n,a_i \le 10^6$
+
+<CollapsibleComponent title="做法">
+从容斥原理的角度来思考，把每个整数当成一个集合，对于每一个$S \in [0,2^{20})$，求，答案为$S$的超集的方案数
+
+这个就是$2^{f(S)}$,$f(S)$为有几个数是$S$的超集
+
+然后再做一遍容斥就可以得到恰好为$S$的方案数
+
+容斥的过程就是FWT
+</CollapsibleComponent>
+
+##### P2714 四元组统计
+
+给定$n$个数$a_{1 \ldots n}$，选四个数使得最大公约数为$1$，求方案数
+
+多组数据$T \le 100, n,a_i \le 10^4$
+
+<CollapsibleComponent title="做法">
+gcd就相当于是对每一个约数的次数取min
+
+先统计高维前缀和，然后点乘，最后再高维差分回去
+</CollapsibleComponent>
+
+
+##### [ARC198E] Monotone OR
+
+
+
+##### Uoj 310 黎明前的巧克力
+	给一个可重集$S$，你需要选出两个不相交的子集$T_1,T_2$，使得$T_1$的异或和和$T_2$相同
+
+	求方案数。
+
+	$|S| \le 10^6$，$\forall x \in S \le 10^6$
+
+
+##### Uoj 310 黎明前的巧克力
+	选两个不相交子集，异或和相同，也就是选的所有数异或和为$0$
+
+	这样，相当于是：对于每一个异或和为$0$的子集$T$，方案数的贡献是$2^{|T|}$，表示每个元素可以分到$T_1$也可以分到$T_2$
+
+	这样，一个元素$k_i$的集合幂级数就为$F_i(x)=1+2x^{k_i}$
+	
+	最终答案是把所有数的集合幂级数做异或卷积，然后求$x^0$的系数，即$[x^0]\prod_{i=1}^{|S|} F_i$
+
+	但是，不可能对每一个$F_i$都去做FWT，所以需要优化
+
+<CollapsibleComponent title="做法">
+	考虑每一个$F_i(x)=1+2x^{k_i}$在FWT之前只有两项，所以直接考虑FWT之后每一项的值
+
+	$[x^s] FWT(1+2x^{k_i}) = 1 + 2 \times (-1)^{|s|-|k_i|}$
+
+	即，FWT之后每一项的系数要么是$1+2=3$，要么是$1-2=-1$
+
+	这时我们可以利用一个技巧：在每一项，这$|S|$个生成函数在FWT之后只有两种数，如果我们能得到这些数的总和$sum$，我们就能利用方程解出每种数的个数
+
+	$$\begin{array}{ll} num_{3}+num_{-1}=n \\ 3num_3-num_{-1}=sum \end{array}$$
+
+	而，FWT之后求和等于先求和再FWT。所以，直接把所有的生成函数加起来求FWT，就能解出每一项的$3$和$-1$的个数，从而直接算出相乘以后的FWT的生成函数，最后再IFWT回来即可
+</CollapsibleComponent>
+
+##### CF1119H Triple
+你的生日礼物是一个$n$个整数三元组，第$i$个三元组是$(a_i,b_i,c_i)$，所有数字$j$都满足$0 \le j < 2^k$，$k$是一个读入的数
+
+一天，你玩三元组玩腻了，所以你有了$3$个新的整数$x,y,z$，然后填充了$n$个数组。第$i$个数组有$x$个$a_i$，$y$个$b_i$，$z$个$c_i$。这样，每个数组的大小都是$x+y+z$。
+
+你希望从每个数组中选一个数，使得他们的异或和为$t$，对于所有$t \in [0,2^k)$，你需要求出方案数
+
+$n \le 10^5, k \le 17$
+
+<CollapsibleComponent title="做法">
+先将$a_i,b_i,c_i$异或上$c_i$，这样就减半了情况
+
+FWT之后，每一位只有四种取值:$xt^{a_i}+yt^{b_i}+z$，带入四个方程：
+
+- 总和为$n$
+- FWT$\sum_{i=1}^{n}t^{a_i}$
+- FWT$\sum_{i=1}^{n}t^{b_i}$
+- FWT$\sum_{i=1}^{n}t^{a_i \oplus b_i}$
+
+复杂度$O(n \log n)$
+</CollapsibleComponent>
+
+##### P11458 USACO24DEC All Pairs Similarity P
+农夫 John 的 $N$ ($1 \leq N \leq 5 \cdot 10^5$) 头奶牛都被分配了一个长度为 $K$ 的非全零位串 ($1 \leq K \leq 20$)。不同的奶牛可能被分配到相同的位串。
+
+两个位串的 Jaccard 相似度定义为它们的按位与的结果中 1 的数量除以它们的按位或的结果中 1 的数量。例如，位串 11001 和 11010 的 Jaccard 相似度为 $2/4$。
+
+对于每头奶牛，输出她的位串与每头奶牛（包括她自己）的位串的 Jaccard 相似度之和，对 $10^9 + 7$ 取模。具体地说，如果总和等于一个有理数 $a/b$，其中 $a$ 和 $b$ 是互质的整数，则输出范围 $[0, 10^9 + 7)$ 内的唯一整数 $x$，使得 $bx - a$ 被 $10^9 + 7$ 整除。
+
+<CollapsibleComponent title="方法一">
+题意即给定$a_{1 \ldots n}$，对每个$i$求$\sum_{j=1}^{n} \frac{|a[i] \cap a[j]|}{|a[i] \cup a[j]|}$
+
+注意到$\sum_{j=1}^{n} \frac{|a[i] \cap a[j]|}{|a[i] \cup a[j]|} = \frac{a[i]}{|a[i] \cup a[j]|}+\frac{a[j]}{|a[i] \cup a[j]|}-1$
+
+先考虑怎么计算$\sum_{j=1}^{n} \frac{1}{|a[i] \cup a[j]|}$，定义$a$的统计数组为$y[]$，并定义$z[i] = \frac{1}{|i|}$
+
+那么我们的目标是求出
+
+$$x[i] = \sum_{j} y[j] \times z[i|j]$$
+
+回忆我们FWT是怎么做集合或卷积的，目标：$z[k] = \sum_{i|j=k} x[i]y[j]$
+
+$$
+\begin{aligned}
+	z_0 &= x_0y_0 \\
+	z_1 &= x0y_1+x_1y_0+x_1y_1
+\end{aligned}
+$$
+	
+则我们考虑求出
+
+$$
+\begin{aligned}
+	z'_0 &= x_0y_0 \\
+	z'_1 &= (x_0+x_1)(y_0+y_1)
+\end{aligned}
+$$
+
+这样$z_0=z'_0,z_1=z'_1-z'_0$
+
+对于本题：
+
+$$
+\begin{aligned}
+	x_0 &= y_0z_0+y_1z_1 \\
+	x_1 &= y_0z_1+y_1z_1
+\end{aligned}
+$$
+
+则我们考虑求出
+
+$$
+\begin{aligned}
+	x'_0 &= y_0(z_0-z_1) \\
+	x'_1 &= (y_0+y_1)z1
+\end{aligned}
+$$
+
+这样$x_0=x'_0+x'_1,x_1=x'_1$
+
+如果不会构造的，也可以用解方程求出FWT的变换：
+
+$a_i = b_j c_{i|j}$，对一个二进制位列出方程：
+
+$$
+\left\{ \begin{array}{l} w_{a,i,0}=w_{b,i,0}w_{c,i,0}+w_{b,i,1}w_{c,i,1} \\ w_{a,i,1}=w_{b,i,0}w_{c,i,1}+w_{b,i,1}w_{c,i,1} \end{array}\right.
+$$
+
+（可以爆搜系数求解
+
+</CollapsibleComponent>
+
+<CollapsibleComponent title="方法二">
+也可以用容斥原理。先把求并改成求交$\frac{1}{|a[i] \cup a[j]|}=\frac{1}{k-|\overline{a[i]} \cap \overline{a[j]}|}$，也就是说把所有$a$取反，当交大小为$w$时贡献为$\frac{1}{k-w}$
+
+$S=|\overline{a[i]} \cap \overline{a[j]}|$既是$\overline{a[i]}$的子集，也是$\overline{a[j]}$的子集。
+
+恰好取到交集不好求，考虑简化条件：只需要$S \subseteq \overline{a[i]} ,S \subseteq \overline{a[j]}$就行
+
+这样，只需要枚举$a[j]$的子集累加，然后枚举$a[i]$的子集求和就可以了
+
+因此，我们需要设计一个容斥系数，假设实际的$|\overline{a[i]} \cap \overline{a[j]}|=w$，则容斥系数需要满足
+
+$$
+\forall w:\sum_{t=0}^{w}f[t]\binom{w}{t}=\frac{1}{k-w}
+$$
+
+根据二项式反演
+
+$$
+f[w] = \sum_{t=0}^{w} \binom{w}{t}(-1)^{w-t}\frac{1}{k-t}
+$$
+</CollapsibleComponent>
+
+# 子集卷积问题
+
+子集卷积问题：给定序列$a,b$，求
+
+$$c_k=\sum_{i \cup j=k,i \cap j=0} a_i b_j$$
+
+这两个条件同时处理比较困难，我们把问题转化一下，变成
+
+$$c_k=\sum_{i \cup j=k,|i|+|j|=|k|} a_i b_j $$
+
+把它看成一个二维序列，第一维是集合，第二维是集合大小
+
+然后我们先做一个高维前缀和，高维前缀和之后，对应位置相乘，这里的乘法就是第二维的多项式乘法
+
+做完之后再进行一次高维差分，就是答案
+
+##### P7526 Virtual Self
+给定$n$个小于$2^w$的非负整数。
+
+对于所有$k \in [0,2^w)$，求从$n$个数中选出$m$个数，异或和为$k$的方案数
+
+$w \le 20, m \le 10^6$
+
+<CollapsibleComponent title="做法">
+相当于集合幂级数里面套了一个多项式
+
+有$n$个生成函数，每一个在FWT之后只有两种取值$1$和$-1$
+
+解出每个位置有几个$1$几个$-1$
+
+然后，用FFT预处理一个多项式展开
+</CollapsibleComponent>
+
+##### CF1906K Deck-Building Game
+
+##### P4221 WC2018 州区划分
+
+有$n$个数，要划分成若干个集合，一个集合S的权值是$f(S)$，一个划分方案的权值是每一个集合权值的乘积，求所有划分方案的权值之和
+
+$n \le 21$
+
+<CollapsibleComponent title="做法">
+题目要求的即
+
+$$
+(\frac{1}{0!}+\frac{f(S)}{1!}+\frac{f(S) \circ f(S)}{2!}+\ldots)[2^n-1]
+$$
+
+其中$\circ$为子集卷积
+
+同样我们把它变成二维问题
+
+第一维做一个高维前缀和，第二维就是一个多项式exp，然后在高维差分即可
+</CollapsibleComponent>
+
+##### P13275 NOI2025 集合
+小 X 有 $2^n$ 个数，编号为 $0$ 到 $2^n - 1$，第 $i \ (0 \leq i < 2^n)$ 个数为 $a_i$。
+
+对于 $S \subseteq \{0, 1, \ldots, 2^n - 1\}$，定义 $f(S)$ 为集合 $S$ 中所有数的二进制按位与。特别地，若 $S$ 为空集，则 $f(S) = 2^n - 1$。
+
+定义两个 $\{0, 1, \ldots, 2^n - 1\}$ 的子集 $P, Q$ （可以为空）构成的有序对 $(P, Q)$ 是 **特别的** 当且仅当 $P \cap Q = \varnothing$ 且 $f(P) = f(Q)$。定义有序对 $(P, Q)$ 的 **权值** 为编号包含在 $P \cup Q$ 内的所有数的乘积，即 $\prod_{i \in P \cup Q} a_i$。特别地，若 $P \cup Q = \varnothing$，则有序对 $(P, Q)$ 的权值为 $1$。
+
+小 X 想要知道所有特别的有序对的权值之和，请你帮助他求出这个值。由于答案可能较大，你只需要求出答案对 $998,244,353$ 取模后的结果。
+
+$t \le 3, n \le 20$
+
+<CollapsibleComponent title="做法">
+先考虑写一个暴力DP：
+
+用$f[i][j][k]$表示已经考虑完了前$i$个数，集合$f(P)=j,f(Q)=k$的权值之和，转移就是枚举$i+1$怎么选：
+
+- 如果$i+1$不选，则从$f[i][j][k]$转移到$f[i+1][j][k]$
+- 如果$i+1$给$P$选，则从$f[i][j][k]$转移到$f[i+1][j\&(i+1)][k]$
+- 如果$i+1$给$Q$选，则从$f[i][j][k]$转移到$f[i+1][j][k\&(i+1)]$
+
+考虑把刚刚的DP写成集合幂级数的形式：
+
+定义$U=2^n-1$，对$f[i][j][k]$建立关于$j$和$k$的二元集合幂级数：
+
+$$
+F[i] = \sum_{j=0}^{U}\sum_{k=0}^{U} f[i][j][k] x^j y^k
+$$
+
+则：（注意：集合幂级数的乘法定义为FWT的与卷积）
+
+$$
+F[i+1] = F[i] \times (x^Uy^U + a_{i+1}x^{i+1}y^U+a_{i+1}x^Uy^{i+1})
+$$
+
+由此可以推出，答案的集合幂级数可以表示为：
+
+$$
+\prod_{i=0}^{U} (x^Uy^U + a_{i}x^{i}y^U+a_{i}x^Uy^{i})
+$$
+
+如果是一元集合幂级数做FWT，就是先求高维后缀和（超集和），再直接点乘
+
+那对于二元集合幂级数做FWT，就是对两维分别求高维后缀和（超集和），再直接点乘
+
+$$
+FWT(x^Uy^U + a_{i}x^{i}y^U+a_{i}x^Uy^{i}) = \sum_{j=0}^{U}\sum_{k=0}^{U} \left(1 + a_i[j \subseteq i]+a_i[k \subseteq i]\right)x^jy^k
+$$
+
+点乘之后的$x^jy^k$项的系数就应该为（利用容斥原理，先计算包含$j,k$中任意一个的，再除掉同时包含的情况）：
+
+$$
+\left[\prod_{j \subseteq j'}(a_{j'}+1)\right] \times \left[\prod_{k \subseteq k'}(a_{k'}+1) \right]\times  \left[\prod_{j \subseteq T \& k \subseteq T} \frac{2a_T+1}{(a_T+1)^2}\right]
+$$
+
+而式子的三个部分都可以用高位后缀积（超集积）计算得出，总复杂度$O(n 4^n)$
+
+$$
+\left[\prod_{j \subseteq j'}(a_{j'}+1)\right] \times \left[\prod_{k \subseteq k'}(a_{k'}+1) \right]\times  \left[\prod_{j \subseteq T \& k \subseteq T} \frac{2a_T+1}{(a_T+1)^2}\right]
+$$
+
+这个式子还有一个小Bug：可能有$a_T$为$-1$的情况，此时分母会出现$0$
+
+可以用这个技巧：把每个数表示成$i \times 0^j$的形式，这样乘法除法都可以正常进行
+
+假设IFWT之前的数组为$s_{j,k}$，IFWT之后的数组为$s'_{j,k}$，答案是所有$s'_{i,i}$之和。考虑先推导出$s'$和$s$的关系式，然后直接用$s$计算答案
+
+$$
+s'_{i,i} = \sum_{i \subseteq j} \sum_{i \subseteq k} s_{j,k} (-1)^{|j|+|k|-2|i|}=\sum_{i \subseteq j} \sum_{i \subseteq k} s_{j,k} (-1)^{|j|+|k|}
+$$
+
+因此答案为：
+
+$$
+\sum_{j=0}^{2^n-1}\sum_{k=0}^{2^n-1}s_{j,k} (-1)^{|j|+|k|} 2^{|j \cap j|}
+$$
+
+复杂度优化到了$O(4^n)$
+
+我们再把完整的式子写到一起：
+
+定义
+
+$$
+F_{i} = \prod_{i \subseteq i'} (a_{i'}+1),G_{i} = \prod_{i \subseteq i'} \frac{2a_{i'}+1}{(a_{i'}+1)^2}
+$$
+
+这样总的答案为：
+
+$$
+\sum_{j=0}^{2^n-1}\sum_{k=0}^{2^n-1} (-1)^{|j|+|k|} 2^{|j \cap k|} F_{j}F_{k}G_{j \cup k}
+$$
+
+公式里同时有交和并比较麻烦，考虑把交也转成并：
+
+$$
+\sum_{j=0}^{2^n-1}\sum_{k=0}^{2^n-1} (-1)^{|j|+|k|} 2^{|j|+|k|-|j \cup k|} F_{j}F_{k}G_{j \cup k} = \sum_{j=0}^{2^n-1}\sum_{k=0}^{2^n-1} (-2)^{|j|+|k|} F_{j}F_{k}G_{j \cup k}2^{-|j \cup k|}
+$$
+
+接下来就可以用or-FWT进行优化了，可以求出$H_u = \sum_{j \cup k=u} (-2)^{|j|}F_j (-2)^{|k|}F_k$，这样答案就为$\sum H_uG_u2^{-|u|}$
+
+</CollapsibleComponent>
+
+##### CF2096H Wonderful XOR Problem
+
+有 $n$ 个区间 $[l_1, r_1], [l_2, r_2], \ldots [l_n, r_n]$。对于每个 $x$ 从 $0$ 到 $2^m - 1$，求满足以下条件的序列 $a_1, a_2, \ldots a_n$ 的数量（模 $998\,244\,353$）：
+
+- 对于所有 $i$ 从 $1$ 到 $n$，有 $l_i \leq a_i \leq r_i$；
+- $a_1 \oplus a_2 \oplus \ldots \oplus a_n = x$，其中 $\oplus$表示异或运算符。
+
+$1 \le n \le 2 \times 10^5, 1 \le m \le 18$
+
+##### ABC367G Sum of (XORK or 0)
+
+##### qoj5089 环覆盖

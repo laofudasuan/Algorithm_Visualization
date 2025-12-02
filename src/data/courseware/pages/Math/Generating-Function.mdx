@@ -1,0 +1,256 @@
+---
+title: 一般型生成函数
+---
+
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+
+# 一般型生成函数
+
+## 定义
+
+生成函数，又称母函数/形式级数
+
+对于序列$a[0 \ldots n]$，定义其一般型生成函数为
+
+$$
+A(x) = \sum_{i=0}^{n}a[i]x^i
+$$
+
+求和的结果并不重要，重要的是参数本身的性质，所以叫做“形式级数”。
+
+有时候，我们发现一些问题的答案，可以表示成含参级数求和的系数。
+
+在实际运用的时候，我们会认为$x$是一个趋近于$0$的数，这样可以把无穷级数转化为有限项的级数。
+
+### 举例
+比如，从$n$个球中选择$0$个球的方案数为$\binom{n}{0}=1$。
+
+我们把这个问题的答案作为系数，表示成含参级数求和的形式：
+
+$$f(x) = \sum_{i=0}^{\infty} 1 \cdot x^i$$
+
+$$(1+x+x^2+x^3+\ldots)(1-x) \to 1$$
+
+所以：
+
+$$1+x+x^2+x^3+\ldots \to \frac{1}{1-x}$$
+
+这样，我们就可以用$\frac{1}{1-x}$简单表示出这个问题的答案系数。
+
+### 例题
+
+求生成函数$\frac{1}{(1-x)^m}$对应的序列$a$。
+
+<CollapsibleComponent title="做法"> 
+$$
+\frac{1}{(1-x)^m}=\left(\frac{1}{1-x}\right)^m
+$$
+
+$a_i$就相当于从$m$个集合 A 中各抽出来一个物品，并且物品权值和恰好为$n$的方案数。
+
+因此：$a_i=\binom{i+m-1}{m-1}x^i$。
+</CollapsibleComponent>
+	
+### 例题
+
+求出序列$a=\{0,1,2,3,\ldots,n,\ldots\}$的生成函数。
+
+<CollapsibleComponent title="做法">
+$$
+\begin{aligned}
+F(x) &= \sum_{i \ge 0} i x^i \\
+xF(x) &= \sum_{i \ge 1} (i-1)x^i \\
+xF(x) &= \sum_{i \ge 1} ix^i - \sum_{i \ge 1}x^i \\
+xF(x) &= F(x) - \frac{x}{1-x} \\
+(1-x)F(x) &= \frac{x}{1-x} \\
+F(x) &= \frac{x}{(1-x)^2}
+\end{aligned}
+$$
+</CollapsibleComponent>
+
+### 例题
+
+求出序列$a=\{0,1,4,9,\ldots,n^2,\ldots\}$的生成函数。
+
+<CollapsibleComponent title="做法">
+$$
+\begin{aligned}
+F(x) &= \sum_{i \ge 0} i^2x^i \\
+xF(x) &= \sum_{i>0} (i-1)^2x^i = \sum_{i>0} i^2x^i + \sum_{i>0} (-2i+1)x^i \\
+(1-x)F(x) &=  2 \sum_{i \ge 0} ix^i - \sum_{i>0} x^i  \\
+&=  2 \frac{x}{(1-x)^2} - \frac{x}{1-x} = \frac{x(x+1)}{(1-x)^2} \\
+F(x) &= \frac{x(x+1)}{(1-x)^3}
+\end{aligned}
+$$
+</CollapsibleComponent>
+
+## 递推式求生成函数
+对于一个递推数列，可以根据其递推式求生成函数。
+
+比如斐波那契数列$f[i]=f[i-1]+f[i-2]$，构造：
+
+$$
+\begin{aligned}
+F(x)&=f[0]+f[1]x+f[2]x^2+f[3]x^3+\ldots \\
+xF(x)&=f[0]x+f[1]x^2+f[2]x^3+\ldots \\
+x^2F(x)&=f[0]x^2+f[1]x^3+\ldots
+\end{aligned}
+$$
+
+从而得到：
+
+$$F(x)-xF(x)-x^2F(x)=x \Rightarrow F(x)=\frac{x}{1-x-x^2}$$
+
+
+## 多项式运算与生成函数
+很多时候，一些组合问题就可以表示成生成函数的运算。
+
+比如，有两个集合$A,B$，每个集合有若干个物品，每个物品有一个权值。
+
+集合$A$中权值为$i$的物品有$a_i$个，集合$B$中权值为$i$的物品有$b_i$个。
+
+$A$的生成函数为$A(x)=\sum a_ix^i$，$B$的生成函数为$B(x)=\sum b_ix^i$。
+
+如果我们要求，从两个集合中挑一个权值为$i$的物品的方案数是多少？答案的生成函数就是原先两个集合生成函数之和。
+
+如果我们要求，从两个集合中各挑一个物品，权值之和为$i$的方案数是多少？答案的生成函数就是原先两个集合生成函数之积。（所以，生成函数的乘法相当于背包合并）。
+
+
+<BoxWithTag tag="常用形式">
+一个$01$序列，不超过$k$的项为$1$的生成函数是$\frac{1-x^{k+1}}{1-x}$
+
+一个$01$序列，$k$的倍数项为$1$的生成函数是$\frac{1}{1-x^k}$
+
+ 
+</BoxWithTag>
+
+### 例题
+
+现在有$A,B,C,D$四种水果，每种都有无限个。
+
+现在要求拿出恰好$n$个水果，但要求水果$A$要拿出恰好偶数个，$B$的个数是$5$的倍数，$C$最多只能拿$4$个，$D$最多拿$1$个，问最终的方案数是多少。
+
+用生成函数来解决。
+
+<BoxWithTag tag="提示">
+构造出每种水果对应的生成函数乘一乘？
+</BoxWithTag>
+
+<CollapsibleComponent title="做法"> 
+
+- $A(x) = \dfrac{1}{1-x^2}$
+- $B(x) = \dfrac{1}{1-x^5}$
+- $C(x) = 1+x+x^2+x^3+x^4$
+- $D(x) = 1+x$
+
+$$
+\begin{aligned}
+&\left(\frac{1}{1-x^2}(1+x)\right)\left(\frac{1}{1-x^5}(1+x+x^2+x^3+x^4)\right) \\
+=& \frac{1}{1-x} \cdot \frac{1}{1-x} \\
+=& \frac{1}{(1-x)^2}
+\end{aligned}
+$$
+
+套用之前的公式，$g(x) = \sum_{i \ge 0}(i+1)x^i$，所以$[x^n]g(x)=n+1$。
+
+</CollapsibleComponent>
+
+##### P10780 BZOJ3028 食物
+
+##### P2000 拯救世界
+
+	有$10$个非负整数变量$x_1,x_2,\ldots,x_{10}$，每个变量都有一个限制：
+
+	$$\begin{array}{c|c} 6|x_1 & 2|x_6 \\ x_2 \le 9 & x_7 \le 1 \\ x_3 \le 5 & 8|x_8 \\ 4|x_4 & 10|x_9 \\ x_5 \le 7 & x_{10} \le 3 \end{array}$$
+
+	求这$10$个变量和为$n$的方案数
+
+	$n \le 10^{100000}$
+
+<CollapsibleComponent title="做法">
+把这$10$个变量的生成函数相乘，然后约分得到$\frac{1}{(1-x)^5}$，然后用组合意义得到，$n$的答案就为$\binom{n+5-1}{5-1}$
+</CollapsibleComponent>
+ 
+
+## 组合对象与生成函数
+遇到组合问题，可以对组合对象建立生成函数。
+
+例如，对于经典问题：用$1 \times 2$和$2 \times 1$的骨牌正好铺满$2 \times n$的矩形的方案数。
+
+考虑从左往右，$2 \times 1$的骨牌可以一列一列放，而$1 \times 2$必须两列两列放。
+
+定义生成函数$F(x) = f[0]+f[1]x+f[2]x^2+\ldots$，其中$f[i]$表示$n=i$的答案。
+
+则$F(x) = 1 + xF(x)+x^2F(x)$，解得$F(x) = \frac{1}{1-x-x^2}$。
+
+### 组合对象与生成函数：LOJ6268 分拆数
+拆分数问题：求将$n$拆成若干个无序的正整数之和的方案数。
+
+每一个数$i$的生成函数为$1+x^i+x^{2i}+\ldots = \frac{1}{1-x^i}$。
+
+总的生成函数就为$\prod_{i=1}^{n} \frac{1}{1-x^i}$。
+
+### 组合对象与生成函数：P5900 无标号无根树计数
+求$n$个点的无标号无根树数量。
+
+先考虑有根的版本，定义$f[i]$表示点数为$i$的无标号有根树的数量。
+
+确定了根以后，剩下的就是要把$n-1$个点分成若干组，每一组是一个递归子问题。
+
+因为无标号，所以方案数就是把每种子树的生成函数相乘：
+
+$$F(x) = x \prod_{i=1}^{n} (\sum_{j \ge 0}x^{ij})^{f(i)} = x \prod_{i=1}^{n} (\frac{1}{1-x^i})^{f_i}$$
+
+$$
+\begin{aligned}
+F(x) &= \exp\left( \sum_{i=1}^{n}\ln\left(\frac{1}{1-x^i}\right) \right) \\
+&= \exp\left( \sum_{i=1}^{n}-f_i\ln(1-x^i) \right)
+\end{aligned}
+$$
+
+然后需要用一些求导技巧来进行求解。
+
+## 泰勒展开
+
+对于任意一个函数$f$，在一个小范围内，用一个多项式函数来进行近似：
+
+$$f(x) = \frac{f(x_0)}{0!} + \frac{f'(x_0)}{1!}(x-x_0) + \frac{f''(x_0)}{2!}(x-x_0)^2+\ldots$$
+
+泰勒公式就是一种生成函数。
+
+### 举例1：二项式定理
+
+二项式定理，其实就是泰勒展开的结果：
+
+$$ (x+y)^a = x^a\left(1+\frac{y}{x}\right)^a $$
+
+把$\left(1+\frac{y}{x}\right)^a$在$1$附近进行泰勒展开：
+
+$$\left(1+\frac{y}{x}\right)^a=\sum_{k=0}^{\infty} \frac{a^{\underline{k}}}{k!}\left(\frac{y}{x}\right)^{k}$$
+
+因此：
+
+$$ (x+y)^a = \sum_{k=0}^{\infty} \frac{a^{\underline{k}}}{k!} x^{a-k}y^{k} $$
+
+### 举例2：多项式展开
+
+$$
+(x_1+x_2+\ldots+x_n)^k = \sum_{a_1+a_2+\ldots+a_n=k} \frac{k!}{a_1!a_2!\ldots a_n!}x_1^{a_1}x_2^{a_2} \ldots x_n^{a_n}
+$$
+
+数学归纳法，假设：
+
+$$
+(x_1+x_2+\ldots+x_{n-1})^k = \sum_{a_1+a_2+\ldots+a_{n-1}=k} \frac{k!}{a_1!a_2!\ldots a_{n-1}!}x_1^{a_1}x_2^{a_2} \ldots x_n^{a_{n-1}}
+$$
+
+$$
+\begin{aligned}
+& (x_1+x_2+\ldots+x_n)^k \\
+=& ((x_1+x_2+\ldots+x_{n-1})+x_n)^k \\
+=& \sum_{a_n=0}^{k} \frac{k!}{a_n!(k-a_n)!}x_n^{a_n} (x_1+x_2+\ldots+x_{n-1})^{k-a_n} \\
+=& \sum_{a_n=0}^{k} \frac{k!}{a_n!(k-a_n)!}x_n^{a_n}  \sum_{a_1+a_2+\ldots+a_{n-1}=k-a_n} \frac{(k-a_n)!}{a_1!a_2!\ldots a_{n-1}!}x_1^{a_1}x_2^{a_2} \ldots x_n^{a_{n-1}}   \\
+=& \sum_{a_1+a_2+\ldots+a_n=k} \frac{k!}{a_1!a_2!\ldots a_n!}x_1^{a_1}x_2^{a_2} \ldots x_n^{a_n}
+\end{aligned}
+$$
+
