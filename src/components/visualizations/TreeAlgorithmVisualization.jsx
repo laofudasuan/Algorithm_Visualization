@@ -3,7 +3,10 @@ import { AnimatePresence, motion } from 'framer-motion';
 import GraphCanvas from '../animation/GraphCanvas.jsx';
 import { loadTreeData } from '../utils/TreeDataLoader.jsx';
 import { rearrangeTreeNodes } from '../utils/TreeLayoutUtils.jsx';
-import GraphAlgorithmMotion from './GraphAlgorithmMotion.jsx';
+import DfsMotion from './graphAlgorithms/DfsMotion.jsx';
+import BfsMotion from './graphAlgorithms/BfsMotion.jsx';
+import AdjacencyMatrixMotion from './graphAlgorithms/AdjacencyMatrixMotion.jsx';
+import AdjacencyListMotion from './graphAlgorithms/AdjacencyListMotion.jsx';
 
 const TreeAlgorithmVisualization = forwardRef(({ 
   treeName = 'binary-tree',
@@ -253,11 +256,18 @@ const TreeAlgorithmVisualization = forwardRef(({
                     </button>
                   </div>
                   <div className="w-full h-full p-4">
-                    <GraphAlgorithmMotion 
-                      ref={algorithmMotionRef}
-                      graphData={treeData}
-                      Algorithm={currentAlgorithm}
-                    />
+                    {currentAlgorithm === 'dfs' && (
+                      <DfsMotion ref={algorithmMotionRef} graphData={treeData} />
+                    )}
+                    {currentAlgorithm === 'bfs' && (
+                      <BfsMotion ref={algorithmMotionRef} graphData={treeData} />
+                    )}
+                    {currentAlgorithm === 'adjacencyMatrix' && (
+                      <AdjacencyMatrixMotion ref={algorithmMotionRef} graphData={treeData} />
+                    )}
+                    {currentAlgorithm === 'adjacencyList' && (
+                      <AdjacencyListMotion ref={algorithmMotionRef} graphData={treeData} />
+                    )}
                   </div>
                 </div>
               </motion.div>

@@ -1,0 +1,494 @@
+---
+title: 线性规划
+---
+
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+
+
+# 线性规划与网络流
+
+## 线性规划的定义
+
+##### 定义
+
+给定:
+
+- $n$ 个**非负**变量 $[x_1,x_2,\ldots,x_n]$
+- $m$ 个线性不等式
+- 最大化目标函数 $c_1x_1+c_2x_2+\ldots+c_nx_n$
+
+$$
+\text{maximize} \ c \cdot x
+$$
+
+$$
+\text{s.t.} \ Ax \le b
+$$
+
+$$
+x \ge 0
+$$
+
+##### 线性规划的表示
+
+- 注意到我们有变量非负的限制
+- 如果变量可为负数：$x = x_1 - x_2$，$x_1$和$x_2$都非负
+- 如果目标是最小化：最大化$c_1x_1+\ldots+c_nx_n \to$ 最小化$-c_1x_1-\ldots-c_nx_n$
+- 如果限制是等式：$Ax=b \to Ax \ge b$ 且 $Ax \le b$
+
+##### 松弛型线性规划
+
+标准线性规划：
+
+$$
+\text{maximize} \ c \cdot x
+$$
+
+$$
+\text{s.t.} \ Ax \le b
+$$
+
+$$
+x \ge 0
+$$
+
+为每个不等式建立一个不等式 $x_{i+n}=b_i-\sum_{j=1}^{n}a_{i,j}x_j$，松弛型线性规划定义为：
+
+$$
+\text{maximize} \ c \cdot x
+$$
+
+$$
+\text{s.t.} \ x_{i+n}=b_i-\sum_{j=1}^{n}a_{i,j}x_j
+$$
+
+$$
+x \ge 0
+$$
+
+## 线性规划建模
+
+##### 线性规划建模方法 · 最短路问题
+
+给定一张$n$个点$m$条边的带权有向图，第$i$条边从$u_i$到$v_i$，长度为$l_i$，求$s$到$t$的最短路 \pause
+
+用$d_i$表示从$s$到$i$的最短路，则线性规划为
+
+$$
+\text{minimize} d_t
+$$
+
+$$
+\text{s.t.} \forall i \in [1,m], d_{u_i}+l_i \ge d_{v_i}
+$$
+
+$$
+\text{s.t.} d_s = 0
+$$
+
+##### 线性规划建模方法 · 最大流问题
+
+给定一张$n$个点$m$条边的有向图，第$i$条边从$u_i$到$v_i$，容量为$c_i$，求$s$到$t$的最大流 \pause
+
+用$w_i$表示第$i$条边的实际流量，则线性规划为
+
+$$
+\text{maximize} \sum_{u_i = s} w_i
+$$
+
+$$
+\text{s.t.} \forall i \in [1,m] w_i \le c_i
+$$
+
+$$
+\text{s.t.} \forall x \in ([1,n]-\{s,t\}) \sum_{u_i=x}w_i=\sum_{v_i=x}w_i
+$$
+
+## 单纯型算法
+
+##### 几何表示
+
+一个不等式 $a_ix \le b$ 可以看成空间中的一个半平面
+
+线性规划的解空间是所有不等式的解空间的交集
+
+解空间是一个凸多边形的结构
+
+![](/images/cov.png)
+
+单纯型算法首先会随机一个可行解，然后沿着凸多边形一路走到最优点
+
+##### 单纯型算法 · Pivot操作
+$$
+\text{maximize} \ c \cdot x
+$$
+
+$$
+\text{s.t.} \ Ax \le b
+$$
+
+$$
+x \ge 0
+$$
+
+- 如果$\forall i \in [1,n], c_i \le 0$，那么取$x_{1 \ldots n}=\mathbf{0},\ x_{n+1 \ldots n+m}=b_{1 \ldots m}$
+- 否则找一个$c_e>0$，再找一个$a_{l,e}>0$，执行：
+
+$$
+x_j= b_l-a_{l,e}x_e \Rightarrow x_e=\frac{b_l-x_j}{a_{l,e}}
+$$
+
+##### 举例
+
+$$\text{maximize} \ 3x_1+x_2+2x_3 $$
+
+满足约束：
+
+$$
+\begin{aligned}
+x_1+x_2+3x_3 &\le 30 \\
+2x_1+2x_2+5x_3 &\le 24 \\
+4x_1+x_2+2x_3 &\le 36
+\end{aligned}
+$$
+
+##### 举例 · 转成松弛型
+
+$$
+\text{maximize} \ 3x_1+x_2+2x_3
+$$
+
+$$
+\begin{aligned}
+x_4&=-x_1-x_2-3x_3 + 30 \\
+x_5&=-2x_1-2x_2-5x_3 + 24 \\
+x_6&=-4x_1-x_2-2x_3 + 36
+\end{aligned}
+$$
+
+##### 举例 · Pivot操作
+
+第一步选$x_1$作为换入变量，$x_1$在目标函数系数为正数，所以希望增大$x_1$。
+
+增大限制：
+
+- 为了保证$x_4$非负，$x_1$不能超过$30$
+- 为了保证$x_5$非负，$x_1$不能超过$12$
+- 为了保证$x_6$非负，$x_1$不能超过$9$
+
+此时最高取$x_1=9$
+
+##### 举例
+
+接下来把$x_1=9-\frac{x_2}{4}-\frac{x_3}{2}-\frac{x_6}{4}$带入，最大化：
+
+$$
+27+\frac{x_2}{4}+\frac{x_3}{2}-\frac{3x_6}{4}
+$$
+
+$$
+\begin{aligned}
+x_4 &= 21 - \frac{3x_2}{4} - \frac{5 x_3}{2} + \frac{x_6}{4} \\
+x_5 &= 6 - \frac{3x_2}{2} - 4x_3 + \frac{x_6}{2} \\
+x_1 &= 9 - \frac{x_2}{4} - \frac{x_3}{2} - \frac{x_6}{4}
+\end{aligned}
+$$
+
+##### 举例 · Pivot
+
+此时$x_3$的系数仍为正，试图增大$x_3$。
+
+对$x_3$最严格的限制是$x_5$非负，$x_3 \le \frac{3}{2}$。
+
+带入$x_3 = \frac{3}{2} -\frac{3x_2}{8} - \frac{x_5}{4} + \frac{x_6}{8}$，最大化：
+
+$$
+\frac{111}{4}+\frac{x_2}{16} - \frac{x_5}{8} - \frac{11x_6}{16}
+$$
+
+$$
+\begin{aligned}
+x_4 &= \frac{69}{4}+\frac{3x_2}{16}+\frac{5x_5}{8}-\frac{x_6}{16} \\
+x_3 &= \frac{3}{2}-\frac{3x_2}{8}-\frac{x_5}{4}+\frac{x_6}{8} \\
+x_1 &= \frac{33}{4} - \frac{x_2}{16}+\frac{x_5}{8} -\frac{5x_6}{16}
+\end{aligned}
+$$
+
+##### 距离 · Pivot
+
+此时$x_2$系数为正，试图增大$x_2$。
+
+对$x_2$最严格的限制是$x_3$非负，带入得，最大化：
+
+$$28-\frac{x_3}{6}-\frac{x_5}{6}-\frac{2x_6}{3}$$
+
+$$
+\begin{aligned}
+x_4 &= 18 - \frac{x_3}{2} + \frac{x_5}{2} \\
+x_2 &= 4 - \frac{8x_3}{3} -\frac{2x_5}{3} + \frac{x_6}{3} \\
+x_1 &= 8 + \frac{x_3}{6} + \frac{x_5}{6} - \frac{x_6}{3}
+\end{aligned}
+$$
+
+此时所有变量系数都是负数，已到达最优解。
+
+## 线性规划对偶问题
+
+##### primal-dual
+
+标准线性规划：
+
+$$
+\text{maximize} \ c \cdot x
+$$
+
+$$
+\text{s.t.} \ Ax \le b
+$$
+
+$$
+x \ge 0
+$$
+
+对偶线性规划：
+
+$$
+\text{minimize} \ y \cdot b
+$$
+
+$$
+\text{s.t.} \ y^TA \ge c
+$$
+
+$$
+y \ge 0
+$$
+
+##### 线性规划与对偶
+
+弱对偶定理：对于标准线性规划的一组解$x$和对偶线性规划的一组解$y$，始终满足$c^Tx \ge y^Tb$。
+
+强对偶定理：对于标准线性规划的**最优解**$x^*$和对偶线性规划的最优解$y^*$，满足${c^*}^Tx={y^*}^Tb$
+
+##### 理解方式
+
+考虑如下线性规划：
+
+最小化$7x_1+x_2+5x_3$
+
+$$
+\begin{aligned}
+    x_1-x_2+3x_3 &\ge 10 \\
+    5x_1+2x_2-x_3 &\ge 6
+\end{aligned}
+$$
+
+注意到
+
+$$
+7x_1+x_2+5x_3 \ge (x_1-x_2+3x_3)+(5x_1+2x_2-x_3) \ge 10+6
+$$
+
+##### 理解方式
+
+可以把找限制的过程看成一个线性规划
+
+$$
+\begin{aligned}
+    f(y_1,y_2) &= y_1(x_1-x_2+3x_3) + y2(5x_1+2x_2-x_3) \\
+    &= (y_1+5y_2)x_1+(-y+2y_2)x_2+(3y_1-y_2)x_3
+\end{aligned}
+$$
+
+由于$(x_1-x_2+3x_3) \ge 10, (5x_1+2x-2-x_3) \ge 6$，所以$f(y_1,y_2) \ge 10y_1+6y_2$
+
+这就是一个线性规划的形式
+
+##### 举例
+
+最大流=最小割
+
+二分图最大权匹配=最小顶标和
+
+# 整数规划
+
+## 定义
+
+在线性规划的基础上，我们加一个限制：每个变量取值必须是整数。
+
+整数规划是NP-Hard问题。
+
+但是当系数矩阵$A$满足特定性质时线性规划的最优解一定能在整数处取到。
+
+##### 全幺模矩阵（Totally Unimodular Matrix）
+
+一个矩阵$A$是 TUM 的当且仅当它的每一个正方形子矩阵行列式为$0,\pm 1$。
+
+一个整点多面体定义为每一个顶点都是整点。
+
+##### Lemma
+如果$A$是 TUM 的，对于任何一个正方形子矩阵$U$，$U^{-1}$是一个整数矩阵。
+
+##### Proof
+$U^{-1}_{i,j}=\frac{\det(U^{*}_{j,i})}{\det(U)}$。
+
+因为$\det(U)$为$\pm 1$，证毕。
+
+##### Theorem
+一个矩阵$A$是 TUM 的当且仅当对于任意整数向量$b$，$P=\{x\mid Ax \le b\}$是一个整点多面体。
+
+##### Proof
+对于任一子矩阵，都可以找一组对应的$b$。
+
+##### Theorem
+一个矩阵$A_{n \times m}$是TUM的当且仅当$\forall R \subseteq [m]$，存在一个划分$R=R_1 \cup R_2,\ R_1 \cap R_2=\emptyset$，$\forall j \in [1,n]$：
+
+$$\sum_{i \in R_1}a_{i,j}-\sum_{i \in R_2}a_{i,j} \in \{0,\pm 1\}$$
+
+##### Proof
+只证明正向。
+
+目标是给每行赋$0/1$系数使得每列的和都在$[\lfloor \tfrac{sum}{2} \rfloor,\lceil \tfrac{sum}{2} \rceil]$。线性规划取每行为$\tfrac{1}{2}$即可。
+
+考虑解空间：
+
+$$\{x\mid x^TA \le \lceil \tfrac{1}{2}d^TA \rceil,\ x^TA \ge \lfloor \tfrac{1}{2} d^TA \rfloor,\ 0 \le x \le d\}$$
+
+因$A$为TUM，$(A,-A,I)^T$亦为TUM，存在整数解，证毕。
+
+### 举例
+
+#### 二分图匹配
+
+$$
+\text{maximize} \ \sum_{e \in T} x_e
+$$
+
+$$
+\text{s.t.}\ \forall v,\sum_{e \in N(v)}x_e \le 1
+$$
+
+$$
+\forall e,x_e \in \{0,1\}
+$$
+
+## 全幺模矩阵
+
+### Network Matrix
+
+一张有向图$(V,E)$，如果把所有边调成无向边它为一颗树。定义集合$P \subseteq V \times V$，则对应的Network matrix为一个$|E| \times |P|$的矩阵。对于边$e=(e_a,e_b)$和点对$p=(p_a,p_b)$，如果边$e$与路径$p$同向则为$1$，如果逆向则为$-1$，如果边$e$不在路径$p$上则为$0$。
+
+### Arc-Vertex Adjacency Matrix
+
+令$|V|=n,|E|=m$，$\forall e_t=(v_i,v_j)$，$M_{it}=1,M_{jt}=-1$，其它位置为$0$。
+
+### Consecutive 1 Matrix
+
+每一行的$1$是连续的$01$矩阵。
+
+##### The application of Network Matrix
+
+- 证明网络流的 LP 最优解一定是整数
+- 证明费用流的 LP 最优解一定是整数
+
+## IP近似
+
+最小点覆盖$2$近似。
+
+把所有$\ge \frac{1}{2}$的点变成$1$，其它变成$0$。
+
+##### P7246 手势密码
+有一棵带点权的树。定义一次操作为选择树上的一条简单路径，并将这条简单路径上的所有点点权减去1。问至少需要多少次操作，使树上所有点的点权恰好变为0。
+
+$n \le 3 \times 10^6$
+
+<CollapsibleComponent title="做法">
+给每条路径设置一个变量$X$。用$S$表示路径的集合，$X_s$表示路径$s$操作了几次，那么我们可以列出等式：
+
+$$\forall i \in [1,n], \sum_{k \in s \in I} X_s = a_k$$
+
+然后转化成线性规划
+
+$$
+\begin{aligned}
+    \text{minimize} & \sum_{s \in S} X_s \\
+    s.t. & \forall i \in [1,n], \sum_{i \in S} X_s \ge a_i \ \ \ (Y_i) \\
+    & \forall i \in [1,n], \sum_{i \in s} -X_s \ge -a_i \ \ \ (Z_i) \\
+    & \forall s \in S, X_s \ge 0
+\end{aligned}
+$$
+
+然后进行对偶
+
+$$
+\begin{aligned}
+    \text{maximize} & \sum_{i=1}^{n}  a_i(Y_i-Z_i) \\
+    s.t. & \forall s \in S, \sum_{i \in s} (Y_i-Z_i) \le 1 \ \ \ (X_s) \\
+    & \forall i \in [1,n],Y_i,Z_i \ge 0
+\end{aligned}
+$$
+
+注意到$Y_i-Z_i$都是一起出现的，所以可以合并
+
+$$
+\begin{aligned}
+	\max & \sum_{i=1}^{n}  a_i \times W_i \\
+	s.t. & \forall s \in S, \sum_{i \in s} W_i \le 1 \ \ \ (X_s)
+\end{aligned}
+$$
+
+问题变成了：给每个点赋一个权值，满足任何一条路径权值之和$\le 1$，最大化$\sum a_i \times W_i$
+</CollapsibleComponent>
+
+##### ZJOI2020 序列
+
+给一个非负序列$a_{1 \ldots n}$，每次可以执行以下三种操作中的一种：
+
+- 选择一个区间 $-1$
+- 选择一个区间的所有下标为奇数的项 $-1$
+- 选择一个区间的所有下标为偶数的项 $-1$
+
+问最少操作多少次，变成全 $0$。
+
+<CollapsibleComponent title="做法">
+令操作集合为$S$，一个操作被执行的次数为$X_s$，则线性规划为：
+
+$$
+\begin{aligned}
+\text{minimize} &\ \sum_{s \in S} X_s \\
+s.t.&\ \forall i \in [1,n], \sum_{s \ni i} X_s \ge a_i \ \ (Y_i) \\
+&\ \forall i \in [1,n], \sum_{s \ni i} (-X_s) \ge -a_i \ \ (Z_i) \\
+&\ \forall s \in S, X_s \ge 0
+\end{aligned}
+$$
+
+$$
+\begin{aligned}
+\text{maximize} &\ \sum_{i=1}^{n}  a_i(Y_i-Z_i) \\
+s.t.&\ \forall s \in S, \sum_{i \in s} (Y_i-Z_i) \le 1 \ \ (X_s) \\
+&\ \forall i \in [1,n], Y_i,Z_i \ge 0
+\end{aligned}
+$$
+
+注意到$Y_i-Z_i$一起出现，可以合并。
+
+$$
+\begin{aligned}
+\max &\ \sum_{i=1}^{n}  a_i \times W_i \\
+s.t.&\ \forall s \in S, \sum_{i \in s} W_i \le 1 \ \ (X_s)
+\end{aligned}
+$$
+
+问题变成：给序列的每个位置设置一个权重$W_i$，满足任何操作的权重之和$\le 1$，最大化$\sum a_iW_i$。
+
+满足任何操作的权重之和$\le 1$，也就是说这个序列、奇数项子序列、偶数项子序列的最大子段和都为$1$。
+
+考虑一个序列，要求任意子段的和都不超过$1$：
+
+- 单个元素不超过 $1$
+- 没必要出现比 $-1$ 更小的数
+
+所以，$W_i \in \{-1,0,1\}$。
+
+可以动态规划：$DP[i][j][k][t]$ 表示从左到第 $i$ 项，$j,k,t$ 分别为整个序列、奇数项、偶数项的最大后缀。
+</CollapsibleComponent>

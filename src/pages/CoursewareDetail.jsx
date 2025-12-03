@@ -105,19 +105,16 @@ const CoursewareDetail = () => {
         if (coursewareFiles[coursewarePath]) {
           const coursewareModule = await coursewareFiles[coursewarePath]();
           
-          // 提取frontmatter信息
-          setCourseware({
-            id,
-            ...coursewareModule.attributes
-          });
+          const meta = coursewareModule.frontmatter || coursewareModule.attributes || {};
+          setCourseware({ id, ...meta });
           
           // 检查是否有分页配置
-          if (coursewareModule.attributes.pages && Array.isArray(coursewareModule.attributes.pages)) {
+          if (Array.isArray(meta.pages)) {
             const components = [];
             const attributes = [];
             
             // 使用glob导入的模块来加载页面文件
-            for (const pageFile of coursewareModule.attributes.pages) {
+            for (const pageFile of meta.pages) {
               try {
                 console.log(`正在加载页面: ${pageFile}`);
                 // 使用预先定义的glob导入来解决Vite警告
@@ -133,7 +130,7 @@ const CoursewareDetail = () => {
                 if (matchedPath && pageFiles[matchedPath]) {
                   const dynamicImport = await pageFiles[matchedPath]();
                   components.push(dynamicImport.default);
-                  attributes.push(dynamicImport.attributes || {});
+                  attributes.push(dynamicImport.frontmatter || dynamicImport.attributes || {});
                 } else {
                   throw new Error(`页面文件不存在: ${pageFile}`);
                 }
@@ -158,7 +155,7 @@ const CoursewareDetail = () => {
           } else {
             // 兼容旧格式
             setPageComponents([coursewareModule.default]);
-            setPageAttributes([coursewareModule.attributes]);
+            setPageAttributes([meta]);
             setPageCount(1);
             setToc(new Array(1)); // 初始化目录数组
           }

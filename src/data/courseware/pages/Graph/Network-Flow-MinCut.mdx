@@ -107,7 +107,7 @@ $S$到每个站点的边，如果割掉表示建立这个站点。每个用户�
 
 对每个同学建立一个点，与$S$和$T$的边分别表示选文科和选理科。
 
-![mincut](graph/network/mincut.png)
+![](/images/mincut.png)
 
 对于一个同学，如果保留和S之间的边则表示选理科，如果保留和T之间的边表示选文科。$v_1$表示同时选理科的收益，$v_2$表示同时选文科的收益。那么，可以列出方程：
 
@@ -196,7 +196,7 @@ $Y_B$向$X_A$连$b_i$的边，表示$A$不愿意但是$B$与队友成功合作
 
 为什么呢？考虑这样一个反例：
 
-![cutsample](graph/network/cutsample.png)
+![](/images/cutsample.png)
 
 对于这张图，最小割可能只割容量为$1$的边，但是这是不合法的。
 </CollapsibleComponent>
@@ -244,7 +244,7 @@ $$f[i][j]=\min(f[i-1][j]+p_i+c\times j,f[i-1][j-1]+s_i)$$
 <CollapsibleComponent title="做法">
 当没有高度限制时，将每一格的每个高度看作一个节点， 同一格的相邻高度代表的节点之间连边，再建立虚拟源点和汇点，将指向一个节点的边的流量设为其相应的代价，则网络最小割即为所求最小总代价。
 
-![cake](graph/network/cake.png)
+![](/images/cake.png)
 
 如何限制相邻高度差不超过$D$？
 
