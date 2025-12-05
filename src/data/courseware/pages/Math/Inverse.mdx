@@ -1,0 +1,45 @@
+---
+title: 逆元
+---
+
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+
+# 逆元
+
+## 逆元的定义
+
+在模$p$的空间中，对于一个元素$a$，如果存在元素$b$，使得$a \times b \equiv 1(\bmod p)$，则称$b$为$a$的逆元。
+
+逆元也记作$a^{-1}$
+
+## 逆元求法【$p$为质数】
+
+### 费马小定理
+
+$a^{p-1} \equiv 1(\bmod \ p)$。
+
+采用快速幂求解
+
+### 递推求逆元
+
+令$p=ax+b(b<x)$，则$b \equiv  -ax(\bmod p)$
+
+把等式两边同乘$b^{-1}x^{-1}$得$x^{-1} \equiv -a \times b^{-1}$
+
+所以递推公式为
+
+$$
+inv[i] \equiv - \lfloor \frac{p}{i} \rfloor inv[p \bmod i]
+$$
+
+## 逆元求法【$p$不为质数】
+
+### 扩展欧几里得
+
+解方程$px+0y=1$
+
+### 欧拉定理
+
+$a^{\varphi(p)} \equiv 1(\bmod \ p)$。
+
+采用快速幂求解

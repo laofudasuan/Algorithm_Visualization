@@ -1,0 +1,150 @@
+---
+title: Powerful Number筛
+---
+
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+
+# Powerful Number筛
+
+## 背景
+对于求$\sum_{i=1}^{n}f(i)$的问题，如果存在一个积性函数$g$满足：
+
+ - $g$容易求前缀和
+ - 对于任意质数$p,f(p)=g(p)$
+
+则可以采用Powerful Number筛求解
+ 
+
+## 算法原理
+	
+基本原理：称一个数是PN(Powerful Number)当且仅当$x$所有质因子的次数都$\ge 2$。
+
+可以证明PN的数量不超过$O(\sqrt{n})$。证明方法：
+
+所有的PN可以被表示为$a^2b^3$的形式，因为所有质因子，如果次数是偶数则可以归入$a^2$，如果次数是奇数，可以给三次给$b^3$，其它的给$a^2$
+
+因此PN的数量不超过
+
+$$\int_{1}^{\sqrt{n}} \sqrt[3]{\frac{n}{x^2}}=O(\sqrt{n})$$
+
+如何求出PN？线性筛预处理$\sqrt{n}$以内质因子然后爆搜
+ 
+构造了$g$之后，定义$h=f/g$，这里的除法是狄利克雷卷积的逆运算
+
+对于质数$p$，$f(p)=h(1)g(p)+g(1)h(p)=h(p)+g(p)$，所以$h(p)=0$。根据积性，$h$只在PN处非零，因此：
+
+$$
+\begin{aligned}
+\sum_{i=1}^{n}f(i) &= \sum_{i=1}^{n} \sum_{d|i} h(d)g(\frac{i}{d}) \\
+&= \sum_{d=1}^{n} h(d) \sum_{id \le n} g(i) = \sum_{d=1, d\text{ is PN}}^{n} h(d) G(\lfloor \frac{n}{d} \rfloor)
+\end{aligned}
+$$
+
+另外还需要考虑如何求解$h(p^c)$，一种是手推公式，还有一种就是根据$h$的定义$h(p^c)=f(p^c)-\sum_{i=1}^{c}g(p^i)h(p^{c-i})$
+
+有时候$g$的前缀和可以用杜教筛求
+ 
+##### ULR Round1 校验码--部分分
+
+给定积性函数$f(x)$满足$f(p^k)=p^{c\lfloor \frac{k}{2} \rfloor}$，求$\sum_{i=1}^{n}f(i)$
+
+$n$和$c$都是读入的数
+
+$n \le 1.2 \times 10^{11}$
+ 
+<CollapsibleComponent title="解法">
+构造$g(x)=1$，算一算会发现$h(p^k) = [k \bmod 2=0](p^{c\lfloor \frac{k}{2} \rfloor}-p^{k\lfloor \frac{k}{2}-1 \rfloor})$
+
+也就是说，$h$函数只在平方数处有值
+
+因此$\sum_{i=1}^{n}f(i) = \sum_{i=1}^{\sqrt{n}}h(i^2)\lfloor \frac{n}{i^2} \rfloor$
+</CollapsibleComponent>
+
+##### Min25筛模板题
+
+给定积性函数$f(x)$满足$f(p^k)=p^k(p^k-1)$，求$\sum_{i=1}^{n}f(i)$
+ 
+<CollapsibleComponent title="做法">
+构造$g(x)=x\varphi(x)$，则$g(p^k)=p^k\varphi(p^k)=p^k(p-1)p^{k-1}=(p-1)p^{2k-1}$
+
+$$
+p^k(p^k-1)=\sum_{i=0}^{k}(p-1)p^{2i-1}h(p^{k-i})
+$$
+
+归纳可知$h(p^k)=(k-1)(p^{k+1}-p^k)$
+
+杜教筛求$g(x)$的前缀和
+ </CollapsibleComponent>
+
+##### LOJ6053简单的函数
+
+给定 $f(n)$:
+
+$$
+f(n) = 
+\begin{cases} 
+1 & n = 1 \\
+p \oplus c & n = p^c \\
+f(a)f(b) & n = ab \text{ and } a \perp b 
+\end{cases}
+$$
+
+易得:
+
+$$
+f(p) = 
+\begin{cases} 
+p + 1 & p = 2 \\
+p - 1 & \text{otherwise}
+\end{cases}
+$$
+
+<CollapsibleComponent title="做法">
+
+构造 $g$ 为
+
+$$
+g(n) = 
+\begin{cases} 
+3\varphi(n) & 2 \mid n \\
+\varphi(n) & \text{otherwise}
+\end{cases}
+$$
+
+易证 $g(p) = f(p)$ 且 $g$ 为积性函数。
+ 
+下面考虑求 $G(n)$。
+
+$$
+G(n) = \sum_{i=1}^{n} [i \mod 2 = 1] \varphi(i) + 3 \sum_{i=1}^{n} [i \mod 2 = 0] \varphi(i)
+$$
+
+$$
+= \sum_{i=1}^{n} \varphi(i) + 2 \sum_{i=1}^{n} [i \mod 2 = 0] \varphi(i)
+$$
+
+$$
+= \sum_{i=1}^{n} \varphi(i) + 2 \sum_{i=1}^{\left\lfloor \frac{n}{2} \right\rfloor} \varphi(2i)
+$$
+
+定义$S_1(n)=\sum_{i=1}^{n}\varphi(i),S_2(n)=\sum_{i=1}^{n}\varphi(2i)$，当$n$为偶数时：
+
+$$
+\begin{aligned}
+	S_2(n)&=\sum_{i=1}^{n/2} (\varphi(2(2i-1)) + \varphi(2(2i))) \\
+	&=\sum_{i=1}^{n/2} (\varphi(2i-1)+2\varphi(2i))\\
+	&=S_1(n)+S_2(n/2)
+\end{aligned}
+$$
+
+当$n$为奇数时
+
+$$
+\begin{aligned}
+	S_2(n)&=S_2(n-1)+\varphi(2n)\\
+	&=S_1(n-1)+S_2((n-1)/2)+\varphi(n)\\
+	&=S_1(n)+S_2((n-1)/2)
+\end{aligned}
+$$
+
+</CollapsibleComponent>

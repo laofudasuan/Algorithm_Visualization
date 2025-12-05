@@ -1,0 +1,38 @@
+---
+title: 数论分块
+---
+
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+
+<a href="https://www.luogu.com.cn/article/hckcjsga" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline inline-flex items-center gap-1">🔗 点击链接</a>
+
+
+##### CF1202F You Are Given Some Letters...
+
+给你一个 $a$ ，一个 $b$ ，让你找出所有字符串，满足它仅由 $a$ 个 $A$ 和 $b$ 个 $B$ ，并且分别求出它们的最小周期 $k$ （设该串为 $s$ ,即$k$满足$s[i]=s[i\%k]$）。
+
+输出共有多少不同的 $k$ 。
+
+##### 例题
+
+有一个方程$x^2-2Bx+C=0$
+
+给定一个区间$[L,R]$，要求参数$C$必须在这个区间内。
+
+现在请问你，有多少组满足要求的正整数$(B,C)$满足这个方程对于$x$有整数解
+
+$1 \le L \le R \le 10^{12}$
+
+<CollapsibleComponent title="解法">
+我们利用二次方程的求根公式$x=\frac{\sqrt{4B^2-4C}+2B}{2}=\sqrt{B^2-C}+B$
+
+得到，$x$有整数解当且仅当$B^2-C$为完全平方数。假设$P^2=B^2-C$，变形得到$(B+P)(B-P)=C$
+
+注意到，$B+P$和$B-P$是同奇偶性的
+
+- 当$C$为奇数时，对于任何一个约数，都可以解出对应的$B$和$P$。所以方案数就是$C$的约数个数
+- 当$C$模$4$余$2$时，不存在同奇偶性的$B+P$和$B-P$
+- 当$C$为$4$的倍数时，要求$B+P$和$B-P$都是偶数，这样相当于求$C/4$的约数个数
+
+这样我们就把问题转化为了求区间约数个数和，可以用数论分块解决
+</CollapsibleComponent>

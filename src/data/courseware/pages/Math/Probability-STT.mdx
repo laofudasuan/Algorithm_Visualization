@@ -1,0 +1,223 @@
+---
+title: 鞅与停时定理
+---
+
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+
+# 鞅与停时定理
+
+## 鞅
+
+有一个随机序列$\{X_0,X_1,X_2,\ldots\}$
+
+如果对于随机序列$\{Y_0,Y_1,Y_2,\ldots\}$如果对于任意$n \in \mathbb{N}^*$有:
+
+- $E[Y_n]<\infty$
+- $Y_n$是关于$X_1,X_2,\ldots,X_n$的函数
+- $E[Y_{n+1}|X_0,X_1,\ldots,X_n] = Y_n$
+
+则称$\{Y_0,Y_1,Y_2,\ldots\}$为鞅
+
+由$E[Y_{n+1}|X_0,X_1,\ldots,X_n] = Y_n$，可以进一步推出
+
+$$
+\forall k \in \mathbb{N}^*,E[Y_{n+k}|X_0,X_1,\ldots,X_n] = Y_n
+$$
+
+这个可以用数学归纳法证明，首先$k=1$满足，然后假设对于$k$满足，可以推出$k+1$满足
+
+$$
+\begin{aligned}
+E[Y_{n+k+1}|X_0,X_1,\ldots,X_n] &= E[E[Y_{n+k} | X_0,X_1,\ldots,X_{n+k}]|X_0,X_1,\ldots,X_n] \\
+&= E[Y_{n+k}|X_0,X_1,\ldots,X_n] = Y_n
+\end{aligned}
+$$
+
+这样一来，我们可以推出$\forall n \in \mathbb{N}^*, E[X_n] = E[X_0]$
+
+### Polya坛子抽样模型
+
+考虑一个坛子里初始装有一个红色球和一个黄色球
+
+接下来进行若干次操作，每一次从坛子里随机拿一个球出来，然后把这个球放回去，同时往坛子里加一个同色的球
+
+用$M_n$表示第$n$次操作以后红球的比例，则$\{M_0,M_1,\ldots\}$是鞅
+
+如何证明？
+
+假设第$n$次操作以后红球有$X_n$个，则显然$X_n$是一个马尔可夫过程
+
+$$
+P(X_{n+1}=X_n+1|X_{1 \ldots n}) = \frac{X_n}{n+2}
+$$
+
+$$
+P(X_{n+1}=X_n|X_{1 \ldots n}) = 1-\frac{X_n}{n+2}=\frac{n+2-X_n}{n+2}
+$$
+
+$$
+E[X_{n+1}|X_{1 \ldots n}] = X_n + \frac{X_n}{n+2} = \frac{(n+3)X_n}{n+2}
+$$
+
+$$
+E[M_{n+1}|X_{1 \ldots n}] = E[\frac{X_{n+1}}{n+3}|X_{1 \ldots n}] = \frac{X_n}{n+2} = M_n
+$$
+
+## 停时定理
+
+停时定理用于解决一类问题：进行一个随机过程，然后按照某种特定规则停止，求停止后某个值的期望，这个规则只取决于当前过程已经进行的部分
+
+比如抛硬币，抛了$5$次以后是否停止只取决于这$5$次的结果
+
+如果$\{X_0,X_1,\ldots\}$是一个鞅，$T$是这个随机过程的停止时间，则$E[X_{T}] = X_0$
+
+应用：把目标构造一个鞅，这样$X_0$就是最终的期望
+
+如果是想求结束的期望步数，就要设法构造一个类似于$X_T-T$的鞅
+
+## 赌徒问题
+
+赌徒初始有$a$元，每次有$p$的概率赢$1$元，$1-p$的概率输$1$元，变成$a+b$时获胜，$0$时失败
+
+令$X_i$表示赌徒第$i$轮赢了多少钱，即$X_i$有$p$的概率为$1$，$1-p$概率为$-1$
+
+先考虑简单版本，$p=0.5$
+
+这样定义$Y_n=a+\sum_{i=1}^{n}X_i$，即$n$轮后的钱数，注意到$E[Y_{n+1}|X_{1 \ldots n}]=Y_n$，所以$Y$是鞅
+
+由停时定理，$E[Y_T] = E[Y_0] = a$
+
+用通过期望反推概率的技巧，假设赌徒最终失败的概率为$e$，则$E[X_T] = (a+b)\times e+0\times (1-e) =a$，解得$e=\frac{a}{a+b}$
+
+###### p为0.5
+
+除了最终获胜的概率，也可以用停时定理求结束的期望步数$E[T]$
+
+定义$Z_n=Y_n^2-n$，则
+
+$$
+\begin{aligned}
+E[Z_{n+1}|X_{1 \ldots n}] &= E[Y_{n+1}^2|X_{1 \ldots n}]-(n+1) \\
+&= E[(X_{n+1}+Y_n)^2|X_{1 \ldots n}]-(n+1) \\
+&= E[X_{n+1}^2|X_{1 \ldots n}] + E[2X_{n+1}Y_n|X_{1 \ldots n}] + E[Y_n^2|X_{1 \ldots n}] - (n+1) \\
+&= E[X_{n+1}^2] + 2Y_nE[X_{n+1}] + Y_n^2 - (n+1) \\
+&= 1+0+Y_n^2-(n+1)=Z_n
+\end{aligned}
+$$
+
+证明了$\{Z_0,Z_1,\ldots,Z_n\}$是鞅
+
+从而得到$E[Z_T]=Z_0=Y_0^2=a^2$
+
+$$
+E[Z_T]=E[Y_T^2-T]=\frac{a}{a+b} \times (a+b)^2 + \frac{b}{a+b} \times 0 - E[T]
+$$
+
+解得$E[T] = a(a+b)-a^2 = ab$
+
+###### p不为0.5
+    
+这样，我们就解决了$p=0.5$的问题，那$p \neq 0.5$怎么办呢？假设$p>1-p$
+
+构造$Y'_n = (\frac{1-p}{p})^{Y_n}$
+
+$$
+\begin{aligned}
+E[Y'_{n+1}|X_{1 \ldots n}] &= E\left[\left(\frac{1-p}{p}\right)^{Y_{n+1}}\middle|X_{1 \ldots n}\right] \\
+&= p \cdot \left(\frac{1-p}{p}\right)^{Y_n+1} + (1-p) \cdot \left(\frac{1-p}{p}\right)^{Y_n-1} \\
+&= (1-p) \cdot \left(\frac{1-p}{p}\right)^{Y_n} + p \cdot \left(\frac{1-p}{p}\right)^{Y_n} \\
+&= \left(\frac{1-p}{p}\right)^{Y_n} = Y'_n
+\end{aligned}
+$$
+
+所以$Y'$也是鞅
+
+$$
+E[Y'_T]=E[(\frac{1-p}{p})^{Y_T}]=Y'_0=(\frac{1-p}{p})^{a}
+$$
+
+还是用期望反推概率，设$e$为最失败的概率
+
+$$
+(\frac{1-p}{p})^{a} = (1-e) (\frac{1-p}{p})^{a+b} + e (\frac{1-p}{p})^0
+$$
+
+$$
+e\left(1-(\frac{1-p}{p})^{a+b}\right) = (\frac{1-p}{p})^{a}-(\frac{1-p}{p})^{a+b}
+$$
+
+$$
+e = \frac{(\frac{1-p}{p})^{a}-(\frac{1-p}{p})^{a+b}}{1-(\frac{1-p}{p})^{a+b}}
+$$
+
+也可以用来求期望步数
+
+定义$Z'_n = Y_n - n(p-(1-p))$
+
+$$
+\begin{aligned}
+E[Z'_{n+1}|X_{1 \ldots n}] &=  E[ Y_{n+1} |X_{1 \ldots n}] - (n+1)(p-(1-p)) \\
+&= Y_n + p \cdot 1 + (1-p) \cdot (-1) - (n+1)(p-(1-p)) \\
+&= Y_n + n(p-(1-p)) = Z'_n
+\end{aligned}
+$$
+
+所以$Z'_n$是鞅
+
+$$
+a = E[Z'_0] = E[Z'_T] = E[Y_T - T(p-(1-p))] = E[Y_T] - (p-(1-p))E[T]
+$$
+
+$$
+E[T] = \frac{E[Y_T]-a}{p-(1-p)}
+$$
+
+##### CF850F Rainbow Balls
+
+$n$种颜色的球，第$i$种有$a_i$个，每次随机选出两个球，把第一个染成第二个的颜色放回，问所有球同色次数的期望。
+
+$n \le 2500, a_i \le 10^5$
+
+<CollapsibleComponent title="解方程法">   
+
+设$p_{i,k}$是第$k$次后都是颜色$i$的概率，答案是
+
+$$
+\sum_{i=1}^{n}\sum_{k=1}^{\infty}k \cdot p_{i,k}
+$$
+
+令$S=\sum a_i$
+
+单独考虑第$i$种球，设$f_x$是当前有$x$个球的期望，要求$x$在到达$0$之前到达$S$，则
+
+$$
+f_x = p f_{x-1} + p f_{x+1} + (1-2p)f_x + \frac{x}{S}, p = \frac{x(S-x)}{S(S-1)}
+$$
+
+注意最后的常数项是$\frac{x}{S}$而不是$1$
+
+</CollapsibleComponent>
+
+<CollapsibleComponent title="停时定理法">
+
+用停时定理求期望步数，其实就是构造一个势能函数$\phi(n)$，使得$\{\phi(n)-n\}$是鞅，即每操作一步，势能期望增加$1$
+
+针对这个题，考虑构造势能函数$\phi=\sum_{i=1}^{n} f(a_i)$，$a_i$为当前第$i$种球的个数
+
+然后解方程解出$f(a_i)=a_i(a_i-1)$
+
+（其实本质上和动态规划是一样的
+
+</CollapsibleComponent>
+
+##### CF1349D Slime and Biscuits
+    
+有$n$个人，第$i$个人有$a_i$个饼干
+
+每次随机选择一个饼干，将其随机分配给除了自己以外的$n-1$个人
+
+求使得一个人拥有所有饼干的期望步数
+
+<CollapsibleComponent title="解法">
+    和上一题差不多
+</CollapsibleComponent>

@@ -1,0 +1,122 @@
+---
+title: 类欧几里得算法
+---
+
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+
+## 类欧几里得算法
+
+问题：给定 $a,b,c,n$，求 $\sum_{i=0}^n \left\lfloor \tfrac{ai+b}{c} \right\rfloor$。
+
+数据范围 $0 < a,b,c,n < 10^{18}$。
+
+## 类欧几里得算法
+
+当 $a \ge c$ 或 $b \ge c$ 时，可以直接把整数部分提出来单独计算。
+
+几何意义：这是 $[0,n]$ 内，直线 $y=\tfrac{ax+b}{c}$ 下方、x 轴上方的整点个数。
+
+![](/images/o1.png)
+
+## 类欧几里得算法
+
+以点 $\big(n,\ \left\lfloor \tfrac{an+b}{c} \right\rfloor\big)$ 为原点重建坐标轴：
+
+![](/images/o2.png)
+
+## 类欧几里得算法
+
+切换坐标轴后直线的斜率变为原来的倒数。取新坐标系的点 $\big( \left\lfloor \tfrac{an+b}{c} \right\rfloor -\tfrac{an+b}{c},\ 0\big)$ 解出截距：
+
+$$B = n + \tfrac{b}{a} - \tfrac{c}{a}\left\lfloor \tfrac{an+b}{c} \right\rfloor$$
+
+推导得到：
+
+$$
+\begin{aligned}
+ans
+&= \sum_{i=0}^{\left\lfloor\tfrac{an+b}{c}\right\rfloor-1} \left\lfloor \tfrac{c}{a} i + n + \tfrac{b}{a} - \tfrac{c}{a} \left\lfloor \tfrac{an+b}{c}\right\rfloor \right\rfloor + 1 \\
+&= \sum_{i=0}^{\left\lfloor\tfrac{an+b}{c}\right\rfloor-1} \left\lfloor \tfrac{ci+a(n+1)+b - c\left\lfloor \tfrac{an+b}{c} \right\rfloor}{a} \right\rfloor
+\end{aligned}
+$$
+
+其中 $+1$ 为翻转坐标轴后统计在 x 轴上的点。
+
+## 类欧几里得算法 · 代数方法
+
+$$
+\begin{aligned}
+\sum_{i=0}^n \left\lfloor \tfrac{ai+b}{c} \right\rfloor &= \sum_{i=0}^n \sum_{y=0}^{m} [y< \left\lfloor \tfrac{ai+b}{c} \right\rfloor] \quad (m=\left\lfloor \tfrac{an+b}{c} \right\rfloor-1) \\
+&=\sum_{i=0}^n \sum_{y=0}^{m} [(y+1)c \le ai+b] \\
+&=\sum_{i=0}^n \sum_{y=0}^{m} [ai \ge yc+c-b] \\
+&=(n+1) \times (m+1)-\sum_{y=0}^{m} \sum_{i=0}^{n} [ai < yc+c-b]
+\end{aligned}
+$$
+
+## 类欧几里得算法 · 代数方法
+
+$$
+\begin{aligned}
+\sum_{i=0}^n \left\lfloor \tfrac{ai+b}{c} \right\rfloor
+&=(n+1) \times (m+1)-\sum_{y=0}^{m} \sum_{i=0}^{n} \big[i\le \left\lfloor\tfrac{yc+c-b-1}{a} \right\rfloor\big] \\
+&=n \times (m+1)-\sum_{y=0}^{m} \sum_{i=0}^{n} \big[i< \left\lfloor \tfrac{yc+c-b-1}{a} \right\rfloor\big] \\
+&=n \times (m+1)-\sum_{y=0}^{m} \left\lfloor \tfrac{yc+c-b-1}{a} \right\rfloor
+\end{aligned}
+$$
+
+## abc313G Redistribution of Piles
+
+你有从 $1$ 到 $N$ 编号的 $N$ 盘石子，第 $i$ 盘石子的个数为 $a_i$，同时你还有一个空背包。
+
+你可以进行以下操作任意次：
+
+1. 从有一个以上石头的盘子里各拿一个石头。取下的石头移动到背包里。
+2. 当背包中有大于等于 $N$ 个石子时，从背包中拿出 $N$ 个石子，每盘各放入一个石子。
+
+问最终得到的 $N$ 堆石子个数组成的序列有多少种，答案对 $998244353$ 取模。
+
+$1 \le N \le 2 \times 10^5$
+
+## abc313G Redistribution of Piles
+
+先把 $A$ 进行排序。
+
+注意到，操作二后面接操作一没有意义，所以可以规定先做若干次操作一，再做操作二。
+
+做完一定次数的操作一以后，效果是：$A$ 的一个前缀变成全 $0$，然后一个后缀整体减小一个值。
+
+如果在 $A_1$ 变成 $0$ 以后还继续操作，则操作一的次数不同就一定是不同的方案。所以，可以枚举操作一使得哪一个前缀变成全 $0$，然后此时背包里的石子数 $/\ (N+1)$ 就是在此基础上做若干次操作二的方案数。
+
+枚举完前缀以后，对应的操作一和操作二的方案数就是一个类欧几里得算法问题。
+
+## abc402g Sum of Prod of Mod of Linear
+
+You are given integers $N, M, A, B_1, B_2$.
+
+$$\sum_{k=0}^{N-1} \{ (Ak + B_1) \bmod M \} \{ (Ak + B_2) \bmod M \}$$
+
+There are $T$ test cases; solve each one.
+
+$T \le 10^5,\ N,M \le 10^6$
+
+## 万能欧几里得算法
+
+模型：在平面直角坐标系中，有一条直线 $y=\tfrac{px+r}{q}$，当碰到一条横线时，执行 $U$ 操作，当碰到一条竖线时，执行 $R$ 操作（同时碰到先执行 $U$）。操作需要满足结合律，不需要交换律。假设结合用 $\cdot$ 表示。
+
+你需要求出从左端点走到右端点的答案。
+
+## 万能欧几里得算法
+
+设 $solve(p,q,r,l,a,b)$ 表示 $y=\tfrac{px+r}{q}$ 在 $(0,l]$ 内，$U$ 操作为 $a$，$R$ 操作为 $b$ 的总操作情况。
+
+当 $p \ge q$ 时，每次 $R$ 之前一定有 $\left\lfloor \tfrac{p}{q} \right\rfloor$ 次 $U$ 操作，所以可以和 $R$ 捆绑，转换为 $solve(p \bmod q,\ q,\ r,\ l,\ a,\ a^{\left\lfloor \tfrac{p}{q} \right\rfloor} b)$。
+
+否则，考虑把坐标轴切换，把图像沿 $y=x$ 对称。
+
+具体推导与类欧几里得算法类似。
+
+## P5170 类欧几里得算法模板
+
+给定 $n,\,a,\,b,\,c$，分别求 $\sum\limits_{i=0}^{n}\left\lfloor \tfrac{ai+b}{c} \right\rfloor$，$\sum\limits_{i=0}^{n}\left(\left\lfloor \tfrac{ai+b}{c} \right\rfloor\right)^2$，$\sum\limits_{i=0}^{n} i\left\lfloor \tfrac{ai+b}{c} \right\rfloor$，答案对 $998244353$ 取模。多组数据。
+
+对于所有测试点，有 $1 \leqslant t \leqslant 10^5,\ 0 \leqslant n,\,a,\,b,\,c \leqslant 10^9,\ c \neq 0$。

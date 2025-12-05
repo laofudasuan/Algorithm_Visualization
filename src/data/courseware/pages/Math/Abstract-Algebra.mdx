@@ -1,0 +1,151 @@
+---
+title: 抽象代数
+---
+
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+
+# 抽象代数
+## 群(Group)
+
+### 群(Group)
+
+定义在一个集合$S$上的运算$\times$满足下列四种性质，
+
+- 封闭性(Closure) $\forall x,y \in S, x\times y \in S$
+- 结合律(Associativity) $\forall x,y,z \in S, (x \times y)\times z=x \times (y \times z)$
+- 存在单位元(Identity element) $\exists e \in S, \forall x \in S, x \times e=e \times x=x$
+- 存在逆元(Inverse element) $\forall x \in S, \exists x^{-1} \in S, x \times x^{-1}=e$
+
+$$\forall x \in S, k \in \mathbb{N}^*, x^k=\left\{ \begin{array}{ll} 0 & k=0 \\ \underbrace{x \times x \times \ldots \times x}_{k \ \ x'\text{s}} & k>0 \end{array} \right. $$
+
+$$|x|=\min(k|x^k=e)$$
+
+一般把$x \times y$记作$xy$
+
+群$S$的一个子集$T$被称为$S$的生成集(Generator)当且仅当
+
+$$\forall x \in S, \exists y_1,y_2,\ldots,y_m \in T, y_1 \times y_2 \times \ldots \times y_m=x$$
+
+ 
+
+### 一些基本群
+
+- $(\mathbb{R},+)$
+- $(\mathbb{R}\\backslash \{0\},\times)$
+- 置换群(Symmetric group)：$S_n$为$1,2,3,\ldots,n$的所有排列构成的群，$|S_n|=n!$
+- 阿贝尔群(Abelian group)：满足交换律：$\forall x,y \in S, x \times y=y \times x$
+- 二面体群(Dihedral group)：$D_n$正为$n$边形旋转和翻转的群
+- 循环群(Cyclic group)：存在大小为$1$的生成集
+ 
+
+### 群的性质
+
+ 
+- [单位元唯一] 如果存在两个单位元$e_1,e_2$，则$e_1e_2=e_1,e_1e_2=e_2 \to e_1=e_2$
+- [逆元唯一] 如果$a$有逆元$x,y$，则$x=xay=y$
+- [$ (x^{-1})^{-1}=x $]
+- [$ au=bu \leftrightarrow a=b $]
+ 
+ 
+
+### 同态和同构
+
+**同态(homomorphism)**
+一个映射 $\varphi: (G,\times) \to (H,\diamond)$满足：
+- $\forall x,y \in G,\varphi(x \times y)=\varphi(x) \diamond \varphi(y)$
+
+**同构(isomorphism)**
+一个映射 $\varphi: (G,\times) \to (H,\diamond)$满足：
+
+- $\forall x,y \in G,\varphi(x \times y)=\varphi(x) \diamond \varphi(y)$
+- $\varphi$可逆
+
+同构的性质：
+
+- $|G|=|H|$
+- $G$为阿贝尔群当且仅当$H$为阿贝尔群
+- $\forall x \in G,|x|=|\varphi(x)|$
+- 如果$T \subseteq S$为一组$S$的生成集，则$\{\varphi(x)|x \in T\}$为一组$H$的生成集
+
+ 
+ 
+
+### 群作用(Group action)
+
+一个从$G \times A$到$A$的映射，满足：
+
+- $\forall g_1,g_2 \in G,a \in A$, $g_1 \cdot (g_2 \cdot a)=(g_1g_2) \times a$
+- $\forall a \in A, e \cdot a=a$
+
+定义$\sigma_g$为一个从$A$到$A$的映射，$\sigma_g(a)=g \cdot a$，则$\sigma_g \in S_{G}$
+
+群作用的核(Kernel of a action)：
+
+$$\{g|g \in G, \forall a \in A, g \cdot a=a\}$$
+
+ 
+
+### 子群(subgroup)
+
+**子群**
+一个群$G$的子群为$G$的一个子集$H$，满足：
+
+- $H \neq \emptyset$
+- 加法封闭性(Addition Closure) $\forall x,y \in H, x\times y \in H$
+- 逆元封闭性(Inverse Closure) $\forall x \in H, x^{-1} \in H$
+
+**结论**
+$|H|$有限+$H$满足加法封闭性$\to \ H$满足逆元封闭性
+
+**推论**
+
+$H$是$G$的子群当且仅当
+
+- $H \neq \emptyset$
+- $\forall x,y \in H,xy^{-1} \in H$
+
+ 
+
+### 术语与集合
+
+- [中心化子(Centralizer)] $C_G(A)=\{g|g \in G, \forall a \in A,gag^{-1}=a\}$
+- [中心(Center)] $Z(G)=\{g|g \in G,\forall x \in G,gx=xg\}$
+- [正规化子(Normalizer)] $N_G(A)=\{g|g \in G, \forall a \in A,gag^{-1} \in A\}$
+
+$$C_G(A) \subseteq N_G(A)$$
+
+ 
+
+### 旁集(coset)
+
+**左旁集(left coset)**
+令子群$K$为群$G$的子群，则可以定义左旁集为$gK,g \in G$, 满足
+
+$$\forall u,v \in G,(uK) \cdot (vK)=(uv)K$$
+
+令$N$为$G$的一个子群，那么左旁集集合构成了$G$的一个划分(partition)：
+
+$$\forall u,v \in G, uN=vN \text{  iff  } v^{-1}u \in N$$
+
+记这个为商群(quotient group)
+
+ 
+
+### 正规子群与拉格朗日定理
+
+**正规子群**
+$N$为$G$的正规子群需要满足$\forall g \in G,g^{-1}Ng=N$
+
+推论：$N$为$G$的正规子群当且仅当$N$为某个同态下的核
+
+**拉格朗日定理**
+$H$为$G$的子群，则左旁集的数量是$|G|/|H|$
+ 
+
+### 轨道公式
+
+- [轨道(Orbit)] $\forall x \in S$，定义$x$的轨道为：$Gs=\{gx|g \in G\}$
+- [稳定器(Stabilizer)] $G_s=\{g|g \in G, \forall s \in S, g \cdot s=s\}$
+- [轨道公式] $|Gx|=[G:G_s]$
+
+ 

@@ -1,0 +1,277 @@
+---
+title: 莫比乌斯反演
+---
+
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+
+## 什么是莫比乌斯反演？
+
+    首先定义这样一个函数$F(n) = \sum_{d|n} f(d)$，则有：
+
+    $$
+    \begin{aligned}
+        F(1)&=f(1) \\
+        F(2)&=f(1)+f(2) \\
+        F(3)&=f(1)+f(3) \\
+        F(4)&=f(1)+f(2)+f(4) \\
+        F(5)&=f(1)+f(5) \\
+        F(6)&=f(1)+f(2)+f(3)+f(6) \\
+        F(7)&=f(1)+f(7) \\
+        F(8)&=f(1)+f(2)+f(4)+f(8)
+    \end{aligned}
+    $$
+ 
+
+## 什么是莫比乌斯反演？
+    反演，通过$F$推出$f$
+
+    $$
+    \begin{aligned}
+        f(1)&=F(1) \\
+        f(2)&=F(2)-F(1) \\
+        f(3)&=F(3)-F(1) \\
+        f(4)&=F(4)-F(2) \\
+        f(5)&=F(5)-F(1) \\
+        f(6)&=F(6)-F(3)-F(2)+F(1) \\
+        f(7)&=F(7)-F(1) \\
+        f(8)&=F(8)-F(4)
+    \end{aligned}
+    $$
+ 
+
+## 莫比乌斯反演
+
+    $$F(n)=\sum_{d|n}f(d) \Longrightarrow f(n) = \sum_{d|n} \mu(d)F(\frac{n}{d})$$
+
+    莫比乌斯函数的定义为
+
+	$$\mu_i= \left\{  \begin{array}{ll} 1 & i=1 \\ (-1)^k & i=p_1p_2\ldots p_k \\ 0 & \text{Other} \end{array} \right.$$
+ 
+
+## 莫比乌斯反演
+
+    重要定理：
+
+    $$\sum_{d|n}\mu(d) = [n==1]$$
+
+    证明：当$n==1$时显然，否则，相当于把每个质因子进行容斥
+
+    如果有$k$个质因子，根据二项式定理$\sum_{i=0}^{k}\binom{k}{i}(-1)^i=(1-1)^k=[k==0]$
+ 
+
+## 好用的公式
+
+    $$\sum_{d|n} \varphi(d) = n$$
+
+    为什么? 
+
+    考虑$gcd(1,n),gcd(2,n),\ldots,gcd(n,n)$
+
+    $gcd$为$d$的恰好有$\varphi(n/d)$个
+ 
+
+## 好用的公式
+    $$\sum_{d|n} \varphi(d) = n$$
+
+    根据刚刚讲过的莫比乌斯反演，可以用$F(n)=n$反演出$\varphi$
+
+    $$\sum_{d|n}\mu(d) \times \frac{n}{d} = \varphi(n)$$
+
+    也可以写成
+
+    $$\sum_{d|n}\frac{\mu(d)}{d} = \frac{\varphi(n)}{n}$$
+ 
+
+## 一个基础例题
+
+    求
+
+    $$\sum_{x=1}^{n}\sum_{y=1}^{m} gcd(x,y)$$
+
+    数据范围$n,m \le 10^7$
+ 
+
+## 一个基础例题（推导）
+
+    $$
+    \begin{aligned}
+        \sum_{x=1}^{n}\sum_{y=1}^{m} gcd(x,y) &= \sum_{x=1}^{n}\sum_{y=1}^{m} \sum_{d|x,d|y} \varphi(d) \\
+        &= \sum_{d=1}^{n} \varphi(d) \sum_{x=1}^{\lfloor \frac{n}{d} \rfloor} \sum_{y=1}^{ \lfloor \frac{m}{d} \rfloor} 1 \\
+        &= \sum_{d=1}^{n} \varphi(d) \lfloor \frac{n}{d} \rfloor \times \lfloor \frac{m}{d} \rfloor
+    \end{aligned}
+    $$
+ 
+
+## 一个基础例题
+    这样我们就得到了一个$O(n)$的做法
+
+    先用线性筛预处理$\varphi$，然后再枚举$d$
+
+    加强到$10000$组询问怎么做？
+
+    求出$\varphi$的前缀和，利用$\frac{n}{d}$分块计算
+ 
+
+## 一个基础例题
+
+    代码实现
+    
+    ![](/images/M1.png)
+ 
+
+## 例题
+
+    求
+
+    $$\sum_{x=1}^{n}\sum_{y=1}^{m} lcm(x,y)$$
+
+    数据范围$n,m \le 10^7$
+ 
+
+## 例题
+    ![](/images/M2.png)
+ 
+
+## 例题
+    ![](/images/M3.png)
+ 
+
+## BZOJ 2440 完全平方数
+    题目大意：求第k个无平方因子数
+
+    无平方因子数(Square-Free Number)，即分解之后所有质因数的次数都为1的数
+
+    $k \le 10^9$
+ 
+
+## BZOJ 2440 完全平方数
+    首先二分答案 问题转化为求$[1,x]$之间有多少个无平方因子数
+    
+    根据容斥原理可知，对于$\sqrt{x}$以内所有的质数，有$x$以内的无平方因子数
+
+    $=0$个质数乘积的平方的倍数的数的数量($1$的倍数)
+    
+    $-$每个质数的平方的倍数的数的数量($9$的倍数,$25$的倍数,...)
+    
+    $+$每$2$个质数乘积的平方的倍数的数的数量($36$的倍数,$100$的倍数,...)$-$...
+ 
+
+## BZOJ 2440 完全平方数
+    容易发现每个乘积$a$前面的符号恰好是$mu(a)$ (例如$\mu(3)=-1$故$9$对答案的贡献为负；$\mu(6)=1$，故$36$对答案的贡献为正)
+
+    $x$以内$i^2$的倍数有$\lfloor \frac{x}{i^2} \rfloor$个
+    
+    故有
+    
+    $$Q(x) = \sum_{i=1}^{\lfloor \sqrt{x} \rfloor} \mu(i) \lfloor \frac{x}{i^2} \rfloor$$
+ 
+
+
+## 莫比乌斯反演例题集
+    - P4844 LJJ爱数数
+    - P3911 最小公倍数之和
+    - P4152 [WC2014] 时空穿梭
+    - CF809E Surprise me!
+    - P13645 Totient with Divisors
+    - P8570 [JRKSJ R6] 牵连的世界
+    - P1587 [NOI2016] 循环之美
+ 
+
+## P2257 YY的gcd
+    给出 $n,m$，求有多少对$(x,y)$满⾜
+    - $1 \le x \le n$
+    - $1 \le y \le m$
+    - $gcd(x, y)$ 为质数
+    - $n, m \le 10^7$
+    - $10000$组询问
+ 
+
+## P2257 YY的gcd
+    $$\sum_{p\text{ is a prime}} \sum_d \mu(d) \lfloor \frac{n}{pd} \rfloor \lfloor \frac{m}{pd} \rfloor$$
+
+    改为先枚举$T = p \times d$
+
+    $$\sum_T \lfloor \frac{n}{T} \rfloor \lfloor \frac{m}{T} \rfloor \sum_{p|T,p\text{ is a prime} \mu(T/p)}$$
+
+    后面设为g(T), 我们对每个质数$p$，暴⼒枚举它的倍数，能把$g$预处理出来
+    
+    然后把$g$的前缀和算出来
+    
+    单次询问$ O(\sqrt{n})$
+ 
+
+## P3312 SDOI2014 数表
+    题目大意：令$F(i)$为$i$的约数和，$q$次给定$n,m,a$,求
+
+    $$\sum_{i \in [1,n], j \in [1,m], F(gcd(i,j)) \le a} F(gcd(i,j)) \bmod 2^{31}$$
+
+    $n,m \le 10^5,q \le 2W,a \le 10^9$
+ 
+
+## P3312 SDOI2014 数表
+    
+    $a$的限制十分讨厌 我们首先假设没有这个限制
+
+    令$g(i)$为$1 \le x \le n,1 \le y \le m,gcd(x,y)=i$的数对$(x,y)$的个数，那么
+
+    $$g(i) = \sum_{i|d} \mu(\frac{d}{i})\lfloor \frac{n}{d} \rfloor \lfloor \frac{m}{d} \rfloor$$
+ 
+
+## P3312 SDOI2014 数表
+
+    $F(i)$利用线性筛可以在$O(n)$时间内处理出来 那么就有
+
+    $$\sum_{i=1}^{n} f(i) \sum_{i|d} \mu(\frac{d}{i})\lfloor \frac{n}{d} \rfloor \lfloor \frac{m}{d} \rfloor  = \sum_d \lfloor \frac{n}{d} \rfloor \lfloor \frac{m}{d} \rfloor \sum _{i|d} f(i)\mu(\frac{d}{i})$$
+
+    现在我们只要有$\sum_{i|d}f(i)\mu(\frac{d}{i})$的前缀和就可以在$O(\sqrt{n})$时间内解决这个弱化版的问题
+
+    枚举每一个$i$，暴力更新$i$的倍数，然后处理前缀和，这样做是$O(n\log n)$的
+    
+    那么现在有了a的限制怎么搞呢？
+ 
+
+## P3312 SDOI2014 数表
+我们发现对答案有贡献的$i$只有$F(i) \le a$的$i$
+
+我们离线处理，将询问按照$a$排序，$i$按照$F(i)$排序
+
+每次询问将所有$F(i) \le a$的$i$按照之前的方式插入，用树状数组维护前缀和即可
+
+时间复杂度$O(n \log^2(n)+q\sqrt{n}\log(n))$
+
+ 
+
+## P5438 XR-2 记忆
+	对于一个序列$P$，定义权值为满足$P_i \times P_{i+1}$为平方数的$i$的个数
+
+	现在$P$中含有数$[l,r] \cap Z$，求可能得最大权值
+
+	$l,r \le 10^{14}$，时限$1.2S$
+ 
+
+## P5438 XR-2 记忆
+	两个数相乘为平方数，即两个数的奇数次的因子相同
+
+	这样，就可以按照奇数次因子分类，将同类的数放在一起，答案为$r-l-$等价类个数
+
+	现在的目标就是求等价类个数。
+
+	枚举奇次数质因子的积，考虑有多少个偶次数质因子也就是平方数能配合。
+
+	$$Ans=\sum_{i=1}^{r} \mu^2(i) [\lfloor \sqrt{r/i} \rfloor - \lfloor \sqrt{(l-1)/i} \rfloor > 0]$$
+ 
+
+## P5438 XR-2 记忆
+	$$Ans=\sum_{i=1}^{r} \mu^2(i) [\lfloor \sqrt{r/i} \rfloor - \lfloor \sqrt{(l-1)/i} \rfloor > 0]$$
+
+	对下取整可以做数论分块，需要快速计算$\mu^2(i)$的前缀和
+
+	同时$\sum_{i=1}^{n} \mu^2(i)=\sum_{i=1}^{\sqrt{n}}\mu(i)\lfloor \frac{n}{i^2} \rfloor$，这个可以数论分块
+
+	复杂度可以被证明为$O(n^{4/9})$
+ 
+
+## 组合数学杂烩题（P5824 十二重计数法）
+
+    组合数学合集
+ 

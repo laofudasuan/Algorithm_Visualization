@@ -1,0 +1,64 @@
+---
+title: 扩展欧几里得
+---
+
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+
+## 扩展欧几里得
+
+解方程 $ax+by=\gcd(a,b)$。
+
+我们先求出任意一组解 $(x_0,y_0)$，那么，任意一组解 $(x,y)$ 都可以表示为：
+
+$$
+\begin{aligned}
+x &= x_0 + k\frac{b}{\gcd(a,b)} \\
+y &= y_0 - k\frac{a}{\gcd(a,b)}
+\end{aligned}
+$$
+
+## 扩展欧几里得
+
+如何求出任意一组解？
+
+我们先求出 $bx+(a \bmod b)y=\gcd(a,b)$。
+
+由于 $a \bmod b=a-\lfloor \frac{a}{b} \rfloor b$：
+
+$$bx+ay-\lfloor \tfrac{a}{b} \rfloor by=\gcd(a,b)$$
+
+$$ay+b\big(x-\lfloor \tfrac{a}{b} \rfloor\big)=\gcd(a,b)$$
+
+## 分数逼近问题
+
+给定 $a,b,c,d$，求最小的 $v$ 使得 $\frac{a}{b}<\frac{u}{v}<\frac{c}{d}$。
+
+$0 < a,b,c,d < 10^{18}$。
+
+首先如果 $a \ge b$，那么我们可以把所有项全部减去 $\lfloor \tfrac{a}{b} \rfloor$。
+
+那么就可以保证 $a<b$，此时如果 $c>d$，那么答案就为 $u=v=1$。
+
+否则可以同时保证 $a<b,\ c<d$，那么可以对分式进行取倒数操作。
+
+两个数取倒数后大小关系取反，故有 $\frac{d}{c}<\frac{v}{u}<\frac{b}{a}$。
+
+## 分数逼近问题
+
+结论：最小化 $u$ 和最小化 $v$ 是等价的。
+
+变成了一个递归子问题。由于递归一次后又有 $d \ge c,\ b \ge a$，这就类似于辗转相除法，所以复杂度是 $\log$ 级别的。
+
+该算法的边界条件是 $a=0$。当 $a=0$ 时 $v,u$ 只要为正整数都满足 $\frac{a}{b}<\frac{u}{v}$，所以只需要考虑小于号的条件。
+
+可以强制 $a=1$，然后寻找最小的 $b$。既然要满足 $\frac{u}{v}<\frac{c}{d}$，那么取 $b= \lfloor \tfrac{d}{c} \rfloor + 1$ 即可。
+
+## [AGC063D] Many CRT
+
+给定正整数 $N,\ a,\ b,\ c,\ d$。
+
+请判断是否存在非负整数 $x$，使得对于所有 $k=0,1,\ldots,N-1$，都有 $x\equiv a+kb\pmod{c+kd}$。如果存在，请输出所有满足条件的 $x$ 中最小的一个对 $998244353$ 取模的结果；如果不存在，请输出 $-1$。
+
+$2\leq N\leq 10^6$，$1\leq a,b,c,d\leq 10^6$。
+
+## P10760 [BalticOI 2024] Portal

@@ -1,0 +1,129 @@
+---
+title: 矩阵
+---
+
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+
+# 拓展内容
+
+## 特征值
+
+对于方阵$A$，如果存在数$\lambda$和非零$n$阶向量$x$，满足$Ax=\lambda x$，则称$\lambda$是$A$的特征值，$x$是关于$\lambda$的特征向量
+
+如何求出特征值？把式子移项变成$(A-\lambda I)x=0$
+
+把方阵A消元成上三角矩阵，这样，对角线上的元素就是所有特征根，可能有重根
+
+$$
+|A-\lambda I|=0
+$$
+
+这个式子是关于λ的一个一元$n$次方程，称为特征方程
+
+方程左侧称为特征多项式，方程的解即为特征值
+
+Hamilton-Caylay定理说明，设$M$是域$F$上的矩阵，$M$的特征多项式$P(x)=\sum_{i=0}^n a_i x^i $是M的零化多项式，即$P(M)=0$
+    
+这说明了，对于任意的$M^x$都可以由$I,M,M^2,M^3\ldots M^{n-1}$的线性组合表出。
+
+## 矩阵对角化
+
+如果一个矩阵$M$存在$n$个线性无关的特征向量$V_1,V_2,\ldots,V_n$，我们可以将这些特征向量作为一个列向量写成一个矩阵$A$
+
+计算$M$和$A$的乘积$MA$，由于矩阵$A$的第$j$列对应特征向量$V_j$，则$MA$的第$j$列等于$MV_j$，根据特征向量的定义，$MV_j=\lambda_jV_j$，故
+
+$$
+MA=[\lambda_1 V_1   \lambda_2 V_2  \ldots  \lambda_n V_n]=A\begin{pmatrix}\lambda_1 & \ldots & 0 \\ \vdots & \ddots & \vdots \\ 0 & \ldots & \lambda_n\end{pmatrix}
+$$
+
+我们将这个对角阵记为$U$，称为特征矩阵
+
+$$
+A^{-1} MA=U
+$$
+
+$$
+M=AUA^{-1}
+$$
+
+矩阵对角化的主要作用就是优化矩阵快速幂
+
+$$
+M^k=(AUA^{-1})^k=AUA^{-1} AUA^{-1} AUA^{-1}\ldots AUA^{-1}
+$$
+
+由于
+
+$$
+AUA^{-1}AΛA^{-1}=AU^2 A^{-1}
+$$
+
+所以
+
+$$
+M^k=AU^k A^{-1}
+$$
+
+由于$U$是对角矩阵，所以$U^k$就是对角线每个元素的$k$次幂，可以$n\log k$计算
+
+一个结论：求出$M$的$n$个特征向量，然后这$n$个列向量构成的矩阵就是$A$
+
+## 线性常系数递推
+
+对于一个数列$a_n$，如果满足递推关系
+
+$$
+a_n=\sum_{i=1}^k a_{n-i} b_i
+$$
+
+则称数列$\{a_n\}$满足k阶常系数线性齐次递推关系
+
+通常我们已知$a_{0 \ldots k-1}$，要求解某一项$a_n$
+
+用经典的矩阵乘法
+
+$$
+\begin{pmatrix} b_1&b_2&b_3&b_4&\cdots&b_k \\ 1&0&0&0&\cdots&0 \\ 0&1&0&0& \cdots &0 \\ \ddots&\ddots&\ddots&\ddots&\ddots&\ddots \\ 0&0&0&1&0&0 \\ 0&0&0&0&1&0 \\ 0&0&0&0&0&1 \end{pmatrix} \begin{pmatrix} a_{k-1}\\ a_{k-2} \\ a_{k-3} \\ \vdots \\ a_0 \end{pmatrix}=\begin{pmatrix}a_k \\ a_{k-1} \\ a_{k-2} \\ \vdots \\ a_1 \end{pmatrix}
+$$
+
+考虑$M$的特征多项式，$f(\lambda )=|\lambda E-M|=$
+
+$$
+\left|\begin{pmatrix} \lambda-a_1&-a_2&-a_3&\cdots&-a_{k-1}&-a_k \\ -1&\lambda&0&\cdots&0&0 \\ 0&-1&\lambda&\cdots&0&0 \\ \vdots & \vdots & \vdots & \ddots &0&0 \\ 0&0&0&-1&\lambda&0 \\ 0&0&0&0&-1&\lambda \end{pmatrix}\right|
+$$
+
+展开之后可以得到$f(\lambda)=\lambda^k-a_1 \lambda^{k-1}-a_2 \lambda^{k-2}-\cdots-a_k \lambda^0$
+
+根据Hamilton-Cayley定理，$f(M)=0$
+
+结论：$\forall i,M^i$都可以表示成$E,M,M^2,\ldots,M^{k-1}$的线性组合
+
+当$i<k$时一定成立,因为$f(M)=0$，所以$M^k=a_1M^{k-1}+a_2 M^{k-2} + \cdots +a_k M^0，i=k$时结论成立
+
+用数学归纳法，假设$i<t$时成立，那么用$M^(t-1) \times M^1$可以表示出$M^t$，所以$M^t$可以表示成$E,M,M^2,\ldots,M^k$的线性组合表出
+
+注意到$f(M)=0$可以得到$M^i f(M)=0=M^{i+k}-a_1 M^{i+k-1}- \cdots a_k M^i$
+
+把$M^k$可以用$E,M,M^2,…,M^{k-1}$再次带入
+
+所以$M^t$也可以被表示成$E,M,M^2,\ldots,M^{k-1}$的线性组合
+
+那么我们只需要快速幂求出$M^n$的线性表示系数就可以了
+
+假设我们要把两组系数$x,y$相乘
+
+$$
+(\sum_{i=0}^{k-1} x_i M^i ) \times (\sum_{i=0}^{k-1} y_i M^i )
+$$
+
+这是一个多项式乘法的形式。我们将得到一个最高次为$2k-2$的多项式\
+
+然后每次带入$M^{i+k}=a_1 M^{i+k-1}+\cdots a_k M^i$
+
+最终可以化简成一个最高次为k的多项式。复杂度$k^2 logn$
+
+求出了$M^t$的线性$g$表示后就可以直接计算答案
+
+我们要求的答案为$\sum_{i=0}^{k-1} g_i M^i \times \begin{pmatrix} a_0 \\ \vdots  \\ a_{k-1} \end{pmatrix}$
+
+用矩阵乘法分配律拆开后计算再相加即可

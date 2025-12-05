@@ -1,0 +1,85 @@
+---
+title: Min25筛
+---
+
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+
+
+# Min25筛
+
+## 算法原理
+
+$$
+G(x)=\sum_{p \le x} [p\text{ is prime}]F(p) 
+$$
+
+$$
+\begin{aligned}
+\sum_{i=1}^{n} F(i)=&1+\sum_{i=2}^{n} F(i)[i\text{的最大质因子次数} \ge 2] \\
+&+\sum_{i=2}^{n}F(i)[i\text{的最大质因子次数} \ge 2]\left(G( \lfloor \frac{n}{i} \rfloor)-G(i\text{的最大质因子})\right)
+\end{aligned}
+$$
+
+对于一个数，如果它的最大质因子次数$ \ge 2$，那么显然数量不超过$\sqrt{n}$个，直接爆搜
+
+如果最大质因子次数=1，那么我们可以先爆搜非最大质因子的部分$k$，然后再和所有大于次大质因子，小于等于$\lfloor \frac{n}{k} \rfloor$的所有质数进行组合
+
+爆搜的复杂度大约是$O(n^{0.69})$的(证明比较复杂，感兴趣的可以看2018年朱震霆的集训队论文)
+
+何求解$G(x)$呢？对于大部分问题，当$p$为质数时$f(p)$是一个关于$p$的低次多项式，因此我们可以对于每一个$t$求
+
+$$
+G(x) = \sum_{p \le x}[p\text{ is prime}]f(p^t)
+$$
+ 
+### 求G
+
+先容斥DP，先假设$2 \sim n$的所有数都是质数，设为$G_0(x)$，然后一步步容斥掉非质数的项
+
+然后枚举所有的质数$p[1 \ldots m]G_k (x)$的意义为只统计$2 \sim x$中，质数或者每一个质因子都大于$p[k]$的数（也就是已经把$p[1 \sim k]$的倍数给去掉了）
+
+容斥的时候就减掉$p[k]$的倍数。因为我们要求解的$f$都形如$f(p)=p^k$，是完全积性的，所以$f(py)=f(p)f(y)$
+
+$$
+_k (x)=\left\{\begin{array}{ll} G_{k-1}(x) & x<p[k]^2 \\ G_{k-1} (x)-f(p_k)(G_{k-1} ( \lfloor \frac{x}{p[k]} \rfloor)-G_{k-1} (p[k]-1)) & p[k]^2 \le x \end{array}\right.
+$$
+
+求G的复杂度是$n^{0.75}/\log n$的。
+ 
+
+#### loj6053 简单的函数
+
+定义以下函数$f$：
+
+ - $f(1)=1$
+ - $f(p^c)=p\oplus c$
+ - $\forall gcd(a,b)=1,f(ab)=f(a)f(b)$
+
+求$\sum_{i=1}^{n}f(i), n \le 10^{10}$
+ 
+<CollapsibleComponent title="做法">
+使用Min25筛，第一步，先预处理质数的$f$前缀和
+
+初始假设所有数都是质数，注意到，质数中只有$p=2$的$f(p)=p+1$，其它的都是奇数，所以$f(p)=p-1$
+
+这样，可以先默认所有都是$p-1$，最后再把$2$的情况特判加回去
+</CollapsibleComponent>
+
+##### 算法马拉松33 E 奇怪的式子
+
+$$
+\prod_{i=1}^{n}\sigma_0(i)^{\mu(i)+i} \bmod (10^{12}+39)
+$$
+
+$\sigma_0$表示约数个数
+
+$3$组数据，$n \le 10^{11}$，时限$15S$
+ 
+<CollapsibleComponent title="解法">
+使用Min25筛，第一步，先预处理质数的$f$前缀和
+
+初始假设所有数都是质数，注意到，质数的$\sigma_0$都是$2$，$\mu$都是$1$，这样可以直接求和
+
+之后再进行爆搜
+</CollapsibleComponent>
+ 

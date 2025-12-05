@@ -1,0 +1,46 @@
+---
+title: 欧几里得算法
+---
+
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+
+# 欧拉定理
+
+$x^{\Phi(p)} \bmod p=1$，要求$x,p$互质
+
+###### 证明
+令$1 \sim n$中与n互质的数为$x_1,x_2,\ldots,x_{\Phi(n)}$
+
+考虑$ax_1,ax_2,…,ax_{\Phi(n)}$这些数，当$a$和$p$互质时，a的逆元存在，所以，一个$ax_i$只对应唯一一个$x_i$
+
+$ax_1,ax_2,…,ax_{\Phi(n)}$这些数两两不相同且与$n$互质
+
+$ax_1,ax_2,…,ax_{\Phi(n)}$就是$x_1,x_2,…,x_{\Phi(n)}$的一个排列
+
+$$
+\prod_{i=1}^{\Phi(n)} ax_i = a^{\Phi(n)}\prod_{i=1}^{\Phi(n)} x_i \equiv \prod_{i=1}^{\Phi(n)} x_i \to a^{\Phi(n)}  \equiv 1(\bmod p)
+$$
+
+# 拓展欧拉定理
+$$
+a^n \equiv \left\{ \begin{array}{ll} 
+a^{n \bmod \Phi(p)} & gcd⁡(a,p)=1 \\
+a^n & n<\Phi(p) \\
+a^{n mod \Phi(p)+ \Phi(p)} & n \ge \Phi(p) \end{array} \right.
+$$
+
+当$gcd(a,\Phi(p))$不为$1$时，$a$中与$\Phi(p)$互质的因子直接用欧拉定理，不互质的因子当$n \ge \Phi(p)$时就与$0$同余了。得证。
+
+##### CF906D
+
+给定$n$个数$w_1 \ldots w_n$和$q$个询问，每次给一个区间$[l,r]$和一个模数$p$，求
+
+$$
+w_l^{w_{l+1}^{w_{l+2}^{\ldots^{w_r}}}} \bmod p
+$$
+
+<CollapsibleComponent title="做法">
+结论：欧拉函数$\Phi$自迭代的深度是log级别的
+
+只需要暴力展开log层
+</CollapsibleComponent>

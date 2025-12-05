@@ -1,0 +1,77 @@
+---
+title: 杜教筛
+---
+
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+
+# 杜教筛
+
+## 狄利克雷卷积
+狄利克雷卷积是针对两个函数f和g的变换，它的定义式为
+
+$$(f \circ g)(n)=\sum_{d|n} f(d)g(\frac{n}{d})$$
+
+十分优美的性质:积性函数与积性函数的狄利克雷卷积仍然是积性函数。
+
+满足交换律、结合律以及对加法的分配律，可以化简很多式子。
+
+## 杜教筛
+	
+求解积性函数的前缀和$F(n)=\sum_{i=1}^{n} f(i)$
+
+方法为构造一个函数$g(n)$，然后对两个函数进行变换
+
+$$
+\sum_{i=1}^{n} (f \circ g)(i)=\sum_{i=1}^{n} \sum_{d|i} f(d)*g(\frac{i}{d})=\sum_{i=1}^{n} g(i)*F(\lfloor \frac{n}{i} \rfloor)
+$$
+
+$$
+g(1)F(n) =\sum_{i=1}^{n} (f \circ g)(i) - \sum_{i=2}^{n}g(i)F(\lfloor \frac{n}{i} \rfloor)
+$$
+
+如果能够快速求出狄利克雷卷积前缀和，那么就可以反推出$F$。
+
+直接带入的复杂度为$o(n^{3/4})$，如果用线性筛预处理前$n^{2/3}$项可以优化到$o(n^{2/3})$
+
+### 例题
+求莫比乌斯函数的前缀和
+
+莫比乌斯函数的定义为
+
+$$
+\mu_i= \left\{  \begin{array}{ll} 1 & i=1 \\ (-1)^k & i=p_1p_2\ldots p_k \\ 0 & \text{Other} \end{array} \right.
+$$
+
+<CollapsibleComponent title="解法">
+
+令$g_i=1$，则$(g \circ f)(i)=[i=1]$
+
+$$F(n)=1-\sum_{i=2}^{n}F(\lfloor \frac{n}{i} \rfloor)$$
+
+</CollapsibleComponent>
+ 
+### 例题
+
+求欧拉函数的前缀和
+
+欧拉函数的定义为
+
+$\Phi_i= $小于$i$并且与$i$互质的数的个数
+
+<CollapsibleComponent title="解法">
+ 
+令$g_i=1$，则$(g \circ f)(i)=i$
+
+$$F(n)=\frac{i(i+1)}{2}-\sum_{i=2}^{n}F(\lfloor \frac{n}{i} \rfloor)$$
+ 
+</CollapsibleComponent>
+
+## 杜教筛总结
+
+适用范围：一般用于一些直接求解很慢，但是能够快速计算狄利克雷卷积前缀和的函数
+
+注意事项
+- 题目的难点在于公式的推导，尤其是g函数的选取
+- 在计算答案时需要采用记忆化搜索以保证复杂度
+	
+ 
