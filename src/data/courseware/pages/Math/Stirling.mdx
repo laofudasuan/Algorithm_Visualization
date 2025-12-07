@@ -6,7 +6,7 @@ import { CollapsibleComponent } from '../../../courseware/markdownConfig';
 
 # 斯特林数
 
-## 斯特林数（第一类斯特林数）
+## 第一类斯特林数
 
 定义为$n$个不同人围$k$个相同圆桌而坐，要求各桌非空，其不同方案数。
 
@@ -22,7 +22,7 @@ $$
 
 所以$\sum_{i=1}^n S_1(n,i) =n!$
 
-## 斯特林数（第二类斯特林数）
+## 第二类斯特林数
 
 第二类斯特林数定义为把$n$个不同的球放入$m$个相同盒子中，每个格子都非空的方案数
     
@@ -30,7 +30,9 @@ $$
 S_2(n,m)=\left\{ \begin{array}{ll} 1 & n=m=0 \\ 0 & n\neq 0,m=0 \\ mS_2(n-1,m)+S_2(n-1,m-1) & \text{other} \end{array} \right.
 $$
 
-## 斯特林数与指数、上升幂、下降幂的展开式
+## 应用
+
+### 斯特林数与指数、上升幂、下降幂的展开式
     
 第二类斯特林数是把指数展开成下降幂的系数：
 
@@ -48,7 +50,7 @@ $$
 我们证明$x^{n}$也满足
 </BoxWithTag>
  
-## 斯特林数与指数、上升幂、下降幂的展开式
+### 斯特林数与指数、上升幂、下降幂的展开式
 
 $$
 \begin{aligned}
@@ -59,7 +61,7 @@ x^n&=\sum_{k=0}^{n-1} S_2(n-1,k) x^{\underline{k+1}} +\sum_{k=0}^{n-1} S_2(n-1,k
 \end{aligned}
 $$
 
-## 斯特林数与指数下降幂的展开式（组合意义）
+### 斯特林数与指数下降幂的展开式（组合意义）
 
 有n个球，x种颜色，要给每个球染一种颜色，方案数就是$x^n$
     
@@ -81,7 +83,7 @@ $$
 直接FFT求出。
  
 
-## 快速求第二类斯特林数某一列
+### 快速求第二类斯特林数某一列
 
 第二类斯特林数的第$m$列为多项式
 
@@ -93,7 +95,7 @@ $$
 
 证明可以利用第二类斯特林数的递推式，从第m-1列递推到第m列时，第a行m-1列的数对第b行m列的元素的贡献系数是$m^{b-a-1} \ (a<b)$
 
-## 第一类斯特林数和指数上升幂的展开式
+### 第一类斯特林数和指数上升幂的展开式
 
 第一类斯特林数是上升幂的展开式系数，即
 
@@ -103,7 +105,7 @@ $$
 
 证明仍然可以归纳法
  
-## 第一类斯特林数和指数上升幂的展开式
+### 第一类斯特林数和指数上升幂的展开式
     
 $$
 \begin{aligned}
@@ -114,7 +116,7 @@ $$
 \end{aligned}
 $$
 
-## 斯特林数和指数上升幂、下降幂的展开式
+### 斯特林数和指数上升幂、下降幂的展开式
 
 推论：
 
@@ -127,11 +129,11 @@ x^{\underline{n}}=\sum_{k=0}^n S_1(n,k) (-1)^{n-k} x^k
 $$
  
 
-## 快速求第一类斯特林数某一行
+### 快速求第一类斯特林数某一行
 
 可以直接倍增FFT求出$x^{\overline{n}}$，复杂度$O(n\log n)$
     
-## P4609 FJOI2016 建筑师
+##### P4609 FJOI2016 建筑师
 
 小 Z 是一个很有名的建筑师，有一天他接到了一个很奇怪的任务：在数轴上建 $n$ 个建筑，每个建筑的高度是 $1$ 到 $n$ 之间的一个整数。
 
@@ -141,47 +143,48 @@ $$
 
 $n \le 50000, A,B \le 100, T \le 200000$
  
+<CollapsibleComponent title="DP方法"> 
 
-## P4609 FJOI2016 建筑师（算法一）
-    数字$n$会把这个序列分成两个部分，并且数字$n$一定能看到
+数字$n$会把这个序列分成两个部分，并且数字$n$一定能看到
 
-    考虑进行如下过程：一开始只有一个$n$
+考虑进行如下过程：一开始只有一个$n$
 
-    接下来，依次把$n-1,n-2,n-3,\ldots,1$放进排列中
+接下来，依次把$n-1,n-2,n-3,\ldots,1$放进排列中
 
-    每次插入一个数$i$时，只有放最左边和最右边会导致看到的建筑数量变多，如果放中间方案数为$n-i-1$
+每次插入一个数$i$时，只有放最左边和最右边会导致看到的建筑数量变多，如果放中间方案数为$n-i-1$
  
+因此，答案为：
 
-## P4609 FJOI2016 建筑师（算法一）
-    因此，答案为：
+$$
+\sum_{\text{从}0,1,2,3,\ldots,n-2\text{选出}A-1+B-1\text{个数字}} \prod_{\text{所有没选的数}x}x \binom{A-1+B-1}{A-1}
+$$
 
-    $$\sum_{\text{从}0,1,2,3,\ldots,n-2\text{选出}A-1+B-1\text{个数字}} \prod_{\text{所有没选的数}x}x \binom{A-1+B-1}{A-1}$$
-
-    这样就可以DP了
+这样就可以DP了
+ </CollapsibleComponent>
  
-
-## P4609 FJOI2016 建筑师（算法二）
+<CollapsibleComponent title="斯特林数推导方法"> 
     
-    数字$n$会把这个序列分成两个部分，并且数字$n$一定能看到
+数字$n$会把这个序列分成两个部分，并且数字$n$一定能看到
 
-    对于$n$的左侧，其实就是要把所有数分成$A-1$个组，满足每一组内部最大值要放开头，然后从左到右每一组的开头要递增。
+对于$n$的左侧，其实就是要把所有数分成$A-1$个组，满足每一组内部最大值要放开头，然后从左到右每一组的开头要递增。
 
-    把若干个数分成一组，并保证最大值在第一个的方案数，其实就是把这些数排成一个圆排列的方案数。所以其实就是第一类斯特林数。
+把若干个数分成一组，并保证最大值在第一个的方案数，其实就是把这些数排成一个圆排列的方案数。所以其实就是第一类斯特林数。
 
-    因此答案就是$S1(n-1,A-1+B-1) \times \binom{A-1+B-1}{A-1}$
+因此答案就是$S1(n-1,A-1+B-1) \times \binom{A-1+B-1}{A-1}$
 
-    用$O(An)$复杂度预处理斯特林数，$O(A^2)$预处理组合数。
+用$O(An)$复杂度预处理斯特林数，$O(A^2)$预处理组合数。
+</CollapsibleComponent>
+
+##### P4827 集训队互测 2011 Crash 的文明世界
+给定一棵 $n$ 个节点的树 $T$ 和一个非负整数 $k$，树上节点编号为 $1 \sim n$。对于每个节点 $u$，求出：
+
+$$
+A(u) = \sum_{v=1}^{n} \text{dist}(u, v)^k \pmod{10007}
+$$
+
+其中 $n \leq 5 \times 10^4$，$k < 150$。
  
-
-## P4827 集训队互测 2011 Crash 的文明世界
-    给定一棵 $n$ 个节点的树 $T$ 和一个非负整数 $k$，树上节点编号为 $1 \sim n$。对于每个节点 $u$，求出：
-
-    $$A(u) = \sum_{v=1}^{n} \text{dist}(u, v)^k \pmod{10007}$$
-
-    其中 $n \leq 5 \times 10^4$，$k < 150$。
- 
-
-## P4827 集训队互测 2011 Crash 的文明世界
+<CollapsibleComponent title="做法"> 
 
 $$
 \begin{aligned}
@@ -196,21 +199,28 @@ $f[x][j]$表示$x$子树内，关于$x:C_{dis(i,x)}^{j}$的答案
 显然有$f[x][j] = \sum_{son} f[son][j] + f[son][j-1]$
 
 复杂度$O(nk)$
+
+</CollapsibleComponent>
  
-## CF932E Team Work
+##### CF932E Team Work
 给定$n,k$，求解：
 
-$$\sum_{i=1}^{n} \binom{n}{i} i^k$$
+$$
+\sum_{i=1}^{n} \binom{n}{i} i^k
+$$
 
-$n \le 5000, n \le 10^9$
- 
+$k \le 5000, n \le 10^9$
 
-## CF932E Team Work
+<CollapsibleComponent title="做法"> 
 
 $$
 \begin{aligned}
-    &\sum_{i=0}^{n} \binom{n}{i} i^k = \sum_{i=0}^{n} \binom{n}{i} \sum_{j=1}^{k} \binom{k}{j} i^{\underline{j}} \\
-    =& \sum_{j=1}^{k} \binom{k}{j} j! \sum_{i=0}^{n} \binom{n}{i} \binom{i}{j} = \sum_{j=1}^{k} \binom{k}{j} j! \sum_{i=0}^{n} \binom{n}{j} \binom{n-j}{i-j} \\
-    =& \sum_{j=1}^{k} \binom{k}{j} j! \binom{n}{j} \sum_{i=0}^{n-j} \binom{n-j}{i} = \sum_{j=1}^{k} \binom{k}{j} j! \binom{n}{j} 2^{n-j}
+&= \sum_{i=0}^{n} \binom{n}{i} \sum_{j=1}^{k} \left\{ \begin{matrix} k \\ j \end{matrix} \right\} i^{\underline{j}} \\
+&= \sum_{j=1}^{k} \left\{ \begin{matrix} k \\ j \end{matrix} \right\} j! \sum_{i=0}^{n} \binom{n}{i} \binom{i}{j} \\
+&= \sum_{j=1}^{k} \left\{ \begin{matrix} k \\ j \end{matrix} \right\} j! \sum_{i=0}^{n} \binom{n}{j} \binom{n-j}{i-j} \\
+&= \sum_{j=1}^{k} \left\{ \begin{matrix} k \\ j \end{matrix} \right\} j! \binom{n}{j} \sum_{i=0}^{n-j} \binom{n-j}{i} \\
+&= \sum_{j=1}^{k} \left\{ \begin{matrix} k \\ j \end{matrix} \right\} j! \binom{n}{j} 2^{n-j}
 \end{aligned}
 $$
+
+</CollapsibleComponent>
