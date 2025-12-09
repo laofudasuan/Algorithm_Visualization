@@ -19,11 +19,14 @@
     { "id": "Euler-Path", "x": 400, "y": 730, "category": "算法" },
 
     { "id": "Greedy", "x": 700, "y": 800, "category": "算法思想" },
-    { "id": "Regret-Greedy", "x": 550, "y": 850, "category": "算法思想" },
-
+    
     { "id": "Counting", "x": 1000, "y": 900, "category": "数学基础" },
 
-    { "id": "String", "x": 1200, "y": 900, "category": "组合对象" },
+    { "id": "String", "x": 1000, "y": 830, "category": "组合对象" },
+    { "id": "Border", "x": 850, "y": 730, "category": "组合对象" },
+    { "id": "Hash", "x": 850, "y": 660, "category": "算法" },
+    { "id": "Automatic-Machine", "x": 1100, "y": 700, "category": "组合对象" },
+    { "id": "Trie", "x": 1000, "y": 680, "category": "组合对象" },
 
     { "id": "Data-Structure", "x": 700, "y": 200, "category": "算法" },
 
@@ -83,8 +86,7 @@
     { "source": "Graph-Basic", "target": "ST-Count", "sourceSide": "right", "targetSide": "left" },
     { "source": "Graph-Basic", "target": "DAG", "sourceSide": "right", "targetSide": "bottom" },
     { "source": "Graph-Basic", "target": "Euler-Path", "sourceSide": "right", "targetSide": "top" },
-    { "source": "Regret-Greedy", "target": "Network-Flow-Simulate", "sourceSide": "left", "targetSide": "top", "label": "算法思想" },
-    { "source": "Greedy", "target": "Regret-Greedy", "sourceSide": "top", "targetSide": "right"},
+    { "source": "Greedy", "target": "Network-Flow-Simulate", "sourceSide": "left", "targetSide": "right", "label": "算法思想" },
     { "source": "Shortest-Path", "target": "Congruence-SSP", "sourceSide": "top", "targetSide": "bottom" },
     { "source": "Connectivity", "target": "Transitive-Closure", "sourceSide": "top", "targetSide": "bottom", "label": "有向图可达性问题" },
     { "source": "Polynomial", "target": "Generating-Function", "sourceSide": "bottom", "targetSide": "top" },
@@ -103,6 +105,11 @@
     { "source": "数论", "target": "Sieve-Method", "sourceSide": "right", "targetSide": "left" },
     { "source": "Sieve-Method", "target": "Number-Theoretic-Function", "sourceSide": "top", "targetSide": "bottom" },
     { "source": "Sieve-Method", "target": "质数问题", "sourceSide": "right", "targetSide": "top" },
+
+    { "source": "String", "target": "Hash", "sourceSide": "top", "targetSide": "right" },
+    { "source": "String", "target": "Border", "sourceSide": "top", "targetSide": "right" },
+    { "source": "String", "target": "Trie", "sourceSide": "top", "targetSide": "bottom" },
+    { "source": "String", "target": "Automatic-Machine", "sourceSide": "top", "targetSide": "left" },
 
     { "source": "Dynamic-Programming", "target": "DP-Sequence", "sourceSide": "bottom", "targetSide": "top" },
     { "source": "Dynamic-Programming", "target": "DP-Tree", "sourceSide": "bottom", "targetSide": "left" },
