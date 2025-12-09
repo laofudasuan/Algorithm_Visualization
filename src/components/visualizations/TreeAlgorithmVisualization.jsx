@@ -20,6 +20,7 @@ const TreeAlgorithmVisualization = forwardRef(({
   const [currentAlgorithm, setCurrentAlgorithm] = useState('dfs'); // 当前选中的算法类型
   const [showAnimationModal, setShowAnimationModal] = useState(false); // 控制动画浮动窗口显示的状态
   const [selectedRootNode, setSelectedRootNode] = useState(''); // 用于存储用户选择的根节点
+  const [clickedButtons, setClickedButtons] = useState(new Set());
 
   // 从JSON文件加载树数据
   useEffect(() => {
@@ -131,24 +132,13 @@ const TreeAlgorithmVisualization = forwardRef(({
                 <div className="space-y-2">
                   {/* 统一渲染按钮配置 */}
                   {(() => {
-                    // 按钮配置数组
                     const buttonConfigs = [
-                      {
-                        id: 'dfs',
-                        label: '深度优先搜索(DFS)',
-                        colorClass: 'bg-green-600 hover:bg-green-700 text-white',
-                        icon: null
-                      },
-                      {
-                        id: 'bfs',
-                        label: '广度优先搜索(BFS)',
-                        colorClass: 'bg-green-600 hover:bg-green-700 text-white',
-                        icon: null
-                      },
+                      { id: 'dfs', label: '深度优先搜索(DFS)', type: 'modal', icon: null },
+                      { id: 'bfs', label: '广度优先搜索(BFS)', type: 'modal', icon: null },
                       {
                         id: 'adjacencyMatrix',
                         label: '邻接矩阵',
-                        colorClass: 'bg-blue-600 hover:bg-blue-700 text-white',
+                        type: 'modal',
                         icon: (
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 inline ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
@@ -158,28 +148,165 @@ const TreeAlgorithmVisualization = forwardRef(({
                       {
                         id: 'adjacencyList',
                         label: '邻接表',
-                        colorClass: 'bg-purple-600 hover:bg-purple-700 text-white',
+                        type: 'modal',
                         icon: (
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 inline ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16l2.879-2.879m0 0a3 3 0 104.243-4.242 3 3 0 00-4.243 4.242zM21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
                         )
+                      },
+                      {
+                        id: 'ShowScc',
+                        label: '展示强连通分量',
+                        type: 'canvas',
+                        icon: (
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 inline ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                          </svg>
+                        )
+                      },
+                      {
+                        id: 'ShowBcc',
+                        label: '展示边双连通分量',
+                        type: 'canvas',
+                        icon: (
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 inline ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                          </svg>
+                        )
+                      },
+                      {
+                        id: 'ShowPbcc',
+                        label: '展示点双连通分量',
+                        type: 'canvas',
+                        icon: (
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 inline ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                          </svg>
+                        )
+                      },
+                      {
+                        id: 'BuildRST',
+                        label: '构建圆方树',
+                        type: 'canvas',
+                        isOneTime: true,
+                        icon: (
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 inline ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                          </svg>
+                        )
+                      },
+                      {
+                        id: 'ShowAugmentingPath',
+                        label: '展示增广路径',
+                        type: 'canvas',
+                        isOneTime: true,
+                        icon: (
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 inline ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                          </svg>
+                        )
+                      },
+                      {
+                        id: 'ShowDfnRange',
+                        label: '展示dfn范围',
+                        type: 'canvas',
+                        isOneTime: true,
+                        icon: (
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 inline ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h12M4 18h8" />
+                          </svg>
+                        )
                       }
                     ];
 
-                    // 过滤并渲染配置的按钮
+                    const handleButtonClick = (config) => {
+                      if (config.isOneTime && clickedButtons.has(config.id)) return;
+                      if (config.type === 'modal') {
+                        selectAlgorithmAndOpenModal(config.id);
+                      } else if (config.type === 'canvas') {
+                        if (config.id === 'ShowScc' || config.id === 'ShowPbcc' || config.id === 'ShowBcc') {
+                          if (treeData?.Indicators && graphCanvasRef.current?.dispatchOperation) {
+                            const indicatorsToAdd = [...treeData.Indicators];
+                            indicatorsToAdd.forEach(indicator => {
+                              graphCanvasRef.current.dispatchOperation('addIndicator', indicator);
+                            });
+                            setTimeout(() => {
+                              indicatorsToAdd.forEach(indicator => {
+                                graphCanvasRef.current.dispatchOperation('removeIndicator', indicator.id);
+                              });
+                            }, 10000);
+                          }
+                        } else if (config.id === 'BuildRST') {
+                          if (graphCanvasRef.current?.dispatchOperation) {
+                            const nodesToAdd = [...(treeData?.PbccAddNodes || [])];
+                            nodesToAdd.forEach(node => {
+                              graphCanvasRef.current.dispatchOperation('addNode', node);
+                            });
+                            const edgesToDelete = [...(treeData?.PbccDeleteEdges || [])];
+                            setTimeout(() => {
+                              edgesToDelete.forEach(edge => {
+                                graphCanvasRef.current.dispatchOperation('deleteEdge', edge.data);
+                              });
+                              const edgesToAdd = [...(treeData?.PbccAddEdges || [])];
+                              setTimeout(() => {
+                                edgesToAdd.forEach(edge => {
+                                  graphCanvasRef.current.dispatchOperation('addEdge', edge);
+                                });
+                              }, 3000);
+                            }, 3000);
+                          }
+                        } else if (config.id === 'ShowAugmentingPath') {
+                          if (graphCanvasRef.current?.dispatchOperation && treeData) {
+                            (treeData.OldIndicators || []).forEach(indicator => {
+                              graphCanvasRef.current.dispatchOperation('addIndicator', indicator);
+                            });
+                            setTimeout(() => {
+                              (treeData.AugmentingPathEdges || []).forEach((edge, index) => {
+                                setTimeout(() => {
+                                  graphCanvasRef.current.dispatchOperation('addIndicator', edge);
+                                }, index * 500);
+                              });
+                              setTimeout(() => {
+                                (treeData.NewIndicators || []).forEach(indicator => {
+                                  graphCanvasRef.current.dispatchOperation('addIndicator', indicator);
+                                });
+                                (treeData.OldIndicators || []).forEach(indicator => {
+                                  graphCanvasRef.current.dispatchOperation('removeIndicator', indicator.id);
+                                });
+                              }, 500 * (treeData.AugmentingPathEdges || []).length);
+                            }, 3000);
+                          }
+                        } else if (config.id === 'ShowDfnRange') {
+                          if (graphCanvasRef.current?.dispatchOperation && treeData) {
+                            (treeData.DfnRangeIndicators || []).forEach(indicator => {
+                              graphCanvasRef.current.dispatchOperation('addIndicator', indicator);
+                            });
+                          }
+                        }
+                      }
+                      if (config.isOneTime) {
+                        setClickedButtons(prev => new Set(prev).add(config.id));
+                      }
+                    };
+
                     return buttonConfigs
                       .filter(config => animationList.includes(config.id))
                       .map(config => (
                         <button
                           key={config.id}
-                          onClick={() => selectAlgorithmAndOpenModal(config.id)}
-                          disabled={!treeData || isLoading}
+                          onClick={() => handleButtonClick(config)}
+                          disabled={!treeData || isLoading || (config.isOneTime && clickedButtons.has(config.id))}
                           className={`px-4 py-2 rounded-md transition-colors w-full ${(
                             (!treeData || isLoading)
                               ? 'bg-gray-400 cursor-not-allowed'
-                              : config.colorClass
-                          )} block`}
+                              : config.isOneTime && clickedButtons.has(config.id)
+                                ? 'bg-gray-900 text-white cursor-not-allowed'
+                                : config.type === 'modal' 
+                                  ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                                  : 'bg-green-600 hover:bg-green-700 text-white'
+                          )} block relative overflow-hidden group`}
+                          title={config.type === 'modal' ? '点击打开模态框' : config.isOneTime ? '一次性操作，点击后变为黑色且不可再点击' : '直接操作当前画布'}
                         >
                           {config.label}
                           {config.icon}

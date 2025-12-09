@@ -514,13 +514,13 @@ const AnimateGraph = forwardRef(({
             const safetyMargin = 50; // 右侧安全边距
             
             // 检查节点是否靠近右侧边界
-            if (position.x + radius + 10 + safetyMargin > canvasWidth) {
+            if (position.x + radius + 20 + safetyMargin > canvasWidth) {
               // 如果节点靠右，将文字放在左侧
-              textPosition.x -= radius + 10; // 放在节点左侧，距离节点半径+10像素
+              textPosition.x -= radius+10; // 左侧贴边
               textAlign = 'right';
             } else {
               // 否则放在右侧
-              textPosition.x += radius + 10; // 放在节点右侧，距离节点半径+10像素
+              textPosition.x += radius+10; // 右侧贴边
               textAlign = 'left';
             }
           }

@@ -1,0 +1,64 @@
+---
+title: DFS序
+---
+
+import TreeAlgorithmVisualization from '../../../../components/visualizations/TreeAlgorithmVisualization';
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+
+# 树的DFS序
+
+我们DFS一棵树的时候，对这棵树的每个点按照访问的时间进行重标号，就得到了树的DFS序列。 这个序列可以有效地处理一些树上的问题。
+
+<TreeAlgorithmVisualization 
+treeName="DFS-Sequence"
+animationList={['ShowDfnRange']}
+/>
+
+## 经典问题
+
+给定一棵$n$个点的树，支持$m$个操作：
+
+1. 单点修改
+2. 求一个点的子树和
+
+## 经典问题
+
+给定一棵$n$个点的树，支持$m$个操作：
+
+给定一棵n个点的树，支持m个操作：
+1.将一个点的子树加
+2.将一个点的子树修改为一个数
+2.求一个点的子树和
+
+##### CF383C
+
+给定一棵$n$个点的树，支持$m$个操作：
+
+1. 把一个点$x$的子树里面：$x$的值$+=v$，$x$的所有儿子的值$-=v$，$x$的儿子的所有儿子的值$+=v$，这样循环
+2. 求一个点的子树和
+
+<CollapsibleComponent title="做法">
+- 发现这个操作其实就是：把$x$子树中距离$x$偶数的$+v$，距离$x$奇数的$-v$
+- 设$x$的深度为$dep[x]$
+- 即等价于深度与$dep[x]$同样的奇偶性的点$+v$，不同样的$-v$
+- 于是分别把这个树里面深度奇数的点和深度偶数的点提出来
+- 分别维护，设深度奇数的树为$T1$，深度偶数的树为$T2$
+- 每次如果$x$的深度是奇数，即把$T1$进行一个子树加，$T2$进行一个子树减
+- 每次如果$x$的深度是偶数，即把$T1$进行一个子树加，$T2$进行一个子树减
+- 用DFS序列，转换为一个区间加区间和的问题
+- 用树状树组或者线段树维护即可
+
+注意：
+- 对于两部分要分别离散化一下，然后按照新的下标维护
+- 不然可能会比较复杂
+
+</CollapsibleComponent>
+
+##### BZOJ3306 树
+
+给定一棵大小为 $n$ 的有根点权树，有 $m$ 次操作: 
+1. 给定 $x$，将树的根换成 $x$ 结点
+2. 修改点权
+3. 给定 $x$，查询 $x$ 子树最小值
+
+##### CF2152G Query Jungle

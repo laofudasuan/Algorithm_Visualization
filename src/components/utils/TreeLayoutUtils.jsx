@@ -64,14 +64,14 @@ export const rearrangeTreeNodes = (treeData, newRootId) => {
     const totalLevels = Object.keys(levelNodes).length;
     
     // 根据每行k个点，相邻距离为width/(k+1)的规则计算
-    const horizontalSpacing = width / (nodesInLevel + 1);
+    const horizontalSpacing = width / nodesInLevel;
     // 根据有k层，相邻两层距离为height/(k+1)的规则计算
-    const verticalSpacing = height / (totalLevels + 1);
+    const verticalSpacing = height / totalLevels;
     
     return {
       ...node,
-      x: horizontalSpacing * (indexInLevel + 1), // 第i个点的位置是(i+1)*spacing
-      y: verticalSpacing * (level + 1) // 第l层的位置是(l+1)*spacing
+      x: horizontalSpacing * (indexInLevel + 0.5), // 第i个点的位置是(i+1)*spacing
+      y: verticalSpacing * (level + 0.5) // 第l层的位置是(l+1)*spacing
     };
   });
   

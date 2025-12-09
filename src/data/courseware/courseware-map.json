@@ -1,20 +1,25 @@
 {
   "nodes": [
-    { "id": "Tree-Basic", "x": 300, "y": 150, "category": "组合对象" },
+    { "id": "Tree-Basic", "x": 200, "y": 300, "category": "组合对象" },
+    { "id": "Tree-Sequence", "x": 350, "y": 330, "category": "组合对象" },
+    { "id": "Tree-Split", "x": 350, "y": 270, "category": "组合对象" },
 
-    { "id": "Graph-Basic", "x": 300, "y": 450, "category": "组合对象" },
-    { "id": "Connectivity", "x": 50, "y": 420, "category": "算法" },
-    { "id": "Bipartite", "x": 30, "y": 500, "category": "算法" },
-    { "id": "2-SAT", "x": 50, "y": 600, "category": "算法" },
-    { "id": "Network-Flow", "x": 200, "y": 600, "category": "算法" },
-    { "id": "Network-Flow-Simulate", "x": 300, "y": 700, "category": "算法" },
-    { "id": "Shortest-Path", "x": 230, "y": 350, "category": "算法" },
-    { "id": "Transitive-Closure", "x": 100, "y": 300, "category": "算法" },
-    { "id": "Minimum-Spanning-Tree", "x": 450, "y": 430, "category": "算法" },
-    { "id": "ST-Count", "x": 500, "y": 480, "category": "数学基础" },
-    { "id": "DAG", "x": 400, "y": 350, "category": "算法" },
-    { "id": "Congruence-SSP", "x": 230, "y": 270, "category": "算法" },
-    { "id": "Euler-Path", "x": 400, "y": 530, "category": "算法" },
+    { "id": "Graph-Basic", "x": 300, "y": 650, "category": "组合对象" },
+    { "id": "Connectivity", "x": 50, "y": 620, "category": "算法" },
+    { "id": "Bipartite", "x": 30, "y": 700, "category": "算法" },
+    { "id": "2-SAT", "x": 50, "y": 800, "category": "算法" },
+    { "id": "Network-Flow", "x": 200, "y": 800, "category": "算法" },
+    { "id": "Network-Flow-Simulate", "x": 300, "y": 900, "category": "算法" },
+    { "id": "Shortest-Path", "x": 230, "y": 550, "category": "算法" },
+    { "id": "Transitive-Closure", "x": 100, "y": 500, "category": "算法" },
+    { "id": "Minimum-Spanning-Tree", "x": 450, "y": 630, "category": "算法" },
+    { "id": "ST-Count", "x": 500, "y": 680, "category": "数学基础" },
+    { "id": "DAG", "x": 400, "y": 550, "category": "算法" },
+    { "id": "Congruence-SSP", "x": 230, "y": 470, "category": "算法" },
+    { "id": "Euler-Path", "x": 400, "y": 730, "category": "算法" },
+
+    { "id": "Greedy", "x": 700, "y": 800, "category": "算法思想" },
+    { "id": "Regret-Greedy", "x": 550, "y": 850, "category": "算法思想" },
 
     { "id": "Counting", "x": 1000, "y": 900, "category": "数学基础" },
 
@@ -32,14 +37,6 @@
     { "id": "DP-Counting", "x": 880, "y": 320, "category": "算法" },
     { "id": "DP-Optimization", "x": 650, "y": 550, "category": "算法" },
     { "id": "DP-Function", "x": 850, "y": 550, "category": "算法" },
-
-    { "id": "Search", "x": 1300, "y": 700, "category": "算法" },
-    { "id": "Game-Theory", "x": 100, "y": 860, "category": "数学基础" },
-    { "id": "Geometry", "x": 200, "y": 860, "category": "数学基础" },
-    { "id": "Greedy", "x": 700, "y": 700, "category": "算法思想" },
-    { "id": "Regret-Greedy", "x": 550, "y": 650, "category": "算法思想" },
-    { "id": "Interactive", "x": 200, "y": 800, "category": "空" },
-    { "id": "Construction", "x": 100, "y": 800, "category": "算法思想" },
 
     { "id": "Convex-Optimization", "x": 700, "y": 900, "category": "数学基础" },
     { "id": "Divide-and-Conquer", "x": 1300, "y": 800, "category": "算法思想" },
@@ -65,9 +62,18 @@
     { "id": "Linear-Algebra", "x": 600, "y": 150, "category": "数学基础" },
     { "id": "Probability", "x": 800, "y": 250, "category": "数学基础" },
 
+    { "id": "Search", "x": 1300, "y": 700, "category": "算法" },
+    { "id": "Game-Theory", "x": 1200, "y": 860, "category": "数学基础" },
+    { "id": "Geometry", "x": 1300, "y": 860, "category": "数学基础" },
+    { "id": "Interactive", "x": 1200, "y": 800, "category": "空" },
+    { "id": "Construction", "x": 1300, "y": 900, "category": "算法思想" },
+
     { "id": "倍增", "x": 500, "y": 250, "category": "算法" }
   ],
   "edges": [
+    { "source": "Tree-Basic", "target": "Tree-Sequence", "sourceSide": "right", "targetSide": "left" },
+    { "source": "Tree-Basic", "target": "Tree-Split", "sourceSide": "right", "targetSide": "left" },
+
     { "source": "Graph-Basic", "target": "Bipartite", "sourceSide": "left", "targetSide": "right" },
     { "source": "Graph-Basic", "target": "Connectivity", "sourceSide": "left", "targetSide": "right" },
     { "source": "Graph-Basic", "target": "2-SAT", "sourceSide": "left", "targetSide": "right" },

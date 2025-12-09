@@ -1,0 +1,43 @@
+{
+  "width": 600,
+  "height": 400,
+  "nodes": [
+    { "id": "1", "label": "1", "style": { "type": "planet1" } },
+    { "id": "2", "label": "2", "style": { "type": "planet1" } },
+    { "id": "3", "label": "3", "style": { "type": "planet1" } },
+    { "id": "4", "label": "4", "style": { "type": "planet1" } },
+    { "id": "5", "label": "5", "style": { "type": "planet1" } },
+    { "id": "6", "label": "6", "style": { "type": "planet1" } },
+    { "id": "7", "label": "7", "style": { "type": "planet1" } }
+  ],
+  "edges": [
+    { "id": "e1", "label": "", "source": "1", "target": "2", "style": {} },
+    { "id": "e2", "label": "", "source": "2", "target": "3", "style": {} },
+    { "id": "e3", "label": "", "source": "2", "target": "4", "style": {} },
+    { "id": "e4", "label": "", "source": "1", "target": "5", "style": {} },
+    { "id": "e5", "label": "", "source": "1", "target": "6", "style": {} },
+    { "id": "e6", "label": "", "source": "6", "target": "7", "style": {} }
+  ],
+  "DfnRangeIndicators": [
+    { "id": "1", "type": "text","target" : "1","size" : 20,"text" : "[1,7]" },
+    { "id": "2", "type": "text","target" : "2","size" : 20,"text" : "[2,4]" },
+    { "id": "3", "type": "text","target" : "3","size" : 20,"text" : "[3,3]" },
+    { "id": "4", "type": "text","target" : "4","size" : 20,"text" : "[4,4]" },
+    { "id": "5", "type": "text","target" : "5","size" : 20,"text" : "[5,5]" },
+    { "id": "6", "type": "text","target" : "6","size" : 20,"text" : "[6,7]" },
+    { "id": "7", "type": "text","target" : "7","size" : 20,"text" : "[7,7]" }
+  ],
+  "rootNode": "1",
+  "nodesStyle": {
+    "size" : 50,
+    "type" : "planet1",
+    "stroke": "#000000",
+    "lineWidth": 2,
+    "labelFill": "#000000",
+    "labelFontSize": 20
+  },
+  "edgesStyle": {
+    "stroke": "#ffffff",
+    "lineWidth": 15
+  }
+}

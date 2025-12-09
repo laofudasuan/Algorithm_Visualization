@@ -49,7 +49,7 @@ import { CollapsibleComponent } from '../../../courseware/markdownConfig';
 
 当$1,2,3$都出现过时，就停止。问我们期望随机多少次
 
-<CollapsibleComponent title="做法一">
+<CollapsibleComponent title="固定起点的DP">
 如果采用固定终点的DP，则用$f[i]$表示当前本子上已经有$i$种数了，接下来还需要期望抛几次
 
 倒推，初始值为$f[3]=0$
@@ -67,7 +67,7 @@ f[0]=1+f[1]=\frac{11}{2}
 $$
 </CollapsibleComponent>
 
-<CollapsibleComponent title="做法二">
+<CollapsibleComponent title="固定终点的DP">
 
 如果采用固定起点的DP，则用$f[i]$表示期望随几次，使得当前本子上已经有$i$种数了
 
@@ -82,6 +82,13 @@ $f[2]=?$
 当然，是可以列出来的，$f[2]=f[1]\sum_{i=1}^{\infty} i \times (\frac{1}{3})^{i-1}\times \frac{2}{3}$
 
 但是，可以看到，没有固定终点的DP简单
+</CollapsibleComponent>
+
+<CollapsibleComponent title="程序模拟法">
+
+求期望的问题，通常可以随机模拟若干次，取平均值得到期望
+
+随机次数越多，期望的误差就越小
 </CollapsibleComponent>
 
 ## 带环的动态规划
@@ -131,7 +138,31 @@ $f[2]=?$
 
 ## 掷骰子问题
 
-### 例题一
+### 例题
+
+不停地抛一个$6$面的骰子，抛到$1$就结束，问期望次数
+
+<CollapsibleComponent title="解法">
+$$
+X = 1 + \frac{1}{6} \times 0 + \frac{5}{6} \times X
+$$
+
+解得$X=6$
+</CollapsibleComponent>
+
+### 例题
+
+##### 猜想：下列问题A和问题B答案是否一致？如果不一致，谁更大？
+
+#### 问题A:
+
+不停地抛一个$6$面的骰子，**连续抛到两次**$1$就结束，问期望次数
+
+#### 问题B:
+
+不停地抛一个$6$面的骰子，**连续抛到**$1,2$就结束，问期望次数
+
+### 例题
     
 不停地抛一个$m$面的骰子，如果最后抛出的$n$次都相同则停止，问期望次数
 
@@ -167,7 +198,7 @@ $$
 
 </CollapsibleComponent>
 
-### 例题二
+### 例题
 
 不停地抛一个$m$面的筛子，如果最后抛出的$n$次都不同则停止，问期望次数
 
@@ -199,7 +230,7 @@ $$
 
 </CollapsibleComponent>
 
-### 例题三
+### 例题
 
 不停地抛一个$6$面的骰子
 

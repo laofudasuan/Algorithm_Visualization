@@ -442,19 +442,21 @@ export class IndicatorRenderer {
     console.log('addTextIndicator', id, x, y, text, color, options);
     
     // 修复：使用更简单的方式创建文字对象，避免对齐问题
+    const textAlignOpt = options.textAlign || 'center';
+    const originXOpt = textAlignOpt === 'left' ? 'left' : (textAlignOpt === 'right' ? 'right' : 'center');
     const textObj = new fabric.Text(text, {
       left: x,
       top: y,
       fill: color,
-      fontSize: options.textSize || options.size || 14, // 同时支持textSize和size参数
+      fontSize: options.textSize || options.size || 14,
       fontWeight: options.fontWeight || 'normal',
       fontFamily: options.fontFamily || 'Arial',
-      textAlign: options.textAlign || 'center',
-      originX: 'center',
-      originY: 'center',
+      textAlign: textAlignOpt,
+      originX: originXOpt,
+      originY: options.verticalAlign === 'top' ? 'top' : (options.verticalAlign === 'bottom' ? 'bottom' : 'center'),
       selectable: false,
       hoverCursor: 'default',
-      opacity: 1 // 暂时去掉淡入，确保文字可见
+      opacity: 1
     });
     
     // 添加到画布
