@@ -447,7 +447,15 @@ $n \le 2000, m \le 16, k \le n$
 
 $n \le 5000$
 
-<CollapsibleComponent title="做法">
+<CollapsibleComponent title="唯一性DP法">
+考虑让每一个方案被唯一计算到一次：如果到达多次取最后一次
+
+可以对于所有后缀预处理出，在这个后缀的开头出发，不会回到起点的概率
+
+这样答案=$\sum_i$在时刻$i$到达$j$的概率$\times i$之后的后缀不会回到起点的概率
+</CollapsibleComponent>
+
+<CollapsibleComponent title="逆向DP法">
 直接DP:用$f[i][j][x]$表示经过了前$i$次行走，走到了$j$，在走的过程中有经过$x$的概率
 
 状态$O(n^3)$，转移$O(1)$
