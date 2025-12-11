@@ -1,4 +1,5 @@
 import React, { useState, useEffect, lazy, Suspense, useRef } from 'react';
+import { createRoot } from 'react-dom/client';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import 'katex/dist/katex.min.css';
@@ -95,6 +96,111 @@ const CoursewareDetail = () => {
   // 切换目录显示/隐藏
   const toggleToc = () => {
     setShowToc(!showToc);
+  };
+
+  const exportToPDF = () => {
+    if (!contentRef.current) return;
+    const source = contentRef.current;
+    const toggles = Array.from(source.querySelectorAll('[data-collapsible-toggle]'));
+    toggles.forEach(t => { if (!t.nextElementSibling) t.click(); });
+    const wait = (ms) => new Promise(r => setTimeout(r, ms));
+    const proceed = async () => {
+      await wait(200);
+      const clone = source.cloneNode(true);
+      Array.from(clone.querySelectorAll('[data-vis]')).forEach(el => el.remove());
+      const htmlContent = clone.innerHTML;
+      const printWindow = window.open('', '_blank');
+      if (!printWindow) return;
+      const fileTitle = (pageAttributes[currentPage]?.title || courseware?.title || id) + '.pdf';
+      const style = `
+        @page { size: A4; margin: 16mm; }
+        * { animation: none !important; transition: none !important; }
+        body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, 'Noto Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif; color: #111827; }
+        h1 { font-size: 24px; margin: 16px 0; }
+        h2 { font-size: 20px; margin: 14px 0; }
+        h3 { font-size: 18px; margin: 12px 0; }
+        h4 { font-size: 16px; margin: 10px 0; }
+        p, li { font-size: 14px; line-height: 1.6; }
+        pre, code { white-space: pre-wrap; word-break: break-word; }
+        img { max-width: 100%; height: auto; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #e5e7eb; padding: 8px; }
+        .katex { font-size: 1em; }
+        [data-vis] { display: none !important; }
+      `;
+      const doc = printWindow.document;
+      doc.open();
+      doc.write(`<!doctype html><html><head><meta charset="utf-8"><title>${fileTitle}</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"><style>${style}</style></head><body>${htmlContent}</body></html>`);
+      doc.close();
+      printWindow.focus();
+      setTimeout(() => {
+        try { printWindow.print(); } catch { /* noop */ }
+      }, 500);
+      printWindow.onafterprint = () => {
+        try { printWindow.close(); } catch { /* noop */ }
+      };
+    };
+    proceed();
+  };
+
+  const exportAllPagesToPDF = async () => {
+    try {
+      const parts = [];
+      for (let i = 0; i < pageComponents.length; i++) {
+        const temp = document.createElement('div');
+        temp.style.position = 'fixed';
+        temp.style.left = '-99999px';
+        temp.style.top = '0';
+        document.body.appendChild(temp);
+        const root = createRoot(temp);
+        const element = React.createElement(pageComponents[i], {
+          components: {
+            ...headingComponents,
+            ...tableComponents,
+            ...listComponents,
+            BoxWithTag: boxWithTagComponent
+          }
+        });
+        root.render(React.createElement(Suspense, { fallback: null }, element));
+        await new Promise(r => setTimeout(r, 600));
+        Array.from(temp.querySelectorAll('[data-collapsible-toggle]')).forEach(t => { if (!t.nextElementSibling) t.click(); });
+        await new Promise(r => setTimeout(r, 200));
+        const clone = temp.cloneNode(true);
+        Array.from(clone.querySelectorAll('[data-vis]')).forEach(el => el.remove());
+        const title = pageAttributes[i]?.title || `页面 ${i + 1}`;
+        parts.push(`<section><h1>${title}</h1>${clone.innerHTML}</section>`);
+        root.unmount();
+        document.body.removeChild(temp);
+        if (i < pageComponents.length - 1) parts.push('<div class="page-break"></div>');
+      }
+      const printWindow = window.open('', '_blank');
+      if (!printWindow) return;
+      const fileTitle = (courseware?.title || id) + '.pdf';
+      const style = `
+        @page { size: A4; margin: 16mm; }
+        * { animation: none !important; transition: none !important; }
+        body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, 'Noto Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif; color: #111827; }
+        h1 { font-size: 24px; margin: 16px 0; }
+        h2 { font-size: 20px; margin: 14px 0; }
+        h3 { font-size: 18px; margin: 12px 0; }
+        h4 { font-size: 16px; margin: 10px 0; }
+        p, li { font-size: 14px; line-height: 1.6; }
+        pre, code { white-space: pre-wrap; word-break: break-word; }
+        img { max-width: 100%; height: auto; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #e5e7eb; padding: 8px; }
+        .katex { font-size: 1em; }
+        [data-vis] { display: none !important; }
+        .page-break { page-break-after: always; }
+      `;
+      const doc = printWindow.document;
+      doc.open();
+      doc.write(`<!doctype html><html><head><meta charset="utf-8"><title>${fileTitle}</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"><style>${style}</style></head><body>${parts.join('')}</body></html>`);
+      doc.close();
+      printWindow.focus();
+      setTimeout(() => { try { printWindow.print(); } catch {} }, 500);
+      printWindow.onafterprint = () => { try { printWindow.close(); } catch {} };
+    } catch {}
   };
 
   useEffect(() => {
@@ -277,6 +383,15 @@ const CoursewareDetail = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
+          <button
+            onClick={exportAllPagesToPDF}
+            className="ml-2 bg-white text-gray-800 p-3 rounded-full shadow-lg hover:bg-gray-100 transition-colors"
+            aria-label="导出所有页面 PDF"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 16v-8m0 8l-3-3m3 3l3-3M5 20h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2z" />
+            </svg>
+          </button>
         </div>
 
         {/* 课件标题和元信息 */}
@@ -292,16 +407,18 @@ const CoursewareDetail = () => {
             <span>创建时间: {courseware.createdAt || '未知'}</span>
           </div>
 
-          {/* 按钮组：Start按钮和返回按钮 */}
           <div className="flex flex-wrap justify-center gap-4">
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={goToFirstPage}
-              className="px-10 py-4 bg-primary text-white rounded-md text-lg font-medium hover:bg-primary/90 transition-all duration-300 shadow-lg"
-            >
-              Start
-            </motion.button>
+            {pageAttributes.map((pageAttr, index) => (
+              <motion.button
+                key={index}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => { setShowMainPage(false); setDirection(index > currentPage ? 'right' : 'left'); setCurrentPage(index); }}
+                className="px-10 py-4 bg-primary text-white rounded-md text-lg font-medium hover:bg-primary/90 transition-all duration-300 shadow-lg"
+              >
+                {pageAttr.title || `页面 ${index + 1}`}
+              </motion.button>
+            ))}
           </div>
         </motion.div>
       </div>
@@ -325,6 +442,15 @@ const CoursewareDetail = () => {
         >
           <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <button
+          onClick={exportToPDF}
+          className="ml-2 bg-white text-gray-800 p-3 rounded-full shadow-lg hover:bg-gray-100 transition-colors"
+          aria-label="导出 PDF"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 16v-8m0 8l-3-3m3 3l3-3M5 20h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2z" />
           </svg>
         </button>
       </div>

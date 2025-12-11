@@ -56,7 +56,7 @@ const GraphAlgorithmVisualization = forwardRef(({
   }));
 
   return (
-    <div className="relative">
+    <div className="relative" data-vis="graph">
       {/* 初始界面 - 图的展示 */}
       <div className="">
         {isLoading ? (

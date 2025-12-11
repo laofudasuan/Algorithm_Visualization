@@ -274,6 +274,7 @@ export const CollapsibleComponent = (props) => {
       <div 
         className="text-base font-medium my-2 inline-block text-black bg-purple-100 border border-purple-500 px-3 py-1 rounded-xl cursor-pointer inline-flex items-center hover:bg-purple-200 transition-colors"
         onClick={toggleCollapse}
+        data-collapsible-toggle="true"
       >
         <span>{title}</span>
         <span className={`ml-2 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>

@@ -105,7 +105,7 @@ const TreeAlgorithmVisualization = forwardRef(({
   };
 
   return (
-    <div className="relative">
+    <div className="relative" data-vis="tree">
       {/* 初始界面 - 树的展示 */}
       <div className="">
         {isLoading ? (
