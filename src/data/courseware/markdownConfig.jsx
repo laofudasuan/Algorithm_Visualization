@@ -290,6 +290,111 @@ export const CollapsibleComponent = (props) => {
   );
 };
 
+// 简易代码高亮与行号组件（覆盖 MDX 的 <pre> 渲染）
+export const CodeBlock = (props) => {
+  const child = props.children;
+  const className = child?.props?.className || '';
+  const language = (className.match(/language-([\w+#-]+)/) || [])[1] || 'text';
+  const raw = (child?.props?.children || '').toString();
+  const lines = raw.split('\n');
+  const escapeHtml = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const kw = [
+    'auto','break','case','char','const','continue','default','do','double','else','enum','extern','float','for','goto','if','inline','int','long','register','restrict','return','short','signed','sizeof','static','struct','switch','typedef','union','unsigned','void','volatile','while','class','namespace','using','new','delete','public','private','protected','template','typename','this','virtual','operator','friend','bool'
+  ];
+  const kwRegex = new RegExp(`\\b(${kw.join('|')})\\b`, 'g');
+  const numRegex = /(?<![\w])(?:0x[0-9a-fA-F]+|\d+(?:\.\d+)?)(?![\w])/g;
+  const strRegex = /"(?:\\.|[^"])*"|'(?:\\.|[^'])*'/g;
+  const oneLineCommentRegex = /\/\/.*$/;
+  const blockStartRegex = /\/\*/;
+  const blockEndRegex = /\*\//;
+  let inBlockComment = false;
+  
+  const renderLine = (line) => {
+    let html = escapeHtml(line);
+    const placeholders = [];
+    const addPlaceholder = (content) => {
+      placeholders.push(content);
+      return `___PH_${placeholders.length - 1}___`;
+    };
+    const restorePlaceholders = (text) => {
+      return text.replace(/___PH_(\d+)___/g, (match, id) => placeholders[parseInt(id)]);
+    };
+
+    // handle block comments across lines
+    if (inBlockComment) {
+      const endIdx = html.search(blockEndRegex);
+      if (endIdx >= 0) {
+        const before = html.slice(0, endIdx + 2);
+        const after = html.slice(endIdx + 2);
+        html = addPlaceholder(`<span class="text-gray-500">${before}</span>`) + after;
+        inBlockComment = false;
+      } else {
+        return `<span class="text-gray-500">${html}</span>`;
+      }
+    }
+    
+    // start of block comment
+    if (!inBlockComment) {
+      const startIdx = html.search(blockStartRegex);
+      if (startIdx >= 0) {
+        const endIdx = html.search(blockEndRegex);
+        if (endIdx >= 0 && endIdx > startIdx) {
+          const before = html.slice(0, startIdx);
+          const middle = html.slice(startIdx, endIdx + 2);
+          const after = html.slice(endIdx + 2);
+          html = before + addPlaceholder(`<span class="text-gray-500">${middle}</span>`) + after;
+        } else {
+          const before = html.slice(0, startIdx);
+          const middle = html.slice(startIdx);
+          html = before + addPlaceholder(`<span class="text-gray-500">${middle}</span>`);
+          inBlockComment = true;
+          return restorePlaceholders(html);
+        }
+      }
+    }
+    
+    // one-line comments
+    const olc = html.match(oneLineCommentRegex);
+    if (olc) {
+      const idx = html.indexOf(olc[0]);
+      const prefix = html.slice(0, idx);
+      const comment = html.slice(idx);
+      html = prefix + addPlaceholder(`<span class="text-gray-500">${comment}</span>`);
+    }
+    
+    // strings
+    html = html.replace(strRegex, (m) => addPlaceholder(`<span class="text-green-700">${m}</span>`));
+    
+    // numbers
+    html = html.replace(numRegex, (m) => addPlaceholder(`<span class="text-blue-600">${m}</span>`));
+    
+    // keywords (only for C/C++)
+    if (language.toLowerCase().includes('c')) {
+      html = html.replace(kwRegex, (m) => addPlaceholder(`<span class="text-purple-700 font-semibold">${m}</span>`));
+    }
+    
+    return restorePlaceholders(html);
+  };
+  
+  return (
+    <div className="my-4 rounded-lg border border-gray-300 overflow-hidden" data-code-block="true">
+      <div className="bg-gray-100 text-gray-700 px-3 py-2 text-xs font-mono uppercase tracking-wide">{language}</div>
+      <div className="font-mono text-sm">
+        <div className="grid grid-cols-[48px_1fr]">
+          {lines.map((line, idx) => (
+            <React.Fragment key={idx}>
+              <div className="px-3 py-0.5 text-right text-gray-400 bg-gray-50 select-none">{idx + 1}</div>
+              <div className="px-3 py-0.5 whitespace-pre">
+                <span dangerouslySetInnerHTML={{ __html: renderLine(line) }} />
+              </div>
+            </React.Fragment>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // 确保React被正确使用
 if (typeof React === 'undefined') {
   console.error('React is not available. CollapsibleComponent requires React.');
@@ -310,5 +415,7 @@ export default {
   boxWithTagConfig,
   boxWithTagComponent,
   // 折叠内容组件
-  CollapsibleComponent
+  CollapsibleComponent,
+  // 代码块
+  CodeBlock
 };

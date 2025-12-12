@@ -3,12 +3,40 @@ import { createRoot } from 'react-dom/client';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import 'katex/dist/katex.min.css';
-import { headingComponents, tableComponents, listComponents, boxWithTagComponent } from '../data/courseware/markdownConfig.jsx';
+import { headingComponents, tableComponents, listComponents, boxWithTagComponent, CodeBlock } from '../data/courseware/markdownConfig.jsx';
 
 const CoursewareDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [courseware, setCourseware] = useState(null);
+  
+  // Exit animation variants
+  const [exitVariants, setExitVariants] = useState({ opacity: 0 });
+
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem('courseware-exit-rect');
+      if (saved) {
+        const rect = JSON.parse(saved);
+        // Calculate the translation needed to move the center of the screen to the center of the rect
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        const x = centerX - window.innerWidth / 2;
+        const y = centerY - window.innerHeight / 2;
+        
+        setExitVariants({
+          opacity: 0,
+          scale: 0,
+          x,
+          y,
+          transition: { duration: 0.5, ease: "easeInOut" }
+        });
+      }
+    } catch (e) {
+      console.error('Failed to parse exit rect', e);
+    }
+  }, []);
+
   const [pageComponents, setPageComponents] = useState([]);
   const [pageAttributes, setPageAttributes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -107,6 +135,26 @@ const CoursewareDetail = () => {
     const proceed = async () => {
       await wait(200);
       const clone = source.cloneNode(true);
+      Array.from(clone.querySelectorAll('[data-code-block="true"]')).forEach(wrapper => {
+        try {
+          const grid = wrapper.querySelector('.grid');
+          if (!grid) return;
+          const children = Array.from(grid.children || []);
+          const codeLines = [];
+          for (let i = 1; i < children.length; i += 2) {
+            const codeCell = children[i];
+            const txt = (codeCell && codeCell.textContent) ? codeCell.textContent.replace(/\u200b/g, '') : '';
+            codeLines.push(txt);
+          }
+          const pre = clone.ownerDocument.createElement('pre');
+          pre.style.whiteSpace = 'pre-wrap';
+          pre.style.wordBreak = 'break-word';
+          const code = clone.ownerDocument.createElement('code');
+          code.textContent = codeLines.join('\n');
+          pre.appendChild(code);
+          wrapper.replaceWith(pre);
+        } catch {}
+      });
       Array.from(clone.querySelectorAll('[data-vis]')).forEach(el => el.remove());
       const htmlContent = clone.innerHTML;
       const printWindow = window.open('', '_blank');
@@ -370,10 +418,16 @@ const CoursewareDetail = () => {
   // 主页视图
   if (showMainPage) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center container mx-auto px-4 pt-32 pb-32">
+      <motion.div 
+        className="fixed inset-0 overflow-y-auto bg-white z-50"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={exitVariants}
+      >
+      <div className="min-h-full flex flex-col items-center justify-center container mx-auto px-4 pt-32 pb-32">
         
         {/* 返回按钮 - 位于页面右上角 */}
-        <div className="fixed top-4 right-4">
+        <div className="absolute top-4 right-4 flex flex-col items-end gap-2">
           <button 
             onClick={goBackToCoursewareList}
             className="bg-white text-gray-800 p-3 rounded-full shadow-lg hover:bg-gray-100 transition-colors"
@@ -385,7 +439,7 @@ const CoursewareDetail = () => {
           </button>
           <button
             onClick={exportAllPagesToPDF}
-            className="ml-2 bg-white text-gray-800 p-3 rounded-full shadow-lg hover:bg-gray-100 transition-colors"
+            className="bg-white text-gray-800 p-3 rounded-full shadow-lg hover:bg-gray-100 transition-colors"
             aria-label="导出所有页面 PDF"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -422,19 +476,20 @@ const CoursewareDetail = () => {
           </div>
         </motion.div>
       </div>
+      </motion.div>
     );
   }
 
   // 子页面视图
   return (
     <motion.div 
-      className="min-h-screen"
+      className="fixed inset-0 bg-white z-50"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
+      exit={exitVariants}
     >
       {/* 返回按钮 */}
-      <div className="fixed top-4 right-4 z-50">
+      <div className="absolute top-4 right-4 z-50 flex flex-col items-end gap-2">
         <button 
           onClick={goBackToCoursewareList}
           className="bg-white text-gray-800 p-3 rounded-full shadow-lg hover:bg-gray-100 transition-colors"
@@ -446,7 +501,7 @@ const CoursewareDetail = () => {
         </button>
         <button
           onClick={exportToPDF}
-          className="ml-2 bg-white text-gray-800 p-3 rounded-full shadow-lg hover:bg-gray-100 transition-colors"
+          className="bg-white text-gray-800 p-3 rounded-full shadow-lg hover:bg-gray-100 transition-colors"
           aria-label="导出 PDF"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -456,7 +511,7 @@ const CoursewareDetail = () => {
       </div>
       
       {/* 目录切换按钮 */}
-      <div className="fixed top-4 left-4 z-50">
+      <div className="absolute top-4 left-4 z-50">
         <button 
           onClick={toggleToc}
           className="bg-white text-gray-800 p-3 rounded-full shadow-lg hover:bg-gray-100 transition-colors"
@@ -472,7 +527,7 @@ const CoursewareDetail = () => {
       {showToc && (
         <motion.div 
           ref={tocRef}
-          className="fixed top-20 left-4 bottom-20 w-64 bg-white rounded-lg shadow-lg z-40 overflow-y-auto hidden lg:block"
+          className="absolute top-20 left-4 bottom-20 w-64 bg-white rounded-lg shadow-lg z-40 overflow-y-auto hidden lg:block"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.3 }}
@@ -529,6 +584,7 @@ const CoursewareDetail = () => {
       )}
       
       {/* 课件内容容器 - 左右滑动结构 */}
+      <div className="w-full h-full overflow-y-auto pt-20 pb-24">
       <div className="w-[80%] mx-auto relative" style={{ minHeight: '500px' }}>
         <div 
           ref={contentRef}
@@ -553,7 +609,8 @@ const CoursewareDetail = () => {
                         ...headingComponents, 
                         ...tableComponents, 
                         ...listComponents, 
-                        BoxWithTag: boxWithTagComponent 
+                        BoxWithTag: boxWithTagComponent,
+                        pre: CodeBlock 
                       } 
                     })}
                   </Suspense>
@@ -562,6 +619,7 @@ const CoursewareDetail = () => {
             </motion.div>
           </AnimatePresence>
         </div>
+      </div>
       </div>
 
       {/* 左右分页导航按钮 - 窗口底部两侧 */}
@@ -574,7 +632,7 @@ const CoursewareDetail = () => {
             animate={{ opacity: 1, x: 0 }}
             onClick={goToPrevPage}
             disabled={currentPage <= 0}
-            className={`fixed bottom-8 left-8 w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center shadow-lg hover:bg-primary/90 transition-all duration-300 ${currentPage <= 0 ? 'cursor-not-allowed' : ''}`}
+            className={`absolute bottom-8 left-8 w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center shadow-lg hover:bg-primary/90 transition-all duration-300 ${currentPage <= 0 ? 'cursor-not-allowed' : ''}`}
             aria-label="上一页"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -588,7 +646,7 @@ const CoursewareDetail = () => {
             animate={{ opacity: 1, x: 0 }}
             onClick={goToNextPage}
             disabled={currentPage >= pageCount - 1}
-            className={`fixed bottom-8 right-8 w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center shadow-lg hover:bg-primary/90 transition-all duration-300 ${currentPage >= pageCount - 1 ? 'cursor-not-allowed' : ''}`}
+            className={`absolute bottom-8 right-8 w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center shadow-lg hover:bg-primary/90 transition-all duration-300 ${currentPage >= pageCount - 1 ? 'cursor-not-allowed' : ''}`}
             aria-label="下一页"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -603,7 +661,7 @@ const CoursewareDetail = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="fixed bottom-0 left-0 right-0 bg-gray-200 h-2 z-30"
+          className="absolute bottom-0 left-0 right-0 bg-gray-200 h-2 z-30"
         >
           <div 
             className="h-full bg-primary transition-all duration-300 ease-out"
