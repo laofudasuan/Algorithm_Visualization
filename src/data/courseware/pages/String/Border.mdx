@@ -4,13 +4,32 @@ title: Border
 
 import { CollapsibleComponent } from '../../../courseware/markdownConfig';
 
-# Border
+# KMP与字符串的周期、Border
 
-## 算法原理
+## 基础定义
+
+对字符串 $ s $ 和 $ 0 < p \leq |s| $，若 $ s[i] = s[i + p] $ 对所有 $ i \in [0, |s| - p - 1] $ 成立，则称 $ p $ 是 $ s $ 的周期。
+
+对字符串 $ s $ 和 $ 0 \leq r < |s| $，若 $ s $ 长度为 $ r $ 的前缀和长度为 $ r $ 的后缀相等，就称 $ s $ 长度为 $ r $ 的前缀是 $ s $ 的 border。
+
+
+由 $ s $ 有长度为 $ r $ 的 border 可以推导出 $ |s| - r $ 是 $ s $ 的周期。
+
+
+根据前缀函数的定义，可以得到 $ s $ 所有的 border 长度，即 $ \pi[n - 1], \pi[\pi[n - 1] - 1], ... $。
+
+
+所以根据前缀函数可以在 $ O(n) $ 的时间内计算出 $ s $ 所有的周期。其中，由于 $ \pi[n - 1] $ 是 $ s $ 最长 border 的长度，所以 $ n - \pi[n - 1] $ 是 $ s $ 的最小周期。
+
+## 例题
 
 ##### NOI2014 动物园
 
-border计数问题，这里需要用到一个性质:若$a,b$都为$s$的border,且$|a|<|b|$,则$a$也为$b$的border。
+<CollapsibleComponent title="做法"> 
+- border计数问题
+- 性质:若$a,b$都为$s$的border，且$|a|<|b|$，则$a$也为$b$的border。
+- 利用这个性质，对Border可以沿着next记录前缀和
+</CollapsibleComponent>
 
 ##### abc312EX snukesnuke
 
