@@ -109,3 +109,18 @@ int main() {
 - 二分斜率的时候为了避免求导， 可以计算 $f(mid), f (mid + \delta)$ 的值， 其中 $\delta$ 是一个很小的数来判断怎么取舍区间。
 - 写成代码和上面代码的三分其实是一样的。
 - 没有啥难度， 一般就是观察到函数有什么单调性就可以用用。
+
+##### P10217 [省选联考 2024] 季风
+
+给定 $n,k,x,y$ 和 $2n$ 个整数 $x_0,y_0,x_1,y_1,\dots,x_{n-1},y_{n-1}$。
+
+找到最小的**非负整数** $m$，使得存在 $2m$ 个实数 $x_0',y_0',x_1',y_1',\dots,x_{m-1}',y_{m-1}'$ 满足以下条件，或报告不存在这样的 $m$：
+- $\sum \limits_{i=0}^{m-1} (x_i'+x_{i \bmod n})=x$；
+- $\sum \limits_{i=0}^{m-1} (y_i'+y_{i \bmod n})=y$；
+- $\forall 0\leq i\leq m-1,|x_i'|+|y_i'|\leq k$。
+
+特别地，$m=0$ 时，认为 $\sum \limits_{i=0}^{m-1} (x_i'+x_{i \bmod n})$ 和 $\sum \limits_{i=0}^{m-1} (y_i'+y_{i \bmod n})$ 均为 $0$。
+
+- $1\leq T\leq 5\times 10^4$；
+- $1\leq n\leq 10^5$，$1\leq \sum n \leq 10^6$；
+- $0\leq |x|,|y|,|x_i|,|y_i|,k\leq 10^8$。
