@@ -313,7 +313,7 @@ const CoursewareDetail = () => {
               id: nodeId,
               type: 'courseware',
               position: { x: pageDef.x || 0, y: pageDef.y || 0 },
-              data: { label, clickable: !!pageDef.path },
+              data: { label, path: pageDef.path || null, link: pageDef.link || null },
               draggable: false,
               style: { borderRadius: 12, border: '2px solid #e6e6e6ff', color: '#000000', fontWeight: 700, padding: '8px 12px' },
               className: 'courseware-node'
@@ -418,7 +418,16 @@ const CoursewareDetail = () => {
 
   const onNodeClick = (_e, node) => {
     if (node.id === 'meta-title' || node.id === 'meta-description') return;
-    if (!node?.data?.clickable) return;
+    if (node?.data?.link) {
+      const url = `/courseware/${node.data.link}`;
+      try {
+        window.open(url, '_blank', 'noopener');
+      } catch {
+        navigate(url);
+      }
+      return;
+    }
+    if (!node?.data?.path) return;
     const idx = pageIdToIndex[String(node.id)];
     if (idx === undefined) return;
     setShowMainPage(false);

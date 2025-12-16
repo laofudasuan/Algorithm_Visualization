@@ -1,0 +1,22 @@
+{
+  "title": "分治",
+  "description": "分治算法",
+  "cover": "/images/no.png",
+  "author": "老虎大蒜",
+  "createdAt": "2025-11-23",
+  "metaPositions": {
+    "title": { "x": 150, "y": 120 },
+    "description": { "x": 500, "y": 150 }
+  },
+  "pages": [
+    { "id": "分治", "path": "Basic/Divide.mdx", "x": 200, "y": 280 },
+    { "id": "序列分治", "path": "Basic/Divide-Sequence.mdx", "x": 300, "y": 280 },
+    { "id": "矩阵分治", "path": "Basic/Divide-Matrix.mdx", "x": 300, "y": 520 },
+    { "id": "树分治", "link": "Tree-Split", "x": 300, "y": 380 },
+    { "id": "时间序列分治", "path": "Basic/Divide-Time.mdx", "x": 300, "y": 420 },
+    { "id": "猫树", "x": 300, "y": 600 }
+  ],
+  "edges": [
+    { "source": "XXX", "target": "XXX", "sourceSide": "top", "targetSide": "bottom" }
+  ]
+}

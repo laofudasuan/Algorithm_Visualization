@@ -1,0 +1,29 @@
+---
+title: Manacher算法
+---
+
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+
+# Manacher算法
+
+**重要结论：一个串的本质不同的回文子串数目最多为$n$个**
+
+##### P12977 泪雨 Namid[A]me
+定义：
+
+$$
+f(l,r)=\sum_{i=l}^{r} [s_i=\texttt{?}]\cdot i
+$$
+
+$$
+g(l,r)=\big[\sum_{i=l}^r{[s_i=\texttt{?}] \geq} \frac{r-l+1}{2}\big]\big[ s[l,r]\text{ is a palindrome} \big]
+$$
+
+请你求出 $\sum_{l=1}^{n} \sum_{r=l}^{n} g(l,r)\cdot f(l,r)$，其中 $n=\lvert s\rvert$。
+
+对于 $100\%$ 的数据满足 $1\leq n\leq 5\times 10^6$，且 $s$ 仅包含小写英文字母和?
+
+##### [ABC349G] Palindrome Construction
+
+##### P1659 [国家集训队] 拉拉队排练
+

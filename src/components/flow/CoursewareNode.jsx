@@ -32,7 +32,7 @@ function CoursewareNode({ data }) {
             }}
           />
         )}
-        {data?.clickable && (
+        {data?.link && (
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -48,6 +48,25 @@ function CoursewareNode({ data }) {
             }}
           >
             <path d="M2 12l20-10-8 10 8 10L2 12z" transform="rotate(135 12 12)" />
+          </svg>
+        )}
+        {data?.path && (
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            style={{
+              position: 'absolute',
+              top: -10,
+              right: -10,
+              width: 14,
+              height: 14,
+              opacity: 0.85,
+              pointerEvents: 'none',
+            }}
+          >
+            <circle cx="10" cy="10" r="7" stroke="#3b82f6" strokeWidth="2" />
+            <line x1="15" y1="15" x2="20" y2="20" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" />
           </svg>
         )}
         <div>{data?.label}</div>

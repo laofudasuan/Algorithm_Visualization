@@ -2,9 +2,13 @@
   "nodes": [
     { "id": "Temp", "x": 100, "y": 200, "category": "空" },
 
+    { "id": "Sequence", "x": 430, "y": 420, "category": "组合对象" },
+
     { "id": "Tree-Basic", "x": 200, "y": 300, "category": "组合对象" },
     { "id": "Tree-Sequence", "x": 350, "y": 330, "category": "组合对象" },
     { "id": "Tree-Split", "x": 350, "y": 270, "category": "组合对象" },
+    { "id": "基环树", "x": 80, "y": 270, "category": "组合对象" },
+    { "id": "仙人掌", "x": 80, "y": 330, "category": "组合对象" },
     { "id": "Permutation", "x": 350, "y": 400, "category": "组合对象" },
 
     { "id": "Graph-Basic", "x": 300, "y": 650, "category": "组合对象" },
@@ -18,10 +22,10 @@
     { "id": "Minimum-Spanning-Tree", "x": 450, "y": 630, "category": "算法" },
     { "id": "ST-Count", "x": 500, "y": 680, "category": "数学基础" },
     { "id": "DAG", "x": 400, "y": 550, "category": "算法" },
-    { "id": "Congruence-SSP", "x": 230, "y": 470, "category": "算法" },
+    { "id": "SSP-Congruence", "x": 230, "y": 470, "category": "算法" },
     { "id": "Euler-Path", "x": 400, "y": 730, "category": "算法" },
 
-    { "id": "Greedy", "x": 700, "y": 800, "category": "算法思想" },
+    { "id": "Greedy", "x": 500, "y": 900, "category": "算法思想" },
     
     { "id": "Counting", "x": 1000, "y": 900, "category": "数学基础" },
 
@@ -31,7 +35,8 @@
     { "id": "Automatic-Machine", "x": 1100, "y": 700, "category": "组合对象" },
     { "id": "Trie", "x": 1000, "y": 680, "category": "组合对象" },
 
-    { "id": "Data-Structure", "x": 700, "y": 200, "category": "算法" },
+    { "id": "Data-Structure", "x": 700, "y": 800, "category": "算法" },
+    { "id": "Segment-Tree", "x": 600, "y": 750, "category": "算法" },
 
     { "id": "Dynamic-Programming", "x": 750, "y": 400, "category": "算法" },
     { "id": "DP-Sequence", "x": 750, "y": 500, "category": "算法" },
@@ -79,6 +84,8 @@
   "edges": [
     { "source": "Tree-Basic", "target": "Tree-Sequence", "sourceSide": "right", "targetSide": "left" },
     { "source": "Tree-Basic", "target": "Tree-Split", "sourceSide": "right", "targetSide": "left" },
+    { "source": "Tree-Basic", "target": "基环树", "sourceSide": "left", "targetSide": "right" },
+    { "source": "Tree-Basic", "target": "仙人掌", "sourceSide": "left", "targetSide": "right" },
 
     { "source": "Graph-Basic", "target": "Bipartite", "sourceSide": "left", "targetSide": "right" },
     { "source": "Graph-Basic", "target": "Connectivity", "sourceSide": "left", "targetSide": "right" },
@@ -90,7 +97,7 @@
     { "source": "Graph-Basic", "target": "DAG", "sourceSide": "right", "targetSide": "bottom" },
     { "source": "Graph-Basic", "target": "Euler-Path", "sourceSide": "right", "targetSide": "top" },
     { "source": "Greedy", "target": "Network-Flow-Simulate", "sourceSide": "left", "targetSide": "right", "label": "算法思想" },
-    { "source": "Shortest-Path", "target": "Congruence-SSP", "sourceSide": "top", "targetSide": "bottom" },
+    { "source": "Shortest-Path", "target": "SSP-Congruence", "sourceSide": "top", "targetSide": "bottom" },
     { "source": "Connectivity", "target": "Transitive-Closure", "sourceSide": "top", "targetSide": "bottom", "label": "有向图可达性问题" },
     { "source": "Polynomial", "target": "Generating-Function", "sourceSide": "bottom", "targetSide": "top" },
     { "source": "FFT", "target": "Polynomial", "sourceSide": "left", "targetSide": "right" },

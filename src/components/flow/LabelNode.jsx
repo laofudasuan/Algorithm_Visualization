@@ -26,7 +26,7 @@ function LabelNode({ data }) {
     };
     return <div style={{ ...base, ...titleStyle }}>{data?.label}</div>;
   }
-  const descStyle = { fontSize: 18, fontWeight: 500, color: '#374151', textShadow: '0 1px 2px rgba(0,0,0,0.04)', maxWidth: 520 };
+  const descStyle = { fontSize: 18, fontWeight: 500, color: '#374151', textShadow: '0 1px 2px rgba(0,0,0,0.04)', maxWidth: 520, textAlign: 'left' };
   return <div style={{ ...base, ...descStyle }}>{data?.label}</div>;
 }
 

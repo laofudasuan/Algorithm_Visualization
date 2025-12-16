@@ -1,0 +1,39 @@
+{
+  "title": "字符串",
+  "description": "展示字符串的基础算法",
+  "cover": "/images/no.png",
+  "author": "老虎大蒜",
+  "createdAt": "2025-11-23",
+  "metaPositions": {
+    "title": { "x": 150, "y": 120 },
+    "description": { "x": 500, "y": 150 }
+  },
+  "pages": [
+    { "id": "字符串", "x": 400, "y": 380 },
+    { "id": "KMP", "path": "String/KMP.mdx", "x": 400, "y": 280 },
+    { "id": "EXKMP", "path": "String/EX-KMP.mdx", "x": 600, "y": 400 },
+    { "id": "Palindrome", "path": "String/Palindrome.mdx", "x": 600, "y": 300 },
+    { "id": "Manacher", "path": "String/Manacher.mdx", "x": 750, "y": 320 },
+    { "id": "循环表示", "path": "Cyclic-Representation.mdx", "x": 600, "y": 500 },
+    { "id": "哈希", "link": "Hash", "x": 200, "y": 440 },
+    { "id": "字典树", "link": "Trie", "x": 200, "y": 320 },
+    { "id": "暴力优化类算法", "x": 820, "y": 450 },
+    { "id": "自动机", "link": "Automatic-Machine", "x": 800, "y": 200 }
+  ],
+  "edges": [
+    { "source": "字符串", "target": "哈希", "sourceSide": "left", "targetSide": "right", "label": "转换为整数问题" },
+    { "source": "字符串", "target": "字典树", "sourceSide": "left", "targetSide": "right", "label": "转化为树上问题" },
+    { "source": "字符串", "target": "KMP", "sourceSide": "top", "targetSide": "bottom", "label": "匹配问题" },
+    { "source": "字符串", "target": "EXKMP", "sourceSide": "right", "targetSide": "left"},
+    { "source": "字符串", "target": "Palindrome", "sourceSide": "right", "targetSide": "left"},
+    { "source": "字符串", "target": "循环表示", "sourceSide": "right", "targetSide": "left"},
+    { "source": "Palindrome", "target": "Manacher", "sourceSide": "right", "targetSide": "left"},
+    { "source": "暴力优化类算法", "target": "Manacher", "sourceSide": "left", "targetSide": "bottom"},
+    { "source": "暴力优化类算法", "target": "EXKMP", "sourceSide": "left", "targetSide": "right"},
+    { "source": "暴力优化类算法", "target": "循环表示", "sourceSide": "left", "targetSide": "right"},
+
+    { "source": "KMP", "target": "自动机", "sourceSide": "top", "targetSide": "bottom", "label": "KMP自动机"},
+    { "source": "Palindrome", "target": "自动机", "sourceSide": "top", "targetSide": "bottom", "label": "回文自动机"},
+    { "source": "字典树", "target": "自动机", "sourceSide": "top", "targetSide": "left", "label": "AC自动机"}
+  ]
+}

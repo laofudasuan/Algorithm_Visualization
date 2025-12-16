@@ -1,0 +1,40 @@
+---
+title: Dilworth引理
+---
+
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+
+##### P11663 JOI 2025 Final 勇者比太郎 2
+
+比太郎要打怪。
+
+令比太郎初始时的力量为 $x$。有 $N$ 个怪物，编号 $1 \sim N$。欲打败第 $i$（$1 \leq i \leq N$）个怪物，需要力量 $\geq A_i$。打败第 $i$（$1 \leq i \leq N$）个怪物，会使比太郎的力量增加 $B_i$。
+
+比太郎会用如下的策略打怪：
+- 选择整数 $j$（$1 \leq j \leq N$），然后按 $j, j+1, \cdots, N$ 的顺序打怪。
+- 如果 $j \geq 2$，回头按顺序打怪物 $1, 2, \cdots, j-1$。
+
+在按照策略打完所有的怪物的前提下，求出比太郎初始力量 $x$ 的最小值。
+
+$n \le 5 \times 10^5$
+
+<CollapsibleComponent title="解法">
+套用Dilworth 定理
+
+然后状压DP
+</CollapsibleComponent>
+
+##### P11665 JOI 2025 Final 只不过是长的领带 2 / Just Long Neckties 2
+    
+有一个长度为 $k$ $(k \geq 1)$ 的正整数数列 $B_1, \cdots, B_k$，初始 $B_i = 1 \ (1 \leq i \leq k)$。这里，$k$ 是一个还未确定的数。
+
+有 $N$ 场演出，第 $i \ (1 \leq i \leq N)$ 场演出中，观众将会报出数字 $A_i$。然后你需要做以下的事情：
+
+- 选择是否回应这个观众。
+  - 如果选择回应，你需要选择 $j \ (1 \leq j \leq k)$ 满足 $B_j \leq A_i$，然后令 $B_j \leftarrow A_i$。（注意这里是小于等于号。）
+  - 如果无法选择这样的 $j$，则演出失败。
+- 否则，不需要做任何事。
+
+然而，如果连续两次（或者更多次）选择不回应观众，那么观众就会生气，从而演出失败。
+
+在演出不失败的前提下，确定 $k$ 的最小值。
