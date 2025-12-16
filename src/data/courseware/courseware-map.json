@@ -5,6 +5,7 @@
     { "id": "Tree-Basic", "x": 200, "y": 300, "category": "组合对象" },
     { "id": "Tree-Sequence", "x": 350, "y": 330, "category": "组合对象" },
     { "id": "Tree-Split", "x": 350, "y": 270, "category": "组合对象" },
+    { "id": "Permutation", "x": 350, "y": 400, "category": "组合对象" },
 
     { "id": "Graph-Basic", "x": 300, "y": 650, "category": "组合对象" },
     { "id": "Connectivity", "x": 50, "y": 620, "category": "算法" },

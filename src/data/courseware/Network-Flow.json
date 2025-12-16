@@ -1,0 +1,28 @@
+{
+  "title": "网络流",
+  "description": "网络流问题",
+  "cover": "/images/no.png",
+  "author": "老虎大蒜",
+  "createdAt": "2025-11-23",
+  "metaPositions": {
+    "title": { "x": 150, "y": 120 },
+    "description": { "x": 500, "y": 150 }
+  },
+  "pages": [
+    { "id": "Basic", "path": "Graph/Network-Flow-Basic.mdx", "x": 300, "y": 220 },
+    { "id": "Key", "path": "Graph/Network-Flow-Key.mdx", "x": 520, "y": 220 },
+    { "id": "网络流建模", "x": 300, "y": 340 },
+    { "id": "MaxFlow", "path": "Graph/Network-Flow-MaxFlow.mdx", "x": 520, "y": 300 },
+    { "id": "MinCut", "path": "Graph/Network-Flow-MinCut.mdx", "x": 520, "y": 360 },
+    { "id": "MinCostMaxFlow", "path": "Graph/Network-Flow-MinCostMaxFlow.mdx", "x": 520, "y": 420 },
+    { "id": "Bound", "path": "Graph/Network-Flow-Bound.mdx", "x": 100, "y": 220 }
+  ],
+  "edges": [
+    { "source": "Basic", "target": "Key", "sourceSide": "right", "targetSide": "left" },
+    { "source": "Basic", "target": "网络流建模", "sourceSide": "bottom", "targetSide": "top" },
+    { "source": "Basic", "target": "Bound", "sourceSide": "left", "targetSide": "right" },
+    { "source": "网络流建模", "target": "MaxFlow", "sourceSide": "right", "targetSide": "left" },
+    { "source": "网络流建模", "target": "MinCut", "sourceSide": "right", "targetSide": "left" },
+    { "source": "网络流建模", "target": "MinCostMaxFlow", "sourceSide": "right", "targetSide": "left" }
+  ]
+}

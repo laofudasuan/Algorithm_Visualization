@@ -14,7 +14,7 @@ import { CollapsibleComponent } from '../../../courseware/markdownConfig';
 - P1352 没有上司的舞会
 - P2016 战略游戏
 
-##### [PA 2021] Poborcy podatkowi
+##### P9047 [PA 2021] Poborcy podatkowi
 
 给定一棵 $n$ 个点的树，你可以选择若干条长度为 $4$（指 $4$ 条边） 的不相交链（可以不选）。
 
@@ -96,16 +96,11 @@ $Ans=min(f[now][p]+1,ans)$,加一表示删去该子树与树上其他部位联�
 - $f[i][2]$不包括i及与其相连的一条链在内所有i子树上的构成环所需添加的边数
 - 可以证明，子树内i若与两条链相连却不处理的情况非法
 
-
-    
 ###### Case1：$i$的各个儿子节点都在环中，$i$无法构成环
 
 $f[fa][1]=sum(f[son][0])$
 
 ![](/DP/G4.png)
-
-
-</CollapsibleComponent>
 
 ###### Case2：除$p$点或$p$链不在环中$i$的各个儿子节点都在环中，$i$与$p$为链
 
@@ -133,10 +128,13 @@ $f[son][0]$非法超过两次时，无法满足答案，退出
 
 $f[son][0]$非法时必须选其$f[son][1]$或$f[son][2]$（无论是否合算）
 
-##### 逃学的小孩（NOI2003）
+</CollapsibleComponent>
+
+##### P4408 [NOI2003] 逃学的小孩
 
 在一棵树中，每条边都有一个长度值，现要求在树中选择$3$个点$X,Y,Z$，满足$X$到$Y$的距离不大于$X$到$Z$的距离，且$X$到$Y$的距离与$Y$到$Z$的距离之和最大，求这个最大值。
 
+<CollapsibleComponent title="做法"> 
 咋看题目，类似求最长路径问题
 
 思考：如果$x,y,z$在同一条链上，则：
@@ -165,6 +163,8 @@ Case 父节点的最大值由该子树提供：$ans=fmid[fa]+fmax[son]+fmid[son]
 
 之后记得用父节点最值更新子节点最值 $f[son]=f[fa]+w,g[son]=fa$
 
+</CollapsibleComponent>
+
 ##### Apple Tree（poj2486）
     
 给定一棵$n(n \le 100)$个节点的树，每个节点上有一个值
@@ -172,6 +172,8 @@ Case 父节点的最大值由该子树提供：$ans=fmid[fa]+fmax[son]+fmid[son]
 从root出发，走$k(k \le 200$)步，每步必须往其相邻的点走，每到一个节点将此节点上的值累加起来（不能重复累加）
 
 问最多可以得到多大的累加值
+
+<CollapsibleComponent title="做法">
 
 易证：对于每棵子树我们只需进入一次；对于每条路径，我们最多往返各一次
 
@@ -185,6 +187,8 @@ $f[i][j][0]$表示从$i$点向其子树走$j$步并最终返回i点可得苹果�
 
 $F[fa][j][1]=\{$选$k-1$个子树往返即$f[sonx][i][0]$,另一子树不需返回,在各子树共走$j-2*k+1$步$\}$
     
+</CollapsibleComponent>
+
 ##### P3354 River
     
 在Byteland国，有$n$个伐木的村庄，这些村庄都座落在河边
@@ -282,5 +286,10 @@ $1 \leq n \leq 200000$
 ![](/DP/G10.jpg)
 </CollapsibleComponent>
 
-##### 白兔的村庄
     
+## 补充题
+- T304520 树的直径3.0
+- T647910 树上路径
+- T525435 生成树
+- T516376 夜跑
+

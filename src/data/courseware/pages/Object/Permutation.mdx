@@ -1,0 +1,22 @@
+---
+title: 排列
+---
+
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+
+# 排列问题
+
+## 看待排列的方式
+
+把一个排列看成一张图，每个$i$连向$P[i]$，形成若干个环
+
+##### abc436_e Minimum Swap 
+
+<CollapsibleComponent title="解题思路">
+
+每一次操作：
+
+- 如果$i,j$是在同一个环，则相当于把环拆开
+- 如果$i,j$不在同一个环，则相当于把环连接起来
+
+</CollapsibleComponent>

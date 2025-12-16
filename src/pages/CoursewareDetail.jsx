@@ -1,9 +1,14 @@
-import React, { useState, useEffect, lazy, Suspense, useRef } from 'react';
+import React, { useState, useEffect, lazy, Suspense, useRef, useMemo } from 'react';
 import { createRoot } from 'react-dom/client';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import 'katex/dist/katex.min.css';
 import { headingComponents, tableComponents, listComponents, boxWithTagComponent, CodeBlock } from '../data/courseware/markdownConfig.jsx';
+import ReactFlow, { Background, ReactFlowProvider, useNodesState, useEdgesState, MarkerType } from 'reactflow';
+import 'reactflow/dist/style.css';
+import '../styles/reactflow-overrides.css';
+import CoursewareNode from '../components/flow/CoursewareNode.jsx';
+import LabelNode from '../components/flow/LabelNode.jsx';
 
 const CoursewareDetail = () => {
   const { id } = useParams();
@@ -44,11 +49,16 @@ const CoursewareDetail = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [pageCount, setPageCount] = useState(0);
   const [direction, setDirection] = useState('right'); // 'left' or 'right' to control animation direction
-  const [showMainPage, setShowMainPage] = useState(true); // 控制显示主页还是子页面
+  const [showMainPage, setShowMainPage] = useState(true); // 控制显示主页/地图还是子页面
   const [toc, setToc] = useState([]); // 存储目录信息
   const [showToc, setShowToc] = useState(false); // 控制目录显示/隐藏
   const contentRef = useRef(null);
   const tocRef = useRef(null);
+  const [mapMode, setMapMode] = useState(false);
+  const [mapNodes, setMapNodes, onNodesChange] = useNodesState([]);
+  const [mapEdges, setMapEdges, onEdgesChange] = useEdgesState([]);
+  const nodeTypes = useMemo(() => ({ courseware: CoursewareNode, label: LabelNode }), []);
+  const [pageIdToIndex, setPageIdToIndex] = useState({});
 
   // 组件加载时隐藏Navbar
   useEffect(() => {
@@ -61,8 +71,9 @@ const CoursewareDetail = () => {
     };
   }, []);
   
-  // 使用Vite的import.meta.glob预加载所有可能的MDX文件
+  // 使用Vite的import.meta.glob预加载可能的文件
   const coursewareFiles = import.meta.glob('../data/courseware/*.mdx', { eager: false });
+  const coursewareJsonFiles = import.meta.glob('../data/courseware/*.json', { eager: false });
   const pageFiles = import.meta.glob('../data/courseware/pages/**/*.mdx', { eager: false });
 
   // 提取页面中的标题信息，构建目录
@@ -254,67 +265,144 @@ const CoursewareDetail = () => {
   useEffect(() => {
     const loadCourseware = async () => {
       try {
-        // 动态导入对应的MDX课件文件
-        const coursewarePath = `../data/courseware/${id}.mdx`;
-        if (coursewareFiles[coursewarePath]) {
-          const coursewareModule = await coursewareFiles[coursewarePath]();
-          
+        const jsonPath = `../data/courseware/${id}.json`;
+        if (coursewareJsonFiles[jsonPath]) {
+          const jsonModule = await coursewareJsonFiles[jsonPath]();
+          const data = jsonModule.default || jsonModule;
+          const meta = {
+            title: data.title,
+            description: data.description,
+            author: data.author,
+            createdAt: data.createdAt,
+            cover: data.cover
+          };
+          setCourseware({ id, ...meta });
+          const components = [];
+          const attributes = [];
+          const nodes = [];
+          const edges = [];
+          const pages = Array.isArray(data.pages) ? data.pages : [];
+          const idToIndex = {};
+          for (let i = 0; i < pages.length; i++) {
+            const pageDef = pages[i];
+            let matchedPath = null;
+            for (const path in pageFiles) {
+              if (pageDef.path && path.endsWith(`/${pageDef.path}`)) {
+                matchedPath = path;
+                break;
+              }
+            }
+            if (matchedPath && pageFiles[matchedPath]) {
+              try {
+                const dynamicImport = await pageFiles[matchedPath]();
+                components.push(dynamicImport.default);
+                const attr = dynamicImport.frontmatter || dynamicImport.attributes || {};
+                attributes.push(attr);
+              } catch {
+                components.push(() => <div className="text-center py-12 bg-red-50 rounded-lg">页面加载失败</div>);
+                attributes.push({});
+              }
+            } else {
+              components.push(() => <div className="text-center py-12 bg-red-50 rounded-lg">页面不存在</div>);
+              attributes.push({});
+            }
+            const label = attributes[i]?.title || pageDef.title || pageDef.id || `页面 ${i + 1}`;
+            const nodeId = String(pageDef.id || `page-${i}`);
+            idToIndex[nodeId] = i;
+            nodes.push({
+              id: nodeId,
+              type: 'courseware',
+              position: { x: pageDef.x || 0, y: pageDef.y || 0 },
+              data: { label, clickable: !!pageDef.path },
+              draggable: false,
+              style: { borderRadius: 12, border: '2px solid #e6e6e6ff', color: '#000000', fontWeight: 700, padding: '8px 12px' },
+              className: 'courseware-node'
+            });
+          }
+          if (data.metaPositions?.title) {
+            nodes.push({
+              id: 'meta-title',
+              type: 'label',
+              position: { x: data.metaPositions.title.x || 0, y: data.metaPositions.title.y || 0 },
+              data: { label: meta.title || id, kind: 'title' },
+              draggable: false,
+              className: 'label-node'
+            });
+          }
+          if (data.metaPositions?.description) {
+            nodes.push({
+              id: 'meta-description',
+              type: 'label',
+              position: { x: data.metaPositions.description.x || 0, y: data.metaPositions.description.y || 0 },
+              data: { label: meta.description || '', kind: 'description' },
+              draggable: false,
+              className: 'label-node'
+            });
+          }
+          (Array.isArray(data.edges) ? data.edges : []).forEach((e, idx) => {
+            const s = String(e.source);
+            const t = String(e.target);
+            edges.push({
+              id: `${s}-${t}-${idx}`,
+              source: s,
+              target: t,
+              sourceHandle: e.sourceSide || null,
+              targetHandle: e.targetSide || null,
+              label: e.label || undefined,
+              style: { stroke: '#A0AEC0', strokeWidth: 3 },
+              markerEnd: { type: MarkerType.ArrowClosed, color: '#A0AEC0' }
+            });
+          });
+          setPageComponents(components);
+          setPageAttributes(attributes);
+          setPageCount(components.length);
+          setToc(new Array(components.length));
+          setMapNodes(nodes);
+          setMapEdges(edges);
+          setPageIdToIndex(idToIndex);
+          setMapMode(true);
+        } else if (coursewareFiles[`../data/courseware/${id}.mdx`]) {
+          const coursewareModule = await coursewareFiles[`../data/courseware/${id}.mdx`]();
           const meta = coursewareModule.frontmatter || coursewareModule.attributes || {};
           setCourseware({ id, ...meta });
-          
-          // 检查是否有分页配置
           if (Array.isArray(meta.pages)) {
             const components = [];
             const attributes = [];
-            
-            // 使用glob导入的模块来加载页面文件
             for (const pageFile of meta.pages) {
-              try {
-                console.log(`正在加载页面: ${pageFile}`);
-                // 使用预先定义的glob导入来解决Vite警告
-                // 查找匹配的页面路径（支持嵌套目录）
-                let matchedPath = null;
-                for (const path in pageFiles) {
-                  if (path.endsWith(`/${pageFile}`)) {
-                    matchedPath = path;
-                    break;
-                  }
+              let matchedPath = null;
+              for (const path in pageFiles) {
+                if (path.endsWith(`/${pageFile}`)) {
+                  matchedPath = path;
+                  break;
                 }
-                
-                if (matchedPath && pageFiles[matchedPath]) {
+              }
+              if (matchedPath && pageFiles[matchedPath]) {
+                try {
                   const dynamicImport = await pageFiles[matchedPath]();
                   components.push(dynamicImport.default);
                   attributes.push(dynamicImport.frontmatter || dynamicImport.attributes || {});
-                } else {
-                  throw new Error(`页面文件不存在: ${pageFile}`);
+                } catch {
+                  components.push(() => <div className="text-center py-12 bg-red-50 rounded-lg">页面加载失败</div>);
+                  attributes.push({});
                 }
-                console.log(`成功加载页面: ${pageFile}`);
-              } catch (importError) {
-                console.error(`加载页面 ${pageFile} 失败:`, importError);
-                // 添加一个错误占位组件
-                components.push(() => (
-                  <div className="text-center py-12 bg-red-50 rounded-lg">
-                    <h3 className="text-xl font-bold text-red-600 mb-2">页面加载失败</h3>
-                    <p className="text-gray-600">{pageFile}</p>
-                  </div>
-                ));
+              } else {
+                components.push(() => <div className="text-center py-12 bg-red-50 rounded-lg">页面不存在</div>);
                 attributes.push({});
               }
             }
-            
             setPageComponents(components);
             setPageAttributes(attributes);
             setPageCount(components.length);
-            setToc(new Array(components.length)); // 初始化目录数组
+            setToc(new Array(components.length));
+            setMapMode(false);
           } else {
-            // 兼容旧格式
             setPageComponents([coursewareModule.default]);
             setPageAttributes([meta]);
             setPageCount(1);
-            setToc(new Array(1)); // 初始化目录数组
+            setToc(new Array(1));
+            setMapMode(false);
           }
         } else {
-          console.error(`课件文件不存在: ${coursewarePath}`);
           setError(new Error('课件文件不存在'));
         }
       } catch (err) {
@@ -327,6 +415,22 @@ const CoursewareDetail = () => {
 
     loadCourseware();
   }, [id]);
+
+  const onNodeClick = (_e, node) => {
+    if (node.id === 'meta-title' || node.id === 'meta-description') return;
+    if (!node?.data?.clickable) return;
+    const idx = pageIdToIndex[String(node.id)];
+    if (idx === undefined) return;
+    setShowMainPage(false);
+    setDirection(idx > currentPage ? 'right' : 'left');
+    setCurrentPage(idx);
+  };
+
+  const containerVariants = useMemo(() => ({
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
+  }), []);
+
 
   // 当页面改变时提取标题
   useEffect(() => {
@@ -415,26 +519,24 @@ const CoursewareDetail = () => {
     );
   }
 
-  // 主页视图
+  // 主页/地图视图
   if (showMainPage) {
     return (
       <motion.div 
-        className="fixed inset-0 overflow-y-auto bg-white z-50"
+        className="fixed inset-0 overflow-hidden bg-white z-50"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={exitVariants}
       >
-      <div className="min-h-full flex flex-col items-center justify-center container mx-auto px-4 pt-32 pb-32">
-        
-        {/* 返回按钮 - 位于页面右上角 */}
-        <div className="absolute top-4 right-4 flex flex-col items-end gap-2">
+      <div className="w-full h-full">
+        <div className="absolute top-4 right-4 flex flex-col items-end gap-2 z-50">
           <button 
             onClick={goBackToCoursewareList}
             className="bg-white text-gray-800 p-3 rounded-full shadow-lg hover:bg-gray-100 transition-colors"
             aria-label="返回"
           >
             <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
           <button
@@ -447,34 +549,62 @@ const CoursewareDetail = () => {
             </svg>
           </button>
         </div>
-
-        {/* 课件标题和元信息 */}
-        <motion.div 
-          className="max-w-3xl mx-auto text-center"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <h1 className="text-5xl font-bold mb-6">{courseware.title || '未命名课件'}</h1>
-          <p className="text-xl text-gray-600 mb-8">{courseware.description || '暂无描述'}</p>
-          <div className="flex flex-wrap justify-center gap-6 text-lg text-gray-500 mb-16">
-            <span>作者: {courseware.author || '未知'}</span>
-            <span>创建时间: {courseware.createdAt || '未知'}</span>
+        {mapMode ? (
+          <motion.div
+            className="page-content w-full h-full max-w-none"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: 'easeOut' }}
+            variants={containerVariants}
+          >
+            <div className="w-full h-full overflow-hidden relative">
+              <ReactFlowProvider>
+                <ReactFlow
+                  nodes={mapNodes}
+                  edges={mapEdges}
+                  onNodesChange={onNodesChange}
+                  onEdgesChange={onEdgesChange}
+                  onNodeClick={onNodeClick}
+                  nodeTypes={nodeTypes}
+                  fitView
+                  minZoom={0.2}
+                  maxZoom={4}
+                  proOptions={{ hideAttribution: true }}
+                >
+                  <Background color="#f3f4f6" variant="dots" gap={16} size={1} />
+                </ReactFlow>
+              </ReactFlowProvider>
+            </div>
+          </motion.div>
+        ) : (
+          <div className="min-h-full flex flex-col items-center justify-center container mx-auto px-4 pt-32 pb-32">
+            <motion.div 
+              className="max-w-3xl mx-auto text-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              <h1 className="text-5xl font-bold mb-6">{courseware.title || '未命名课件'}</h1>
+              <p className="text-xl text-gray-600 mb-8">{courseware.description || '暂无描述'}</p>
+              <div className="flex flex-wrap justify-center gap-6 text-lg text-gray-500 mb-16">
+                <span>作者: {courseware.author || '未知'}</span>
+                <span>创建时间: {courseware.createdAt || '未知'}</span>
+              </div>
+              <div className="flex flex-wrap justify-center gap-4">
+                {pageAttributes.map((pageAttr, index) => (
+                  <motion.button
+                    key={index}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => { setShowMainPage(false); setDirection(index > currentPage ? 'right' : 'left'); setCurrentPage(index); }}
+                    className="px-10 py-4 bg-primary text-white rounded-md text-lg font-medium hover:bg-primary/90 transition-all duration-300 shadow-lg"
+                  >
+                    {pageAttr.title || `页面 ${index + 1}`}
+                  </motion.button>
+                ))}
+              </div>
+            </motion.div>
           </div>
-
-          <div className="flex flex-wrap justify-center gap-4">
-            {pageAttributes.map((pageAttr, index) => (
-              <motion.button
-                key={index}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => { setShowMainPage(false); setDirection(index > currentPage ? 'right' : 'left'); setCurrentPage(index); }}
-                className="px-10 py-4 bg-primary text-white rounded-md text-lg font-medium hover:bg-primary/90 transition-all duration-300 shadow-lg"
-              >
-                {pageAttr.title || `页面 ${index + 1}`}
-              </motion.button>
-            ))}
-          </div>
-        </motion.div>
+        )}
       </div>
       </motion.div>
     );
@@ -494,6 +624,15 @@ const CoursewareDetail = () => {
           onClick={goBackToCoursewareList}
           className="bg-white text-gray-800 p-3 rounded-full shadow-lg hover:bg-gray-100 transition-colors"
           aria-label="返回"
+        >
+          <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+        <button
+          onClick={goBackToMainPage}
+          className="bg-white text-gray-800 p-3 rounded-full shadow-lg hover:bg-gray-100 transition-colors"
+          aria-label="返回地图"
         >
           <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -536,32 +675,6 @@ const CoursewareDetail = () => {
             <h3 className="font-bold text-lg text-gray-800">目录</h3>
           </div>
           <div className="p-2">
-            {/* 页面导航 */}
-            {pageCount > 1 && (
-              <div className="mb-3">
-                <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  页面导航
-                </div>
-                <ul className="space-y-1">
-                  {pageAttributes.map((pageAttr, index) => (
-                    <li key={index}>
-                      <button
-                        onClick={() => goToPage(index)}
-                        className={`w-full text-left px-3 py-2 rounded transition-colors text-sm ${
-                          currentPage === index 
-                            ? 'bg-primary/10 text-primary font-medium' 
-                            : 'hover:bg-gray-100 text-gray-700'
-                        }`}
-                      >
-                        {pageAttr.title || `页面 ${index + 1}`}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-                <div className="border-t border-gray-200 my-2"></div>
-              </div>
-            )}
-            
             {/* 当前页面的标题导航 */}
             {toc[currentPage] && toc[currentPage].length > 0 ? (
               <ul className="space-y-1">
@@ -594,10 +707,8 @@ const CoursewareDetail = () => {
             <motion.div
               key={currentPage}
               className="w-full h-full"
-              // 进入动画：从左右两侧滑入
               initial={{ opacity: 0, x: direction === 'right' ? '100%' : '-100%' }}
               animate={{ opacity: 1, x: 0 }}
-              // 退出动画：向中间收缩消失
               exit={{ opacity: 0, scale: 0.8 }}
               transition={{ duration: 0.5, ease: "easeInOut" }}
             >

@@ -72,17 +72,30 @@ const CoursewareList = () => {
   useEffect(() => {
     const loadCoursewares = async () => {
       try {
+        const jsonFiles = import.meta.glob('/src/data/courseware/*.json', { eager: true });
         const mdxFiles = import.meta.glob('/src/data/courseware/*.mdx', { eager: true });
-        const coursewaresData = Object.entries(mdxFiles).map(([filepath, module]) => {
+        const mapById = {};
+        Object.entries(jsonFiles).forEach(([filepath, module]) => {
+          const id = filepath.split('/').pop().replace('.json', '');
+          const data = module.default || module;
+          const title = data?.title || '未知标题';
+          const description = data?.description || '暂无描述';
+          const author = data?.author || '未知作者';
+          const createdAt = data?.createdAt || '未知时间';
+          const cover = data?.cover;
+          mapById[id] = { id, title, description, author, createdAt, cover };
+        });
+        Object.entries(mdxFiles).forEach(([filepath, module]) => {
           const id = filepath.split('/').pop().replace('.mdx', '');
+          if (mapById[id]) return;
           const title = module.attributes?.title || module.frontmatter?.title || '未知标题';
           const description = module.attributes?.description || module.frontmatter?.description || '暂无描述';
           const author = module.attributes?.author || module.frontmatter?.author || '未知作者';
           const createdAt = module.attributes?.createdAt || module.frontmatter?.createdAt || '未知时间';
           const cover = module.attributes?.cover || module.frontmatter?.cover;
-          return { id, title, description, author, createdAt, cover };
+          mapById[id] = { id, title, description, author, createdAt, cover };
         });
-        setCoursewares(coursewaresData);
+        setCoursewares(Object.values(mapById));
         const mapModule = await import('../data/courseware/courseware-map.json');
         setMapConfig(mapModule.default || mapModule);
       } catch (error) {

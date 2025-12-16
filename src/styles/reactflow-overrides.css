@@ -10,6 +10,23 @@
   cursor: pointer !important;
 }
 
+.react-flow__node.label-node {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  pointer-events: none;
+}
+.react-flow__node.label-node:hover {
+  transform: none;
+  box-shadow: none;
+  cursor: default;
+}
+.react-flow__node.label-node div {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
 .react-flow__node.courseware-node:active {
   cursor: pointer !important;
 }
