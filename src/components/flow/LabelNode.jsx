@@ -1,4 +1,5 @@
 import React from 'react';
+import { Handle, Position } from 'reactflow';
 
 function LabelNode({ data }) {
   const kind = data?.kind || 'title';
@@ -10,6 +11,21 @@ function LabelNode({ data }) {
     wordBreak: 'break-word',
     pointerEvents: 'none'
   };
+
+  const handles = (
+    <>
+      <Handle id="top" type="target" position={Position.Top} isConnectable={false} style={{ opacity: 0 }} />
+      <Handle id="right" type="target" position={Position.Right} isConnectable={false} style={{ opacity: 0 }} />
+      <Handle id="bottom" type="target" position={Position.Bottom} isConnectable={false} style={{ opacity: 0 }} />
+      <Handle id="left" type="target" position={Position.Left} isConnectable={false} style={{ opacity: 0 }} />
+      
+      <Handle id="top" type="source" position={Position.Top} isConnectable={false} style={{ opacity: 0 }} />
+      <Handle id="right" type="source" position={Position.Right} isConnectable={false} style={{ opacity: 0 }} />
+      <Handle id="bottom" type="source" position={Position.Bottom} isConnectable={false} style={{ opacity: 0 }} />
+      <Handle id="left" type="source" position={Position.Left} isConnectable={false} style={{ opacity: 0 }} />
+    </>
+  );
+
   if (kind === 'title') {
     const titleStyle = {
       fontSize: 42,
@@ -24,10 +40,20 @@ function LabelNode({ data }) {
       WebkitTextStroke: '1.2px rgba(255,255,255,.55)',
       textShadow: '0 4px 20px rgba(0,0,0,.12)'
     };
-    return <div style={{ ...base, ...titleStyle }}>{data?.label}</div>;
+    return (
+      <div style={{ ...base, ...titleStyle }}>
+        {handles}
+        {data?.label}
+      </div>
+    );
   }
   const descStyle = { fontSize: 18, fontWeight: 500, color: '#374151', textShadow: '0 1px 2px rgba(0,0,0,0.04)', maxWidth: 520, textAlign: 'left' };
-  return <div style={{ ...base, ...descStyle }}>{data?.label}</div>;
+  return (
+    <div style={{ ...base, ...descStyle }}>
+      {handles}
+      {data?.label}
+    </div>
+  );
 }
 
 export default LabelNode;

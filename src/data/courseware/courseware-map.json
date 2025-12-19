@@ -116,6 +116,8 @@
     { "source": "Sieve-Method", "target": "Number-Theoretic-Function", "sourceSide": "top", "targetSide": "bottom" },
     { "source": "Sieve-Method", "target": "质数问题", "sourceSide": "right", "targetSide": "top" },
 
+    { "source": "Data-Structure", "target": "Segment-Tree", "sourceSide": "left", "targetSide": "right" },
+
     { "source": "String", "target": "Hash", "sourceSide": "top", "targetSide": "right" },
     { "source": "String", "target": "Border", "sourceSide": "top", "targetSide": "right" },
     { "source": "String", "target": "Trie", "sourceSide": "top", "targetSide": "bottom" },

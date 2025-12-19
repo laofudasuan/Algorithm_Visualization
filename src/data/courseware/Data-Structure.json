@@ -1,0 +1,72 @@
+{
+  "title": "数据结构",
+  "description": "数据结构",
+  "cover": "/images/no.png",
+  "author": "老虎大蒜",
+  "createdAt": "2025-11-23",
+  "metaPositions": {
+    "title": { "x": 150, "y": 120 },
+    "description": { "x": 500, "y": 150 }
+  },
+  "anchor": [
+    { "id": "根号", "x": 550, "y": 350 }
+  ],
+  "pages": [
+    { "id": "数据结构", "x": 400, "y": 400 },
+
+    { "id": "序列", "x": 416, "y": 330 },
+    { "id": "线段树", "link": "Segment-Tree", "x": 300, "y": 220 },
+    { "id": "树状数组", "x": 400, "y": 220 },
+    { "id": "平衡树", "x": 520, "y": 220 },
+
+    { "id": "矩阵（平面）", "x": 270, "y": 330 },
+    { "id": "KD树", "x": 150, "y": 360 },
+    { "id": "扫描线", "x": 150, "y": 300 },
+    { "id": "树套树", "x": 150, "y": 180 },
+
+    { "id": "分块", "x": 650, "y": 250 },
+    { "id": "莫队", "x": 650, "y": 300 },
+
+    { "id": "集合", "x": 550, "y": 400 },
+    { "id": "堆", "x": 700, "y": 400 },
+
+    { "id": "树", "x": 300, "y": 430 },
+    { "id": "树分治", "link": "Tree-Split", "x": 150, "y": 520 },
+    { "id": "动态树", "x": 280, "y": 520 },
+    { "id": "Dsu On Tree", "x": 380, "y": 520 },
+    { "id": "虚树", "x": 150, "y": 440 },
+
+    { "id": "图", "x": 550, "y": 480 },
+    { "id": "并查集", "x": 700, "y": 500 }
+  ],
+  "edges": [
+    { "source": "数据结构", "target": "序列", "sourceSide": "top", "targetSide": "bottom" },
+    { "source": "数据结构", "target": "树", "sourceSide": "left", "targetSide": "right" },
+    { "source": "数据结构", "target": "图", "sourceSide": "right", "targetSide": "left" },
+
+    { "source": "序列", "target": "线段树", "sourceSide": "top", "targetSide": "bottom" },
+    { "source": "序列", "target": "树状数组", "sourceSide": "top", "targetSide": "bottom" },
+    { "source": "序列", "target": "平衡树", "sourceSide": "top", "targetSide": "bottom" },
+    
+    { "source": "序列", "target": "矩阵（平面）", "sourceSide": "left", "targetSide": "right" },
+    { "source": "矩阵（平面）", "target": "KD树", "sourceSide": "left", "targetSide": "right" },
+    { "source": "矩阵（平面）", "target": "扫描线", "sourceSide": "left", "targetSide": "right" },
+    { "source": "矩阵（平面）", "target": "树套树", "sourceSide": "left", "targetSide": "right" },
+    { "source": "线段树", "target": "树套树", "sourceSide": "top", "targetSide": "right" },
+    { "source": "树状数组", "target": "树套树", "sourceSide": "top", "targetSide": "right" },
+    { "source": "平衡树", "target": "树套树", "sourceSide": "top", "targetSide": "right" },
+
+    { "source": "序列", "target": "根号", "sourceSide": "right", "targetSide": "left" , "label": "根号算法"},
+    { "source": "根号", "target": "分块", "sourceSide": "right", "targetSide": "left" },
+    { "source": "根号", "target": "莫队", "sourceSide": "right", "targetSide": "left" },
+
+    { "source": "集合", "target": "堆", "sourceSide": "right", "targetSide": "left" },
+
+    { "source": "树", "target": "树分治", "sourceSide": "bottom", "targetSide": "top" },
+    { "source": "树", "target": "动态树", "sourceSide": "bottom", "targetSide": "top" },
+    { "source": "树", "target": "Dsu On Tree", "sourceSide": "bottom", "targetSide": "top" },
+    { "source": "树", "target": "虚树", "sourceSide": "left", "targetSide": "right" },
+
+    { "source": "图", "target": "并查集", "sourceSide": "right", "targetSide": "left" }
+  ]
+}
