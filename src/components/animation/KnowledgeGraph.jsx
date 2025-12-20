@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { knowledgeGraphApi } from '../../services/apiService';
 import { knowledgeGraphData } from '../../data/knowledge-graph/mockData';
 
 const KnowledgeGraph = () => {
@@ -68,7 +69,12 @@ const KnowledgeGraph = () => {
     scene.add(directionalLight2);
     
     // 2. 加载和渲染知识图谱数据
-    loadGraphData(scene);
+    const loadData = async () => {
+      await loadGraphData(scene);
+      setIsLoading(false);
+    };
+    
+    loadData();
     
     // 3. 开始动画循环
     const animate = () => {
@@ -143,9 +149,23 @@ const KnowledgeGraph = () => {
   }, []);
   
   // 加载图谱数据并创建3D对象
-  const loadGraphData = (scene) => {
+  const loadGraphData = async (scene) => {
+    let graphData = knowledgeGraphData;
+    
+    try {
+      // 从后端API获取知识图谱数据
+      const response = await knowledgeGraphApi.getAll();
+      if (response && response.length > 0) {
+        // 假设后端返回的是包含nodes和links的对象数组
+        const latestData = response[0];
+        graphData = JSON.parse(latestData.dataContent);
+      }
+    } catch (error) {
+      console.error('获取知识图谱数据失败，使用本地模拟数据:', error);
+    }
+    
     // 应用力导向布局
-    const positionedData = applyForceLayout(knowledgeGraphData);
+    const positionedData = applyForceLayout(graphData);
     
     // 创建节点材质
     const nodeMaterials = {};

@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom'
 import { useState, useEffect, useRef } from 'react'
+import { useAuth } from '../context/AuthContext'
 
 const Navbar = ({ menuItems, isMenuOpen, setIsMenuOpen, hasScrolled, currentPath }) => {
+  const { currentUser, openLoginModal, logout } = useAuth();
   // 用于存储哪个下拉菜单是打开的
   const [openDropdown, setOpenDropdown] = useState(null)
   // 用于检测点击外部区域关闭下拉菜单
@@ -116,6 +118,60 @@ const Navbar = ({ menuItems, isMenuOpen, setIsMenuOpen, hasScrolled, currentPath
                 )
               }
             })}
+            
+            {/* 用户模块 */}
+            <div className="relative">
+              {currentUser ? (
+                // 已登录状态
+                <div 
+                  className="relative"
+                  ref={el => dropdownRefs.current['user'] = el}
+                >
+                  <button
+                    onClick={(e) => toggleDropdown('user', e)}
+                    className="group inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-600 hover:text-primary"
+                  >
+                    <span>{currentUser.nickname}</span>
+                    <svg 
+                      className={`ml-1 h-4 w-4 transition-transform duration-300 ${openDropdown === 'user' ? 'transform rotate-180' : ''}`}
+                      fill="none" 
+                      viewBox="0 0 24 24" 
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  
+                  {/* 用户下拉菜单 */}
+                  {openDropdown === 'user' && (
+                    <div 
+                      className="absolute right-0 mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 hidden md:block overflow-hidden min-w-[120px]"
+                      style={{ display: 'block' }}
+                    >
+                      <div className="flex flex-col p-1">
+                        <button
+                          onClick={() => {
+                            logout();
+                            setOpenDropdown(null);
+                          }}
+                          className="text-left px-2 py-1.5 rounded-md transition-all duration-200 text-xs font-medium text-gray-600 hover:text-primary hover:bg-gray-50"
+                        >
+                          退出登录
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                // 未登录状态
+                <button
+                  onClick={openLoginModal}
+                  className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-600 hover:text-primary"
+                >
+                  用户
+                </button>
+              )}
+            </div>
           </div>
           
           {/* 移动端菜单按钮 */}
