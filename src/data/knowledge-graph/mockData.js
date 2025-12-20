@@ -119,13 +119,23 @@ export const getNodeStyle = (nodeType) => {
   return styles[nodeType] || styles[NODE_TYPES.CONCEPT];
 };
 
-// 模拟从Neo4j数据库获取数据的函数
+// 从后端API获取知识图谱数据
+import { knowledgeGraphApi } from '../../services/apiService';
+
 export const fetchKnowledgeGraphData = async () => {
-  // 在实际项目中，这里会调用API从Neo4j数据库获取数据
-  // 现在返回模拟数据
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(knowledgeGraphData);
-    }, 300);
-  });
+  try {
+    // 从后端API获取知识图谱数据
+    const response = await knowledgeGraphApi.getById('main');
+    console.log('成功从API获取知识图谱数据');
+    // 返回解析后的JSON数据
+    return response.dataContent ? JSON.parse(response.dataContent) : knowledgeGraphData;
+  } catch (error) {
+    console.warn('无法从API加载知识图谱数据，使用模拟数据代替', error);
+    // 降级：返回模拟数据
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(knowledgeGraphData);
+      }, 300);
+    });
+  }
 };
