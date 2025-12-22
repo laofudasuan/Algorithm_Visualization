@@ -182,7 +182,7 @@ const CoursewareDetail = () => {
       `;
       const doc = printWindow.document;
       doc.open();
-      doc.write(`<!doctype html><html><head><meta charset="utf-8"><title>${fileTitle}</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"><style>${style}</style></head><body>${htmlContent}</body></html>`);
+      doc.write(`<!doctype html><html><head><meta charset="utf-8"><title>${fileTitle}</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/fonts.css"><style>${style}</style></head><body>${htmlContent}</body></html>`);
       doc.close();
       printWindow.focus();
       setTimeout(() => {

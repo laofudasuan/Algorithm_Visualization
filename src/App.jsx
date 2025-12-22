@@ -37,7 +37,7 @@ function AppContent() {
     { name: '内容', path: '/courseware' },
     { name: '知识图谱', path: '/knowledge-graph' },
     { name: '可视化模块', path: '/visualizations' },
-    { name: '用户管理', path: '/users' },
+    // { name: '用户管理', path: '/users' },
   ]
 
   // 加载中的占位组件
@@ -60,7 +60,7 @@ function AppContent() {
         currentPath={location.pathname}
       />
       
-      <AuthModal />
+      {/* <AuthModal /> */}
       
       <ScrollToTop />
       
@@ -73,7 +73,7 @@ function AppContent() {
           <Route path="/courseware/:id" element={<CoursewareDetail />} />
           <Route path="/visualizations" element={<VisualizationsIndex />} />
           <Route path="/visualizations/:slug" element={<VisualizationsDetail />} />
-          <Route path="/users" element={<UsersManagement />} />
+          {/* <Route path="/users" element={<UsersManagement />} /> */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
