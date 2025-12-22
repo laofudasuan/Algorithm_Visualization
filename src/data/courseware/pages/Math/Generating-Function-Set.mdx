@@ -111,16 +111,18 @@ FWT之后，每一位只有四种取值:$xt^{a_i}+yt^{b_i}+z$，带入四个方�
 
 对于每头奶牛，输出她的位串与每头奶牛（包括她自己）的位串的 Jaccard 相似度之和，对 $10^9 + 7$ 取模。具体地说，如果总和等于一个有理数 $a/b$，其中 $a$ 和 $b$ 是互质的整数，则输出范围 $[0, 10^9 + 7)$ 内的唯一整数 $x$，使得 $bx - a$ 被 $10^9 + 7$ 整除。
 
-<CollapsibleComponent title="方法一">
+<CollapsibleComponent title="FWT方法">
 题意即给定$a_{1 \ldots n}$，对每个$i$求$\sum_{j=1}^{n} \frac{|a[i] \cap a[j]|}{|a[i] \cup a[j]|}$
 
-注意到$\sum_{j=1}^{n} \frac{|a[i] \cap a[j]|}{|a[i] \cup a[j]|} = \frac{a[i]}{|a[i] \cup a[j]|}+\frac{a[j]}{|a[i] \cup a[j]|}-1$
+注意到
+
+$$
+\sum_{j=1}^{n} \frac{|a[i] \cap a[j]|}{|a[i] \cup a[j]|} = \frac{a[i]}{|a[i] \cup a[j]|}+\frac{a[j]}{|a[i] \cup a[j]|}-1
+$$
 
 先考虑怎么计算$\sum_{j=1}^{n} \frac{1}{|a[i] \cup a[j]|}$，定义$a$的统计数组为$y[]$，并定义$z[i] = \frac{1}{|i|}$
 
-那么我们的目标是求出
-
-$$x[i] = \sum_{j} y[j] \times z[i|j]$$
+那么我们的目标是求出$x[i] = \sum_{j} y[j] \times z[i|j]$
 
 回忆我们FWT是怎么做集合或卷积的，目标：$z[k] = \sum_{i|j=k} x[i]y[j]$
 
@@ -174,7 +176,7 @@ $$
 
 </CollapsibleComponent>
 
-<CollapsibleComponent title="方法二">
+<CollapsibleComponent title="容斥方法">
 也可以用容斥原理。先把求并改成求交$\frac{1}{|a[i] \cup a[j]|}=\frac{1}{k-|\overline{a[i]} \cap \overline{a[j]}|}$，也就是说把所有$a$取反，当交大小为$w$时贡献为$\frac{1}{k-w}$
 
 $S=|\overline{a[i]} \cap \overline{a[j]}|$既是$\overline{a[i]}$的子集，也是$\overline{a[j]}$的子集。
