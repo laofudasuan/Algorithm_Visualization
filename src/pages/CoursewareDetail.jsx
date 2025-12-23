@@ -182,12 +182,32 @@ const CoursewareDetail = () => {
       `;
       const doc = printWindow.document;
       doc.open();
-      doc.write(`<!doctype html><html><head><meta charset="utf-8"><title>${fileTitle}</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/fonts.css"><style>${style}</style></head><body>${htmlContent}</body></html>`);
+      doc.write(`<!doctype html><html><head><meta charset="utf-8"><title>${fileTitle}</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/fonts.css"><script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script><script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script><style>${style}</style></head><body>${htmlContent}</body></html>`);
       doc.close();
       printWindow.focus();
-      setTimeout(() => {
-        try { printWindow.print(); } catch { /* noop */ }
-      }, 500);
+      // 确保所有资源加载完成后再执行渲染
+      printWindow.onload = () => {
+        // 渲染所有数学公式
+        try {
+          printWindow.renderMathInElement(printWindow.document.body, {
+            delimiters: [
+              {left: "$$", right: "$$", display: true},
+              {left: "$", right: "$", display: false}
+            ],
+            throwOnError: false
+          });
+          // 给渲染公式一些时间，然后打印
+          setTimeout(() => {
+            try { printWindow.print(); } catch { /* noop */ }
+          }, 1000);
+        } catch (error) {
+          console.error("公式渲染错误:", error);
+          // 如果渲染失败，仍然尝试打印
+          setTimeout(() => {
+            try { printWindow.print(); } catch { /* noop */ }
+          }, 500);
+        }
+      };
       printWindow.onafterprint = () => {
         try { printWindow.close(); } catch { /* noop */ }
       };

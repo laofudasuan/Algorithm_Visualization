@@ -1,0 +1,24 @@
+{
+  "title": "线性代数",
+  "description": "矩阵、线性相关、行列式、矩阵其他内容",
+  "cover": "/images/no.png",
+  "author": "老虎大蒜",
+  "createdAt": "2025-11-23",
+  "metaPositions": {
+    "title": { "x": 150, "y": 120 },
+    "description": { "x": 500, "y": 150 }
+  },
+  "pages": [
+    { "id": "矩阵", "path": "Math/Matrix.mdx", "x": 300, "y": 280 },
+    { "id": "线性相关", "path": "Math/Linear-Correlation.mdx", "x": 500, "y": 280 },
+    { "id": "行列式", "path": "Math/Determinant.mdx", "x": 100, "y": 280 },
+    { "id": "矩阵树定理", "path": "Math/Matrix-Tree.mdx", "x": 100, "y": 380 },
+    { "id": "矩阵其他内容", "path": "Math/Matrix-Others.mdx", "x": 500, "y": 380 }
+  ],
+  "edges": [
+    { "source": "矩阵", "target": "线性相关", "sourceSide": "right", "targetSide": "left" },
+    { "source": "矩阵", "target": "行列式", "sourceSide": "left", "targetSide": "right" },
+    { "source": "矩阵", "target": "矩阵其他内容", "sourceSide": "right", "targetSide": "left" },
+    { "source": "行列式", "target": "矩阵树定理", "sourceSide": "bottom", "targetSide": "top" }
+  ]
+}
