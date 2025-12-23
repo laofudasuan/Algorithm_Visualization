@@ -1,0 +1,27 @@
+{
+  "title": "生成树",
+  "description": "最小生成树、生成树计数",
+  "cover": "/images/no.png",
+  "author": "老虎大蒜",
+  "createdAt": "2025-11-23",
+  "metaPositions": {
+    "title": { "x": 150, "y": 120 },
+    "description": { "x": 500, "y": 150 }
+  },
+  "pages": [
+    { "id": "生成树", "x": 300, "y": 280 },
+    { "id": "最小生成树", "path": "Graph/Minimum-Spanning-Tree.mdx", "x": 420, "y": 280 },
+    { "id": "Prim算法", "x": 600, "y": 220 },
+    { "id": "Kruskal算法", "path": "Graph/Kruskal.mdx", "x": 600, "y": 280 },
+    { "id": "Boruvka算法", "path": "Graph/Boruvka.mdx", "x": 600, "y": 340 },
+    { "id": "生成树计数", "link": "Tree-Count", "x": 100, "y": 280 },
+    { "id": "最小树形图", "x": 700, "y": 500 }
+  ],
+  "edges": [
+    { "source": "生成树", "target": "最小生成树", "sourceSide": "right", "targetSide": "left" },
+    { "source": "最小生成树", "target": "Prim算法", "sourceSide": "right", "targetSide": "left" },
+    { "source": "最小生成树", "target": "Kruskal算法", "sourceSide": "right", "targetSide": "left" },
+    { "source": "最小生成树", "target": "Boruvka算法", "sourceSide": "right", "targetSide": "left" },
+    { "source": "生成树", "target": "生成树计数", "sourceSide": "left", "targetSide": "right" }
+  ]
+}

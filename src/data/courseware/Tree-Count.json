@@ -1,0 +1,20 @@
+{
+  "title": "树的计数",
+  "description": "树的计数、生成树计数",
+  "cover": "/images/no.png",
+  "author": "老虎大蒜",
+  "createdAt": "2025-11-23",
+  "metaPositions": {
+    "title": { "x": 150, "y": 120 },
+    "description": { "x": 500, "y": 150 }
+  },
+  "pages": [
+    { "id": "树的计数", "path": "Tree/Tree-Count.mdx", "x": 200, "y": 280 },
+    { "id": "矩阵树定理", "path": "Graph/Matrix-Tree.mdx", "x": 400, "y": 280 },
+    { "id": "Prufer序列", "path": "Tree/Prufer-Sequence.mdx", "x": 200, "y": 380 }
+  ],
+  "edges": [
+    { "source": "树的计数", "target": "矩阵树定理", "sourceSide": "right", "targetSide": "left", "label": "生成树计数" },
+    { "source": "树的计数", "target": "Prufer序列", "sourceSide": "bottom", "targetSide": "top" }
+  ]
+}

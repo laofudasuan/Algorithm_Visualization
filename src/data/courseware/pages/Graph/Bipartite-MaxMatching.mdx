@@ -32,26 +32,6 @@ import { CollapsibleComponent } from '../../../courseware/markdownConfig';
 - 对于某些特殊问题（如NOI2009变幻序列，用dfs会更方便）
 - 匈牙利算法有一个优化叫做HopcroftKarp算法，其原理和网络流的Dinic类似
 
-##### P3231 [HNOI2013] 消毒
-
-最近在生物实验室工作的小 T 遇到了大麻烦。 由于实验室最近升级的缘故，他的分格实验皿是一个长方体，其尺寸为 $a\times b\times c$。为了实验的方便，它被划分为 $a\times b\times c$ 个单位立方体区域，每个单位立方体尺寸为 $1\times 1\times 1$，并用 $(i,j,k)$ 标识一个单位立方体。这个实验皿已经很久没有人用了。现在，小 T 被导师要求将其中一些单位立方体区域进行消毒操作（每个区域可以被重复消毒）。
-
-而由于严格的实验要求，他被要求使用一种特定的 F 试剂来进行消毒。 这种 F 试剂特别奇怪，每次对尺寸为 $x\times y\times z$ 的长方体区域（它由 $x\times y\times z$ 个单位立方体组成）进行消毒时，只需要使用 $\min(x,y,z)$ 单位的 F 试剂。F 试剂的价格不菲，这可难倒了小 T。
-
-现在请你告诉他，最少要用多少单位的 F 试剂。
-
-$1\le a,b,c\le 5\times 10^3$，$abc\le 5\times 10^3$，且 $1\le D\le 3$。
-
-<CollapsibleComponent title="做法" >
-先考虑二维的情况
-
-消除$x \times y$的矩形内所有的点需要用$\min(x,y)$的代价
-
-转化成二分图最小点覆盖问题
-
-转化到三维以后，由于$a \times b \times c \le 5000$，所以必然存在一维不超过$17$，可以先爆搜这一维
-
-</CollapsibleComponent>
 
 ##### AT_jsc2019_qual_e Card Collector
 
@@ -75,7 +55,7 @@ $1 \leq N,H,W,A_i \leq 10^5$, $1 \leq R_i \leq H$, $1 \leq C_i \leq W$
 那么问题变成了选出一个基环森林的最大边权和
 </CollapsibleComponent>
 
-##### 矩阵游戏 联合省选2021
+##### P7515 [省选联考 2021 A 卷] 矩阵游戏
 
 有一个$n \times m$的矩阵$a_{i,j}$，每个元素为不超过$10^6$的非负整数
 
@@ -156,7 +136,7 @@ $n,m \le 500$
 从后往前增广，每次优先增广字典序小的点
 </CollapsibleComponent>
 
-##### Namori atcoder
+##### AT_agc004_f [AGC004F] Namori
 
 给出一张$N$个点$M$条边无自环的无向连通图。有黑白两种颜色，一开始所有点的颜色都是白色。
 

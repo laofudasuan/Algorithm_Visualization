@@ -8,12 +8,9 @@ import { CollapsibleComponent } from '../../../courseware/markdownConfig';
 
 ## 概率生成函数的形式
 
-概率生成函数通常是把一个整数随机变量的分布用多项式给表示出来
+常用形式：是把一个取值范围为非负整数的随机变量用多项式给表示
 
-用$X$表示一个整数随机变量，$p_i$表示这个变量为$i$的概率，这样，生成函数就为$f(X) = \sum_i p_i x^i$
-
-概率生成函数的常见用法：$f(X)$满足$f(1)=1$，$X$的期望就是$\sum_i p_i \times i = F'(1)$
-
+设$X$表示一个整数随机变量，$p_i$表示这个变量为$i$的概率，这样，生成函数就为$f(X) = \sum_i p_i x^i$
 
 ##### AGC034F RNG and XOR
 
@@ -23,7 +20,7 @@ import { CollapsibleComponent } from '../../../courseware/markdownConfig';
 
 对于所有$k \in [0,2^n)$，求$x$第一次变成$k$的期望次数
 
-$n \le 18, P[i] \le 1000$，实现$3s$
+$n \le 18, P[i] \le 1000$，时限$3s$
 
 <CollapsibleComponent title="做法">
 设$h[k]$表示第一次变成$k$的期望次数
@@ -58,15 +55,16 @@ $$
     
 </CollapsibleComponent>
 
-##### P5326 ZJOI2019 开关
+## 重要用法
 
-拓展题
+对一个非负整数随机变量建立的生成函数$f(X)$满足$f(1)=1$
 
+$X$的期望就是$\sum_i p_i \times i = F'(1)$
 
-##### 歌唱王国 CTSC2006
+##### P4548 [CTSC2006] 歌唱王国
 
 有$m$种字符，系统将产生一个随机序列，初始为空串，每次在最后随机添加一个字符。问期望添加多少次后，随机序列包含子串S
-    
+
 定义函数
     
 $$
@@ -92,7 +90,7 @@ $$
 $$
 f(\{""\} \cup \sum_{\alpha\in N}\sum_{c}(a+c),x)=f(N \cup Y,x)
 $$
-    
+
 $$
 f( \sum_{\alpha\in N}{(a + s)} ,x)=f( \sum_{\alpha\in Y}\sum_{p\in P}(a+p) ,x)
 $$
@@ -149,4 +147,11 @@ $$
 f'(Y,1)=f(N,1)=f(P,1)*n^{|S|}
 $$
 
+##### 例题
+
+把歌唱王国改为求方差
+
+##### P5326 ZJOI2019 开关
+
+拓展题
 

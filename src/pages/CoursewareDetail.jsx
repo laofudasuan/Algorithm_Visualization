@@ -61,6 +61,7 @@ const CoursewareDetail = () => {
   const [pages, setPages] = useState([]);
   const [combinedMode, setCombinedMode] = useState(false);
   const [combinedComponents, setCombinedComponents] = useState([]);
+  const [isExporting, setIsExporting] = useState(false);
 
   // 组件加载时隐藏Navbar
   useEffect(() => {
@@ -130,14 +131,22 @@ const CoursewareDetail = () => {
     setCombinedMode(false);
     setShowOverlay(false);
   };
-  const exportToPDF = () => {
+  const exportToPDF = async () => {
     if (!contentRef.current) return;
-    const source = contentRef.current;
-    const toggles = Array.from(source.querySelectorAll('[data-collapsible-toggle]'));
-    toggles.forEach(t => { if (!t.nextElementSibling) t.click(); });
-    const wait = (ms) => new Promise(r => setTimeout(r, ms));
-    const proceed = async () => {
-      await wait(200);
+    setIsExporting(true);
+    
+    // 给UI一点时间渲染loading
+    await new Promise(r => setTimeout(r, 100));
+    
+    try {
+      const source = contentRef.current;
+      const toggles = Array.from(source.querySelectorAll('[data-collapsible-toggle]'));
+      toggles.forEach(t => { if (!t.nextElementSibling) t.click(); });
+      
+      const wait = (ms) => new Promise(r => setTimeout(r, ms));
+      
+      await wait(500); // 等待展开动画
+      
       const clone = source.cloneNode(true);
       Array.from(clone.querySelectorAll('[data-code-block="true"]')).forEach(wrapper => {
         try {
@@ -161,8 +170,21 @@ const CoursewareDetail = () => {
       });
       Array.from(clone.querySelectorAll('[data-vis]')).forEach(el => el.remove());
       const htmlContent = clone.innerHTML;
-      const printWindow = window.open('', '_blank');
-      if (!printWindow) return;
+      
+      let iframe = document.getElementById('print-iframe');
+      if (!iframe) {
+        iframe = document.createElement('iframe');
+        iframe.id = 'print-iframe';
+        iframe.style.position = 'fixed';
+        iframe.style.right = '0';
+        iframe.style.bottom = '0';
+        iframe.style.width = '0';
+        iframe.style.height = '0';
+        iframe.style.border = '0';
+        iframe.style.visibility = 'hidden';
+        document.body.appendChild(iframe);
+      }
+      
       const fileTitle = (pageAttributes[currentPage]?.title || courseware?.title || id) + '.pdf';
       const style = `
         @page { size: A4; margin: 16mm; }
@@ -180,39 +202,57 @@ const CoursewareDetail = () => {
         .katex { font-size: 1em; }
         [data-vis] { display: none !important; }
       `;
-      const doc = printWindow.document;
+      const doc = iframe.contentDocument || iframe.contentWindow.document;
       doc.open();
-      doc.write(`<!doctype html><html><head><meta charset="utf-8"><title>${fileTitle}</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/fonts.css"><script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script><script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script><style>${style}</style></head><body>${htmlContent}</body></html>`);
+      doc.write(`<!doctype html><html><head><meta charset="utf-8"><title>${fileTitle}</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous"><script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script><script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script><style>${style}</style></head><body>${htmlContent}</body></html>`);
       doc.close();
-      printWindow.focus();
-      // 确保所有资源加载完成后再执行渲染
-      printWindow.onload = () => {
-        // 渲染所有数学公式
-        try {
-          printWindow.renderMathInElement(printWindow.document.body, {
-            delimiters: [
-              {left: "$$", right: "$$", display: true},
-              {left: "$", right: "$", display: false}
-            ],
-            throwOnError: false
-          });
-          // 给渲染公式一些时间，然后打印
-          setTimeout(() => {
-            try { printWindow.print(); } catch { /* noop */ }
-          }, 1000);
-        } catch (error) {
-          console.error("公式渲染错误:", error);
-          // 如果渲染失败，仍然尝试打印
-          setTimeout(() => {
-            try { printWindow.print(); } catch { /* noop */ }
-          }, 500);
-        }
-      };
-      printWindow.onafterprint = () => {
-        try { printWindow.close(); } catch { /* noop */ }
-      };
-    };
-    proceed();
+      
+      await new Promise((resolve) => {
+        const checkLoaded = () => {
+          if (iframe.contentWindow.katex && iframe.contentWindow.renderMathInElement) {
+            try {
+              iframe.contentWindow.renderMathInElement(iframe.contentDocument.body, {
+                delimiters: [
+                  {left: "$$", right: "$$", display: true},
+                  {left: "$", right: "$", display: false}
+                ],
+                throwOnError: false
+              });
+              
+              // 等待字体加载完成
+              if (iframe.contentDocument.fonts) {
+                iframe.contentDocument.fonts.ready.then(() => {
+                  setTimeout(() => resolve(), 500);
+                });
+              } else {
+                setTimeout(() => resolve(), 1000);
+              }
+            } catch (e) {
+              console.error(e);
+              resolve();
+            }
+          } else {
+            setTimeout(checkLoaded, 100);
+          }
+        };
+        const timeout = setTimeout(() => {
+          console.warn('Print iframe timeout');
+          resolve();
+        }, 15000);
+        iframe.onload = () => {
+          clearTimeout(timeout);
+          checkLoaded();
+        };
+        setTimeout(checkLoaded, 500);
+      });
+      
+      iframe.contentWindow.focus();
+      iframe.contentWindow.print();
+    } catch (err) {
+      console.error('导出失败:', err);
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   const renderCombinedPages = async () => {
@@ -567,6 +607,19 @@ const CoursewareDetail = () => {
       </div>
 
       <AnimatePresence>
+        {isExporting && (
+          <motion.div
+            className="fixed inset-0 z-[60] flex flex-col items-center justify-center bg-black/50 backdrop-blur-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <div className="bg-white p-6 rounded-lg shadow-xl flex flex-col items-center">
+              <div className="animate-spin rounded-full h-10 w-10 border-4 border-primary border-t-transparent mb-4"></div>
+              <p className="text-lg font-medium text-gray-800">导出中...</p>
+            </div>
+          </motion.div>
+        )}
         {showOverlay && (
           <motion.div 
             className="fixed inset-0 bg-white z-50"

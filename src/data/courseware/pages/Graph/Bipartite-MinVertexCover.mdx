@@ -12,6 +12,28 @@ import { CollapsibleComponent } from '../../../courseware/markdownConfig';
 
 Konig定理：最小点覆盖=最大匹配
 
+
+##### P3231 [HNOI2013] 消毒
+
+最近在生物实验室工作的小 T 遇到了大麻烦。 由于实验室最近升级的缘故，他的分格实验皿是一个长方体，其尺寸为 $a\times b\times c$。为了实验的方便，它被划分为 $a\times b\times c$ 个单位立方体区域，每个单位立方体尺寸为 $1\times 1\times 1$，并用 $(i,j,k)$ 标识一个单位立方体。这个实验皿已经很久没有人用了。现在，小 T 被导师要求将其中一些单位立方体区域进行消毒操作（每个区域可以被重复消毒）。
+
+而由于严格的实验要求，他被要求使用一种特定的 F 试剂来进行消毒。 这种 F 试剂特别奇怪，每次对尺寸为 $x\times y\times z$ 的长方体区域（它由 $x\times y\times z$ 个单位立方体组成）进行消毒时，只需要使用 $\min(x,y,z)$ 单位的 F 试剂。F 试剂的价格不菲，这可难倒了小 T。
+
+现在请你告诉他，最少要用多少单位的 F 试剂。
+
+$1\le a,b,c\le 5\times 10^3$，$abc\le 5\times 10^3$，且 $1\le D\le 3$。
+
+<CollapsibleComponent title="做法" >
+先考虑二维的情况
+
+消除$x \times y$的矩形内所有的点需要用$\min(x,y)$的代价
+
+转化成二分图最小点覆盖问题
+
+转化到三维以后，由于$a \times b \times c \le 5000$，所以必然存在一维不超过$17$，可以先爆搜这一维
+
+</CollapsibleComponent>
+
 # 二分图最大独立集
 
 最大独立集(选择最多的点使得它们两两没有边直接相连)=点数-最大匹配

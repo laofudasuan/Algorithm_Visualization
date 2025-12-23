@@ -2,14 +2,15 @@
   "nodes": [
     { "id": "Temp", "x": 100, "y": 200, "category": "空" },
 
-    { "id": "Sequence", "x": 430, "y": 420, "category": "组合对象" },
+    { "id": "Sequence", "x": 430, "y": 220, "category": "组合对象" },
+    { "id": "Permutation", "x": 350, "y": 200, "category": "组合对象" },
 
     { "id": "Tree-Basic", "x": 200, "y": 300, "category": "组合对象" },
     { "id": "Tree-Sequence", "x": 350, "y": 330, "category": "组合对象" },
     { "id": "Tree-Split", "x": 350, "y": 270, "category": "组合对象" },
     { "id": "基环树", "x": 80, "y": 270, "category": "组合对象" },
     { "id": "仙人掌", "x": 80, "y": 330, "category": "组合对象" },
-    { "id": "Permutation", "x": 350, "y": 400, "category": "组合对象" },
+    { "id": "Tree-Count", "x": 360, "y": 420, "category": "算法" },
 
     { "id": "Graph-Basic", "x": 300, "y": 650, "category": "组合对象" },
     { "id": "Connectivity", "x": 50, "y": 620, "category": "算法" },
@@ -19,9 +20,8 @@
     { "id": "Network-Flow-Simulate", "x": 300, "y": 900, "category": "算法" },
     { "id": "Shortest-Path", "x": 230, "y": 550, "category": "算法" },
     { "id": "Transitive-Closure", "x": 100, "y": 500, "category": "算法" },
-    { "id": "Minimum-Spanning-Tree", "x": 450, "y": 630, "category": "算法" },
-    { "id": "ST-Count", "x": 500, "y": 680, "category": "数学基础" },
-    { "id": "DAG", "x": 400, "y": 550, "category": "算法" },
+    { "id": "Spanning-Tree", "x": 400, "y": 550, "category": "算法" },
+    { "id": "DAG", "x": 450, "y": 630, "category": "算法" },
     { "id": "SSP-Congruence", "x": 230, "y": 470, "category": "算法" },
     { "id": "Euler-Path", "x": 400, "y": 730, "category": "算法" },
 
@@ -69,7 +69,7 @@
     { "id": "Series", "x": 1000, "y": 300, "category": "数学基础" },
     { "id": "Inclusion-Exclusion", "x": 1050, "y": 150, "category": "数学基础" },
     { "id": "Abstract-Algebra", "x": 750, "y": 150, "category": "数学基础" },
-    { "id": "Linear-Algebra", "x": 600, "y": 150, "category": "数学基础" },
+    { "id": "Linear-Algebra", "x": 550, "y": 300, "category": "数学基础" },
     { "id": "Probability", "x": 800, "y": 250, "category": "数学基础" },
 
     { "id": "Search", "x": 1300, "y": 700, "category": "算法" },
@@ -78,22 +78,24 @@
     { "id": "Interactive", "x": 1200, "y": 800, "category": "空" },
     { "id": "Construction", "x": 1300, "y": 900, "category": "算法思想" },
 
-    { "id": "倍增", "x": 500, "y": 250, "category": "算法" }
+    { "id": "倍增", "x": 1100, "y": 850, "category": "算法" }
   ],
   "edges": [
     { "source": "Tree-Basic", "target": "Tree-Sequence", "sourceSide": "right", "targetSide": "left" },
     { "source": "Tree-Basic", "target": "Tree-Split", "sourceSide": "right", "targetSide": "left" },
     { "source": "Tree-Basic", "target": "基环树", "sourceSide": "left", "targetSide": "right" },
     { "source": "Tree-Basic", "target": "仙人掌", "sourceSide": "left", "targetSide": "right" },
+    { "source": "Tree-Basic", "target": "Tree-Count", "sourceSide": "bottom", "targetSide": "top" },
+    { "source": "Linear-Algebra", "target": "Tree-Count", "sourceSide": "left", "targetSide": "right" },
+    { "source": "Spanning-Tree", "target": "Tree-Count", "sourceSide": "top", "targetSide": "bottom" },
 
     { "source": "Graph-Basic", "target": "Bipartite", "sourceSide": "left", "targetSide": "right" },
     { "source": "Graph-Basic", "target": "Connectivity", "sourceSide": "left", "targetSide": "right" },
     { "source": "Graph-Basic", "target": "2-SAT", "sourceSide": "left", "targetSide": "right" },
     { "source": "Graph-Basic", "target": "Network-Flow", "sourceSide": "bottom", "targetSide": "top" },
     { "source": "Graph-Basic", "target": "Shortest-Path", "sourceSide": "top", "targetSide": "bottom" },
-    { "source": "Graph-Basic", "target": "Minimum-Spanning-Tree", "sourceSide": "right", "targetSide": "left" },
-    { "source": "Graph-Basic", "target": "ST-Count", "sourceSide": "right", "targetSide": "left" },
-    { "source": "Graph-Basic", "target": "DAG", "sourceSide": "right", "targetSide": "bottom" },
+    { "source": "Graph-Basic", "target": "Spanning-Tree", "sourceSide": "right", "targetSide": "bottom" },
+    { "source": "Graph-Basic", "target": "DAG", "sourceSide": "right", "targetSide": "left" },
     { "source": "Graph-Basic", "target": "Euler-Path", "sourceSide": "right", "targetSide": "top" },
     { "source": "Greedy", "target": "Network-Flow-Simulate", "sourceSide": "left", "targetSide": "right", "label": "算法思想" },
     { "source": "Shortest-Path", "target": "SSP-Congruence", "sourceSide": "top", "targetSide": "bottom" },
