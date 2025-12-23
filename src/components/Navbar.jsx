@@ -119,8 +119,8 @@ const Navbar = ({ menuItems, isMenuOpen, setIsMenuOpen, hasScrolled, currentPath
               }
             })}
             
-            {/* 用户模块 */}
-            <div className="relative">
+            {/* 用户模块 - 已隐藏 */}
+            {/* <div className="relative">
               {currentUser ? (
                 // 已登录状态
                 <div 
@@ -142,7 +142,6 @@ const Navbar = ({ menuItems, isMenuOpen, setIsMenuOpen, hasScrolled, currentPath
                     </svg>
                   </button>
                   
-                  {/* 用户下拉菜单 */}
                   {openDropdown === 'user' && (
                     <div 
                       className="absolute right-0 mt-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 hidden md:block overflow-hidden min-w-[120px]"
@@ -171,7 +170,7 @@ const Navbar = ({ menuItems, isMenuOpen, setIsMenuOpen, hasScrolled, currentPath
                   用户
                 </button>
               )}
-            </div>
+            </div> */}
           </div>
           
           {/* 移动端菜单按钮 */}
