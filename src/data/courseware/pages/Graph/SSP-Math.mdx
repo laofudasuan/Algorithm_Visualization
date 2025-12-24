@@ -1,0 +1,20 @@
+---
+title: 数学中的最短路建模
+---
+
+import GraphAlgorithmVisualization from '../../../../components/visualizations/GraphAlgorithmVisualization';
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+
+##### T630287 三进制数
+给定一个大小为 $ N $ 的非负整数集合 $ S = \{ A_1, A_2, \dots, A_N \} $。
+
+有一个变量 $ x $，初始值为 $ x = A_1 $。你可以任意多次进行以下操作：
+
+- 从集合 $ S $ 中选择一个元素 $ y $。
+- 当 $ y $ 满足以下条件时，将 $ x $ 赋值为 $ y $。
+
+条件：当 $ x $ 和 $ y $ 都用三进制表示时，将 $ x $ 位权为 $ 3^j $ 位的数字记为 $ X_j $，将 $ y $ 位权为 $ 3^j $ 位的数字记为 $ Y_j $。要求满足 $ X_j > Y_j $ 的 $ j $ 的个数最多为1。
+
+请你判断是否可以通过若干次操作使 $ x = A_N $。
+
+$N \le 2 \times 10^5, 0 \le A_i < 3^{12}$

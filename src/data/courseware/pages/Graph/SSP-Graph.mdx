@@ -1,0 +1,37 @@
+---
+title: 最短路图
+---
+
+import GraphAlgorithmVisualization from '../../../../components/visualizations/GraphAlgorithmVisualization';
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+
+## 最短路图
+
+给定起点$S$，仅保留$S$到每个点最短路径可能经过的边的图叫做最短路图
+
+
+## 最短路径计数
+
+##### AT_arc090_c [ARC090E] Avoiding Collision
+
+##### P7669 JOI2018 Commuter Pass
+给一张$n$个点$m$条边的无向图，每条边有一个正整数边权
+
+给定四个点$S,T,U,V$，你需要从$S$到$T$的所有最短路径中选出一条，把这些边的边权置为$0$。目标是，最小化在操作完成之后，$U$到$V$的最短路
+
+$n \le 10^5, m \le 2 \times 10^5$
+
+<CollapsibleComponent title="做法"> 
+用$d_{x,y}$表示在原图中$x$到$y$的最短路
+
+因为边权都是正整数，所以最短路图是一个DAG。
+
+本题相当于是选两条路径，一条从$S$到$T$，另外一条是从$U$到$V$，目标是最小化$U$到$V$路径中不和$S$到$T$路径相交的部分
+
+重要性质：最优解中，这两条路径的交一定是连续的，不可能交成两段（因为中间一定是走最短路，不可能分开走）
+
+所以，这题相当于是找两个点$x,y$，满足在$S$到$T$的最短路图中，$x$可以到达$y$，最小化$d_{U,x}+d(y,V)$
+
+令$F(x)=d_{U,x},G(y)=d_{y,V}$，这样就变成了一个DAG上的DP问题
+
+</CollapsibleComponent>

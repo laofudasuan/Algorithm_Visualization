@@ -18,16 +18,15 @@
     { "id": "2-SAT", "x": 50, "y": 800, "category": "算法" },
     { "id": "Network-Flow", "x": 200, "y": 800, "category": "算法" },
     { "id": "Network-Flow-Simulate", "x": 300, "y": 900, "category": "算法" },
-    { "id": "Shortest-Path", "x": 230, "y": 550, "category": "算法" },
+    { "id": "Shortest-Path", "x": 300, "y": 750, "category": "算法" },
     { "id": "Transitive-Closure", "x": 100, "y": 500, "category": "算法" },
     { "id": "Spanning-Tree", "x": 400, "y": 550, "category": "算法" },
     { "id": "DAG", "x": 450, "y": 630, "category": "算法" },
-    { "id": "SSP-Congruence", "x": 230, "y": 470, "category": "算法" },
-    { "id": "Euler-Path", "x": 400, "y": 730, "category": "算法" },
+    { "id": "Euler-Path", "x": 230, "y": 550, "category": "算法" },
 
-    { "id": "Greedy", "x": 500, "y": 900, "category": "算法思想" },
+    { "id": "Greedy", "x": 500, "y": 700, "category": "算法思想" },
     
-    { "id": "Counting", "x": 1000, "y": 900, "category": "数学基础" },
+    { "id": "Counting", "x": 1050, "y": 350, "category": "数学基础" },
 
     { "id": "String", "x": 1000, "y": 830, "category": "组合对象" },
     { "id": "Border", "x": 850, "y": 730, "category": "组合对象" },
@@ -56,7 +55,7 @@
     { "id": "FFT", "x": 1450, "y": 480, "category": "算法" },
     { "id": "FWT", "x": 1550, "y": 540, "category": "算法" },
     { "id": "Generating-Function-Set", "x": 1450, "y": 600, "category": "数学基础" },
-    { "id": "Linear-Programming", "x": 500, "y": 800, "category": "数学基础" },
+    { "id": "Linear-Programming", "x": 320, "y": 840, "category": "数学基础" },
     { "id": "数论", "x": 1300, "y": 300, "category": "数学基础" },
     { "id": "Number-Theoretic-Function", "x": 1500, "y": 200, "category": "数学基础" },
     { "id": "Sieve-Method", "x": 1420, "y": 280, "category": "算法" },
@@ -91,13 +90,13 @@
     { "source": "Graph-Basic", "target": "Bipartite", "sourceSide": "left", "targetSide": "right" },
     { "source": "Graph-Basic", "target": "Connectivity", "sourceSide": "left", "targetSide": "right" },
     { "source": "Graph-Basic", "target": "2-SAT", "sourceSide": "left", "targetSide": "right" },
+    { "source": "Graph-Basic", "target": "Shortest-Path", "sourceSide": "bottom", "targetSide": "top" },
+    { "source": "Shortest-Path", "target": "Network-Flow", "sourceSide": "bottom", "targetSide": "right", "label": "最短增广路算法" },
     { "source": "Graph-Basic", "target": "Network-Flow", "sourceSide": "bottom", "targetSide": "top" },
-    { "source": "Graph-Basic", "target": "Shortest-Path", "sourceSide": "top", "targetSide": "bottom" },
     { "source": "Graph-Basic", "target": "Spanning-Tree", "sourceSide": "right", "targetSide": "bottom" },
     { "source": "Graph-Basic", "target": "DAG", "sourceSide": "right", "targetSide": "left" },
-    { "source": "Graph-Basic", "target": "Euler-Path", "sourceSide": "right", "targetSide": "top" },
+    { "source": "Graph-Basic", "target": "Euler-Path", "sourceSide": "top", "targetSide": "bottom" },
     { "source": "Greedy", "target": "Network-Flow-Simulate", "sourceSide": "left", "targetSide": "right", "label": "算法思想" },
-    { "source": "Shortest-Path", "target": "SSP-Congruence", "sourceSide": "top", "targetSide": "bottom" },
     { "source": "Connectivity", "target": "Transitive-Closure", "sourceSide": "top", "targetSide": "bottom", "label": "有向图可达性问题" },
     
     { "source": "Polynomial", "target": "Generating-Function", "sourceSide": "bottom", "targetSide": "top" },
@@ -137,6 +136,7 @@
     { "source": "Dynamic-Programming", "target": "DP-Counting", "sourceSide": "right", "targetSide": "left" },
     { "source": "Combinatorics", "target": "DP-Counting", "sourceSide": "left", "targetSide": "top" },
     { "source": "Dynamic-Programming", "target": "DP-Optimization", "sourceSide": "bottom", "targetSide": "top" },
-    { "source": "Dynamic-Programming", "target": "DP-Function", "sourceSide": "bottom", "targetSide": "top" }
+    { "source": "Dynamic-Programming", "target": "DP-Function", "sourceSide": "bottom", "targetSide": "top" },
+    { "source": "Greedy", "target": "DP-Optimization", "sourceSide": "right", "targetSide": "left", "label": "贪心优化DP" }
   ]
 }

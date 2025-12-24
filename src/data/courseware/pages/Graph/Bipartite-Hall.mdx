@@ -200,3 +200,7 @@ $n \le 1000, m \le n^2$
 
 随机算法中有 $ T(n,m) = O(mn + n\log n) $。记 $ S(n,m) $ 为求出所有匹配的复杂度。当 $ m $ 是偶数的时候，我们可以先跑欧拉回路，即 $ S(n,m) = O(nm) + 2S(n,m/2) $；$ m $ 是奇数的时候，$ S(n,m) = S(n,m - 1) + O(nm + n\log n) $。因此总复杂度为 $ O(nm\log m + nm\log n) $。
 </CollapsibleComponent>
+
+## Hall定理优化贪心
+
+##### P7838 「Wdoi-3」夜雀 treating
