@@ -1,0 +1,24 @@
+{
+  "title": "数列",
+  "description": "数列",
+  "cover": "/images/no.png",
+  "author": "老虎大蒜",
+  "createdAt": "2025-11-23",
+  "metaPositions": {
+    "title": { "x": 150, "y": 120 },
+    "description": { "x": 500, "y": 150 }
+  },
+  "pages": [
+    { "id": "数列", "x": 200, "y": 300 },
+    { "id": "递推数列", "x": 300, "y": 300 },
+    { "id": "斐波那契数列", "path": "Math/Fibonacci.mdx", "x": 450, "y": 270 },
+    { "id": "卡特兰数", "path": "Math/Catalan.mdx", "x": 450, "y": 330 },
+    { "id": "母函数", "link": "Generating-Function", "x": 300, "y": 400 }
+  ],
+  "edges": [
+    { "source": "数列", "target": "递推数列", "sourceSide": "right", "targetSide": "left" },
+    { "source": "递推数列", "target": "斐波那契数列", "sourceSide": "right", "targetSide": "left" },
+    { "source": "递推数列", "target": "卡特兰数", "sourceSide": "right", "targetSide": "left" },
+    { "source": "递推数列", "target": "母函数", "sourceSide": "bottom", "targetSide": "top", "label": "生成函数" }
+  ]
+}

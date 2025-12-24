@@ -15,7 +15,8 @@
     { "id": "多元生成函数", "path": "Math/Math/Generating-Function-Bivariate.mdx", "x": 400, "y": 320 },
     { "id": "集合幂级数", "link": "Generating-Function-Set", "x": 400, "y": 380 },
     { "id": "例题", "path": "Math/Generating-Function-Problem.mdx", "x": 200, "y": 200 },
-    { "id": "多项式", "link": "Polynomial", "x": 200, "y": 400 }
+    { "id": "多项式", "link": "Polynomial", "x": 50, "y": 300 },
+    { "id": "生成函数与递推数列", "path": "Math/Generating-Function-Recurrence.mdx", "x": 50, "y": 400 }
   ],
   "edges": [
     { "source": "生成函数", "target": "一般型生成函数", "sourceSide": "right", "targetSide": "left" },
@@ -23,6 +24,7 @@
     { "source": "生成函数", "target": "多元生成函数", "sourceSide": "right", "targetSide": "left" },
     { "source": "生成函数", "target": "集合幂级数", "sourceSide": "right", "targetSide": "left" },
     { "source": "生成函数", "target": "例题", "sourceSide": "top", "targetSide": "bottom" },
-    { "source": "生成函数", "target": "多项式", "sourceSide": "bottom", "targetSide": "top" }
+    { "source": "生成函数", "target": "多项式", "sourceSide": "left", "targetSide": "right" },
+    { "source": "生成函数", "target": "生成函数与递推数列", "sourceSide": "bottom", "targetSide": "right" }
   ]
 }
