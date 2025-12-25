@@ -11,19 +11,21 @@
   "pages": [
     { "id": "图", "link": "Graph-Basic", "x": 300, "y": 280 },
     { "id": "有向图", "x": 400, "y": 250 },
-    { "id": "无向图", "x": 400, "y": 320 },
-    { "id": "强连通", "path": "Graph/SCC.mdx", "x": 600, "y": 250 },
-    { "id": "双连通", "path": "Graph/BCC.mdx", "x": 600, "y": 320 },
+    { "id": "无向图", "x": 400, "y": 380 },
+    { "id": "强连通", "path": "Graph/SCC.mdx", "x": 600, "y": 320 },
+    { "id": "传递闭包", "path": "Graph/Transitive-Closure.mdx", "x": 600, "y": 260 },
+    { "id": "双连通", "path": "Graph/BCC.mdx", "x": 600, "y": 380 },
     { "id": "定向问题", "path": "Graph/Orientation.mdx", "x": 200, "y": 400 },
-    { "id": "圆方树", "path": "Graph/Round-Square-Tree.mdx", "x": 800, "y": 320 },
+    { "id": "圆方树", "path": "Graph/Round-Square-Tree.mdx", "x": 800, "y": 380 },
     { "id": "支配树", "x": 600, "y": 200 }
   ],
   "edges": [
     { "source": "图", "target": "有向图", "sourceSide": "right", "targetSide": "left" },
     { "source": "图", "target": "无向图", "sourceSide": "right", "targetSide": "left" },
-    { "source": "有向图", "target": "强连通", "sourceSide": "right", "targetSide": "left" },
-    { "source": "有向图", "target": "支配树", "sourceSide": "right", "targetSide": "left", "label": "必经点问题" },
-    { "source": "无向图", "target": "双连通", "sourceSide": "right", "targetSide": "left" },
-    { "source": "双连通", "target": "圆方树", "sourceSide": "right", "targetSide": "left" }
+    { "source": "有向图", "target": "强连通", "sourceSide": "right", "targetSide": "left", "label": "双向连通" },
+    { "source": "有向图", "target": "传递闭包", "sourceSide": "right", "targetSide": "left", "label": "可达性" },
+    { "source": "有向图", "target": "支配树", "sourceSide": "right", "targetSide": "left", "label": "必经点" },
+    { "source": "无向图", "target": "双连通", "sourceSide": "right", "targetSide": "left", "label": "关键点/边" },
+    { "source": "双连通", "target": "圆方树", "sourceSide": "right", "targetSide": "left", "label": "点双联通技巧" }
   ]
 }
