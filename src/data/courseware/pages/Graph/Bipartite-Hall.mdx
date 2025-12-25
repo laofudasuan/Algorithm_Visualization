@@ -7,7 +7,7 @@ import { CollapsibleComponent } from '../../../courseware/markdownConfig';
 
 # 霍尔(Hall)定理
 
-### 定理内容
+## 定理内容
 
 令二分图的左点集和右点集分别为$L$和$R$，
 
@@ -21,6 +21,10 @@ import { CollapsibleComponent } from '../../../courseware/markdownConfig';
 - 假设存在非空子集$S \subset L$，满足$|f(S)|=|S|$，则可以把当前二分图划分成两个二分图：$\{S,f(S)\},\{L-S,R-f(S)\}$，递归证明
 - 否则，可以随便连一条边，归纳到$|L|-1$的情况
 </BoxWithTag>
+
+## 直观解释
+
+Hall定理相当于是在给每个子集找必要条件，只要所有子集都满足必要条件则一定存在
 
 ## 霍尔定理推论
 霍尔定理有很多推论，比如 k 正则二分图一定恰存在 k 组完全匹配。
