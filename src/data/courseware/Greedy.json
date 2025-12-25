@@ -1,0 +1,21 @@
+{
+  "title": "贪心",
+  "description": "贪心算法",
+  "cover": "/images/no.png",
+  "author": "老虎大蒜",
+  "createdAt": "2025-11-23",
+  "metaPositions": {
+    "title": { "x": 150, "y": 120 },
+    "description": { "x": 500, "y": 150 }
+  },
+  "pages": [
+    { "id": "贪心算法", "path": "Greedy/Greedy.mdx", "x": 200, "y": 300 },
+    { "id": "拆贡献法", "path": "Greedy/Greedy-Split.mdx", "x": 350, "y": 300 },
+    { "id": "贪心调整法", "path": "Greedy/Greedy-Adjust.mdx", "x": 500, "y": 300 },
+    { "id": "模拟费用流", "link": "Network-Flow-Simulate", "x": 500, "y": 400 },
+    { "id": "贪心顺序确定", "path": "Greedy/Greedy-Order.mdx", "x": 650, "y": 300 }
+  ],
+  "edges": [
+    { "source": "博弈问题", "target": "通用算法", "sourceSide": "right", "targetSide": "left" }
+  ]
+}

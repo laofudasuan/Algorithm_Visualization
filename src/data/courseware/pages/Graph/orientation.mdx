@@ -5,6 +5,7 @@ title: 定向问题专题
 # 专题：定向问题
 
 import GraphAlgorithmVisualization from '../../../../components/visualizations/GraphAlgorithmVisualization';
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
 
 ##### 例题
 
@@ -43,12 +44,14 @@ import GraphAlgorithmVisualization from '../../../../components/visualizations/G
   </div>
 </div>
 
-###### 想法1
+<CollapsibleComponent title="缩环法">
 
 - 每次在图中找一个环，把环上所有边朝一个方向定向，然后缩起来
 - 重复这个过程直到只剩下一个点
 
-###### 想法2
+</CollapsibleComponent>
+
+<CollapsibleComponent title="DFS树法"> 
 
 - 直接按照DFS的顺序定向
   - DFS的树边朝下
@@ -59,8 +62,9 @@ import GraphAlgorithmVisualization from '../../../../components/visualizations/G
 
 （如果不能回到根说明有桥，有桥的图一定无解）
 </BoxWithTag>
+</CollapsibleComponent>
 
-##### 例题完整版（提交链接可以看UOJ134 App 管理器）
+##### 例题完整版
 
 给定一张混合向图（初始既有有向边也有无向边），你需要给每条无向边定一个方向，变成有向图
 
@@ -69,6 +73,7 @@ import GraphAlgorithmVisualization from '../../../../components/visualizations/G
 数据范围:
 
 - 部分分：$n,m \le 100$
+- 部分分：$n,m \le 5000$（UOJ134 App 管理器就对应这个数据范围）
 - 满分：$n,m \le 10^6$
 
 
@@ -91,16 +96,16 @@ import GraphAlgorithmVisualization from '../../../../components/visualizations/G
   </div>
 </div>
 
-###### 想法1
+<CollapsibleComponent title="暴力缩环法"> 
 暴力做法可以延续
 - 每次在图中找一个环，把换上所有边朝一个方向定向，然后缩起来
 - 重复这个过程直到只剩下一个点
+</CollapsibleComponent>
+
+<CollapsibleComponent title="DFS树法"> 
 ---
 <div className="my-8 flex gap-4">
   <div className="w-3/5">
-
-###### 想法2
-
 直接按照 DFS 的顺序定向
 - DFS 的树边朝下（可能有问题，例如右图如果 $2 \to 1$ 朝下就完蛋啦！）
   - 如果子树内有非树边往上，则树边往下是对的，因为形成环了  
@@ -108,8 +113,7 @@ import GraphAlgorithmVisualization from '../../../../components/visualizations/G
 - DFS 的非树边朝上(一定正确，因为可以和树边形成环)
 ---
 
-  </div>
-
+</div>
   <div className="w-2/5">
     <GraphAlgorithmVisualization 
       graphName="orientation3" 
@@ -118,25 +122,26 @@ import GraphAlgorithmVisualization from '../../../../components/visualizations/G
   </div>
 </div>
 
-  
+</CollapsibleComponent>  
 
 ##### C. Economic One-way Roads XXI Open Cup, Grand Prix of Korea
 
 给出一张$n$个点的无向连通图
 
-将所有道路定向，每条道路定为两个方向有各自的花费
+将所有道路定向，读入每条道路定为两个方向有各自的花费
 
 最终要使得定向后的图为强连通图，求最小花费
 
 $n \le 18$，时间限制$5S$
 
----
 
-###### 想法
-
-- 还是可以沿用缩环法的思路，每次找一个环锁起来，直到只剩一个点
+<CollapsibleComponent title="缩环法"> 
+- 沿用缩环法的思路，每次找一个环缩起来，直到只剩一个点
 - 但是因为要求最最优解，所以不能随便找一个环，而是需要DP
 - $dp[S]$表示把$S$内的点缩成起来的最小代价
+</CollapsibleComponent>
+
+##### T444338 白兔的村庄
 
 ## 拓展阅读
 
