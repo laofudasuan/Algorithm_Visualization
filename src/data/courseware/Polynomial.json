@@ -1,0 +1,24 @@
+{
+  "title": "多项式",
+  "description": "多项式运算",
+  "cover": "/images/no.png",
+  "author": "老虎大蒜",
+  "createdAt": "2025-11-23",
+  "metaPositions": {
+    "title": { "x": 150, "y": 120 },
+    "description": { "x": 500, "y": 150 }
+  },
+  "pages": [
+    { "id": "多项式", "path": "Math/Polynomial.mdx", "x": 450, "y": 250 },
+    { "id": "点值表示", "path": "Math/Interpolation.mdx", "x": 450, "y": 350 },
+    { "id": "应用", "x": 350, "y": 250 },
+    { "id": "生成函数", "link": "Generating-Function", "x": 200, "y": 200 },
+    { "id": "哈希", "link": "Hash", "x": 200, "y": 300 }
+  ],
+  "edges": [
+    { "source": "多项式", "target": "点值表示", "sourceSide": "bottom", "targetSide": "top", "label": "表示方法" },
+    { "source": "多项式", "target": "应用", "sourceSide": "left", "targetSide": "right" },
+    { "source": "应用", "target": "生成函数", "sourceSide": "left", "targetSide": "right" },
+    { "source": "应用", "target": "哈希", "sourceSide": "left", "targetSide": "right" }
+  ]
+}

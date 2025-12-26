@@ -1,0 +1,24 @@
+{
+  "title": "组合数学",
+  "description": "组合数学基础、取模计算、斯特林数、组合意义",
+  "cover": "/images/no.png",
+  "author": "老虎大蒜",
+  "createdAt": "2025-11-23",
+  "metaPositions": {
+    "title": { "x": 150, "y": 120 },
+    "description": { "x": 500, "y": 150 }
+  },
+  "pages": [
+    { "id": "组合数学基础", "path": "Math/Combinatorics.mdx", "x": 300, "y": 280 },
+    { "id": "取模计算", "path": "Math/Combinatorics-Module.mdx", "x": 300, "y": 400 },
+    { "id": "斯特林数", "path": "Math/Stirling.mdx", "x": 600, "y": 380 },
+    { "id": "计数", "link" : "Counting", "x": 600, "y": 200 },
+    { "id": "生成函数", "link" : "Generating-Function", "x": 150, "y": 280 }
+  ],
+  "edges": [
+    { "source": "组合数学基础", "target": "取模计算", "sourceSide": "bottom", "targetSide": "top" },
+    { "source": "组合数学基础", "target": "计数", "sourceSide": "right", "targetSide": "left", "label": "用组合意义解决计数问题" },
+    { "source": "组合数学基础", "target": "斯特林数", "sourceSide": "right", "targetSide": "left" },
+    { "source": "组合数学基础", "target": "生成函数", "sourceSide": "left", "targetSide": "right" }
+  ]
+}
