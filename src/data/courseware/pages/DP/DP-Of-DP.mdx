@@ -1,0 +1,60 @@
+---
+title: DP套DP
+---
+
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+
+
+
+## DP of DP
+
+##### P10614 BZOJ3864 Hero meet devil
+给一个长度为$n$的字符串$S$，问有多少个长度为$m$的串$s$与它的最长公共子序列为$0,1,2,\ldots,n$
+
+字符串只由$A,G,C,T$组成
+
+$n \le 10, M \le 1000$
+
+<CollapsibleComponent title="做法">
+先考虑给定另一个串，如何求最长公共子序列：
+
+$$
+F_{i,j}= \begin{cases}
+F_{i-1,j-1}+1 & s_i = s_j \\
+\max(F_{i-1,j}, F_{i,j-1}) & s_i \neq s_j
+\end{cases}
+$$
+
+根据递推式，我们有$F_{i,j}-F_{i-1,j} \le 1$，所以固定一个$j$，可能的$F_{i,j}$数组只有$2^n$种
+
+暴力把每种状态的方案数记下来即可
+</CollapsibleComponent>
+
+##### P4590 TJOI2018 游园会
+
+小豆参加了NOI的游园会，会场上每完成一个项目就会获得一个奖章，奖章只会是$\texttt{N}$、$\texttt{O}$、$\texttt{I}$的字样。在会场上他收集到了$K$个奖章组成的串。兑奖规则是奖章串和兑奖串的最长公共子序列长度为小豆最后奖励的等级。已知兑奖串长度为$N$，并且在兑奖串上不会出现连续三个奖章为$\texttt{NOI}$。现在小豆想知道各个奖励等级会对应多少个不同的合法兑奖串。
+
+$N\leq1000, K\leq15$。
+
+<CollapsibleComponent title="做法">
+和上一题类似
+</CollapsibleComponent>
+
+##### 例题
+定义两个串相似，当且仅当两个串各删掉最多两个字符后相等
+
+求有多少对长度为$n$，字符集大小为$m$的串相似
+
+$n \le 100, m \le 10^9$
+
+<CollapsibleComponent title="做法">
+考虑如何判断两个序列是否相似：
+
+$F_{i,j,x,y}$表示$A$的前$i$个中删了$x$个，$B$的前$j$个中删了$y$个是否可能相同
+
+注意到固定了$i$以后，$j$的取值范围为$[i-2,i+2]$，一共只有$2^9$种可能性
+
+修改状态：$F_{i,x,y,\text{state}}$表示考虑了$A$和$B$的前$i$个，$A$删了$x$个，$B$删了$y$个，以及剩下字符的相等情况
+</CollapsibleComponent>
+
+##### P5279 ZJOI2019 麻将

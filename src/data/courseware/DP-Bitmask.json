@@ -1,0 +1,24 @@
+{
+  "title": "状压DP",
+  "description": "状压DP",
+  "cover": "/images/no.png",
+  "author": "老虎大蒜",
+  "createdAt": "2025-11-23",
+  "metaPositions": {
+    "title": { "x": 150, "y": 120 },
+    "description": { "x": 500, "y": 150 }
+  },
+  "pages": [
+    { "id": "状压DP", "path": "DP/DP-Bitmask.mdx", "x": 300, "y": 280 },
+    { "id": "连通性状压", "path": "DP/DP-Connectivity.mdx", "x": 500, "y": 280 },
+    { "id": "插头DP", "path": "DP/DP-Plug.mdx", "x": 500, "y": 380 },
+    { "id": "数论状压", "path": "DP/DP-Math.mdx", "x": 100, "y": 280 },
+    { "id": "DP套DP", "path": "DP/DP-Of-DP.mdx", "x": 300, "y": 380 }
+  ],
+  "edges": [
+    { "source": "状压DP", "target": "连通性状压", "sourceSide": "right", "targetSide": "left" },
+    { "source": "连通性状压", "target": "插头DP", "sourceSide": "bottom", "targetSide": "top" },
+    { "source": "状压DP", "target": "数论状压", "sourceSide": "left", "targetSide": "right" },
+    { "source": "状压DP", "target": "DP套DP", "sourceSide": "bottom", "targetSide": "top" }
+  ]
+}

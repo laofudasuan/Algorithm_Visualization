@@ -37,8 +37,8 @@
     { "id": "Automatic-Machine", "x": 350, "y": 600, "category": "组合对象" },
     { "id": "Trie", "x": 300, "y": 450, "category": "组合对象" },
 
-    { "id": "Data-Structure", "x": 500, "y": 400, "category": "算法" },
-    { "id": "Segment-Tree", "x": 500, "y": 350, "category": "算法" },
+    { "id": "Data-Structure", "x": 600, "y": 400, "category": "算法" },
+    { "id": "Segment-Tree", "x": 450, "y": 350, "category": "算法" },
 
     { "id": "Dynamic-Programming", "x": 850, "y": 500, "category": "算法" },
     { "id": "状态设计", "x": 1000, "y": 750, "category": "算法" },
@@ -67,8 +67,8 @@
     { "id": "Combinatorics", "x": 1200, "y": 350, "category": "数学基础" },
     { "id": "Series", "x": 1400, "y": 370, "category": "数学基础" },
     { "id": "Inclusion-Exclusion", "x": 1200, "y": 250, "category": "数学基础" },
-    { "id": "Linear-Algebra", "x": 800, "y": 150, "category": "数学基础" },
-    { "id": "Linear-Programming", "x": 820, "y": 100, "category": "数学基础" },
+    { "id": "Linear-Algebra", "x": 850, "y": 100, "category": "数学基础" },
+    { "id": "Linear-Programming", "x": 720, "y": 100, "category": "数学基础" },
 
     { "id": "Search", "x": 1500, "y": 700, "category": "算法" },
     { "id": "Game-Theory", "x": 1500, "y": 760, "category": "数学基础" },
@@ -84,7 +84,7 @@
     { "source": "Tree-Basic", "target": "Tree-Split", "sourceSide": "right", "targetSide": "left" },
     { "source": "Tree-Basic", "target": "基环树", "sourceSide": "left", "targetSide": "right" },
     { "source": "Tree-Basic", "target": "仙人掌", "sourceSide": "left", "targetSide": "right" },
-    { "source": "Linear-Algebra", "target": "Tree-Count", "sourceSide": "right", "targetSide": "top" },
+    { "source": "Linear-Algebra", "target": "Tree-Count", "sourceSide": "bottom", "targetSide": "top" },
     
     { "source": "Graph-Basic", "target": "Bipartite", "sourceSide": "left", "targetSide": "right" },
     { "source": "Graph-Basic", "target": "Connectivity", "sourceSide": "bottom", "targetSide": "top" },
@@ -133,13 +133,13 @@
     { "source": "Counting", "target": "Probability", "sourceSide": "top", "targetSide": "bottom", "label": "非确定性计数" },
     { "source": "Counting", "target": "Generating-Function", "sourceSide": "bottom", "targetSide": "left", "label": "数学工具" },
     
-    { "source": "Dynamic-Programming", "target": "状态设计", "sourceSide": "left", "targetSide": "bottom" },
+    { "source": "Dynamic-Programming", "target": "状态设计", "sourceSide": "bottom", "targetSide": "top" },
     { "source": "状态设计", "target": "DP-Sequence", "sourceSide": "left", "targetSide": "right" },
     { "source": "状态设计", "target": "DP-Tree", "sourceSide": "left", "targetSide": "right" },
     { "source": "状态设计", "target": "DP-Knapsack", "sourceSide": "left", "targetSide": "right" },
     { "source": "状态设计", "target": "DP-Bitmask", "sourceSide": "left", "targetSide": "right" },
     { "source": "Connectivity", "target": "DP-Bitmask", "sourceSide": "right", "targetSide": "left", "label": "连通性DP" },
-    { "source": "DP-Sequence", "target": "DP-Digit", "sourceSide": "left", "targetSide": "right" },
+    { "source": "DP-Sequence", "target": "DP-Digit", "sourceSide": "bottom", "targetSide": "top" },
     { "source": "Dynamic-Programming", "target": "DP-Optimization", "sourceSide": "top", "targetSide": "bottom" },
     { "source": "DP-Optimization", "target": "DP-Function", "sourceSide": "right", "targetSide": "top" },
     { "source": "Greedy", "target": "DP-Optimization", "sourceSide": "bottom", "targetSide": "left", "label": "贪心优化DP" }

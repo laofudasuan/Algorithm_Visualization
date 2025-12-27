@@ -1,0 +1,54 @@
+---
+title: 连通性状压
+---
+
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+
+
+##### NOI2007生成树计数
+
+有一张$n$个点的图，两个不同的点$x,y$之间有一条无向边当且仅当两个点的编号差不超过$m$，即$|x-y| \le m$
+
+求生成树个数
+
+$n \le 10^{15}, m \le 5$
+
+<CollapsibleComponent title="做法">
+
+- 从小往大DP，处理到点$x$时，由于只能向$x-m \sim x-1$内的点连边
+- 只需要在状态中记录前$m$个点的连通性
+- 状态总数为把$m$个球放到若干个无标号非空盒子的方案数（爆搜为$52$种）
+- DP转移可用矩阵乘法描述
+- 复杂度$52^3 \log n$
+
+</CollapsibleComponent>
+
+
+##### UVA10572 Black and White
+
+有一个$n$行$m$列的网络，有些格子上涂了黑色或者白色
+
+需要把剩下的格子也涂上黑色或者白色，要求对于任意$2 \times 2$的子矩阵，不能全部同色
+
+同时要求，所有黑色格子四联通，所有白色格子四联通
+
+$n,m \le 8$，求合法的涂色方案数
+
+<CollapsibleComponent title="做法">
+和上一题思路一样，分别记录黑色格子的连通性和白色格子的连通性
+</CollapsibleComponent>
+
+##### 生成树计数
+给一张无向图，保证所有简单路径长度不超过$8$，求这张图的生成树个数
+
+$n,m \le 10^5$
+
+<CollapsibleComponent title="做法">
+如何利用本题的性质？任意一棵生成树，深度不超过$8$
+
+在DFS树上DP：无向图的DFS树没有横向边
+
+按照DFS序DP，只需要状压当前点到根的所有点的连通性
+</CollapsibleComponent>
+
+##### T525435 生成树
