@@ -1,0 +1,62 @@
+---
+title: 动态树分治
+---
+
+import TreeAlgorithmVisualization from '../../../../components/visualizations/TreeAlgorithmVisualization';
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+
+##### P2056 捉迷藏
+一棵树，黑白两种颜色
+
+支持修改颜色、问黑色直径
+
+<CollapsibleComponent title="点分治做法">
+动态树分治
+
+每一层开两个两个multiset，记录深度
+
+全局再开一个multiset
+</CollapsibleComponent>
+
+
+<CollapsibleComponent title="链分治做法">
+除了点分治也可以用链分治来做
+
+对每个节点，开一个堆，维护它的所有轻儿子的子树最深黑点深度
+
+对每条重链，开一个线段树，维护线段树上选两个端点的距离+两个端点轻儿子子树内最深黑点深度的最大值
+</CollapsibleComponent>
+
+##### P5642 人造情感（emotion）
+给你一颗 $n$ 个节点的树，以及 $m$ 条路径 $(u, v, w)$，其中 $w$ 可以认为是 $(u, v)$ 这题路径被标记的一个权值。一个路径集合 $S$ 的重量 $W(S)$ 记为：找出 $S$ 的一个权值之和最大的子集，该子集满足任何两条路径没有公共点，这个子集的所有路径权值之和就是 $W(S)$。
+
+记 $f(u, v) = w$ 为最小的非负整数 $w$，使得对于给定的 $m$ 条边组成的路径集合 $U$，$W(U \cup \{(u, v, w+1)\}) > W(U)$。
+
+请你计算下式，对 $998244353$ 取模。
+
+$$\sum_{u=1}^{n} \sum_{v=1}^{n} f(u, v)$$
+
+$n,m \le 3 \times 10^5$
+
+##### P3345 幻想乡战略游戏
+给一棵树，有边权点权，支持单点修改，查询带权重心到各个点的加权距离和
+
+度数不超过$20, n,q \le 10^5$
+
+时间限制$6s$
+
+##### 紫荆花之恋
+有一棵初始为空的树，给 $n$ 次操作，每次操作加入一个节点 $k$，给出 $k$ 的父亲、$k$ 与父亲之间的边权、$k$ 的点权 $r_k$，操作后求出 $|\{(i,j)|1 \leq i < j \leq k \text{ and } r_i + r_j \geq \text{dis}(i,j)\}|$。强制在线。
+
+$n \leq 10^5$。
+
+时间限制$12s$
+
+##### P6666 [清华集训 2016] 数据交互
+给定一棵$n$个点的树，$m$次操作：
+
+添加一条路径$(u_i,v_i)$，权值为$w_i$
+
+撤回一次操作
+
+每一次操作后求出一条路径使得与这条路径有交的路径的权值和最大。
