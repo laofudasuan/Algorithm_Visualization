@@ -1,138 +1,211 @@
-// apiService.js - API服务层
+// apiService.js - 纯前端数据服务层 (无后端版本)
 
-const API_BASE_URL = 'http://localhost:8080/api';
+// 模拟延迟，使体验更真实
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-// 获取认证令牌
-const getAuthToken = () => {
-  return localStorage.getItem('authToken');
-};
-
-// 通用请求函数
-const request = async (url, options = {}) => {
-  const headers = {
-    'Content-Type': 'application/json',
-    ...options.headers,
-  };
-
-  const token = getAuthToken();
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-
-  const response = await fetch(`${API_BASE_URL}${url}`, {
-    ...options,
-    headers,
-  });
-
-  if (!response.ok) {
-    if (response.status === 401) {
-      // 未授权，清除本地存储并跳转到登录
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('user');
-      window.location.href = '/';
-    }
-    throw new Error(`API请求失败: ${response.status}`);
-  }
-
-  // 检查响应是否为JSON
-  const contentType = response.headers.get('content-type');
-  if (contentType && contentType.includes('application/json')) {
-    return await response.json();
-  }
-  return response;
-};
-
-// 用户认证API
+// ----------------------------------------------------------------------
+// 用户认证API (Mock)
+// ----------------------------------------------------------------------
 export const authApi = {
-  login: (credentials) => request('/auth/login', {
-    method: 'POST',
-    body: JSON.stringify(credentials),
-  }),
-  register: (userData) => request('/auth/register', {
-    method: 'POST',
-    body: JSON.stringify(userData),
-  }),
+  login: async (credentials) => {
+    await delay(500);
+    // 总是登录成功
+    return {
+      id: 1,
+      username: credentials.username,
+      nickname: '本地用户',
+      token: 'mock-token-' + Date.now(),
+      roles: ['ROLE_USER']
+    };
+  },
+  register: async (userData) => {
+    await delay(500);
+    // 总是注册成功
+    return {
+      id: 1,
+      username: userData.username,
+      nickname: userData.nickname || '本地用户',
+      token: 'mock-token-' + Date.now(),
+      roles: ['ROLE_USER']
+    };
+  },
 };
 
-// 用户数据API
-export const userDataApi = {
-  getAll: () => request('/user-data'),
-  getByType: (dataType) => request(`/user-data/type/${dataType}`),
-  getByTypeAndKey: (dataType, dataKey) => request(`/user-data/type/${dataType}/key/${dataKey}`),
-  createOrUpdate: (userData) => request('/user-data', {
-    method: 'POST',
-    body: JSON.stringify(userData),
-  }),
-  delete: (id) => request(`/user-data/${id}`, {
-    method: 'DELETE',
-  }),
-};
-
-// 课件数据API
-export const coursewareApi = {
-  getAll: () => request('/user-data/type/courseware'),
-  getById: (id) => request(`/user-data/type/courseware/key/${id}`),
-  createOrUpdate: (coursewareData) => request('/user-data', {
-    method: 'POST',
-    body: JSON.stringify({
-      ...coursewareData,
-      dataType: 'courseware',
-    }),
-  }),
-  delete: (id) => request(`/user-data/type/courseware/key/${id}`, {
-    method: 'DELETE',
-  }),
-};
-
+// ----------------------------------------------------------------------
 // 图数据API
+// ----------------------------------------------------------------------
 export const graphApi = {
-  getAll: () => request('/user-data/type/graphs'),
-  getById: (id) => request(`/user-data/type/graphs/key/${id}`),
-  createOrUpdate: (graphData) => request('/user-data', {
-    method: 'POST',
-    body: JSON.stringify({
-      ...graphData,
-      dataType: 'graphs',
-    }),
-  }),
-  delete: (id) => request(`/user-data/type/graphs/key/${id}`, {
-    method: 'DELETE',
-  }),
+  getAll: async () => {
+    await delay(200);
+    // 动态获取 src/data/graphs 下的所有 json 文件
+    // import.meta.glob 返回一个对象 { path: importFunc }
+    const modules = import.meta.glob('../data/graphs/*.json');
+    const results = [];
+    
+    for (const path in modules) {
+        const name = path.split('/').pop().replace('.json', '');
+        results.push({
+            id: name,
+            dataKey: name,
+            dataType: 'graphs',
+            // 注意：这里我们只返回列表，不加载具体内容，除非 eager=true
+            // 为了模拟后端列表接口，只返回元数据
+        });
+    }
+    return results;
+  },
+  
+  getById: async (id) => {
+    await delay(100);
+    try {
+        // 使用动态导入加载特定文件
+        // Vite 支持在 import 中使用变量，只要它能被静态分析为相对于当前文件的路径
+        const data = await import(`../data/graphs/${id}.json`);
+        return {
+            id: id,
+            dataKey: id,
+            dataType: 'graphs',
+            dataContent: JSON.stringify(data.default || data)
+        };
+    } catch (e) {
+        console.warn(`Graph not found: ${id}`, e);
+        throw new Error(`Graph not found: ${id}`);
+    }
+  },
+  
+  createOrUpdate: async (data) => { 
+      console.log('Mock save graph (local only):', data); 
+      return data; 
+  },
+  
+  delete: async (id) => { 
+      console.log('Mock delete graph (local only):', id); 
+      return { success: true }; 
+  },
 };
 
+// ----------------------------------------------------------------------
 // 树数据API
+// ----------------------------------------------------------------------
 export const treeApi = {
-  getAll: () => request('/user-data/type/trees'),
-  getById: (id) => request(`/user-data/type/trees/key/${id}`),
-  createOrUpdate: (treeData) => request('/user-data', {
-    method: 'POST',
-    body: JSON.stringify({
-      ...treeData,
-      dataType: 'trees',
-    }),
-  }),
-  delete: (id) => request(`/user-data/type/trees/key/${id}`, {
-    method: 'DELETE',
-  }),
+  getAll: async () => {
+    await delay(200);
+    const modules = import.meta.glob('../data/trees/*.json');
+    const results = [];
+    for (const path in modules) {
+        const name = path.split('/').pop().replace('.json', '');
+        results.push({ id: name, dataKey: name, dataType: 'trees' });
+    }
+    return results;
+  },
+  
+  getById: async (id) => {
+    await delay(100);
+    try {
+        const data = await import(`../data/trees/${id}.json`);
+        return {
+            id: id,
+            dataKey: id,
+            dataType: 'trees',
+            dataContent: JSON.stringify(data.default || data)
+        };
+    } catch (e) {
+        console.warn(`Tree not found: ${id}`, e);
+        throw new Error(`Tree not found: ${id}`);
+    }
+  },
+  
+  createOrUpdate: async (data) => { 
+      console.log('Mock save tree (local only):', data); 
+      return data; 
+  },
+  
+  delete: async (id) => { 
+      console.log('Mock delete tree (local only):', id); 
+      return { success: true }; 
+  },
 };
 
+// ----------------------------------------------------------------------
 // 知识图谱API
+// ----------------------------------------------------------------------
 export const knowledgeGraphApi = {
-  getAll: () => request('/user-data/type/knowledge-graph'),
-  getById: (id) => request(`/user-data/type/knowledge-graph/key/${id}`),
-  createOrUpdate: (graphData) => request('/user-data', {
-    method: 'POST',
-    body: JSON.stringify({
-      ...graphData,
-      dataType: 'knowledge-graph',
-    }),
-  }),
-  delete: (id) => request(`/user-data/type/knowledge-graph/key/${id}`, {
-    method: 'DELETE',
-  }),
+  getAll: async () => {
+      await delay(200);
+      try {
+          const { knowledgeGraphData } = await import('../data/knowledge-graph/mockData.js');
+          return [{
+              id: 'knowledge-graph-main',
+              dataKey: 'main',
+              dataType: 'knowledge-graph',
+              dataContent: JSON.stringify(knowledgeGraphData)
+          }];
+      } catch (e) {
+          console.error('Failed to load knowledge graph data', e);
+          return [];
+      }
+  },
+  
+  getById: async (id) => {
+      try {
+          const { knowledgeGraphData } = await import('../data/knowledge-graph/mockData.js');
+          return {
+              id: id,
+              dataKey: id,
+              dataType: 'knowledge-graph',
+              dataContent: JSON.stringify(knowledgeGraphData)
+          };
+      } catch (e) {
+          throw new Error('Knowledge graph data not found');
+      }
+  },
+  
+  createOrUpdate: async (data) => { console.log('Mock save KG:', data); return data; },
+  delete: async (id) => { console.log('Mock delete KG:', id); return { success: true }; },
 };
 
+// ----------------------------------------------------------------------
+// 课件API
+// ----------------------------------------------------------------------
+export const coursewareApi = {
+    getAll: async () => {
+        // CoursewareList.jsx 已经实现了自己的加载逻辑
+        return []; 
+    },
+    getById: async (id) => {
+         return { id, content: 'Mock content' };
+    },
+    createOrUpdate: async () => {},
+    delete: async () => {}
+};
+
+// ----------------------------------------------------------------------
+// 通用用户数据API
+// ----------------------------------------------------------------------
+export const userDataApi = {
+    getAll: async () => [],
+    getByType: async (type) => {
+        if (type === 'graphs') return graphApi.getAll();
+        if (type === 'trees') return treeApi.getAll();
+        return [];
+    },
+    getByTypeAndKey: async (type, key) => {
+        if (type === 'graphs') return graphApi.getById(key);
+        if (type === 'trees') return treeApi.getById(key);
+        return null;
+    },
+    createOrUpdate: async () => {},
+    delete: async () => {}
+};
+
+// ----------------------------------------------------------------------
 // 用户管理API
+// ----------------------------------------------------------------------
 export const userApi = {
-  getAllUsers: () => request('/users'),
+    getAllUsers: async () => {
+        await delay(300);
+        return [
+            { id: 1, username: 'admin', nickname: '管理员', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
+        ];
+    }
 };
