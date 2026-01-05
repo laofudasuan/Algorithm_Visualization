@@ -11,6 +11,7 @@
   "pages": [
     { "id": "树分治", "x": 200, "y": 280 },
     { "id": "点分治", "path": "Tree/Tree-Point-Split.mdx", "x": 400, "y": 220 },
+    { "id": "有根树点分治", "path": "Tree/Tree-Rooted-Point-Split.mdx", "x": 520, "y": 180 },
     { "id": "边分治", "path": "Tree/Tree-Edge-Split.mdx", "x": 400, "y": 280 },
     { "id": "链分治", "x": 400, "y": 340 },
     { "id": "树链剖分", "path": "Tree/Tree-Chain-Split.mdx", "x": 600, "y": 280 },
@@ -20,6 +21,7 @@
   ],
   "edges": [
     { "source": "树分治", "target": "点分治", "sourceSide": "right", "targetSide": "left" },
+     { "source": "点分治", "target": "有根树点分治", "sourceSide": "right", "targetSide": "left" },
     { "source": "树分治", "target": "边分治", "sourceSide": "right", "targetSide": "left" },
      { "source": "树分治", "target": "链分治", "sourceSide": "right", "targetSide": "left" },
      { "source": "链分治", "target": "树链剖分", "sourceSide": "right", "targetSide": "left" },

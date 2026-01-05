@@ -1,0 +1,44 @@
+---
+title: 集合幂级数
+---
+
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+
+# 集合幂级数
+
+## 定义
+
+设全集 $U = \{1,2,\dots,n\}$，$\mathcal{P}(U) = \{S \mid S \subseteq U\}$。  
+定义 $U$ 上的集合幂级数 $f: \mathcal{P}(U) \to R$，其中 $R$ 为一交换环。令 $f_S$ 表示 $f$ 上 $S$ 的像。
+
+## 运算
+
+若 $f: \mathcal{P}(U) \to R$，$g: \mathcal{P}(U) \to R$，则定义：
+
+- $h = f + g$，其中 $h: \mathcal{P}(U) \to R$ 且 $h_S = f_S + g_S$。  
+  类似的可以定义 $h = f - g$。
+
+- $h = kf$，其中 $h: \mathcal{P}(U) \to R$，$k \in R$，且 $h_S = kf_S$。  
+  类似的可以定义 $h = -f$。
+
+- $h = f \times g$，其中 $h: \mathcal{P}(U) \to R$ 且  
+  $$
+  h_S = \sum_{T \uplus U = S} f_T g_U,
+  $$  
+  即 $f,g$ 的子集卷积（不交并卷积）。
+
+&gt; 为了方便之后的表述，我们定义 $S \uplus T$ 表示 $S,T$ 的不交并（若 $S \cap T = \varnothing$，则 $S \uplus T = S \cup T$，否则是非法的）。
+
+- $h = f * g$，其中 $h: \mathcal{P}(U) \to R$ 且  
+  $$
+  h_S = \sum_{A \cup B = S} f_A g_B,
+  $$  
+  即 $f,g$ 的集合并卷积（OR 卷积）。
+
+- $h = f \circ g$，其中 $h: \mathcal{P}(U) \to R$ 且 $h_S = f_S \cdot g_S$，即 $f,g$ 的逐项积。
+
+
+###### 快速计算集合与、或、非卷积
+
+<a href="/courseware/FWT" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline inline-flex items-center gap-1">🔗 可以先学习FWT算法</a>
+

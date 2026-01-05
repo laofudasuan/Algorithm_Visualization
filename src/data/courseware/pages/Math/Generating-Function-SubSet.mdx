@@ -1,0 +1,176 @@
+---
+title: 子集卷积问题
+---
+
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+
+
+# 子集卷积问题
+
+子集卷积问题：给定序列$a,b$，求
+
+$$c_k=\sum_{i \cup j=k,i \cap j=0} a_i b_j$$
+
+这两个条件同时处理比较困难，我们把问题转化一下，变成
+
+$$c_k=\sum_{i \cup j=k,|i|+|j|=|k|} a_i b_j $$
+
+把它看成一个二维序列，第一维是集合，第二维是集合大小
+
+然后我们先做一个高维前缀和，高维前缀和之后，对应位置相乘，这里的乘法就是第二维的多项式乘法
+
+做完之后再进行一次高维差分，就是答案
+
+##### P7526 Virtual Self
+给定$n$个小于$2^w$的非负整数。
+
+对于所有$k \in [0,2^w)$，求从$n$个数中选出$m$个数，异或和为$k$的方案数
+
+$w \le 20, m \le 10^6$
+
+<CollapsibleComponent title="做法">
+相当于集合幂级数里面套了一个多项式
+
+有$n$个生成函数，每一个在FWT之后只有两种取值$1$和$-1$
+
+解出每个位置有几个$1$几个$-1$
+
+然后，用FFT预处理一个多项式展开
+</CollapsibleComponent>
+
+##### CF1906K Deck-Building Game
+
+##### P4221 WC2018 州区划分
+
+有$n$个数，要划分成若干个集合，一个集合S的权值是$f(S)$，一个划分方案的权值是每一个集合权值的乘积，求所有划分方案的权值之和
+
+$n \le 21$
+
+<CollapsibleComponent title="做法">
+题目要求的即
+
+$$
+(\frac{1}{0!}+\frac{f(S)}{1!}+\frac{f(S) \circ f(S)}{2!}+\ldots)[2^n-1]
+$$
+
+其中$\circ$为子集卷积
+
+同样我们把它变成二维问题
+
+第一维做一个高维前缀和，第二维就是一个多项式exp，然后在高维差分即可
+</CollapsibleComponent>
+
+##### P13275 NOI2025 集合
+小 X 有 $2^n$ 个数，编号为 $0$ 到 $2^n - 1$，第 $i \ (0 \leq i < 2^n)$ 个数为 $a_i$。
+
+对于 $S \subseteq \{0, 1, \ldots, 2^n - 1\}$，定义 $f(S)$ 为集合 $S$ 中所有数的二进制按位与。特别地，若 $S$ 为空集，则 $f(S) = 2^n - 1$。
+
+定义两个 $\{0, 1, \ldots, 2^n - 1\}$ 的子集 $P, Q$ （可以为空）构成的有序对 $(P, Q)$ 是 **特别的** 当且仅当 $P \cap Q = \varnothing$ 且 $f(P) = f(Q)$。定义有序对 $(P, Q)$ 的 **权值** 为编号包含在 $P \cup Q$ 内的所有数的乘积，即 $\prod_{i \in P \cup Q} a_i$。特别地，若 $P \cup Q = \varnothing$，则有序对 $(P, Q)$ 的权值为 $1$。
+
+小 X 想要知道所有特别的有序对的权值之和，请你帮助他求出这个值。由于答案可能较大，你只需要求出答案对 $998,244,353$ 取模后的结果。
+
+$t \le 3, n \le 20$
+
+<CollapsibleComponent title="做法">
+先考虑写一个暴力DP：
+
+用$f[i][j][k]$表示已经考虑完了前$i$个数，集合$f(P)=j,f(Q)=k$的权值之和，转移就是枚举$i+1$怎么选：
+
+- 如果$i+1$不选，则从$f[i][j][k]$转移到$f[i+1][j][k]$
+- 如果$i+1$给$P$选，则从$f[i][j][k]$转移到$f[i+1][j\&(i+1)][k]$
+- 如果$i+1$给$Q$选，则从$f[i][j][k]$转移到$f[i+1][j][k\&(i+1)]$
+
+考虑把刚刚的DP写成集合幂级数的形式：
+
+定义$U=2^n-1$，对$f[i][j][k]$建立关于$j$和$k$的二元集合幂级数：
+
+$$
+F[i] = \sum_{j=0}^{U}\sum_{k=0}^{U} f[i][j][k] x^j y^k
+$$
+
+则：（注意：集合幂级数的乘法定义为FWT的与卷积）
+
+$$
+F[i+1] = F[i] \times (x^Uy^U + a_{i+1}x^{i+1}y^U+a_{i+1}x^Uy^{i+1})
+$$
+
+由此可以推出，答案的集合幂级数可以表示为：
+
+$$
+\prod_{i=0}^{U} (x^Uy^U + a_{i}x^{i}y^U+a_{i}x^Uy^{i})
+$$
+
+如果是一元集合幂级数做FWT，就是先求高维后缀和（超集和），再直接点乘
+
+那对于二元集合幂级数做FWT，就是对两维分别求高维后缀和（超集和），再直接点乘
+
+$$
+FWT(x^Uy^U + a_{i}x^{i}y^U+a_{i}x^Uy^{i}) = \sum_{j=0}^{U}\sum_{k=0}^{U} \left(1 + a_i[j \subseteq i]+a_i[k \subseteq i]\right)x^jy^k
+$$
+
+点乘之后的$x^jy^k$项的系数就应该为（利用容斥原理，先计算包含$j,k$中任意一个的，再除掉同时包含的情况）：
+
+$$
+\left[\prod_{j \subseteq j'}(a_{j'}+1)\right] \times \left[\prod_{k \subseteq k'}(a_{k'}+1) \right]\times  \left[\prod_{j \subseteq T \& k \subseteq T} \frac{2a_T+1}{(a_T+1)^2}\right]
+$$
+
+而式子的三个部分都可以用高位后缀积（超集积）计算得出，总复杂度$O(n 4^n)$
+
+$$
+\left[\prod_{j \subseteq j'}(a_{j'}+1)\right] \times \left[\prod_{k \subseteq k'}(a_{k'}+1) \right]\times  \left[\prod_{j \subseteq T \& k \subseteq T} \frac{2a_T+1}{(a_T+1)^2}\right]
+$$
+
+这个式子还有一个小Bug：可能有$a_T$为$-1$的情况，此时分母会出现$0$
+
+可以用这个技巧：把每个数表示成$i \times 0^j$的形式，这样乘法除法都可以正常进行
+
+假设IFWT之前的数组为$s_{j,k}$，IFWT之后的数组为$s'_{j,k}$，答案是所有$s'_{i,i}$之和。考虑先推导出$s'$和$s$的关系式，然后直接用$s$计算答案
+
+$$
+s'_{i,i} = \sum_{i \subseteq j} \sum_{i \subseteq k} s_{j,k} (-1)^{|j|+|k|-2|i|}=\sum_{i \subseteq j} \sum_{i \subseteq k} s_{j,k} (-1)^{|j|+|k|}
+$$
+
+因此答案为：
+
+$$
+\sum_{j=0}^{2^n-1}\sum_{k=0}^{2^n-1}s_{j,k} (-1)^{|j|+|k|} 2^{|j \cap j|}
+$$
+
+复杂度优化到了$O(4^n)$
+
+我们再把完整的式子写到一起：
+
+定义
+
+$$
+F_{i} = \prod_{i \subseteq i'} (a_{i'}+1),G_{i} = \prod_{i \subseteq i'} \frac{2a_{i'}+1}{(a_{i'}+1)^2}
+$$
+
+这样总的答案为：
+
+$$
+\sum_{j=0}^{2^n-1}\sum_{k=0}^{2^n-1} (-1)^{|j|+|k|} 2^{|j \cap k|} F_{j}F_{k}G_{j \cup k}
+$$
+
+公式里同时有交和并比较麻烦，考虑把交也转成并：
+
+$$
+\sum_{j=0}^{2^n-1}\sum_{k=0}^{2^n-1} (-1)^{|j|+|k|} 2^{|j|+|k|-|j \cup k|} F_{j}F_{k}G_{j \cup k} = \sum_{j=0}^{2^n-1}\sum_{k=0}^{2^n-1} (-2)^{|j|+|k|} F_{j}F_{k}G_{j \cup k}2^{-|j \cup k|}
+$$
+
+接下来就可以用or-FWT进行优化了，可以求出$H_u = \sum_{j \cup k=u} (-2)^{|j|}F_j (-2)^{|k|}F_k$，这样答案就为$\sum H_uG_u2^{-|u|}$
+
+</CollapsibleComponent>
+
+##### CF2096H Wonderful XOR Problem
+
+有 $n$ 个区间 $[l_1, r_1], [l_2, r_2], \ldots [l_n, r_n]$。对于每个 $x$ 从 $0$ 到 $2^m - 1$，求满足以下条件的序列 $a_1, a_2, \ldots a_n$ 的数量（模 $998\,244\,353$）：
+
+- 对于所有 $i$ 从 $1$ 到 $n$，有 $l_i \leq a_i \leq r_i$；
+- $a_1 \oplus a_2 \oplus \ldots \oplus a_n = x$，其中 $\oplus$表示异或运算符。
+
+$1 \le n \le 2 \times 10^5, 1 \le m \le 18$
+
+##### ABC367G Sum of (XORK or 0)
+
+##### qoj5089 环覆盖
