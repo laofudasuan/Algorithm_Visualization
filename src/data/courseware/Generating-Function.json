@@ -12,7 +12,7 @@
     { "id": "生成函数", "x": 200, "y": 300 },
     { "id": "一般型生成函数", "path": "Math/Generating-Function.mdx", "x": 400, "y": 200 },
     { "id": "指数型生成函数", "path": "Math/Generating-Function-Exp.mdx", "x": 400, "y": 260 },
-    { "id": "多元生成函数", "path": "Math/Math/Generating-Function-Bivariate.mdx", "x": 400, "y": 320 },
+    { "id": "多元生成函数", "path": "Math/Generating-Function-Bivariate.mdx", "x": 400, "y": 320 },
     { "id": "集合幂级数", "link": "Generating-Function-Set", "x": 400, "y": 380 },
     { "id": "例题", "path": "Math/Generating-Function-Problem.mdx", "x": 200, "y": 200 },
     { "id": "多项式", "link": "Polynomial", "x": 50, "y": 300 },

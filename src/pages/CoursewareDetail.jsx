@@ -62,6 +62,7 @@ const CoursewareDetail = () => {
   const [combinedMode, setCombinedMode] = useState(false);
   const [combinedComponents, setCombinedComponents] = useState([]);
   const [isExporting, setIsExporting] = useState(false);
+  const [showExportOptions, setShowExportOptions] = useState(false);
 
   // 组件加载时隐藏Navbar
   useEffect(() => {
@@ -131,7 +132,8 @@ const CoursewareDetail = () => {
     setCombinedMode(false);
     setShowOverlay(false);
   };
-  const exportToPDF = async () => {
+
+  const performExport = async (expandAll) => {
     if (!contentRef.current) return;
     setIsExporting(true);
     
@@ -141,7 +143,15 @@ const CoursewareDetail = () => {
     try {
       const source = contentRef.current;
       const toggles = Array.from(source.querySelectorAll('[data-collapsible-toggle]'));
-      toggles.forEach(t => { if (!t.nextElementSibling) t.click(); });
+      
+      toggles.forEach(t => { 
+        const isOpen = !!t.nextElementSibling;
+        if (expandAll) {
+          if (!isOpen) t.click(); 
+        } else {
+          if (isOpen) t.click();
+        }
+      });
       
       const wait = (ms) => new Promise(r => setTimeout(r, ms));
       
@@ -607,6 +617,52 @@ const CoursewareDetail = () => {
       </div>
 
       <AnimatePresence>
+        {showExportOptions && (
+          <motion.div
+            className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowExportOptions(false)}
+          >
+            <motion.div 
+              className="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full mx-4"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={e => e.stopPropagation()}
+            >
+              <h3 className="text-xl font-bold mb-4 text-gray-800">导出选项</h3>
+              <p className="text-gray-600 mb-6">是否展开所有折叠内容？</p>
+              <div className="flex flex-col gap-3">
+                <button
+                  onClick={() => {
+                    setShowExportOptions(false);
+                    performExport(true);
+                  }}
+                  className="w-full py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors"
+                >
+                  是 (展开所有)
+                </button>
+                <button
+                  onClick={() => {
+                    setShowExportOptions(false);
+                    performExport(false);
+                  }}
+                  className="w-full py-2 bg-gray-100 text-gray-800 rounded-md hover:bg-gray-200 transition-colors"
+                >
+                  否 (隐藏所有)
+                </button>
+                <button
+                  onClick={() => setShowExportOptions(false)}
+                  className="w-full py-2 text-gray-500 hover:text-gray-700 transition-colors"
+                >
+                  取消
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
         {isExporting && (
           <motion.div
             className="fixed inset-0 z-[60] flex flex-col items-center justify-center bg-black/50 backdrop-blur-sm"
@@ -649,7 +705,7 @@ const CoursewareDetail = () => {
                 </svg>
               </button>
               <button
-                onClick={exportToPDF}
+                onClick={() => setShowExportOptions(true)}
                 className="bg-white text-gray-800 p-3 rounded-full shadow-lg hover:bg-gray-100 transition-colors"
                 aria-label="导出 PDF"
               >
