@@ -346,6 +346,23 @@ const CoursewareDetail = () => {
               });
             });
           }
+          if (Array.isArray(data.annotation)) {
+            data.annotation.forEach((ann, idx) => {
+              nodes.push({
+                id: `annotation-${idx}`,
+                type: 'label',
+                position: { x: ann.x || 0, y: ann.y || 0 },
+                data: { 
+                  label: ann.text, 
+                  kind: 'annotation',
+                  fontSize: ann.fontSize,
+                  color: ann.color
+                },
+                draggable: false,
+                className: 'label-node'
+              });
+            });
+          }
           if (data.metaPositions?.title) {
             nodes.push({
               id: 'meta-title',

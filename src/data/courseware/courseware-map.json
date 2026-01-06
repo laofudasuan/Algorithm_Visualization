@@ -43,7 +43,6 @@
 
     { "id": "Dynamic-Programming", "x": 850, "y": 500, "category": "算法" },
     { "id": "状态设计", "x": 1000, "y": 750, "category": "算法" },
-    { "id": "贡献计算", "x": 1000, "y": 850, "category": "算法" },
     { "id": "DP-Bitmask", "x": 570, "y": 550, "category": "算法" },
     { "id": "DP-Knapsack", "x": 570, "y": 630, "category": "算法" },
     { "id": "DP-Tree", "x": 570, "y": 710, "category": "算法" },
@@ -136,7 +135,6 @@
     { "source": "Counting", "target": "Generating-Function", "sourceSide": "bottom", "targetSide": "left", "label": "数学工具" },
     
     { "source": "Dynamic-Programming", "target": "状态设计", "sourceSide": "bottom", "targetSide": "top" },
-    { "source": "状态设计", "target": "贡献计算", "sourceSide": "bottom", "targetSide": "top" },
     { "source": "状态设计", "target": "DP-Sequence", "sourceSide": "left", "targetSide": "right" },
     { "source": "状态设计", "target": "DP-Tree", "sourceSide": "left", "targetSide": "right" },
     { "source": "状态设计", "target": "DP-Knapsack", "sourceSide": "left", "targetSide": "right" },

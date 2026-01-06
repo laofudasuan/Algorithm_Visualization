@@ -1,0 +1,21 @@
+{
+  "title": "计数",
+  "description": "计数问题",
+  "cover": "/images/no.png",
+  "author": "老虎大蒜",
+  "createdAt": "2025-11-23",
+  "metaPositions": {
+    "title": { "x": 150, "y": 120 },
+    "description": { "x": 500, "y": 150 }
+  },
+  "pages": [
+    { "id": "计数方法", "path" : "Counting/Counting-Method.mdx", "x": 200, "y": 300 },
+    { "id": "DP计数", "path" : "DP/DP-Counting.mdx", "x": 400, "y": 300 },
+    { "id": "组合意义", "path" : "Counting/Combined-Meaning.mdx", "x": 400, "y": 380 },
+    { "id": "网格图走路", "path" : "Counting/Grid-Walk.mdx", "x": 400, "y": 460 },
+    { "id": "LGV引理", "link" : "Linear-Algebra", "x": 600, "y": 460 }
+  ],
+  "edges": [
+    { "source": "网格图走路", "target": "LGV引理", "sourceSide": "right", "targetSide": "left" }
+  ]
+}

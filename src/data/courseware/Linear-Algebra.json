@@ -13,12 +13,14 @@
     { "id": "线性相关", "path": "Math/Linear-Correlation.mdx", "x": 500, "y": 280 },
     { "id": "行列式", "path": "Math/Determinant.mdx", "x": 100, "y": 280 },
     { "id": "矩阵树定理", "link": "Tree-Count", "x": 100, "y": 380 },
-    { "id": "矩阵其他内容", "path": "Math/Matrix-Others.mdx", "x": 500, "y": 380 }
+    { "id": "矩阵其他内容", "path": "Math/Matrix-Others.mdx", "x": 500, "y": 380 },
+    { "id": "LGV引理", "path": "Counting/LGV.mdx", "x": 100, "y": 200 }
   ],
   "edges": [
     { "source": "矩阵", "target": "线性相关", "sourceSide": "right", "targetSide": "left" },
     { "source": "矩阵", "target": "行列式", "sourceSide": "left", "targetSide": "right" },
     { "source": "矩阵", "target": "矩阵其他内容", "sourceSide": "right", "targetSide": "left" },
-    { "source": "行列式", "target": "矩阵树定理", "sourceSide": "bottom", "targetSide": "top" }
+    { "source": "行列式", "target": "矩阵树定理", "sourceSide": "bottom", "targetSide": "top" },
+    { "source": "行列式", "target": "LGV引理", "sourceSide": "top", "targetSide": "bottom" }
   ]
 }

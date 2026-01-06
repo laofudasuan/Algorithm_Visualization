@@ -37,7 +37,7 @@ $3 \le n \le 1000, m \le 1000$
 因此只需要记录$f[i][j]$表示经过$i$步，有$j$栈灯翻转了奇数次的方案数
 </CollapsibleComponent>
 
-## 神奇配方
+# 贡献转换
 
 ##### T457039 排列问题
 
@@ -49,6 +49,46 @@ $$
 
 $n \le 2 \times 10^6$
 
+##### P7143 THUPC2021 初赛 线段树
+
+题面略
+
+<CollapsibleComponent title="做法">
+用$f[i]$表示长度为$i$的所有子区间的询问的次数和
+
+用$L[i]$表示所有前缀的询问次数和、$R[i]$表示所有后缀的询问次数和
+
+$f[i]$可以由$\lfloor \frac{i}{2} \rfloor,\lceil \frac{i}{2} \rceil$递推得到
+
+记忆化搜索，复杂度$O(\log n)$
+</CollapsibleComponent>
+
+##### P14139 SFMOI Round IIStrange Counting Game
+
+$T$ 组数据，对于每组数据，给定 $n$，求 
+
+$$
+\sum_{x=1}^{n} \left\lfloor \frac{x^2}{n} \right\rfloor + \left\lfloor \sqrt{nx} \right\rfloor
+$$
+
+答案对 $10^9+7$ 取模。
+
+$1 \le T \le 1000,1 \le n \le 10^{18}$
+
+<CollapsibleComponent title="做法">
+
+考虑枚举$y$，求$\lfloor \frac{x^2}{n} \rfloor=y$的出现了几次
+
+$$
+\begin{aligned}
+\sum_{x=1}^{n} \left\lfloor \frac{x^2}{n} \right\rfloor + \lfloor \sqrt{nx} \rfloor &= \sum_{y=0}^{n - 1} y \left( \lfloor \sqrt{n(y + 1)} \rfloor - \lfloor \sqrt{ny} \rfloor \right) + \sum_{x=1}^{n} \left\lfloor n \mid x^2 \right\rfloor + \sum_{x=1}^{n} \lfloor \sqrt{nx} \rfloor \\
+&= \sum_{y=0}^{n - 1} y \left( \lfloor \sqrt{n(y + 1)} \rfloor - \lfloor \sqrt{ny} \rfloor \right) + \lfloor \sqrt{n(y + 1)} \rfloor + \sum_{x=1}^{n} \left\lfloor n \mid x^2 \right\rfloor \\
+&= \sum_{y=0}^{n - 1} - \lfloor \sqrt{ny} \rfloor \times y + \lfloor \sqrt{n(y + 1)} \rfloor \times (y + 1) + \sum_{x=1}^{n} \left\lfloor n \mid x^2 \right\rfloor \\
+&= n^2 + \sum_{x=1}^{n} \left\lfloor n \mid x^2 \right\rfloor
+\end{aligned}
+$$
+
+</CollapsibleComponent>
 
 ##### P4249 [WC2007] 剪刀石头布
 
@@ -58,7 +98,7 @@ $n \le 2 \times 10^6$
 
 $N \leq 100$。
 
-##### 题意简述
+###### 题意简述
 
 一张竞赛图，已经确定了一些边的方向
 
