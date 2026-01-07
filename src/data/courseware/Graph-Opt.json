@@ -1,0 +1,23 @@
+{
+  "title": "图论优化",
+  "description": "图论优化",
+  "cover": "/images/no.png",
+  "author": "老虎大蒜",
+  "createdAt": "2025-11-23",
+  "metaPositions": {
+    "title": { "x": 150, "y": 120 },
+    "description": { "x": 500, "y": 150 }
+  },
+  "pages": [
+    { "id": "建图优化", "x": 100, "y": 250 },
+    { "id": "最短路", "path" : "Graph/SSP-DS.mdx", "x": 300, "y": 200 },
+    { "id": "网络流", "path" : "Graph/Network-Flow-DS.mdx", "x": 300, "y": 300 },
+    { "id": "算法优化", "x": 700, "y": 250 },
+    { "id": "最小割", "path" : "Graph/Network-Flow-MinCut-DS.mdx", "x": 500, "y": 200 }
+  ],
+  "edges": [
+    { "source": "线段树优化建图", "target": "最短路", "sourceSide": "right", "targetSide": "left" },
+    { "source": "线段树优化建图", "target": "网络流", "sourceSide": "right", "targetSide": "left" },
+    { "source": "算法优化", "target": "最小割", "sourceSide": "left", "targetSide": "right" }
+  ]
+}

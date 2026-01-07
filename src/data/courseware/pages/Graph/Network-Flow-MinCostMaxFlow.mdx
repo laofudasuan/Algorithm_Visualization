@@ -7,7 +7,12 @@ import { CollapsibleComponent } from '../../../courseware/markdownConfig';
 
 # 费用流问题
 
+- P2469 [SDOI2010] 星际竞速
+- CF739E Gosha is hunting
+
 ## 二分图角度建模
+
+- P4068 [SDOI2016] 数字配对
 
 ##### 环覆盖问题
 一张$n$个点$m$条边的图，有$m$条边，每条边有一个代价。
@@ -20,21 +25,6 @@ import { CollapsibleComponent } from '../../../courseware/markdownConfig';
 
 </CollapsibleComponent>
 
-##### AT_agc034_d [AGC034D] Manhattan Max Matching
-
-二维平面上，点$(RX_i,RY_i)$有$RC_i$个红球，点$(BX_i,BY_i)$有$BC_i$个篮球，保证$\sum RC_i = \sum BC_i$
-
-需要将篮球和红球之间构造一组完美匹配，匹配的价值为每一对的曼哈顿距离之和，求最大价值
-
-<CollapsibleComponent title="做法"> 
-注意到，两个点$(x_1,y_1),(x_2,y_2)$的曼哈顿距离可以转化为
-
-$$\max(x_1-x_2+y_1-y_2,x_1-x_2-y_1+y_2,-x_1+x_2+y_1-y_2,-x_1+x_2-y_1+y_2)$$
-
-而因为我们是求最大权匹配，所以费用流模型可以连四类边，算法会自动选最大值
-
-这四类边，每一类的费用对于两个点是相互独立的，所以边数可以优化到线性
-</CollapsibleComponent>
 
 ##### UVA1104 芯片难题 Chips Challenge
 
@@ -116,6 +106,26 @@ $1 \le n_1,n_2 \le 10^5, 1 \le m \le 2 \times 10^5$
 
 时间复杂度$O(m\sqrt{n})$。
 
+</CollapsibleComponent>
+
+## 建图优化
+
+##### CF818G Four Melodies
+
+##### AT_agc034_d [AGC034D] Manhattan Max Matching
+
+二维平面上，点$(RX_i,RY_i)$有$RC_i$个红球，点$(BX_i,BY_i)$有$BC_i$个篮球，保证$\sum RC_i = \sum BC_i$
+
+需要将篮球和红球之间构造一组完美匹配，匹配的价值为每一对的曼哈顿距离之和，求最大价值
+
+<CollapsibleComponent title="做法"> 
+注意到，两个点$(x_1,y_1),(x_2,y_2)$的曼哈顿距离可以转化为
+
+$$\max(x_1-x_2+y_1-y_2,x_1-x_2-y_1+y_2,-x_1+x_2+y_1-y_2,-x_1+x_2-y_1+y_2)$$
+
+而因为我们是求最大权匹配，所以费用流模型可以连四类边，算法会自动选最大值
+
+这四类边，每一类的费用对于两个点是相互独立的，所以边数可以优化到线性
 </CollapsibleComponent>
 
 ## 不等关系建立网络流模型

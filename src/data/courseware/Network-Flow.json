@@ -17,7 +17,8 @@
     { "id": "最小割", "path": "Graph/Network-Flow-MinCut.mdx", "x": 520, "y": 360 },
     { "id": "费用流", "path": "Graph/Network-Flow-MinCostMaxFlow.mdx", "x": 520, "y": 420 },
     { "id": "上下界", "path": "Graph/Network-Flow-Bound.mdx", "x": 100, "y": 220 },
-    { "id": "模拟费用流", "path": "Graph/Network-Flow-Simulate.mdx", "x": 100, "y": 360 }
+    { "id": "模拟费用流", "link": "Network-Flow-Simulate", "x": 100, "y": 380 },
+    { "id": "数据结构优化建图", "link": "Graph-Builder", "x": 100, "y": 300 }
   ],
   "edges": [
     { "source": "网络流基础", "target": "关键点、边", "sourceSide": "top", "targetSide": "bottom" },
@@ -27,6 +28,7 @@
     { "source": "网络流建模", "target": "最大流", "sourceSide": "right", "targetSide": "left" },
     { "source": "网络流建模", "target": "最小割", "sourceSide": "right", "targetSide": "left" },
     { "source": "网络流建模", "target": "费用流", "sourceSide": "right", "targetSide": "left" },
-    { "source": "网络流基础", "target": "模拟费用流", "sourceSide": "bottom", "targetSide": "top", "label": "优化" }
+    { "source": "网络流基础", "target": "模拟费用流", "sourceSide": "bottom", "targetSide": "top", "label": "优化" },
+    { "source": "网络流基础", "target": "数据结构优化建图", "sourceSide": "left", "targetSide": "right" }
   ]
 }

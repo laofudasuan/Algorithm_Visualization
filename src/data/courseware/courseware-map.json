@@ -12,13 +12,13 @@
     { "id": "仙人掌", "x": 80, "y": 730, "category": "组合对象" },
 
     { "id": "Graph-Basic", "x": 300, "y": 250, "category": "组合对象" },
-    { "id": "Connectivity", "x": 400, "y": 420, "category": "算法" },
+    { "id": "Connectivity", "x": 350, "y": 350, "category": "算法" },
     { "id": "Bipartite", "x": 30, "y": 280, "category": "算法" },
     { "id": "2-SAT", "x": 50, "y": 350, "category": "算法" },
     { "id": "Network-Flow", "x": 500, "y": 100, "category": "算法" },
     { "id": "Network-Flow-Simulate", "x": 600, "y": 200, "category": "算法" },
     { "id": "Shortest-Path", "x": 450, "y": 250, "category": "算法" },
-    { "id": "Spanning-Tree", "x": 300, "y": 350, "category": "算法" },
+    { "id": "Spanning-Tree", "x": 250, "y": 350, "category": "算法" },
     { "id": "DAG", "x": 150, "y": 200, "category": "算法" },
     { "id": "Euler-Path", "x": 230, "y": 150, "category": "算法" },
     
@@ -38,18 +38,19 @@
     { "id": "Automatic-Machine", "x": 350, "y": 600, "category": "组合对象" },
     { "id": "Trie", "x": 300, "y": 450, "category": "组合对象" },
 
-    { "id": "Data-Structure", "x": 600, "y": 400, "category": "算法" },
-    { "id": "Segment-Tree", "x": 450, "y": 350, "category": "算法" },
+    { "id": "Data-Structure", "x": 600, "y": 450, "category": "算法" },
+    { "id": "Segment-Tree", "x": 450, "y": 400, "category": "算法" },
+    { "id": "Graph-Opt", "x": 450, "y": 320, "category": "算法" },
 
-    { "id": "Dynamic-Programming", "x": 850, "y": 500, "category": "算法" },
-    { "id": "状态设计", "x": 1000, "y": 750, "category": "算法" },
-    { "id": "DP-Bitmask", "x": 570, "y": 550, "category": "算法" },
-    { "id": "DP-Knapsack", "x": 570, "y": 630, "category": "算法" },
-    { "id": "DP-Tree", "x": 570, "y": 710, "category": "算法" },
-    { "id": "DP-Sequence", "x": 570, "y": 790, "category": "算法" },
-    { "id": "DP-Digit", "x": 570, "y": 870, "category": "算法" },
-    { "id": "DP-Optimization", "x": 750, "y": 400, "category": "算法" },
-    { "id": "DP-Function", "x": 950, "y": 540, "category": "算法" },
+    { "id": "Dynamic-Programming", "x": 950, "y": 500, "category": "算法" },
+    { "id": "状态设计", "x": 1200, "y": 750, "category": "算法" },
+    { "id": "DP-Bitmask", "x": 700, "y": 550, "category": "算法" },
+    { "id": "DP-Knapsack", "x": 700, "y": 630, "category": "算法" },
+    { "id": "DP-Tree", "x": 700, "y": 710, "category": "算法" },
+    { "id": "DP-Sequence", "x": 700, "y": 790, "category": "算法" },
+    { "id": "DP-Digit", "x": 700, "y": 870, "category": "算法" },
+    { "id": "DP-Optimization", "x": 800, "y": 400, "category": "算法" },
+    { "id": "DP-Function", "x": 1050, "y": 540, "category": "算法" },
 
     { "id": "Generating-Function", "x": 1250, "y": 450, "category": "数学基础" },
     { "id": "Polynomial", "x": 1500, "y": 430, "category": "数学基础" },
@@ -78,7 +79,8 @@
     { "id": "Divide-and-Conquer", "x": 1400, "y": 800, "category": "算法思想" },
 
     { "id": "倍增", "x": 1300, "y": 950, "category": "算法" },
-    { "id": "二进制", "x": 1300, "y": 650, "category": "数学基础" }
+    { "id": "二进制", "x": 1300, "y": 650, "category": "数学基础" },
+    { "id": "Math-Transform", "x": 1200, "y": 550, "category": "数学基础" }
   ],
   "edges": [
     { "source": "Tree-Basic", "target": "Tree-Sequence", "sourceSide": "right", "targetSide": "left" },
@@ -122,6 +124,7 @@
     { "source": "Combinatorics", "target": "Generating-Function", "sourceSide": "bottom", "targetSide": "top" },
 
     { "source": "Data-Structure", "target": "Segment-Tree", "sourceSide": "left", "targetSide": "right" },
+    { "source": "Segment-Tree", "target": "Graph-Opt", "sourceSide": "top", "targetSide": "bottom", "label": "线段树优化图论" },
 
     { "source": "String", "target": "Hash", "sourceSide": "top", "targetSide": "right" },
     { "source": "String", "target": "Border", "sourceSide": "left", "targetSide": "right" },
@@ -139,7 +142,7 @@
     { "source": "状态设计", "target": "DP-Tree", "sourceSide": "left", "targetSide": "right" },
     { "source": "状态设计", "target": "DP-Knapsack", "sourceSide": "left", "targetSide": "right" },
     { "source": "状态设计", "target": "DP-Bitmask", "sourceSide": "left", "targetSide": "right" },
-    { "source": "Connectivity", "target": "DP-Bitmask", "sourceSide": "right", "targetSide": "left", "label": "连通性DP" },
+    { "source": "Connectivity", "target": "DP-Bitmask", "sourceSide": "bottom", "targetSide": "left", "label": "连通性DP" },
     { "source": "DP-Sequence", "target": "DP-Digit", "sourceSide": "bottom", "targetSide": "top" },
     { "source": "Dynamic-Programming", "target": "DP-Optimization", "sourceSide": "top", "targetSide": "bottom" },
     { "source": "DP-Optimization", "target": "DP-Function", "sourceSide": "right", "targetSide": "top" },

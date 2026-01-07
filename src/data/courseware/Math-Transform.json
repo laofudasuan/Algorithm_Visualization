@@ -1,6 +1,6 @@
 {
-  "title": "序列问题",
-  "description": "和序列相关的算法",
+  "title": "数学变换",
+  "description": "用数学工具进行变换",
   "cover": "/images/no.png",
   "author": "老虎大蒜",
   "createdAt": "2025-11-23",
@@ -9,8 +9,8 @@
     "description": { "x": 500, "y": 150 }
   },
   "pages": [
-    { "id": "Dilworth", "path": "Sequence/Dilworth.mdx", "x": 200, "y": 380 },
-    { "id": "差分", "path": "Sequence/Difference.mdx", "x": 400, "y": 380 }
+    { "id": "差分与前缀和", "x": 200, "y": 380 },
+    { "id": "坐标变幻", "path": "Math/Coordinate-Transform.mdx", "x": 400, "y": 380 }
   ],
   "edges": [
   ]
