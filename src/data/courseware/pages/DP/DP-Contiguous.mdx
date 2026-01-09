@@ -1,0 +1,96 @@
+---
+title: 连续段DP
+---
+
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+
+##### SRM625 DIV1 900pts
+
+有一张$n$个位置的圆桌，圆桌位置是带标号的
+
+现在有m个不同的人按一定顺序到来并且坐下，我们将左右相邻的人为联通的，如果一个人与另一个人直接或者间接联通我们称他们在同一个联通块
+
+要求每一个时刻最多不超过$k$个联通块，问有多少种不同安排位置的方案(同一个人坐的位置标号不同算不同方案)
+
+$n,m,k \le 2000$
+
+<CollapsibleComponent title="做法">
+我们先考虑去掉所有空位置的方案
+
+可以设$f(i,j)$为现在有$i$个人安排好了，共有$j$个联通块
+
+加入一个人考虑是在一个联通块左右，合并联通块，独立为一个联通块三种情况
+
+$$
+f_{i,j}=f_{i-1,j} \times j \times 2+f_{i-1,j+1} \times (j+1)+f_{i-1,j-1} \times (j-1)
+$$
+
+最后统计$n \times \sum(f_{m,i}*C(n-m-1,i-1))$，即在联通块之间加入空位置并统计在圆桌上旋转的方案即可，避免重复第一个联通块之前和最后一个联通块之后不能同时又空位置
+
+</CollapsibleComponent>
+
+##### CF1515E Phoenix and Computers
+有$n$台电脑排成一排
+
+你可以手动开启一台电脑。在任意时刻，若电脑$i-1$与电脑$i+1$都已经开启$(1<i<n)$，电脑$i$将立刻被自动开启。你不能再开启已经开启的电脑。
+
+求你有多少种开启电脑的方案。两个方案不同当且仅当你手动开启的电脑的集合不同，或是手动开启电脑的顺序不同。
+
+$n \le 400$
+
+<CollapsibleComponent title="做法">
+最终的序列会是若干段手动点亮，每两段手动点亮中间夹一个自动点亮
+
+动态规划，用$f[i][j]$表示点亮了$i$盏，有$j$段手动点亮的方案数
+
+$$
+f[i][j] = f[i-1][j] \times 2j + f[i-2][j-1] \times j
+$$
+</CollapsibleComponent>
+
+##### ZJOI2012波浪
+定义一个排列$P_{1 \ldots n}$的波动强度为$\sum_{i=1}^{n-1}|P_i-P_{i+1}|$
+
+给出$n$和$m$，求随机一个$1$到$n$的排列，波动强度$\ge m$的概率
+
+$n \le 100, m \le 2147483647$
+
+<CollapsibleComponent title="做法">
+考虑从小往大把数一个一个往里面放
+
+这样每次放一个数的时候，根据左右有没有放就知道和左右的大小关系
+</CollapsibleComponent>
+
+##### CF704B
+有 $n$ 个元素，第 $i$ 个元素有五个参数 $x_i, a_i, b_i, c_i, d_i$。
+
+你需要求出一个 $1\sim n$ 的排列 $p$，满足 $p_1=s, p_n=e$，同时最小化这个排列的权值。
+
+一个排列的权值为
+
+$$
+\sum_{i=1}^{n-1} f(p_i, p_{i+1})
+$$
+
+其中 $f(i, j)$ 的值有两种情况：
+
+- 若 $i > j$，则，$f(i, j) = x_i - x_j + c_i + b_j$
+- 若 $i < j$，则，$f(i, j) = x_j - x_i + d_i + a_j$
+
+参数限制：
+
+- $n \leq 5 \times 10^3$
+- $s \neq e$
+- $1 \leq x_1 < x_2 < \cdots < x_n \leq 10^9$
+- $1 \leq a_i, b_i, c_i, d_i \leq 10^9$
+
+<CollapsibleComponent title="做法">
+  讨论从小往大插入时的情况
+</CollapsibleComponent>
+
+##### P9197 JOI Open 2016 摩天大楼
+将互不相同的 $N$ 个整数 $A_1, A_2, \cdots, A_N$ 按照一定顺序排列。
+
+假设排列为 $f_1, f_2, \cdots, f_N$，要求：$|f_1 - f_2| + |f_2 - f_3| + \cdots + |f_{N-1} - f_N| \leq L$。
+
+求满足题意的排列的方案数对 $10^9 + 7$ 取模后的结果。

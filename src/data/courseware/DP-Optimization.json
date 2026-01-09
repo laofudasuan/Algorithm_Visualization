@@ -16,7 +16,8 @@
     { "id": "矩阵优化", "path": "DP/DP-Optimization-Matrix.mdx", "x": 600, "y": 260 },
     { "id": "数据结构优化", "path": "DP/DP-Optimization-DS.mdx", "x": 600, "y": 320 },
     { "id": "决策单调性", "path": "DP/DP-Optimization-Monoton.mdx", "x": 600, "y": 380 },
-    { "id": "贪心优化", "path": "DP/DP-Optimization-Greedy.mdx", "x": 600, "y": 440 }
+    { "id": "贪心优化", "path": "DP/DP-Optimization-Greedy.mdx", "x": 600, "y": 440 },
+    { "id": "最短路优化", "path": "DP/DP-Optimization-SP.mdx", "x": 400, "y": 440 }
   ],
   "edges": [
     { "source": "状态优化", "target": "逆向DP", "sourceSide": "left", "targetSide": "right" },
