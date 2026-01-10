@@ -2,8 +2,6 @@ import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import ScrollToTop from './components/ScrollToTop';
-import AuthModal from './components/AuthModal';
-import { AuthProvider } from './context/AuthContext';
 import './index.css';
 
 // 懒加载组件
@@ -14,7 +12,6 @@ const CoursewareList = lazy(() => import('./pages/CoursewareList'));
 const CoursewareDetail = lazy(() => import('./pages/CoursewareDetail'));
 const VisualizationsIndex = lazy(() => import('./pages/VisualizationsIndex'));
 const VisualizationsDetail = lazy(() => import('./pages/VisualizationsDetail'));
-const UsersManagement = lazy(() => import('./pages/UsersManagement'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 function AppContent() {
@@ -60,8 +57,6 @@ function AppContent() {
         currentPath={location.pathname}
       />
       
-      {/* <AuthModal /> */}
-      
       <ScrollToTop />
       
       <Suspense fallback={<LoadingFallback />}>
@@ -73,7 +68,6 @@ function AppContent() {
           <Route path="/courseware/:id" element={<CoursewareDetail />} />
           <Route path="/visualizations" element={<VisualizationsIndex />} />
           <Route path="/visualizations/:slug" element={<VisualizationsDetail />} />
-          {/* <Route path="/users" element={<UsersManagement />} /> */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
@@ -81,12 +75,10 @@ function AppContent() {
   )
 }
 
-// 包装应用，提供认证上下文
+// 包装应用
 function App() {
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
+    <AppContent />
   )
 }
 

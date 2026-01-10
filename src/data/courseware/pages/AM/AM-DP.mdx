@@ -1,0 +1,21 @@
+---
+title: 自动机与DP
+---
+
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+import GraphAlgorithmVisualization from '../../../../components/visualizations/GraphAlgorithmVisualization';
+
+## 如何用自动机来刻画DP？
+
+举例：求有多少个长度为$n$的01序列满足，存在连续三个相同的数字
+
+可以构造如下自动机，对于任何一个$01$序列，如果能走到终点则合法
+
+<div className="flex-1">
+    <GraphAlgorithmVisualization 
+      graphName="AM" 
+      animationList={[]}
+      enableDrawing={false}
+    />
+</div>
+

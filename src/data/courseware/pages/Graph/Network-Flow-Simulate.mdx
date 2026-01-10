@@ -32,25 +32,48 @@ import { CollapsibleComponent } from '../../../courseware/markdownConfig';
 
 $X+Y+Z \le 10^5, 1 \le A_i,B_i,C_i \le 10^9$
 
-<CollapsibleComponent title="做法">
-
-先建出费用流
+###### 费用流建图
 
 对每一个人建立一个点$P_1,\ldots,P_n$，对每一组建一个点$F_1,F_2,F_3$
 
-$S$向每个人连边，容量1，费用0
+$S$向每个人$P_i$连边，容量1，费用0
 
-每个人向三个组连边，容量1，费用为对应的数量
+每个人$P_i$向三个组连边，容量1，费用为对应的数量（如果是跑最小费用流，费用可以取负数）
 
 每一组向$T$连边，容量为$X,Y,Z$，费用0
 
-选择增广的顺序：先增广$F_1$到$T$的边，再增广$F_2$到$T$的边，最后增广$F_3$到$T$的边
+<div className="flex-1">
+    <GraphAlgorithmVisualization 
+      graphName="AGC018CCoins" 
+      animationList={[]}
+      enableDrawing={false}
+    />
+</div>
 
-每次增广最多经过一条反向边
+###### 模拟费用流
 
-堆维护最大值
+注意到在这张图中，除了$P_{1 \ldots n}$其他点数是很少的，因此我们把$P_{1 \ldots n}$称为非关键点。
 
-</CollapsibleComponent>
+将所有可能的增广路形式按照经过的关键点进行分类：
+
+- 经过三条边：
+  - ① $S \to P_i \to Gold \to T$
+  - ② $S \to P_i \to Silver \to T$
+  - ③ $S \to P_i \to Copper \to T$
+- 经过五条边：
+  - ④ $S \to P_i \to Gold \to P_j \to Silver \to T$
+  - ⑤ $S \to P_i \to Copper \to P_j \to Silver \to T$
+  - ⑥ $S \to P_i \to Gold \to P_j \to Copper \to T$
+  - ⑦ $S \to P_i \to Silver \to P_j \to Copper \to T$
+  - ⑧ $S \to P_i \to Silver \to P_j \to Gold \to T$
+  - ⑨ $S \to P_i \to Copper \to P_j \to Gold \to T$
+- 经过七条边：
+  - ⑩ $S \to P_i \to Gold \to P_j \to Silver \to P_k \to Copper \to T$
+  - ⑪ $S \to P_i \to Silver \to P_j \to Gold \to P_k \to Copper \to T$
+  - ⑫ $S \to P_i \to Silver \to P_j \to Copper \to P_k \to Gold \to T$
+  - ⑬ $S \to P_i \to Copper \to P_j \to Silver \to P_k \to Gold \to T$
+  - ⑭ $S \to P_i \to Gold \to P_j \to Copper \to P_k \to Silver \to T$
+  - ⑮ $S \to P_i \to Copper \to P_j \to Gold \to P_k \to Silver \to T$
 
 ##### NOI2019 序列
 

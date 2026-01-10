@@ -580,11 +580,24 @@ export class PixiGraphRenderer {
         // 更新边标签位置
         const edgeLabelObject = this.edgeLabelObjects.get(edgeId);
         if (edgeLabelObject) {
-          // 计算新的边中点
-          const midX = (edgeObject.startX + edgeObject.endX) / 2;
-          const midY = (edgeObject.startY + edgeObject.endY) / 2;
-          edgeLabelObject.x = midX;
-          edgeLabelObject.y = midY;
+          const ratio = edgeStyle?.labelPosition !== undefined ? edgeStyle.labelPosition : 0.5;
+          // 计算新的边标签位置（考虑曲率）
+          if (edgeStyle.curvature && edgeStyle.curvature !== 0) {
+            const point = this.getCurvedLinePointAndAngle(
+              {x: edgeObject.startX, y: edgeObject.startY}, 
+              {x: edgeObject.endX, y: edgeObject.endY}, 
+              edgeStyle.curvature, 
+              ratio
+            );
+            edgeLabelObject.x = point.x;
+            edgeLabelObject.y = point.y;
+          } else {
+            // 计算新的边中点
+            const midX = edgeObject.startX + (edgeObject.endX - edgeObject.startX) * ratio;
+            const midY = edgeObject.startY + (edgeObject.endY - edgeObject.startY) * ratio;
+            edgeLabelObject.x = midX;
+            edgeLabelObject.y = midY;
+          }
         }
       });
 
@@ -663,6 +676,23 @@ export class PixiGraphRenderer {
         labelObject.text = label;
         labelObject.style.fill = edgeStyle?.labelFill || 0x000000;
         labelObject.style.fontSize = edgeStyle?.labelFontSize || 14;
+        
+        // 更新位置
+        const ratio = edgeStyle?.labelPosition !== undefined ? edgeStyle.labelPosition : 0.5;
+        if (edgeStyle.curvature && edgeStyle.curvature !== 0) {
+           const point = this.getCurvedLinePointAndAngle(
+             {x: edgeObject.startX, y: edgeObject.startY}, 
+             {x: edgeObject.endX, y: edgeObject.endY}, 
+             edgeStyle.curvature, 
+             ratio
+           );
+           labelObject.x = point.x;
+           labelObject.y = point.y;
+        } else {
+           labelObject.x = edgeObject.startX + (edgeObject.endX - edgeObject.startX) * ratio;
+           labelObject.y = edgeObject.startY + (edgeObject.endY - edgeObject.startY) * ratio;
+        }
+
         labelObject.alpha = 1;
       } else {
         // 如果标签不存在，但有边和节点信息，创建新标签
@@ -742,11 +772,17 @@ export class PixiGraphRenderer {
         labelObject.alpha = 1;
 
         // 计算中点位置
-        const midX = (sourceNode.x + targetNode.x) / 2;
-        const midY = (sourceNode.y + targetNode.y) / 2;
-
-        labelObject.x = midX;
-        labelObject.y = midY;
+        const ratio = edgeStyle?.labelPosition !== undefined ? edgeStyle.labelPosition : 0.5;
+        if (edgeStyle.curvature && edgeStyle.curvature !== 0) {
+           const point = this.getCurvedLinePointAndAngle(sourceNode, targetNode, edgeStyle.curvature, ratio);
+           labelObject.x = point.x;
+           labelObject.y = point.y;
+        } else {
+           const midX = sourceNode.x + (targetNode.x - sourceNode.x) * ratio;
+           const midY = sourceNode.y + (targetNode.y - sourceNode.y) * ratio;
+           labelObject.x = midX;
+           labelObject.y = midY;
+        }
       } else {
         // 使用默认样式创建新标签
         const defaultStyle = { ...this.defaultEdgeStyle };
@@ -1089,8 +1125,17 @@ export class PixiGraphRenderer {
     // 检查应用是否已初始化
     if (!this.app || !this.app.stage || !this.edgeLabelContainer) return;
     
-    const midX = (sourceNode.x + targetNode.x) / 2;
-    const midY = (sourceNode.y + targetNode.y) / 2;
+    let midX, midY;
+    const ratio = style?.labelPosition !== undefined ? style.labelPosition : 0.5;
+
+    if (style && style.curvature && style.curvature !== 0) {
+      const point = this.getCurvedLinePointAndAngle(sourceNode, targetNode, style.curvature, ratio);
+      midX = point.x;
+      midY = point.y;
+    } else {
+      midX = sourceNode.x + (targetNode.x - sourceNode.x) * ratio;
+      midY = sourceNode.y + (targetNode.y - sourceNode.y) * ratio;
+    }
 
     const labelObject = new PIXI.Text({
       text: label,

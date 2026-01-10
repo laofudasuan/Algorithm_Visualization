@@ -1,6 +1,6 @@
 {
-  "title": "序列DP",
-  "description": "序列DP",
+  "title": "目标拆解",
+  "description": "DP中的贡献拆解技巧",
   "cover": "/images/no.png",
   "author": "老虎大蒜",
   "createdAt": "2025-11-23",
@@ -9,13 +9,9 @@
     "description": { "x": 500, "y": 150 }
   },
   "pages": [
-    { "id": "序列DP", "x": 300, "y": 280 },
-    { "id": "前缀DP", "path": "DP/DP-Prefix.mdx", "x": 300, "y": 380 },
-    { "id": "区间DP", "path": "DP/DP-Range.mdx", "x": 500, "y": 280 },
-    { "id": "数位DP", "path": "DP/DP-Digit.mdx", "x": 500, "y": 380 },
-    { "id": "括号序列DP", "path": "DP/DP-Bracket.mdx", "x": 700, "y": 280 },
-    { "id": "排列DP", "path": "DP/DP-Permutation.mdx", "x": 700, "y": 380 },
-    { "id": "连续段DP", "path": "DP/DP-Contiguous.mdx", "x": 100, "y": 280 }
+    { "id": "贡献拆解", "path" : "DP/DP-Apart.mdx", "x": 400, "y": 250 },
+    { "id": "连续段DP", "path": "DP/DP-Contiguous.mdx", "x": 200, "y": 280 },
+    { "id": "延迟计算", "path": "DP/DP-Delay.mdx", "x": 600, "y": 280 }
   ],
   "edges": [
     { "source": "状压DP", "target": "连通性状压", "sourceSide": "right", "targetSide": "left" },

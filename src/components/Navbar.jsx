@@ -1,9 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useState, useEffect, useRef } from 'react'
-import { useAuth } from '../context/AuthContext'
 
 const Navbar = ({ menuItems, isMenuOpen, setIsMenuOpen, hasScrolled, currentPath }) => {
-  const { currentUser, openLoginModal, logout } = useAuth();
   // 用于存储哪个下拉菜单是打开的
   const [openDropdown, setOpenDropdown] = useState(null)
   // 用于检测点击外部区域关闭下拉菜单

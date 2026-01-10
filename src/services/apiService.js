@@ -4,34 +4,6 @@
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 // ----------------------------------------------------------------------
-// 用户认证API (Mock)
-// ----------------------------------------------------------------------
-export const authApi = {
-  login: async (credentials) => {
-    await delay(500);
-    // 总是登录成功
-    return {
-      id: 1,
-      username: credentials.username,
-      nickname: '本地用户',
-      token: 'mock-token-' + Date.now(),
-      roles: ['ROLE_USER']
-    };
-  },
-  register: async (userData) => {
-    await delay(500);
-    // 总是注册成功
-    return {
-      id: 1,
-      username: userData.username,
-      nickname: userData.nickname || '本地用户',
-      token: 'mock-token-' + Date.now(),
-      roles: ['ROLE_USER']
-    };
-  },
-};
-
-// ----------------------------------------------------------------------
 // 图数据API
 // ----------------------------------------------------------------------
 export const graphApi = {
@@ -177,35 +149,4 @@ export const coursewareApi = {
     },
     createOrUpdate: async () => {},
     delete: async () => {}
-};
-
-// ----------------------------------------------------------------------
-// 通用用户数据API
-// ----------------------------------------------------------------------
-export const userDataApi = {
-    getAll: async () => [],
-    getByType: async (type) => {
-        if (type === 'graphs') return graphApi.getAll();
-        if (type === 'trees') return treeApi.getAll();
-        return [];
-    },
-    getByTypeAndKey: async (type, key) => {
-        if (type === 'graphs') return graphApi.getById(key);
-        if (type === 'trees') return treeApi.getById(key);
-        return null;
-    },
-    createOrUpdate: async () => {},
-    delete: async () => {}
-};
-
-// ----------------------------------------------------------------------
-// 用户管理API
-// ----------------------------------------------------------------------
-export const userApi = {
-    getAllUsers: async () => {
-        await delay(300);
-        return [
-            { id: 1, username: 'admin', nickname: '管理员', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
-        ];
-    }
 };

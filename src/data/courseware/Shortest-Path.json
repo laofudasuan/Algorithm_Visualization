@@ -18,7 +18,7 @@
     { "id": "综合运用", "path": "Graph/SSP-Opt.mdx", "x": 290, "y": 390 },
     { "id": "建模", "x": 430, "y": 300 },
     { "id": "分层图", "path": "Graph/SSP-Layer.mdx", "x": 420, "y": 400 },
-    { "id": "数据结构优化建图", "link": "Graph-Builder", "x": 550, "y": 260 },
+    { "id": "数据结构优化建图", "link": "Graph-Opt", "x": 550, "y": 260 },
     { "id": "数学建模", "path": "Graph/SSP-Math.mdx", "x": 550, "y": 350 },
     { "id": "差分约束", "path": "Graph/SSP-Diff.mdx", "x": 700, "y": 320 },
     { "id": "同余最短路", "link": "Modulo", "x": 700, "y": 400 },

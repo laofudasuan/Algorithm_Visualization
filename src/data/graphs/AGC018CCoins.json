@@ -1,0 +1,41 @@
+{
+  "width": 1000,
+  "height": 600,
+  "nodes": [
+    { "id": "S", "label": "S", "x": 100, "y": 300, "style": { "type": "planet1", "size": 80 } },
+    { "id": "P1", "label": "P1", "x": 300, "y": 100, "style": { "type": "planet1" } },
+    { "id": "P2", "label": "P2", "x": 300, "y": 200, "style": { "type": "planet1" } },
+    { "id": "P3", "label": "P3", "x": 300, "y": 300, "style": { "type": "planet1" } },
+    { "id": "P4", "label": "P4", "x": 300, "y": 400, "style": { "type": "planet1" } },
+    { "id": "P5", "label": "P...", "x": 300, "y": 500, "style": { "type": "planet1" } },
+    { "id": "Gold", "label": "Gold", "x": 700, "y": 100, "style": { "type": "planet1", "size": 80 } },
+    { "id": "Silver", "label": "Silver", "x": 700, "y": 300, "style": { "type": "planet1", "size": 80 } },
+    { "id": "Copper", "label": "Copper", "x": 700, "y": 500, "style": { "type": "planet1", "size": 80 } },
+    { "id": "T", "label": "T", "x": 900, "y": 300, "style": { "type": "planet1", "size": 80 } }
+  ],
+  "edges": [
+    { "id": "e1", "source": "S", "target": "P1", "label" : "(1,0)", "style": { "directional": true, "labelPosition": 0.8} },
+    { "id": "e2", "source": "S", "target": "P2", "label" : "(1,0)", "style": { "directional": true, "labelPosition": 0.8} },
+    { "id": "e3", "source": "S", "target": "P3", "label" : "(1,0)", "style": { "directional": true, "labelPosition": 0.8} },
+    { "id": "e4", "source": "S", "target": "P4", "label" : "(1,0)", "style": { "directional": true, "labelPosition": 0.8} },
+    { "id": "e5", "source": "S", "target": "P5", "label" : "(1,0)", "style": { "directional": true, "labelPosition": 0.8} },
+    { "id": "e6", "source": "P1", "target": "Gold", "label" : "(1,-A[1])", "style": { "directional": true, "labelPosition": 0.5} },
+    { "id": "e7", "source": "P1", "target": "Silver", "label" : "(1,-B[1])", "style": { "directional": true, "labelPosition": 0.5} },
+    { "id": "e8", "source": "P1", "target": "Copper", "label" : "(1,-C[1])", "style": { "directional": true, "labelPosition": 0.5} },
+    { "id": "e9", "source": "Gold", "target": "T", "label" : "(X,0)", "style": { "directional": true, "labelPosition": 0.5} },
+    { "id": "e10", "source": "Silver", "target": "T", "label" : "(Y,0)", "style": { "directional": true, "labelPosition": 0.5} },
+    { "id": "e11", "source": "Copper", "target": "T", "label" : "(Z,0)", "style": { "directional": true, "labelPosition": 0.5} }
+  ],
+  "nodesStyle": {
+    "size" : 50,
+    "type" : "planet1",
+    "stroke": "#000000",
+    "lineWidth": 2,
+    "labelFill": "#000000",
+    "labelFontSize": 20
+  },
+  "edgesStyle": {
+    "stroke": "#ffffff",
+    "lineWidth": 15
+  }
+}
