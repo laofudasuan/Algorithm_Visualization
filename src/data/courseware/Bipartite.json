@@ -11,7 +11,6 @@
   "pages": [
     { "id": "基础", "path": "Graph/Bipartite-Basic.mdx", "x": 200, "y": 400 },
     { "id": "最大匹配", "path": "Graph/Bipartite-MaxMatching.mdx", "x": 520, "y": 400 },
-    { "id": "极大匹配", "path": "Graph/Bipartite-MaximalMatching.mdx", "x": 320, "y": 340 },
     { "id": "最大权匹配", "path": "Graph/Bipartite-MaxWeightMatching.mdx", "x": 520, "y": 300 },
     { "id": "最小顶点覆盖", "path": "Graph/Bipartite-MinVertexCover.mdx", "x": 800, "y": 400 },
     { "id": "一般图最大匹配", "path": "Graph/General-MaxMatching.mdx", "x": 860, "y": 520 },
@@ -22,7 +21,6 @@
   "edges": [
     { "source": "基础", "target": "最大匹配", "sourceSide": "right", "targetSide": "left" },
     { "source": "最大匹配", "target": "最大权匹配", "sourceSide": "top", "targetSide": "bottom" },
-    { "source": "最大匹配", "target": "极大匹配", "sourceSide": "top", "targetSide": "right" },
     { "source": "最大匹配", "target": "最小顶点覆盖", "sourceSide": "right", "targetSide": "left" },
     { "source": "最大匹配", "target": "Hall定理", "sourceSide": "bottom", "targetSide": "top" },
     { "source": "最大匹配", "target": "一般图最大匹配", "sourceSide": "right", "targetSide": "left" },

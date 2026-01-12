@@ -1,12 +1,12 @@
 ---
-title: 极大匹配问题
+title: DP顺序确定
 ---
 
 
 import GraphAlgorithmVisualization from '../../../../components/visualizations/GraphAlgorithmVisualization';
 import { CollapsibleComponent } from '../../../courseware/markdownConfig';
 
-# 极大匹配问题
+## 匹配问题
 
 ##### P7154 [USACO20DEC] Sleeping Cows P
 
@@ -18,3 +18,15 @@ Farmer John 有 $N$（$1≤N≤3000$）头各种大小的奶牛。他原本为�
 
 计算极大的匹配的数量模 $10^9+7$ 的结果。
 
+##### P8321 『JROI-4』沈阳大街 2
+
+给定两个长度为$n$的序列$A,B$满足一些意义不明的条件，求$\frac{1}{n!} \sum_{\text{排列}p} \prod \min(A_i, B_{p_i})$
+
+要求的时间复杂度：$O(n^2)$
+
+<CollapsibleComponent title="Solution"> 
+考虑合并$A$和$B$并按非增的顺序排序，相当于将$n$个来自$A$的元素和$n$个来自$B$的元素配对，每个方案的权值是每对数中靠后的那个数的积，求所有方案的权值和
+
+考虑dp，设$f(i,j)$表示前$i$个数中配出$j$对的方案的权值和，分讨第$i$个数是否向前匹配转移，时间复杂度$O(n^2)$
+
+</CollapsibleComponent>
