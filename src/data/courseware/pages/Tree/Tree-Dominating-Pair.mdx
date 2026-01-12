@@ -1,0 +1,22 @@
+---
+title: 支配对
+---
+
+import TreeAlgorithmVisualization from '../../../../components/visualizations/TreeAlgorithmVisualization';
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+
+##### P9678 [ICPC 2022 Jinan R] Tree Distance
+
+给定一棵带边权的树，有$n$个节点。$m次询问，每次给定$l,r$
+
+求$\min_{l \le u \le v \le r}dis(u,v)$
+
+$n \le 2 \times 10^5, m \le 10^6$
+
+<CollapsibleComponent title="Solution">
+这是经典的支配对问题，遇到 $\text{dis}$ 直接上点分治。由于 $\text{dis}(u, v) \leq \text{dis}(u, w) + \text{dis}(v, w)$，每次分治的时候求分治中心到连通块内所有节点的距离，找出对应的两个加起来即可。
+
+每次递归处理一个子树的时候，令 $d_u$ 表示 $u$ 到当前根节点的距离，对每个 $u$ 找出最大的 $v < u, d_v \leq d_u$ 和最小的 $v > u, d_v \leq d_u$，即可找到所有支配点对。
+
+所以支配对的数量是 $O(n\log n)$ 的。最后二维数点使用树状数组维护，总复杂度为 $O(n\log^2 n + m\log n)$。
+</CollapsibleComponent>
