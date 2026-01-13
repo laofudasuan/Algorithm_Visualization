@@ -1,0 +1,946 @@
+---
+title: 搜索算法
+---
+
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+
+# 搜索算法
+
+## 算法介绍
+
+在我们遇到的一些问题当中，有些问题不能够确切的建立数学模型，或即便有数学模型但该模型的准确方法也不一定能运用现成算法
+
+在要求枚举方案时，常常会遇到这一类问题
+
+解决这一类问题，我们一般采用搜索的方法解决，即从初始状态出发，运用题目所给出的条件和规则扩展所有可能情况，从中找出满足题意要求的解答
+    
+    \begin{frame}{搜索问题框架}
+    
+    一个\textcolor{red}{搜索问题} 包含:
+    
+    \begin{itemize}
+      \item $S:$ 状态空间
+      \item $S_{start}:$ 初始态
+      \item Action$(s):$ 可行动作
+      \item Succ$(s,a):$ 后继
+      \item Cost$(s,a):$ 动作费用
+      \item IsEnd$(s):$ 目标函数
+    \end{itemize}
+    
+    一个 \textcolor{red}{解} 是一个从初始态出发到达一个终止态的可行动作序列
+    
+    \end{frame}
+    
+    \subsection{基本搜索方法}
+    
+    \begin{frame}{DFS（深度优先搜索）}
+    
+    \begin{algorithmic}[1]
+    \Function{DFS}{$s$}
+      \If{IsEnd$(s)$}
+        \State \Return True
+      \EndIf
+      \ForAll{$a \in$ Action$(s)$}
+        \If{DFS(Succ$(s,a)$)}
+          \State \Return True
+        \EndIf
+      \EndFor
+      \State \Return False
+    \EndFunction
+    \end{algorithmic}
+    
+    \end{frame}
+    
+    \begin{frame}{DFS(深度优先搜索)}{非递归版}
+    
+    \begin{algorithmic}[1]
+    \Function{DFS}{$s$}
+      \State St $\gets$ an empty stack
+      \State St.push$(s)$
+      \While{St is not empty}
+        \State $v \gets$ St.pop()
+        \If{IsEnd$(v)$}
+          \State \Return True
+        \EndIf
+        \ForAll{$a \in$ Action$(v)$}
+          \State St.push(Succ$(v,a)$)
+        \EndFor
+      \EndWhile
+      \State \Return False
+    \EndFunction
+    \end{algorithmic}
+    
+    \end{frame}
+    
+    \begin{frame}{BFS（广度优先搜索）}
+    \begin{algorithmic}[1]
+    \Function{BFS}{$s$}
+      \State Q $\gets$ an empty queue
+      \State Q.push$(s)$
+      \While{Q is not empty}
+        \State $v \gets$ Q.pop()
+        \If{IsEnd$(v)$}
+          \State \Return True
+        \EndIf
+        \ForAll{$a \in$ Action$(v)$}
+          \State Q.push(Succ$(v,a)$)
+        \EndFor
+      \EndWhile
+      \State \Return False
+    \EndFunction
+    \end{algorithmic}
+    \end{frame}
+
+    \begin{frame}{八数码问题}
+        八数码难题：在$3 \times 3$的棋盘上，摆有八个棋子，每个棋子上标有$1$至$8$的某一数字
+        
+        棋盘中留有一个空格（空格用$0$表示），空格周围的棋子可以移到空格中
+        
+        给出一种初始布局（初始状态）和目标面局（目标状态），找到一种最少步骤的移动方法，实现从初始布局到目标布局的转变
+
+        \begin{center}
+        \includegraphics[width=6cm]{search/G12.png}
+        \end{center}
+
+        以上图为例，从初始状态到目标状态的最少步数方案如下：
+
+        将8移到空位，将7移到空位，将4移到空位，将5移到空位，将6移到空位，将3移到空位，将2移到空位，将1移到空位
+    \end{frame}
+
+    \begin{frame}{八数码问题}
+        
+        由于题目要找到的解是达到目标最少步骤
+        
+        因此解题的方法为：从初始状态出发，先把移动一步后的布局全部找到，检查是否达到目标布局，如果没有，再从这些移动一步的布局出发，找到移动两步后的所有布局，再判断是否有达到目标的
+        
+        如此继续，一直达到目标状态为止，输出结果
+        
+        由于是按移动步数从少到多产生新布局的，所以找到的第一个目标一定是移动步数最少的一个，也就是最优解
+
+    \end{frame}
+    
+    \begin{frame}{深搜和广搜的对比}
+
+        \begin{itemize}
+            \item 深搜每个时候只需要开一个状态，广搜需要开一个队列，存很多个状态
+            \item 当状态量为无穷，求最小步数时，只能选择广搜
+        \end{itemize}
+        
+    \end{frame}
+
+    \subsection{$\text{A}^*$ 搜索}
+    
+    \begin{frame}{$\text{A}^*$}
+    \pause
+    \begin{itemize}[<+->]
+      \item 求状态图上一个点到另一个点的最短路
+      \item 令$g(x)$表示从起点出发到达$x$的已走距离
+      \item 用一个启发式函数$h(x)=x$表示到达终点的估测距离
+      \item 令$f(x)$表示$x$这个方案的估价：$f(x)=g(x)+h(x)$
+      \item 步骤：
+        \begin{enumerate}
+            \item 把起点放入优先队列
+            \item 从优先队列中取出$f(x)$最小的元素
+            \item 如果$x$为终点，直接结束
+            \item 否则枚举$x$的所有出边$(x \to y)$，把$y$放入优先队列中，回到步骤2
+            \item 保存路径，从终点开始，沿着父节点移动至起点，即为路径
+        \end{enumerate}
+    \end{itemize}
+    \end{frame}
+
+    \begin{frame}{启发式函数}
+    
+        \begin{itemize}
+            \item 一个启发式函数 $h$ 是 \textcolor{red}{admissible}(Optimistic) 当且仅当 :
+        
+            $$0 \le h(n) \le h^*(n)$$
+        
+            其中 $h^*(n)$ 是到达终点的\textbf{真实距离}
+        
+            \item Consistency:
+        
+            $$h(A)-h(C) \le w_{a,c}$$
+        \end{itemize}
+    \end{frame}
+    
+    \begin{frame}{A*是最优的吗？}
+    \includegraphics[width=10cm]{search/G1.PNG}
+    
+    \begin{itemize}
+      \item 问题在哪？
+      \item 真实距离$<$估测距离
+      \item 所以估测距离必须$\le$真实距离
+    \end{itemize}
+    \end{frame}
+    
+    \begin{frame}{A*在树上问题的最优性}
+    
+    \begin{multicols}{2}
+    
+    假设:
+    
+    \begin{itemize}
+      \item $A$ 是最优解
+      \item $B$ 是一个非最优解
+      \item $h$ 满足 admissible
+    \end{itemize}
+    
+    结论:
+    
+    \begin{itemize}
+      \item $A$ 将比 $B$先访问到
+    \end{itemize}
+    
+    \includegraphics[width=5cm]{search/G2.PNG}
+    
+    \end{multicols}
+    
+    \end{frame}
+    
+    \begin{frame}{树上A*搜索最优性}
+    
+    \begin{multicols}{2}
+    
+    证明:
+    
+    \begin{itemize}
+      \item $n$为$A$的某一个祖先（可以是$A$自己）
+      \item 结论: $n$ 将比 $B$ 先访问
+      \item 令$g(n)$为到达$n$已经走过的费用总和
+      \item $f(n)=g(n)+h(n)$
+      \item $f(n) \le g(A)$: Admissibility
+      \item $g(A)=f(A)$
+      \item $g(A)<g(B)$
+      \item $f(A)<f(B)$
+    \end{itemize}
+    
+    \includegraphics[width=5cm]{search/G3.PNG}
+    
+    \end{multicols}
+    
+    \end{frame}
+    
+    \begin{frame}{A*在图上呢？}
+    \begin{center}
+    \begin{multicols}{2}
+    
+    状态图
+    
+    \includegraphics[width=6cm]{search/G4.PNG}
+    
+    搜索树
+    
+    \includegraphics[width=5cm]{search/G5.PNG}
+    
+    \end{multicols}
+    \end{center}
+    \end{frame}
+    
+    \begin{frame}{启发式函数的Consistency}
+    
+    \begin{multicols}{2}
+    
+    \includegraphics[width=4cm]{search/G6.PNG}
+    
+    \begin{itemize}
+      \item 首先，估价函数必须$\le $最小费用
+      $$h(A) \le w_{a,G}$$
+      \item Consistency: $$h(A)-h(C) \le w_{A,C}$$
+      \item 所以：
+    
+      $$h(A) \le w_{a,c}+h(C)$$
+    \end{itemize}
+    
+    \end{multicols}
+    
+    \end{frame}
+    
+    \begin{frame}{K短路}
+    
+    \begin{block}{Problem}
+    找到$S$到$T$的第$k$短路
+    \end{block}
+
+    
+    \begin{block}{Algorithm}
+    
+    启发式函数: $h(x)$
+    
+    一直迭代直到终点被取出$k$次为止
+    
+    \end{block}
+    
+    \end{frame}
+    
+    \begin{frame}{ID$\text{A}^*$}
+    
+    \begin{block}{Problem}
+    找到搜索树深度最浅的节点
+    \end{block}
+    
+    DFS? 节省空间，但是无法限制搜索深度
+    
+    BFS? 按深度搜索，但是消耗过多的空间
+    
+    两者结合: IDA*
+    
+    \end{frame}
+    
+    \begin{frame}{ID$\text{A}^*$}
+    
+    \begin{block}{Algorithm}
+    从低到高枚举答案
+    
+    \ \ \ \  按照DFS序进行搜索.
+    \end{block}
+    
+    \end{frame}
+    
+    \subsection{对抗搜索}
+    
+    \begin{frame}{对抗搜索}
+    \framesubtitle{MinMax 值}
+    
+    \begin{block}{一个例子}
+    \begin{center}
+    \includegraphics[width=11cm]{search/G8.PNG}
+    \end{center}
+    \end{block}
+    
+    \end{frame}
+    
+    \begin{frame}{MinMax Search}
+    
+    \begin{multicols}{2}
+    \begin{algorithmic}[1]
+      \Function{Max-Value}{state}
+        \State $v \gets -\infty$
+        \ForAll{each successor of state}
+          \State $v \gets \max(v,$Min-Value(succ)$)$
+        \EndFor
+        \State \Return $v$
+      \EndFunction
+    \end{algorithmic}
+    \begin{algorithmic}[1]
+      \Function{Min-Value}{state}
+        \State $v \gets \infty$
+        \ForAll{each successor of state}
+          \State $v \gets \min(v,$Max-Value(succ)$)$
+        \EndFor
+        \State \Return $v$
+      \EndFunction
+    \end{algorithmic}
+    \end{multicols}
+    
+    \pause
+    
+    时间复杂度$O(b^m)$
+    
+    空间复杂度$O(m)$
+    \end{frame}
+    
+    \begin{frame}{Alpha-Beta 剪枝}
+    
+    \begin{multicols}{2}
+    \begin{algorithmic}[1]
+      \Function{Max-Value}{$state,\alpha,\beta$}
+        \State $v \gets -\infty$
+        \ForAll{each successor of state}
+          \State $v \gets \max(v,$Min-Value$(succ,\alpha,\beta))$
+          \If{$v \ge \beta$}
+            \State \Return $v$
+          \EndIf
+          \State $\alpha \gets \max(\alpha,v)$
+        \EndFor
+        \State \Return $v$
+      \EndFunction
+    \end{algorithmic}
+    \begin{algorithmic}[1]
+      \Function{Min-Value}{$state,\alpha,\beta$}
+        \State $v \gets \infty$
+        \ForAll{each successor of state}
+          \State $v \gets \min(v,$Max-Value$(succ,\alpha,\beta))$
+          \If{$v \le \alpha$}
+            \State \Return $v$
+          \EndIf
+          \State $\beta \gets \min(\beta,v)$
+        \EndFor
+        \State \Return $v$
+      \EndFunction
+    \end{algorithmic}
+    \end{multicols}
+    
+    \pause
+    
+    最优时间复杂度? \pause \textcolor{red}{$O(b^{m/2})$}
+    
+    \end{frame}
+    
+    \subsection{MCTS(蒙特卡洛搜索)}
+    
+    \begin{frame}{MCTS 简介}
+    
+    \begin{multicols}{2}
+    \begin{itemize}
+      \item 在树上采样搜索
+      \item 对每个节点维护一个估价
+      \item 迭代
+        \begin{itemize}
+          \item 找一条采样路径
+          \item 更新估价函数
+      \end{itemize}
+    \end{itemize}
+    
+    \includegraphics[width=7cm]{search/G9.PNG}
+    \end{multicols}
+    \end{frame}
+
+    \begin{frame}{[Openjudge7591]反质数}
+        设$g(x)$为正整数$x$的约数个数
+
+        若对于任意$0<y<x$($y$为整数)，都有$g(x)>g(y)$，就把正整数$x$叫做反质数
+        
+        给定正整数$m,n$,且$m \le n \le 20000000$，求$[m,n]$内所有的反质数
+        
+        若没有，输出NO
+
+        时限1s，空限64M
+
+        
+    \end{frame}
+
+    \begin{frame}{[Openjudge7591]反质数}
+        开始的思路是直接暴力求区间内所有数的质数个数
+        
+        既然这道题目叫反质数，也许能和质数扯上关系
+        
+        一个数的因数个数=各个质因数个数+1的乘积
+
+        例如$12=2 \times 2 \times 3$，因数个数就有$(2+1) \times (1+1)=6$个
+
+        验证一下,(1,2,3,4,6,12),的确没错
+
+    \end{frame}
+
+    \begin{frame}{[Openjudge7591]反质数}
+        
+于是就得到一种搜索的思路：枚举使用哪些质数以及使用它们的个数。越大的质数，性价比是越低的(在增加同等因数个数的情况下，大质数增加的大小会更多)，于是只需要取一定范围内的质数。我们只要判断各种质数组合相乘结果之间的关系就可以了。
+
+可以发现$2 \times 3 \times 5 \times \ldots \times 23$和$2^{25}$都大于$20000000$，于是我们只需枚举$2 \sim 23$内的质数，每个质数选的个数不超过25个
+
+一旦乘积超过$n$就立即返回，这样时间复杂度是完全可以接受的
+
+    \end{frame}
+    
+    \section{搜索优化}
+
+    \subsection{记忆化搜索}
+    
+    \begin{frame}{记忆化搜素}
+        搜索+判重差不多
+
+        遇到重复的状态，就把那个状态的结果拿来用
+
+        难在有的时候状态不好设计
+    \end{frame}
+
+    \begin{frame}{哈希挂链}
+        可以作为记忆化搜索的一个工具
+
+        把一个状态通过一定的方式转换成一个编号，用编号来代表状态
+
+        有时候会发现不同状态有相同的编号，那么就把这个编号当做头，几个状态像连边一样挂成链。检验一个编号时，顺着以这个编号为头的链一路往下找，看有没有同状态的
+    \end{frame}
+
+    \begin{frame}{P11378 [GESP202412 七级] 燃烧}
+      
+    \end{frame}
+
+    \begin{frame}{HNOI2013比赛}
+    
+        一场足球赛共$N$支球队参加，比赛规则如下：
+        
+        \begin{itemize}
+            \item 每两只球队之间踢一场比赛
+            \item 平局各得一分
+            \item 胜利得三分，败者不得分
+        \end{itemize}
+        
+        给定每个球队的最终得分，求有多少种可能的比赛结果，$N \le 10$
+        
+    \end{frame}
+
+    \begin{frame}{HNOI2013比赛}
+        首先考虑的是直接枚举
+
+        但是状态量太大了
+        
+        十支队伍，四十五场比赛，复杂度有$3^{45}$
+        
+        显然会TLE
+
+        然后就只有$40 \sim 70$分了
+
+    \end{frame}
+
+    \begin{frame}{HNOI2013比赛}
+        所以我们考虑这样一种搜索方式：
+
+        开始设一个序列，里面存每个队伍的最终分数，然后对这个数组进行操作，最终让所有分数变成0，那么就算是一种方案。
+
+    \end{frame}
+
+    \begin{frame}{HNOI2013比赛}
+        假如有4个队伍，两两之间没有比赛过
+
+        序列1:(4,2,3,5)
+
+        序列2:(5,3,2,4)
+
+        可以高兴地发现这两个序列的答案是一样的
+
+        也就是说，顺序不会影响答案        
+    \end{frame}
+
+    \begin{frame}{HNOI2013比赛}
+        那么可以这样搜：
+        
+        每次选一个队伍，枚举它与其他所有队伍的胜负情况。如果最终使其得分为0，那么就可以进入下一个队伍。并且这时，我们知道剩下队伍的得分序列，这些队伍两两之间都没有比赛过
+    
+        既然顺序不影响一个序列的答案，那么重复的状态（即搜完一个队伍后，剩下队伍的得分序列）会非常多
+
+        每次搜完，对剩下队伍的得分序列排序并哈希，看是否已经出现过这个状态。出现过就直接调用答案，否则就把它记为新状态
+    \end{frame}
+
+    \begin{frame}{HNOI2013比赛}
+        哈希可以用类似字符串哈希的方法做。设一个质数b，然后对剩下的序列不断进行乘和加的操作
+
+        假设b=31，剩下的序列是(3,2,4,5)
+        
+        那么就用$((3 \times 31+2) \times 31+4) \times 31+5$这个数来代表这个序列
+        
+        之所以这样做，是因为通过这个数也可以还原序列
+        
+        拿上面那个数举例，取余31就得到5，然后再自除31，继续取余得到4
+        
+        以此类推就得到整个状态
+    \end{frame}
+
+    \begin{frame}{埃及分数}
+        用若干个形如1/n的分数之和表示a/b
+        
+        加数个数越少越好，加数个数相等的话，最小的加数越大越好
+        
+        加数中不允许有相同的，求最好的表示形式
+
+        $0<a,b<1000$，保证有解
+        
+        时限1s，空限128M
+    \end{frame}
+
+    \begin{frame}{埃及分数}
+        除了从小到大枚举加数以外似乎找不到别的办法
+        
+        解理论上没有深度限制，而且一定存在最优解，那么可以考虑迭代加深。
+
+    \end{frame}
+
+    \begin{frame}{埃及分数}
+        规定搜索的层数之后，每层都从小到大枚举分母，可以得到两个剪枝
+
+        1.如果剩余每一层都使用当前枚举的分数，最后的和仍然不大于a/b，那么这个分数以及它之后的分数都不用考虑
+
+        2.搜完倒数第二层，最后一层就确定了
+
+    \end{frame}
+
+    \begin{frame}{埃及分数}
+        一个例子:$\frac{19}{45}$
+
+        首先深度=1，显然没有解
+
+        然后深度加1变成2
+
+        第一层首先搜$\frac{1}{2}$，剩下的一层确定了，但不是$\frac{1}{x}$的形式。又去搜$\frac{1}{3},\frac{1}{4}$，都不满足条件
+        
+        发现$\frac{1}{5} \times 2<\frac{19}{45}$，那么$\frac{1}{5}$及之后的都是不行的，搜索终止
+
+        然后深度加$1$变成$3$
+
+        发现第一层$\frac{1}{5}$，第二层$\frac{1}{6}$时，剩下$\frac{1}{18}$
+        
+        这是满足条件的，搜索就完成了
+    \end{frame}
+
+    \begin{frame}{UVA529 Addition Chains}
+    \end{frame}
+
+    \begin{frame}{NOIP2009靶形数独}
+      \begin{multicols}{2}
+      \includegraphics[width=7cm]{search/G13.jpg}
+
+      如图，每个格子有各自的分数，一个格子的得分=填入的数$\times$分值
+      
+      并且初始数独中已经填入了一些数
+
+      你需要用数字$1 \sim 9$完成这个数独，任意一行、一列、一个九宫格内都不得有重复的数，并且使得分最高
+
+      初始已填入数的个数不少于24
+
+      时限2s，空限128M
+      \end{multicols}
+    \end{frame}
+
+    \begin{frame}{NOIP2009靶形数独}
+      直接搜索，理论复杂度是$9^{67}$
+
+      显然是TLE的
+      
+      使用剪枝，提前判断数独的合法性，仍然没办法通过
+
+      然后好像就没什么办法了
+
+    \end{frame}
+
+    \begin{frame}{NOIP2009}
+      如此大的状态量，不禁让我们想到了改变搜索顺序
+
+      每次搜索时，我们选择可能填入的数最少的一个格子进行搜索
+      
+      虽然我们每次找这个格子要花费一定的时间，但由此剪掉的状态是非常多的
+      
+      试想一下，第一层扩展的状态由9种变成3种，对67层的搜索来说，效率提升简直惊人
+
+    \end{frame}
+
+\begin{frame}{Binary Cards}{Codeforces \#469 (Div.1) E}
+
+    给出$n$个需要表示的数，你需要用最少的$2^k$或$-2^k$，使得能拼出所有需要表示的数。输出方案。
+
+    $n,|A_i| \le 100000$
+\end{frame}
+
+\begin{frame}{Binary Cards}{Codeforces \#469 (Div.1) E}
+
+    \begin{itemize}[<+->]
+        \item 同一个数最多只会选一次，因为选两个$2$不如选一个$4$
+        \item $2$和$-2$不会同时选，因为不如选$4$和$-2$或者$-4$和$2$
+        \item 按位考虑，如果所有数都是偶数，则可以全部$/2$，否则必须选$1$或$-1$，爆搜选哪一个
+        \item 搜索的时候去重，第$k$层数字不会超过$\frac{A}{2^k}$
+        \item 复杂度$O((n+A_i)\log(n))$
+    \end{itemize}
+\end{frame}
+
+    \begin{frame}{[CTSC2013]复原}
+
+      一个圆上有n条弦，从1到n编号，两两不重合，但有m对弦相交
+      
+      给出n,m及每对相交弦的编号，按逆时针方向给出符合要求的圆上每条弦两个端点的相对顺序，其中第i条弦的两个端点均用i表示
+      
+      还需要求出最多能选多少条两两不相交的弦
+      
+      $1 \le n \le 20，1 \le m \le 40$
+
+      时限1s，空限128M
+    \end{frame}
+
+    \begin{frame}{[CTSC2013]复原}
+      如果把红色的弦当作固定的，绿色的弦当作插入的
+
+      那么它们相交的条件就是，绿色的端点有且仅有一个包含在红色的两端点之间
+
+      \includegraphics[width=10cm]{search/G14.png}
+
+    \end{frame}
+
+    \begin{frame}{[CTSC2013]复原}
+      \includegraphics[width=10cm]{search/G15.png}
+
+      那么不相交的情况，就是绿色的两端点都在或者都不在红色两端点之间
+    \end{frame}
+
+    \begin{frame}{[CTSC2013]复原}
+      那么我们一条条枚举弦的插入位置，要求每条弦插进去，跟之前插进去的弦相交关系合法即可
+      
+      第二问直接枚举每条弦选不选即可
+
+      然而提交后发现TLE了
+
+    \end{frame}
+
+    \begin{frame}{[CTSC2013]复原}
+      问题出在第一问的搜索
+      
+      直接搜索理论上复杂度有可能达到19!
+      
+      如此大的状态量，不禁让我们想到了改变搜索顺序
+
+      如果先枚举那些相交数量多的弦，对后面插入弦的限制就会增多，从而减少了节点扩展出的状态量
+    \end{frame}
+
+    \begin{frame}{[NOIP2011]Mayan游戏}
+      题面有点长，就不放课件上了
+
+    \end{frame}
+    \begin{frame}{[NOIP2011]Mayan游戏}
+      比较麻烦的是处理方块的状态
+
+      可以分成几个部分去处理
+
+      交换：直接交换就好了
+      
+      掉落：对一列从下往上扫一遍，把空格去掉
+      
+      消除：先把符合要求的全部消除掉，然后判断每一列能不能掉落，再判断能不能消除，直到不能消除为止
+    \end{frame}
+
+    \begin{frame}{[NOIP2011]Mayan游戏}
+      剪枝比较容易想到
+
+      可行性：某种颜色方块数为1或2就不用搜了
+      
+      最优性：按x从小到大，再按y从小到大去枚举，如果方块A左边有方块B，不要把方块A左移，因为方块B右移是等效的而且更优
+
+      用这两个剪枝就可以过掉了
+
+    \end{frame}
+
+    \begin{frame}{P2668 斗地主}
+      ...
+    \end{frame}
+
+    \begin{frame}{UOJ215 果冻运输}
+    \end{frame}
+
+    \subsection{双向搜索}
+
+    \begin{frame}{Meeting the Middle（双向搜索）}
+    
+    \begin{block}{Problem}
+    
+    有$n$个数，要求你找到一个和为$0$的非空子集
+    
+    $n \le 40$
+    
+    \end{block}
+    
+    \end{frame}
+    
+    \begin{frame}{Meeting the Middle}
+    \framesubtitle{P5691 NOI2001方程的解数}
+    
+    已知$1 \le x_i \le m$，求方程$\sum_{i=1}^{n}k_ix_i^{p_i}=0$有多少组整数解
+    
+    $n \le 6,m \le 160,|\sum_{k_i}m^{p_i}| < 2^{31}$
+    
+    \end{frame}
+
+    \begin{frame}{ABC326F Robot Rotation}
+      给定$n,x,y$和一个长度为$n$的数组$a[1 \ldots n]$
+
+      一个人在二维平面上，初始站在原点，方向朝向$X$轴正方向
+
+      接下来这个人会走$n$步，第$i$步的时候，这个人会先选择从当前的朝向左转90度，或者右转90度，然后往前走$a[i]$长度
+      
+      问，这个人应该如何选择，使得最后到达点$(x,y)$
+
+      $n \le 80, a[i],x,y \le 10^9$
+    \end{frame}
+
+    \begin{frame}{凤仙花}{上一题的加强}
+
+      现在有个机器人在平面上走路，初始在$(0,0)$，面向x 轴正方向。有$n$个指令，形如先向左或右转 $90$ 度，然后向对应方向走 $x$ 个单位长度。每个指令都有如下限制：
+      
+      \begin{itemize}
+        \item 转向这一步有三种可能：只能左转，只能右转，两者都可以。
+        \item 向前走的长度必须在 $l$ 到 $r$ 之间。
+      \end{itemize}
+      
+      现在给出每个指令的限制，请构造出一种可行的方案使得最终停留在$(X, Y)$。
+
+      $n \le 60$
+      
+    \end{frame}
+
+    \begin{frame}{凤仙花}
+      
+    考虑确定了每个问号为 $L / R$ 之后，那么一个操作序列可以到达的位置是一个矩形。
+
+    考虑meet in the middle，把操作序列对半划开，枚举前一半和后一半能到达的矩形。进行一些平移反转操作后，可以将问题转化为：判断能否从两个集合里各选选一个矩形，使得这两个矩形有交的问题。直接扫描线维护线段树即可。
+
+    时间复杂度$O(2^{n/2} poly(n))$。
+    \end{frame}
+
+    \begin{frame}{凤仙花}
+      注意到第奇数步控制 $y$，第偶数步控制 $x$。如果存在两个连续的$?$，目前该移动$y$，那么无论方向选择正或负都不影响下一步的决策。比如我两个$??$ 之后希望向右走，那么我如果第一个问号选了上，第二个就右拐就向右了，否则就左拐还是可以向右。这两种情况下 $x$ 轴的影响都是选择了正方向也就是右侧，但是$y$轴的选取却不同。这提示我们当有连续 $??$ 的时候，第一个$?$ 是几乎不具有后效性的。
+
+      比如最极端的例子——全是 $?$。那么第奇数步和偶数步会的变得完全独立。可以分成两个子问题，每个子问题继续沿用meet in the middle，而且会简化为 区间是否有交，而不是矩形是否有交。
+
+    \end{frame}
+
+    \begin{frame}{凤仙花}
+      对于不那么极端的情况。考虑标记所有 $L, R$ 操作以及他们的前一个操作。对于已经标记的 $?$ 操作暴力枚举他们的方向，剩余分裂成两个独立的部分，分别 meet in the middle。
+
+      考虑分析上述做法的时间复杂度，假设 $?$ 个数为 $B$。
+
+      做法1的时间复杂度是 $O(2^{B/2} poly(n))$。
+    
+      做法2的时间复杂度是 $O(2^{n-B} 2^{(B - (n - B)) / 4} poly(n)) = O(2^{3n/4 - B/2})$。
+
+      取 $B = 3/4n$ 的时候两个复杂度达到平衡，时间复杂度为$O(2^{3n/8} poly(n))$
+    \end{frame}
+
+    \subsection{舞蹈链算法}
+    
+    \begin{frame}{Dancing Links（舞蹈链算法）}
+    \begin{itemize}
+        \item 
+    精确覆盖问题
+    
+    \item 
+    一个$n \times m$的$01$矩阵，要求选出一个行的子集，使得在这些选出的行中，每一列都恰好有一个$1$。
+    
+    \item 
+    数据结构：双向十字链表
+    
+    \item 
+    固定一列，枚举选择使用哪一行
+    
+    \item 
+    把这一列所有行全部删除
+    \end{itemize}
+    
+    \end{frame}
+
+    \begin{frame}{P4929 【模板】舞蹈链（DLX）}
+      舞蹈链模板题
+    \end{frame}
+
+    \begin{frame}{P1784 数独}
+
+    \end{frame}
+
+    \begin{frame}{P4205 智慧珠游戏}
+    \end{frame}
+    
+    \section{迭代算法}
+    
+    \begin{frame}{迭代}
+    
+    搜索：一般定义在树/图空间上
+    
+    迭代：可以定义在树/图空间上，也可以定义在欧式空间/离散欧式空间上
+
+    迭代往往处理空间更大的问题
+    \end{frame}
+    
+    \subsection{0阶优化}
+    
+    \begin{frame}{爬山}
+    
+    $$x_{n+1}=\underset{x' \in \operatorname{Neighbor}(x_n)}{\operatorname{argmin}}(f(x'))$$
+    
+    从一个点出发，每次按照最近的邻居走
+    
+    \end{frame}
+
+    \begin{frame}{[THUWC2017] 大葱的神力}
+      ...
+    \end{frame}
+
+    \begin{frame}{[CTSC2018] 组合数问题}
+      ...
+    \end{frame}
+
+    
+    \begin{frame}{模拟退火}
+    
+    $$P(x_n \to x')=\left\{ \begin{array}{ll}
+      1 & f(x')<f(x_n) \\
+      e^{\frac{f(n)-f(x')}{t}} & f(x') \ge f(x_n) \\
+    \end{array} \right.$$
+    
+    \end{frame}
+    
+    \subsection{一阶优化}
+    
+    \begin{frame}{牛顿迭代算法}
+    
+    \begin{multicols}{2}
+    
+    \includegraphics[width=5cm]{search/G10.jpg}
+    
+    $$y=f'(x_n)(x-x_n)+f(x_n)$$
+    
+    $$0=f'(x_n)(x_{n+1}-x_n)+f(x_n)$$
+    
+    $$x_{n+1}=x_n-\frac{f(x_n)}{f'(x_n)}$$
+    
+    \end{multicols}
+    
+    \end{frame}
+    
+    \begin{frame}{错误点}
+    
+    \begin{description}
+      \item[错误的初始点] 
+      $$f(x)=1-x^2$$
+    
+      $x_0=0$, $f'(0)=0$.
+      \item[循环的初始点] 
+      $$f(x)=x^3-2x+2$$
+    
+      Start from $x_0=0$.
+    
+      $$x_1=x_0-\frac{f(x_0)}{f'(x_0)}=-\frac{2}{-2}=1$$
+    
+      $$x_2=x_1-\frac{f(x_1)}{f'(x_1)}=1-\frac{1}{1}=0$$
+    \end{description}
+    
+    \end{frame}
+    
+    \begin{frame}{梯度下降(Gradient descent)}
+    
+    \includegraphics[width=6cm]{search/G11.png}
+    
+    $$\textbf{x}_{n+1}=\textbf{x}_n-\alpha \nabla F(\textbf{x}_n)$$
+    
+    \end{frame}
+    
+    \subsection{图迭代}
+    
+    \begin{frame}{图迭代}
+    
+    \begin{block}{赌徒问题}
+    
+    有一个赌徒，初始有$k$元，每次他有$p$的概率赢一元钱，有$1-p$的概率输一元钱，当他赢到$m$元时就会离开，当手上没有钱时就会破产，问赌徒一直玩下去离开的概率
+    
+    \end{block}
+    
+    \pause
+    
+    迭代做法：
+    
+    随机一个函数$f_0:[m] \to [0,1]$
+    
+    $\forall n \in \mathbb{N}^+$, $f_n(x)=pf_n(x-1)+(1-p)f_n(x+1)$
+    
+    \end{frame}
+    
+    \begin{frame}{图迭代}
+    
+    \begin{block}{赌徒问题2}
+    
+    有一个赌徒，初始有$k$元，每次他可以押注$t$元，然后有$p$的概率再赢$t$元钱，有$1-p$的概率输掉这$t$元，当他赢到$\ge m$元时就会离开，当手上没有钱时就会破产，问赌徒一直玩下去离开的概率
+    
+    \end{block}
+    
+    \pause
+    
+    迭代做法：
+    
+    随机一个函数$f_0:[m] \to [0,1]$
+    
+    $\forall n \in \mathbb{N}^+$, $f_n(x)=\max_{y \in [1,x]}pf_n(x-y)+(1-p)f_n(x+y)$
+    
+    \end{frame}

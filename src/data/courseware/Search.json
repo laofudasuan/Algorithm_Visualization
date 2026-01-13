@@ -1,0 +1,22 @@
+{
+  "title": "搜索",
+  "description": "搜索算法",
+  "cover": "/images/no.png",
+  "author": "老虎大蒜",
+  "createdAt": "2025-11-23",
+  "metaPositions": {
+    "title": { "x": 150, "y": 120 },
+    "description": { "x": 500, "y": 150 }
+  },
+  "pages": [
+    { "id": "搜索算法", "path" : "Search/Search.mdx", "x": 300, "y": 280 },
+    { "id": "深度优先搜索", "path" : "Search/DepthFirstSearch.mdx", "x": 300, "y": 380 },
+    { "id": "广度优先搜索", "path" : "Search/BreadthFirstSearch.mdx", "x": 300, "y": 480 },
+    { "id": "A*搜索", "path" : "Search/AStar.mdx", "x": 300, "y": 580 },
+    { "id": "前K优解问题", "path" : "Search/KOptimalSolution.mdx", "x": 300, "y": 680 },
+    { "id": "博弈搜索", "path" : "Search/GameSearch.mdx", "x": 300, "y": 780 },
+    { "id": "记忆化搜索", "path" : "Search/MemoizationSearch.mdx", "x": 300, "y": 880 }
+  ],
+  "edges": [
+  ]
+}

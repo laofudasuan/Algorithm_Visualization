@@ -22,3 +22,15 @@ $$R \times C \leq 6 \times 10^6, \quad N \leq R \leq C$$
 </CollapsibleComponent>
 
 ##### CF1163F Indecisive Taxi Fee
+
+##### qoj6391 NOI 2023 Final C. Airplane
+
+<CollapsibleComponent title="做法"> 
+
+首先可以分析出最优解的一个性质：飞机一定是先上升再下降，不可能反复上下。而这个上升到下降的临界点就是路径上经过的$a$的最大值
+
+因此可以考虑枚举这个$a$，然后转化为两个子问题：从$S$和$T$出发到达这个点，路上只能上升的最短时间
+
+跑最短路，在跑到每个点的时候把时间对当前点的$a$取max即可
+
+</CollapsibleComponent>

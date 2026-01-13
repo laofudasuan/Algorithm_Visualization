@@ -73,7 +73,7 @@
     { "id": "Linear-Algebra", "x": 850, "y": 100, "category": "数学基础" },
     { "id": "Linear-Programming", "x": 720, "y": 100, "category": "数学基础" },
 
-    { "id": "Search", "x": 1500, "y": 700, "category": "算法" },
+    { "id": "Search", "x": 1200, "y": 800, "category": "算法" },
     { "id": "Game-Theory", "x": 1500, "y": 760, "category": "数学基础" },
     { "id": "Geometry", "x": 1400, "y": 860, "category": "数学基础" },
     { "id": "Interactive", "x": 1500, "y": 650, "category": "空" },
