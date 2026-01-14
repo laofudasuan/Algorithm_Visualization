@@ -12,6 +12,7 @@ const CoursewareList = lazy(() => import('./pages/CoursewareList'));
 const CoursewareDetail = lazy(() => import('./pages/CoursewareDetail'));
 const VisualizationsIndex = lazy(() => import('./pages/VisualizationsIndex'));
 const VisualizationsDetail = lazy(() => import('./pages/VisualizationsDetail'));
+const LogList = lazy(() => import('./pages/LogList'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 function AppContent() {
@@ -33,8 +34,8 @@ function AppContent() {
     { name: '主页', path: '/' },
     { name: '内容', path: '/courseware' },
     { name: '知识图谱', path: '/knowledge-graph' },
-    { name: '可视化模块', path: '/visualizations' },
-    // { name: '用户管理', path: '/users' },
+    //{ name: '可视化模块', path: '/visualizations' },
+    { name: '随笔', path: '/logs' },
   ]
 
   // 加载中的占位组件
@@ -68,6 +69,7 @@ function AppContent() {
           <Route path="/courseware/:id" element={<CoursewareDetail />} />
           <Route path="/visualizations" element={<VisualizationsIndex />} />
           <Route path="/visualizations/:slug" element={<VisualizationsDetail />} />
+          <Route path="/logs" element={<LogList />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { motion } from 'framer-motion'
 
 const VisualizationsIndex = () => {
   const navigate = useNavigate()
@@ -35,7 +36,12 @@ const VisualizationsIndex = () => {
 
   return (
     <div className="min-h-screen pt-28 pb-16">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <motion.div 
+        className="container mx-auto px-4 sm:px-6 lg:px-8"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: 'easeOut' }}
+      >
         <h1 className="text-3xl font-bold mb-6">可视化模块</h1>
         {loading ? (
           <div className="bg-white rounded-xl shadow-md p-8">
@@ -65,7 +71,7 @@ const VisualizationsIndex = () => {
             </ul>
           </div>
         )}
-      </div>
+      </motion.div>
     </div>
   )
 }

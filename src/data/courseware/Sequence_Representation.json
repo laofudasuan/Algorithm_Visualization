@@ -1,0 +1,17 @@
+{
+  "title": "序列表示法",
+  "description": "序列的表示方法",
+  "cover": "/images/no.png",
+  "author": "老虎大蒜",
+  "createdAt": "2025-11-23",
+  "metaPositions": {
+    "title": { "x": 150, "y": 120 },
+    "description": { "x": 500, "y": 150 }
+  },
+  "pages": [
+    { "id": "循环表示", "path": "Sequence/Cycle_Representation.mdx", "x": 200, "y": 380 },
+    { "id": "最小表示法", "path": "Sequence/Minimum_Representation.mdx", "x": 400, "y": 380 }
+  ],
+  "edges": [
+  ]
+}
