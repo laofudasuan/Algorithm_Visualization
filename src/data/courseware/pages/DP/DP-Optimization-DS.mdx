@@ -11,7 +11,7 @@ import { CollapsibleComponent } from '../../../courseware/markdownConfig';
 
 求选若干个区间的最小总花费，使得覆盖$[L,R]$内所有整数
 
-##### P4644 USACO05DEC Cleaning Shifts S
+<CollapsibleComponent title="做法"> 
 用$f[i]$表示，按照从左到右的顺序选择了第$i$个区间，保证当前已经覆盖了$[L,b_i]$的所有数
 
 转移：$f[i] = \min_{a_i<b_j<b_i}( f[j] )+c_i$
@@ -19,13 +19,14 @@ import { CollapsibleComponent } from '../../../courseware/markdownConfig';
 变成了一个单点修改、查询后缀最小值的问题
 
 采用树状数组优化即可
+</CollapsibleComponent>
 
 ##### P3287 SCOI2014 方伯伯的玉米田
 给一个序列$a_{1 \ldots n}$，可以最多做$k$次区间$+1$操作
 
 求操作完成以后，最长不下降子序列的长度最多是多少
 
-##### P3287 SCOI2014 方伯伯的玉米田
+<CollapsibleComponent title="做法">
 显然，每次操作的一定是一段后缀
 
 用$F[i][j]$表示，第$i$个数被进行了$j$次$+1$，以$i$结尾的不下降子序列的最长长度
@@ -35,6 +36,7 @@ F[i][j] = \max_{k<i,0 \le l \le j,h[i]+j \ge h[k]+l}(F[k][l])+1
 $$
 
 按照$i$的顺序，剩下的是一个二维偏序，可以用二维树状数组进行维护
+</CollapsibleComponent>
 
 ##### 数据结构优化DP例题
 
@@ -58,7 +60,7 @@ $(1\le n \le 5\times 10^5,\ 1 \le v \le 10^9)$
 
 问总能量的最大值
 
-##### P9871 NOIP2023 天天爱打卡
+<CollapsibleComponent title="做法"> 
 用$f[i]$表示考虑完了前$i$天，并且第$i$天不跑步的最大能量
 
 $$
@@ -66,16 +68,17 @@ f[i]=\max_{ i-k-1 \le j<i } f[j]+(i-j-1)\times d + \sum_{j<l_k \le r_k<i} v_k
 $$
 
 考虑按顺序枚举$i$，同时用线段树维护这个转移的系数
+</CollapsibleComponent>
 
 ##### CF1168D Anagram Paths
-题面略
 
-##### CF1168D Anagram Paths
+<CollapsibleComponent title="做法"> 
 如果合法，答案为，$\sum_{c} \max($每个叶子到根$c$的数量$)$
 
 开26棵线段树维护
 
 如何判断合法：是否有某个点，DP值之和超过到叶子的距离
+</CollapsibleComponent>
 
 ##### P11630 WC2025 士兵
 
@@ -86,7 +89,6 @@ $$
 
 在经过几条割草道后，割草机的收集箱可能会达到满容量，此时它将停止割草，剩下的草会留在该条道上。每当出现这种情况时，必须在该条道的末端清空收集箱，这需要花费$b$秒。清空只能在割草道的末端进行。如果在经过第$i$条割草道时收集箱已满，Vlad 仍需要推到该条道的末端，再清空收集箱，然后重新经过该条道一次（或多次），直到割完剩余的草。
 
-##### P13692 [CEOI 2025] lawnmower
 例如，如果某条第$i$条割草道需要经过$3$次才能割完全部草，则所需时间为：
 
 $$a[i] + b + a[i] + b + a[i]$$
@@ -101,7 +103,7 @@ $1 \leq n \leq 200000$
 
 $1 \leq a[i],v[i],b,c \leq 10^9$
 
-##### P13692 [CEOI 2025] lawnmower
+<CollapsibleComponent title="做法"> 
 设$ f_{i,j} $表示割完了前$i$条草道，还剩下了$j$单位的草没清空（$ 0 \leq j < c $）。
 
 注意到，在割一块草地的中途，只有当容量满的时候才会清空。所以我们需要决策的仅仅是一块草地割完以后是否主动清空，因此转移为：
@@ -113,6 +115,7 @@ $$
 开 Treap 对于$ O(1) $个转移情况分开考虑（这里有一点细节，需要想清楚之后再动手），有值的$ f_{i,*} $只有$ O(n) $个，维护区间加、平移、求最值即可。
 
 时间复杂度$ O(n \log n) $。
+</CollapsibleComponent>
 
 ##### [ABC262Ex] Max Limited Sequence
 求满足以下条件的长度为$N$的序列$A=(A_1,A_2,\cdots A_N)$有多少种：
@@ -122,7 +125,6 @@ $\forall i \in[1,N],\ 0\leq A_i\leq M$
 $\forall i \in[1,Q],\ \max \limits_{L_i\leq j\leq R_i}A_j=X_i$
 
 $N \le 2 \times 10^5,\ M < 998244353,\ Q \le 2 \times 10^5$
-
 
 ## 数据结构优化区间DP
 
@@ -135,7 +137,7 @@ $N \le 2 \times 10^5,\ M < 998244353,\ Q \le 2 \times 10^5$
 
 $n,Q \le 10^5$
 
-##### P11049 尼罗河船运 · 做法一
+<CollapsibleComponent title="做法一"> 
 先考虑一次询问怎么做
 
 注意到关键性质：把所有物品按照重量排序以后匹配不交叉，否则交换更优
@@ -150,14 +152,14 @@ $$
 dp[i] = \begin{cases} dp[i-1]+A[i] & W[i]-W[i-1] > D \\ \max(dp[i-1]+A[i],\ dp[i-2]+B[i-1]+B[i]) & W[i]-W[i-1] \le D,\ \ W[i]-W[i-2]>D \\ \max(dp[i-1]+A[i],\ dp[i-2]+B[i-1]+B[i],\ dp[i-3]+B[i-2]+A[i-1]+B[i]) & W[i]-W[i-1] \le D \end{cases}
 $$
 
-##### P11049 尼罗河船运 · 做法一
 然后把前缀DP改成区间DP。考虑DP的过程就是把$1 \sim n$划分成很多个长度为$1 \sim 3$的区间。
 
 对于一段区间$i$，用$dp[i][j=0/1/2][k=0/1/2]$表示区间开头有$j$个数跟之前合成一段，有$k$个数跟之后合成一段的最小代价，这样可以用线段树维护答案。
 
 然后考虑把所有询问按照$D$从小往大，随着$D$的增加，如果一对原本不能组合的物品现在能组合了就进行线段树的单点修改。
+</CollapsibleComponent>
 
-##### P11049 尼罗河船运 · 做法二
+<CollapsibleComponent title="做法二">
 如果有排序后相邻两个物品是不能组合的，则可以切割成两个独立的子问题。
 
 这样，我们就可以把$n$个物品切割成很多个独立的段，每一段的相邻两个都是可以组合的。
@@ -167,6 +169,25 @@ $$
 如果一个物品和这一段的左端点奇偶性相同，则让这个物品单独运输可以让其他物品都组合。否则，放弃这个物品的条件是它左右相邻的物品可以组合。
 
 对于多次询问，可以按照$D$从小往大扫，一边扫就一边对应着段与段的合并。
+</CollapsibleComponent>
+
+## 线段树/树状数组优化树形DP
+
+##### P4577 [FJOI2018]领导集团问题
+
+<CollapsibleComponent title="做法"> 
+设 $f_{i,j}$ 表示以 $i$ 为根的子树 $\min w \ge j$ 的答案，分两种情况讨论：
+
+- 令 $f_{i,j}\;(j \le w_i) \leftarrow \max(f_{i,j}, f_{i,w_i} + 1)$，在合并完儿子后进行该操作。
+- $f_{i,j} \leftarrow f_{i,j} + f_{u,j}$，其中 $u$ 是 $i$ 的儿子，即合并树上的一条边 $(i,j)$。
+
+对于上述转移方程使用整体 DP 即可。
+
+注意到区间 $\text{checkmax}$ 的标记永久化无法合并：对于两棵线段树的同一个位置，它的新值应该是两棵树从根到路径的所有节点的标记的 $\max$ 的和而不是所有节点的标记的和的 $\max$：$\max(a_i) + \max(b_i) \neq \max(a_i + b_i)$。
+
+由于我们只进行 $f_{i,w_i} + 1$ 且 $f_{i,j}$ 是单调递减的，所以注意到每次 $\text{checkmax}$ 就相当于区间 $+1$，标记永久化即可，时间复杂度 $O(n \log n)$。
+
+</CollapsibleComponent>
 
 ## 线段树合并优化DP
 
@@ -177,12 +198,14 @@ $$
 
 由于答案可能非常大，你只需要输出结果对$ 998,244,353 $取模的结果。
 
-##### P6773 NOI2020 命运
+<CollapsibleComponent title="做法"> 
+
 先写出动态规划，用$dp[x][i]$表示已经考虑完了$x$子树内所有边，对于所有一个端点在$x$子树内，另一个端点在$x$子树外的限制，在子树外的最深深度为$i$的方案数。
 
 合并两颗子树时，第二维取$\max$。
 
 用线段树合并DP数组，可以在线段树合并的同时维护取$\max$这个操作。
+</CollapsibleComponent>
 
 ##### CF2079C Dreaming Is Not Harmful
 简化题意（如果看原题意的时候，注意简化后的编号是在原问题中按照解雇顺序重新编排的）：
@@ -195,7 +218,8 @@ $$
 
 复杂度要求：$ O(n \log n) $。
 
-##### CF2079C Dreaming Is Not Harmful
+<CollapsibleComponent title="做法"> 
+
 （树链剖分是可以做的，但是复杂度是$O(\log^2 n)$）
 
 从下往上合并，每次合并两棵子树。
@@ -203,11 +227,12 @@ $$
 合并两棵子树时，对于一个子树中的某个点$i$，需要在另一棵子树中统计$<i$的点数并更新$i$的答案。
 
 这个是可以在线段树合并的同时实现的。
+</CollapsibleComponent>
 
 ##### P10789 NOI2024 登山
-题面略
 
-##### P10789 NOI2024 登山
+<CollapsibleComponent title="做法"> 
+
 令$l_i,r_i = d_i-r_i,d_i-l_i$，即把$l,r$的定义修改为需要冲刺到深度为$[l,r]$范围内的点，然后定义$v_i=d_i-(h_i+1)$，即冲刺需要到达深度$\le v_i$的点。
 
 先列出DP的公式，考虑按照每次冲刺到达的点DP：
@@ -223,6 +248,7 @@ $$
 $$
 f[x] = \sum_{y \in subtree(x),\min_{i \in path(x,y)} \ge l_y} \left(sum[anc[x][\min(\min_{i \in path(x,y)}v_i,r_y)]]-sum[anc[x][l_y-1]]\right)
 $$
+</CollapsibleComponent>
 
 <CollapsibleComponent title="做法一"> 
 
@@ -281,5 +307,17 @@ $$
 但还有一个小问题：求解$f$需要从下往上，但求解$c$是从下往上的。
 
 考虑求$f$的时候把线段树合并的过程反过来即可。
+
+</CollapsibleComponent>
+
+#####  CF490F Treeland Tour
+
+<CollapsibleComponent title="做法"> 
+
+整体 DP 的经典题。对于每个区间维护 $\text{LIS}$（最长上升子序列）和 $\text{LDS}$（最长下降子序列），线段树合并直接取 $\max$ 即可。
+
+具体地，设 $f_{i,j}/g_{i,j}$ 分别表示最后一个元素为 $j$ 的 $\text{LIS}/\text{LDS}$ 最长长度。合并的时候也要更新答案。
+
+时间复杂度 $O(n \log n)$。
 
 </CollapsibleComponent>

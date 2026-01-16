@@ -25,6 +25,8 @@ $F_{s,k}$代表当前到了第$k$个点，已经走过的点集为$s$的路径�
 
 $$F_{s,k} = \min_{(t,k) \in E,\ t \in S,\ t \neq k} \big(F_{s-(1<<k),t} + w_{k,t}\big)$$
 
+##### P1357 花园
+
 ##### P1896 SCOI2005互不侵犯King
 在$n \times n$的棋盘里面放置$m$个国王，使得他们互相不能攻击，求共有多少种不同的放置方案
 
@@ -115,6 +117,8 @@ $n \le 22$
 暴力判断两个序列能否转移，然后矩乘即可
 </CollapsibleComponent>
 
+## 子集转移
+
 ##### P7718 「EZEC-10」Equalization
 
 给你一个长为$n$的数组$a_1,a_2,\ldots,a_n$。
@@ -163,3 +167,10 @@ $n \le 15$，时限$4S$
 
 然后就可以状压DP了，复杂度$O(3^n \times n)$
 </CollapsibleComponent>
+
+##### 例题
+
+- P5911 [POI2004]PRZ
+- CF1152F2 Neko Rules the Catniverse (Large Version)
+- CF1342F Make It Ascending
+

@@ -9,53 +9,59 @@
     "description": { "x": 500, "y": 150 }
   },
   "anchor": [
-    { "id": "根号", "x": 550, "y": 350 }
+    { "id": "根号", "x": 550, "y": 450 },
+    { "id": "升维", "x": 250, "y": 200 }
   ],
   "pages": [
-    { "id": "数据结构", "x": 400, "y": 400 },
+    { "id": "数据结构", "x": 400, "y": 500 },
 
-    { "id": "序列", "x": 416, "y": 330 },
+    { "id": "序列", "x": 416, "y": 430 },
+    { "id": "区间修改", "x": 480, "y": 350 },
     { "id": "线段树", "link": "Segment-Tree", "x": 300, "y": 220 },
     { "id": "树状数组", "x": 400, "y": 220 },
     { "id": "平衡树", "x": 520, "y": 220 },
+    { "id": "区间赋值", "link" : "DS/Interval-Assign.mdx", "x": 320, "y": 350 },
 
-    { "id": "矩阵（平面）", "x": 270, "y": 330 },
-    { "id": "KD树", "x": 150, "y": 360 },
-    { "id": "扫描线", "x": 150, "y": 300 },
-    { "id": "树套树", "x": 150, "y": 180 },
+    { "id": "矩阵（平面）", "x": 270, "y": 430 },
+    { "id": "KD树", "x": 150, "y": 460 },
+    { "id": "扫描线", "x": 150, "y": 400 },
+    { "id": "树套树", "x": 150, "y": 280 },
 
-    { "id": "分块", "path": "DS/Block.mdx", "x": 650, "y": 250 },
-    { "id": "莫队", "path": "DS/Mo.mdx", "x": 650, "y": 320 },
-    { "id": "回滚莫队", "x": 750, "y": 320 },
+    { "id": "分块", "path": "DS/Block.mdx", "x": 650, "y": 350 },
+    { "id": "莫队", "path": "DS/Mo.mdx", "x": 650, "y": 420 },
+    { "id": "回滚莫队", "x": 750, "y": 420 },
 
-    { "id": "集合", "x": 550, "y": 400 },
-    { "id": "堆", "x": 700, "y": 400 },
+    { "id": "集合", "x": 550, "y": 500 },
+    { "id": "堆", "x": 700, "y": 500 },
 
-    { "id": "树", "x": 300, "y": 430 },
-    { "id": "树分治", "link": "Tree-Split", "x": 150, "y": 520 },
-    { "id": "动态树", "x": 280, "y": 520 },
-    { "id": "Dsu On Tree", "x": 380, "y": 520 },
-    { "id": "虚树", "x": 150, "y": 440 },
+    { "id": "树", "x": 300, "y": 530 },
+    { "id": "树分治", "link": "Tree-Split", "x": 150, "y": 620 },
+    { "id": "动态树", "x": 280, "y": 620 },
+    { "id": "Dsu On Tree", "x": 380, "y": 620 },
+    { "id": "虚树", "x": 150, "y": 540 },
 
-    { "id": "图", "x": 550, "y": 480 },
-    { "id": "并查集", "x": 700, "y": 500 }
+    { "id": "图", "x": 550, "y": 580 },
+    { "id": "并查集", "x": 700, "y": 600 }
   ],
   "edges": [
     { "source": "数据结构", "target": "序列", "sourceSide": "top", "targetSide": "bottom" },
     { "source": "数据结构", "target": "树", "sourceSide": "left", "targetSide": "right" },
     { "source": "数据结构", "target": "图", "sourceSide": "right", "targetSide": "left" },
 
-    { "source": "序列", "target": "线段树", "sourceSide": "top", "targetSide": "bottom" },
-    { "source": "序列", "target": "树状数组", "sourceSide": "top", "targetSide": "bottom" },
-    { "source": "序列", "target": "平衡树", "sourceSide": "top", "targetSide": "bottom" },
+    { "source": "序列", "target": "区间修改", "sourceSide": "top", "targetSide": "bottom" },
+    { "source": "区间修改", "target": "线段树", "sourceSide": "top", "targetSide": "bottom" },
+    { "source": "区间修改", "target": "树状数组", "sourceSide": "top", "targetSide": "bottom" },
+    { "source": "区间修改", "target": "平衡树", "sourceSide": "top", "targetSide": "bottom" },
+    { "source": "序列", "target": "区间赋值", "sourceSide": "top", "targetSide": "bottom" },
     
     { "source": "序列", "target": "矩阵（平面）", "sourceSide": "left", "targetSide": "right" },
     { "source": "矩阵（平面）", "target": "KD树", "sourceSide": "left", "targetSide": "right" },
     { "source": "矩阵（平面）", "target": "扫描线", "sourceSide": "left", "targetSide": "right" },
     { "source": "矩阵（平面）", "target": "树套树", "sourceSide": "left", "targetSide": "right" },
-    { "source": "线段树", "target": "树套树", "sourceSide": "top", "targetSide": "right" },
-    { "source": "树状数组", "target": "树套树", "sourceSide": "top", "targetSide": "right" },
-    { "source": "平衡树", "target": "树套树", "sourceSide": "top", "targetSide": "right" },
+    { "source": "线段树", "target": "升维", "sourceSide": "top", "targetSide": "right" },
+    { "source": "树状数组", "target": "升维", "sourceSide": "top", "targetSide": "right" },
+    { "source": "平衡树", "target": "升维", "sourceSide": "top", "targetSide": "right" },
+    { "source": "升维", "target": "树套树", "sourceSide": "left", "targetSide": "top" },
 
     { "source": "序列", "target": "根号", "sourceSide": "right", "targetSide": "left" , "label": "根号算法"},
     { "source": "根号", "target": "分块", "sourceSide": "right", "targetSide": "left" },

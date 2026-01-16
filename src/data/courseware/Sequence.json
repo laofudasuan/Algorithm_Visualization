@@ -10,7 +10,8 @@
   },
   "pages": [
     { "id": "Dilworth", "path": "Sequence/Dilworth.mdx", "x": 200, "y": 380 },
-    { "id": "差分", "path": "Sequence/Difference.mdx", "x": 400, "y": 380 }
+    { "id": "差分", "path": "Sequence/Difference.mdx", "x": 400, "y": 380 },
+    { "id": "区间覆盖", "path": "Sequence/Interval_Cover.mdx", "x": 600, "y": 380 }
   ],
   "edges": [
   ]

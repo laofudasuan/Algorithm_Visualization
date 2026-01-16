@@ -6,8 +6,6 @@ import { CollapsibleComponent } from '../../../courseware/markdownConfig';
 
 # 决策单调性
 
-## 决策单调性
-
 决策单调性，指在DP转移的过程中，最优决策点的移动是单调的
 
 1D/1D： 一般指序列分段DP
@@ -80,6 +78,40 @@ $f[i]$表示把前$i$个数合并完，最后一段最小是多少
 这样，可以对$sum[j]+f[j]$建立单调队列
 </CollapsibleComponent>
 
+##### P2254 [NOI2005] 瑰丽华尔兹
+
+<CollapsibleComponent title="做法"> 
+
+注意到求最长滑行距离等价于求最少使用魔法的次数，那么设 $f_{t,i,j}$ 表示 $t$ 时间使钢琴在 $(i,j)$ 的最少魔法使用次数。$O(nmt)$ 无法承受。
+
+注意到一段时间内移动方向相同，设 $f_{k,i,j}$ 表示在第 $k$ 段结束后使钢琴在 $(i,j)$ 的最少魔法使用次数。以向右移动为例：设持续时间为 $L = t_k - s_k + 1$，则：
+
+$$
+f_{k,i,j} = \min_{p=\max(0,j-L_{as})}^{j} f_{k-1,i,p} + L - (j - p)
+$$
+
+并满足 $(i,p),(i,p+1),\dots,(i,j)$ 之间没有障碍。使用常见的拆贡献套路，将 $L - (j - p)$ 拆成 $p$ 和 $L - j$，这样贡献就分别与 $p,j$ 有关，可以使用单调队列优化。其余方向同理，时间复杂度为 $O(nmk)$。
+
+</CollapsibleComponent>
+
+##### P3572 [POI2014]PTA-Little Bird
+
+<CollapsibleComponent title="做法"> 
+
+$$
+f_i = \min_{j=i-k}^{i-1} f_j + [d_j \leq d_i]
+$$
+
+由于 $d_j \leq d_i$ 的贡献仅有 1，因此将 $i$ 压入队列和队尾 $t$ 比较时，若 $f_i < f_t$ 或 $f_i = f_t \land d_i \geq d_t$，说明 $i$ 不劣于 $t$：当 $f_i < f_t$ 时，显然有 $f_i + [d_i \leq d_i'] \leq f_t + [d_t \leq d_i']$。时间复杂度 $O(nq)$。
+
+</CollapsibleComponent>
+
+##### 例题
+
+- P3422 [POI2005]LOT-A Journey to Mars
+- P3512 [POI2010]PIL-Pilots
+- P3487 [POI2009]ARC-Architects
+
 ##### P7962 NOIP2021 方差
 给定长度为 $n$ 的非严格递增正整数数列 $1 \le a_1 \le a_2 \le \cdots \le a_n$。每次可以进行的操作是：任意选择一个正整数 $1 < i < n$，将 $a_i$ 变为 $a_{i - 1} + a_{i + 1} - a_i$。求在若干次操作之后，该数列的方差最小值是多少。请输出最小值乘以 $n^2$ 的结果。
 
@@ -121,8 +153,7 @@ $d_4$会变成$a_4-(a_2+a_4-a_3)=a_3-a_2$
 
 那么我们通过维护凸包来求得DP值在什么时候取得最优解
 
-
-## 例题
+### 例题
 
 求解
 
@@ -187,6 +218,17 @@ $(n \le 10^5, k \le \min(n, 200))$
 
 </CollapsibleComponent>
 
+##### 例题
+
+- P2120 [ZJOI2007]仓库建设
+- P6047 丝之割
+- CF311B Cats Transport
+- P2365 任务安排
+- P5785 [SDOI2012]任务安排
+- P6302 [NOI2019] 回家路线 加强版
+
+## 决策二分栈
+
 ##### bzoj3156 防御准备
 
 - 一个长度为$n$的序列，每个位置有一个检查点
@@ -211,6 +253,13 @@ $$
 方法二：决策二分栈
 
 </CollapsibleComponent>
+
+###### 决策二分栈/队列例题
+
+- P1912 [NOI2009] 诗人小G
+- P3515 [POI2011]Lightning Conductor
+- P5504 [JSOI2011] 柠檬
+
 
 ## 分治法
 
@@ -289,7 +338,12 @@ $n \times k \le 2 \times 10^5$
 
 算上set的复杂度，在本题中运用这个算法复杂度即为$O(kn log^2 n)$
 </CollapsibleComponent>
-##### P11847 USACO25FEB True or False Test P
+
+- P11847 USACO25FEB True or False Test P
+- P4360 [CEOI2004]锯木厂选址
+- CF868F Yet Another Minimization Problem
+- P5574 [CmdOI2019]任务分配问题
+- CF1603D. Artistic Partition *3000
 
 # 2D/1D决策单调
 
@@ -331,7 +385,7 @@ $$
 
 违背四边形不等式
 
-## 石子归并
+### 石子归并
     
 在一个操场上摆放着一排$n(n \le 1000)$堆石子。现要将石子有次序地合并成一堆。
 
@@ -339,7 +393,7 @@ $$
 
 试编程求出将$n$堆石子合并成一堆的最小花费。
 
-## 石子归并（动态规划）
+#### 石子归并（动态规划）
 
 $f[l][r]$表示把$l$到$r$合成一段区间的最优费用
 
@@ -347,7 +401,7 @@ $$
 f[l][r]=\sum_{k=l}^{r}a_k+ \min_{l \le k < r} (f[l][k]+f[k+1][r])
 $$
 
-## 石子归并（四边形不等式）
+#### 石子归并（四边形不等式）
 
 令$s[i,j]$表示使得$f[i,j]$取到最小时的$k$，则
 
