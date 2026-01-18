@@ -1,0 +1,16 @@
+{
+  "title": "子串问题",
+  "description": "研究一个串的所有子串",
+  "cover": "/images/no.png",
+  "author": "老虎大蒜",
+  "createdAt": "2025-11-23",
+  "metaPositions": {
+    "title": { "x": 150, "y": 120 },
+    "description": { "x": 500, "y": 150 }
+  },
+  "pages": [
+    { "id": "子串问题", "path" : "String/Substring.mdx", "x": 100, "y": 200 }
+  ],
+  "edges": [
+  ]
+}

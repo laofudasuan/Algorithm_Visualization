@@ -38,8 +38,9 @@
     { "id": "String", "x": 200, "y": 530, "category": "组合对象" },
     { "id": "Border", "x": 50, "y": 530, "category": "组合对象" },
     { "id": "Hash", "x": 50, "y": 460, "category": "算法" },
-    { "id": "Automatic-Machine", "x": 500, "y": 600, "category": "组合对象" },
-    { "id": "Trie", "x": 300, "y": 450, "category": "组合对象" },
+    { "id": "Automatic-Machine", "x": 500, "y": 600, "category": "算法" },
+    { "id": "Trie", "x": 300, "y": 450, "category": "算法" },
+    { "id": "Substring", "x": 300, "y": 600, "category": "算法" },
 
     { "id": "Data-Structure", "x": 600, "y": 450, "category": "算法" },
     { "id": "Segment-Tree", "x": 450, "y": 400, "category": "算法" },

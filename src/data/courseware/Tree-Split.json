@@ -21,14 +21,14 @@
   ],
   "edges": [
     { "source": "树分治", "target": "点分治", "sourceSide": "right", "targetSide": "left" },
-     { "source": "点分治", "target": "有根树点分治", "sourceSide": "right", "targetSide": "left" },
+    { "source": "点分治", "target": "有根树点分治", "sourceSide": "right", "targetSide": "left" },
     { "source": "树分治", "target": "边分治", "sourceSide": "right", "targetSide": "left" },
-     { "source": "树分治", "target": "链分治", "sourceSide": "right", "targetSide": "left" },
-     { "source": "链分治", "target": "树链剖分", "sourceSide": "right", "targetSide": "left" },
-     { "source": "链分治", "target": "长链剖分", "sourceSide": "right", "targetSide": "left" },
-     { "source": "链分治", "target": "实链剖分", "sourceSide": "right", "targetSide": "left" },
-      { "source": "点分治", "target": "动态树分治", "sourceSide": "right", "targetSide": "left" },
-       { "source": "边分治", "target": "动态树分治", "sourceSide": "right", "targetSide": "left" },
-      { "source": "树链剖分", "target": "动态树分治", "sourceSide": "right", "targetSide": "left" }
+    { "source": "树分治", "target": "链分治", "sourceSide": "right", "targetSide": "left" },
+    { "source": "链分治", "target": "树链剖分", "sourceSide": "right", "targetSide": "left" },
+    { "source": "链分治", "target": "长链剖分", "sourceSide": "right", "targetSide": "left" },
+    { "source": "链分治", "target": "实链剖分", "sourceSide": "right", "targetSide": "left" },
+    { "source": "点分治", "target": "动态树分治", "sourceSide": "right", "targetSide": "left" },
+    { "source": "边分治", "target": "动态树分治", "sourceSide": "right", "targetSide": "left" },
+    { "source": "树链剖分", "target": "动态树分治", "sourceSide": "right", "targetSide": "left" }
   ]
 }
