@@ -1,0 +1,70 @@
+---
+title: 后缀自动机
+---
+
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+import GraphAlgorithmVisualization from '../../../../components/visualizations/GraphAlgorithmVisualization';
+
+## 想法来源
+
+我们想用一个结构来表示一个字符串的所有子串
+
+后缀字典树结构简单，但是时间复杂度太高，后缀树虽然降低了复杂度，但是边的压缩导致实现起来有很多细节
+
+有没有一种既好写时间复杂度还低的结构呢？当然有
+
+## 原理
+
+以字符串`aba`为例，如果构造后缀字典树，会包含6个点：
+
+<div className="flex-1">
+    <GraphAlgorithmVisualization 
+      graphName="SAM1" 
+      animationList={[]}
+      enableDrawing={false}
+    />
+</div>
+
+如果用后缀树的角度来优化，会把点3和点4合并，点5和点6合并
+
+后缀自动机的想法：
+- 点$4$和点$6$都表示不能继续往后走了，可以合并
+- 点$3$和点$5$都表示最多往后加一个字符a，可以合并
+
+合并以后的结果：
+
+<div className="flex-1">
+    <GraphAlgorithmVisualization 
+      graphName="SAM3" 
+      animationList={[]}
+      enableDrawing={false}
+    />
+</div>
+
+
+
+## 处理子串出现次数
+
+- 即right集合大小
+- 利用性质:每个非叶子节点代表的right集合是它所有儿子的并集
+- 可以把parent树建出来，也可以利用$len[fa[k]]<len[k]$，使用桶排序。
+- 上述方法只能求出right集合的大小，如何把整个集合内容求出来呢？
+- 线段树合并即可
+
+##### Rikka with String BestCoder Round #37
+
+给定一个长度为$n$的小写字母字符串$S$，你需要对每个$[1,n]$中的i求出$S[i]$修改成\#后S的本质不同的子串个数
+
+$1 \le n \le 3*10^5$
+
+<CollapsibleComponent title="做法"> 
+
+首先答案的第一部分是$i*(n-i+1)$个跨越#的子串
+
+第二部分是被#分裂成两部分的串的本质不同的子串的并集
+
+我们先建出SAM，显然right集合里只要考虑第一个和最后一个，我们用差分标记一下即可
+
+时间复杂度$O(nlogn)$
+
+</CollapsibleComponent>
