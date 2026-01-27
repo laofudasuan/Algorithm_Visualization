@@ -7,7 +7,32 @@ import GraphAlgorithmVisualization from '../../../../components/visualizations/G
 
 ## 什么是自动机？
 
-自动机是对一件事情所有可能发生的情况进行建模
+自动机是一种“小计算机”模型，它把一件事物的发展设计成一个简单的规则地图
+
+<BoxWithTag tag="自动机的概念">
+自动机可以形式化地定义为：
+- 状态（States）：系统可能处于的各种情况
+- 输入字母表（Alphabet）：允许输入的符号集合
+- 转移函数（Transition Function）：定义如何根据当前状态和输入转移到下一个状态
+- 初始状态（Start State）：系统开始时的状态
+- 接受状态（Accept States）：表示成功/终止的状态集合
+
+简单理解，状态就是一个地图的若干点，转移函数就是每个点转移的边，初始状态是起点，接受状态是终点
+</BoxWithTag>
+
+### 案例：自动售货机
+
+例如，我们生活中常常见到的自动售货机，可以用如下自动机来描述：
+
+<div className="flex-1">
+    <GraphAlgorithmVisualization 
+      graphName="AM2" 
+      animationList={[]}
+      enableDrawing={false}
+    />
+</div>
+
+### 案例：抛硬币检测机
 
 举例：我们不停地抛一枚硬币，如果连续三次抛出的结果相同就停止
 
@@ -21,6 +46,6 @@ import GraphAlgorithmVisualization from '../../../../components/visualizations/G
     />
 </div>
 
-## 定义
+## 参考资料
 
-<a href="https://oi-wiki.org/misc/fsm/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline inline-flex items-center gap-1">🔗 OI-Wiki关于后缀自动机的定义</a>
+<a href="https://oi-wiki.org/misc/fsm/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline inline-flex items-center gap-1">🔗 OI-Wiki关于自动机的定义</a>

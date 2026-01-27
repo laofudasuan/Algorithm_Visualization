@@ -1,0 +1,35 @@
+{
+  "width": 1000,
+  "height": 500,
+  "nodes": [
+    { "id": "Idle", "label": "待机\n(Idle)", "x": 100, "y": 200, "style": { "type": "planet1" } },
+    { "id": "CoinInserted", "label": "已投币\n(Coin)", "x": 300, "y": 200, "style": { "type": "planet1" } },
+    { "id": "Selecting", "label": "选购中\n(Select)", "x": 700, "y": 150, "style": { "type": "planet1" } },
+    { "id": "Dispensing", "label": "出货中\n(Dispense)", "x": 650, "y": 400, "style": { "type": "planet1" } },
+    { "id": "Refunding", "label": "退款中\n(Refund)", "x": 300, "y": 400, "style": { "type": "planet1" } },
+    { "id": "Success", "label": "交易成功\n(Success)", "x": 900, "y": 200, "style": { "type": "planet1" } }
+  ],
+  "edges": [
+    { "id": "e1", "source": "Idle", "target": "CoinInserted", "label": "投币", "style": { "directional": true } },
+    { "id": "e2", "source": "CoinInserted", "target": "Selecting", "label": "选商品", "style": { "directional": true } },
+    { "id": "e3", "source": "CoinInserted", "target": "Refunding", "label": "取消", "style": { "directional": true} },
+    { "id": "e4", "source": "Selecting", "target": "Dispensing", "label": "确认购买", "style": { "directional": true } },
+    { "id": "e5", "source": "Selecting", "target": "CoinInserted", "label": "返回", "style": { "directional": true, "curvature": -0.3 } },
+    { "id": "e6", "source": "Dispensing", "target": "Success", "label": "出货完成", "style": { "directional": true } },
+    { "id": "e7", "source": "Dispensing", "target": "Refunding", "label": "缺货/故障", "style": { "directional": true, "curvature": 0.2 } },
+    { "id": "e8", "source": "Refunding", "target": "Idle", "label": "退款完成", "style": { "directional": true } },
+    { "id": "e9", "source": "Success", "target": "Idle", "label": "复位", "style": { "directional": true, "curvature": 0.3 } }
+  ],
+  "nodesStyle": {
+    "size": 100,
+    "type": "planet1",
+    "stroke": "#2c3e50",
+    "lineWidth": 3,
+    "labelFill": "#2c3e50",
+    "labelFontSize": 14
+  },
+  "edgesStyle": {
+    "stroke": "#ffffff",
+    "lineWidth": 15
+  }
+}
