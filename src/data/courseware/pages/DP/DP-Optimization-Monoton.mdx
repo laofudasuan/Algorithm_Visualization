@@ -273,6 +273,12 @@ $$
 
 缺点：无法在线解决问题
 
+###### 特大喜讯
+
+分治无法解决在线问题的Bug已经被修复：
+
+<a href="https://www.luogu.com/article/vqf42hah" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline inline-flex items-center gap-1">🔗 最新链接</a>
+
 ##### CF833B The Bakery
 将一个长度为$n$的序列分成$k$段，使得总价值最大
 
@@ -471,7 +477,7 @@ $$
 
 只有当$g[g[i][k-1]][k-1] \neq g[i][k-1]$时，操作才有意义
 
-动态维护处所哟偶满足$g[g[i][k-1]][k-1] \neq g[i][k-1]$的$g[i][k-1]$
+动态维护处所有满足$g[g[i][k-1]][k-1] \neq g[i][k-1]$的$g[i][k-1]$
 
 维护一个数据结构，支持区间赋值，并查询某个值出现的区间，线段树上二分即可
 
