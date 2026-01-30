@@ -1,6 +1,6 @@
 import React, { useState, useEffect, Suspense, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { headingComponents, tableComponents, listComponents, boxWithTagComponent, CodeBlock } from '../data/courseware/markdownConfig.jsx';
+import { headingComponents, tableComponents, listComponents, imageComponents, boxWithTagComponent, CodeBlock } from '../data/courseware/markdownConfig.jsx';
 import 'katex/dist/katex.min.css';
 
 const LogList = () => {
@@ -194,6 +194,7 @@ const LogList = () => {
                         ...headingComponents,
                         ...tableComponents,
                         ...listComponents,
+                        ...imageComponents,
                         BoxWithTag: boxWithTagComponent,
                         pre: CodeBlock
                       }

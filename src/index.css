@@ -79,6 +79,14 @@
     opacity: 0;
     transition: transform 0.3s ease, opacity 0.3s ease;
   }
+
+  .mdx-col-divider {
+    width: 1px;
+    margin: 0 16px;
+    align-self: stretch;
+    flex-shrink: 0;
+    background-color: rgb(209 213 219);
+  }
 }
 
 /* 3D变换相关样式 */

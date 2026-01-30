@@ -65,6 +65,43 @@ export const listComponents = {
     );
   }
 };
+
+export const imageComponents = {
+  img: (props) => {
+    const { title, alt, style, ...rest } = props;
+    const parseSize = (raw) => {
+      if (!raw) return null;
+      const trimmed = String(raw).trim();
+      const m =
+        trimmed.match(/(?:^|\s)(?:w|width)\s*=\s*([0-9.]+)(px|%|rem|vw|vh)?(?:\s|$)/i) ||
+        trimmed.match(/^(?:w|width)\s*:\s*([0-9.]+)(px|%|rem|vw|vh)?$/i) ||
+        trimmed.match(/^([0-9.]+)(px|%|rem|vw|vh)$/i) ||
+        trimmed.match(/^([0-9.]+)$/);
+      if (!m) return null;
+      const value = m[1];
+      const unit = m[2] || (trimmed.includes('%') ? '%' : 'px');
+      return `${value}${unit}`;
+    };
+
+    const width = parseSize(title);
+
+    return (
+      <img
+        {...rest}
+        alt={alt || ''}
+        loading="lazy"
+        style={{
+          display: 'block',
+          margin: '16px auto',
+          maxWidth: '100%',
+          height: 'auto',
+          width: width || undefined,
+          ...style,
+        }}
+      />
+    );
+  },
+};
 export const headingConfig = {
   h1: {
     className: 'text-4xl font-bold text-primary text-center my-6 border-t-2 border-b-2 border-primary pt-4 pb-4',
