@@ -5,6 +5,23 @@ title: 动态树分治
 import TreeAlgorithmVisualization from '../../../../components/visualizations/TreeAlgorithmVisualization';
 import { CollapsibleComponent } from '../../../courseware/markdownConfig';
 
+
+##### P6626 省选联考 2020 B 卷 消息传递
+
+给出一棵边权为$1$的树，多次查询距离$x \le y$的点数
+
+$n,m \le 1e5$
+
+<CollapsibleComponent title="解法">
+考虑查询的$x$，在当前分治子树$a$中，$x$到分治中心距离是$z$
+
+然后其他分治子树中距离$x \le y$的点，满足距离分治中心$ \le y-z$
+
+对每个点挂询问，然后点分治到每个点的时候处理一下这个点上所有询问，并把该递归下去的东西递归下去挂询问
+
+每层预处理前缀和可以$O(1)$查询，时间复杂度$O( (n+m)\log n )$
+</CollapsibleComponent>
+
 ##### P2056 捉迷藏
 一棵树，黑白两种颜色
 

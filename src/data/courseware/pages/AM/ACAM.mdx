@@ -1,0 +1,70 @@
+---
+title: 自动机与DP
+---
+
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+
+# AC自动机
+
+## 结构
+
+两棵树，一棵表示前缀关系，一棵表示后缀关系
+
+##### CF1110H Modest Substrings
+    
+给定 $l, r, n$，定义一个数的权值为数对 $(i, j) (i < j)$ 的数量，满足 $i$ 到 $j$ 位的数拿出来得到的数的值在 $[l, r]$ 内。
+
+试求一个 $n$ 位大数（包含前导0的子串不计入答案），使得其权值最大。
+
+##### CF1038F Wrap Around
+
+##### P8011 「Wdsr-3」蓬莱药局（gene）
+
+##### loj2505 Fim4
+
+给定$n$个字符串$s_{1 \ldots n}$一个值域为$[1,n]$的整数序列$a_{1 \ldots m}$，以此来构造字符串$S=s_{a_1}+s_{a_2}+s_{a_3}+\cdots+s_{a_m}$
+
+接下来有$q$个询问，每个询问给出一个字符串$T$，求$T$在$S$的出现次数
+
+$n,m,q \le 5 \times 10^4,\sum |s_i|,\sum_{|T|} \le 10^5$
+
+<CollapsibleComponent title="做法">
+首先对询问串建立AC自动机，接下来需要求出将$S$在AC自动机上匹配的过程中每个点的经过次数
+
+将$s_i$按照长度根号分治，如果$|s_i| \le \sqrt{|S|}$可以暴力匹配，接下来考虑$|s_i|>\sqrt{|S|}$怎么做
+
+为了方便，我们把$s_{1 \dots n}$也放到AC自动机当中
+
+假设当前在AC自动机的点$u$，接下来要匹配一段$s_i$，匹配完$s_i$之后在AC自动机中对应的串是$u+s_i$的最长后缀，即$u$在Fail树中最深的，能往后$+s_i$的祖先
+
+这样我们可以先预处理出AC自动机上哪些点能直接$+s_i$，然后如果不能加$s_i$的，就选fail能跳到的点。
+
+
+<div className="my-8 flex justify-center">
+  <div className="w-1/2 pr-4">
+    - 刚刚我们已经能求出在AC自动机上每个点后加上$s_i$会跳到哪个点，但为了求答案，还需要解决形如这样的问题：
+    - 在AC自动机上，从某个点$u$后面加上字符串$s_i$，把一路经过的所有点次数$+1$
+    - 假设从$u$开始匹配$s_i$，第一次跳fail是发生在点$v$，也就是说子树$u$和$s_i$的最长公共前缀长度为$l=dep[v]-dep[u]$
+    - 那么接下来我们还需要从$fail[v]$出发匹配$s_i[l+1 \cdots |s_i|]$
+    - 而我们可以求出$fail[v]$往上的$l$级祖先$x$，那么接下来的路程，相当于从$x$开始匹配$s_i$
+    - 这样，我们可以考虑把问题转化为从$x$开始匹配$s_i$，然后给链$x \sim fail[v]$整体$--$，给链$u \sim v$整体$++$
+    </div>
+  <div
+    aria-hidden="true"
+    style={{
+      width: 1,
+      margin: '0 16px',
+      alignSelf: 'stretch',
+      backgroundColor: 'currentColor',
+      opacity: 0.25,
+    }}
+  />
+  <div className="w-1/2 pl-4">
+    ![](/String/G3.png "w=80%")
+  </div>
+</div>
+
+最后还有一个小问题：怎么求每棵子树和$s_i$的最长公共前缀
+
+这个可以用扩展KMP，求出每个询问串的每个后缀和$s_i$的最长公共前缀
+</CollapsibleComponent>

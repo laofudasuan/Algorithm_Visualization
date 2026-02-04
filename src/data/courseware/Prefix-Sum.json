@@ -1,0 +1,22 @@
+{
+  "title": "前缀和与差分",
+  "description": "前缀和与差分技巧",
+  "cover": "/images/no.png",
+  "author": "老虎大蒜",
+  "createdAt": "2025-11-23",
+  "metaPositions": {
+    "title": { "x": 150, "y": 120 },
+    "description": { "x": 500, "y": 150 }
+  },
+  "pages": [
+    { "id": "序列", "path" : "Space/Prefix-Sum-Sequence.mdx", "x": 400, "y": 250 },
+    { "id": "树上", "path": "Space/Prefix-Sum-Tree.mdx", "x": 200, "y": 280 },
+    { "id": "高维空间", "path": "Space/Prefix-Sum-High-Dimensional.mdx", "x": 600, "y": 280 }
+  ],
+  "edges": [
+    { "source": "状压DP", "target": "连通性状压", "sourceSide": "right", "targetSide": "left" },
+    { "source": "连通性状压", "target": "插头DP", "sourceSide": "bottom", "targetSide": "top" },
+    { "source": "状压DP", "target": "数论状压", "sourceSide": "left", "targetSide": "right" },
+    { "source": "状压DP", "target": "DP套DP", "sourceSide": "bottom", "targetSide": "top" }
+  ]
+}

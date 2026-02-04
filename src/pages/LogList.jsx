@@ -27,7 +27,8 @@ const LogList = () => {
             id: filename,
             path: path,
             component: mod.default,
-            ...meta
+            ...meta,
+            pinned: meta.pinned === true || meta.pinned === 'true' || meta.pinned === 1 || meta.pinned === '1'
           });
         }
 
@@ -43,8 +44,9 @@ const LogList = () => {
         });
         setAllTags(Array.from(tags));
 
-        // Sort by date and time descending
+        // Sort pinned first, then by date and time descending
         visibleLogs.sort((a, b) => {
+          if (!!a.pinned !== !!b.pinned) return a.pinned ? -1 : 1;
           const dateA = new Date(`${a.date} ${a.time || '00:00'}`);
           const dateB = new Date(`${b.date} ${b.time || '00:00'}`);
           return dateB - dateA;
@@ -115,9 +117,14 @@ const LogList = () => {
               key={log.id}
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.99 }}
-              className="bg-white rounded-lg shadow-md p-6 cursor-pointer hover:shadow-lg transition-all border border-gray-100"
+              className="relative bg-white rounded-lg shadow-md p-6 cursor-pointer hover:shadow-lg transition-all border border-gray-100"
               onClick={() => openLog(log)}
             >
+              {log.pinned && (
+                <div className="absolute top-0 left-0 px-2 py-0.5 text-xs font-semibold rounded bg-amber-100 text-amber-800 border border-amber-200">
+                  置顶
+                </div>
+              )}
               <div className="flex justify-between items-start">
                 <div>
                   <h2 className="text-xl font-semibold text-gray-800 mb-2">{log.title || '无标题'}</h2>

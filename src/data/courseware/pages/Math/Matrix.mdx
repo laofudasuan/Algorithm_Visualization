@@ -96,19 +96,6 @@ $$
 复杂度为 $ O((5n)^3 \log N) $。
 
 </CollapsibleComponent>
- 
-##### P3193 HNOI2008 GT考试
-
-阿申准备报名参加GT考试，准考证号为$n$位数$X_1X_2 \ldots X_n(0 \le X_i \le 9)$,他不希望准考证号上出现不吉利的数字。
-他的不吉利数字$A_1A_2 \ldots A_m(0 \le Ai \le 9)$有M位，不出现是指$X_1X_2 \ldots X_n$中没有恰好一段等于$A_1A_2 \ldots Am$。
-
-<CollapsibleComponent title="做法"> 
-设状态$f[i][j]$表示考虑了前$i$位，当前匹配的长度为$j$的方案数
-
-转移：枚举第$i+1$位是什么，然后用KMP求出新的匹配长度
-
-注意到这个DP中$j$这一维很小，所以可以把这一维写成矩阵的形式
-</CollapsibleComponent>
 
 ##### P3216 HNOI2011 数学作业
 

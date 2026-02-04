@@ -7,10 +7,13 @@ import { CollapsibleComponent } from '../../../courseware/markdownConfig';
 
 # 点分治
 
+## 思路
+
+要求出树上的某种信息（路径、联通块），每次选出一个关键点，统计经过关键点的信息，然后删除这个点递归处理
+
 ## 树的点分治
 
 每次根据重心把树切开
-    
 我们每次递归下去的连通子图大小至少减半，所以递归树的深度O$( \log n )$，所以点分治复杂度$O( n\log n )$
 
 # 例题
@@ -29,22 +32,6 @@ import { CollapsibleComponent } from '../../../courseware/markdownConfig';
 如果插入$x$时，数组中有$k-x$，则有一条链长为$k$，否则没有
 
 总时间复杂度$O( nm\log n )$
-</CollapsibleComponent>
-
-##### P6626 省选联考 2020 B 卷 消息传递
-
-给出一棵边权为$1$的树，多次查询距离$x \le y$的点数
-
-$n,m \le 1e5$
-
-<CollapsibleComponent title="解法">
-考虑查询的$x$，在当前分治子树$a$中，$x$到分治中心距离是$z$
-
-然后其他分治子树中距离$x \le y$的点，满足距离分治中心$ \le y-z$
-
-对每个点挂询问，然后点分治到每个点的时候处理一下这个点上所有询问，并把该递归下去的东西递归下去挂询问
-
-每层预处理前缀和可以$O(1)$查询，时间复杂度$O( (n+m)\log n )$
 </CollapsibleComponent>
 
 ##### P4149 IOI2011Race
