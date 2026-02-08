@@ -1,22 +1,38 @@
 {
   "width": 800,
-  "height": 400,
+  "height": 600,
   "nodes": [
     { "id": "1", "label": "1", "style": { "type": "planet1" } },
-    { "id": "2", "label": "2", "style": { "type": "planet2" } },
-    { "id": "3", "label": "3", "style": { "type": "planet3" } },
-    { "id": "4", "label": "4", "style": { "type": "planet4" } },
+    { "id": "2", "label": "2", "style": { "type": "planet1" } },
+    { "id": "3", "label": "3", "style": { "type": "planet1" } },
+    { "id": "4", "label": "4", "style": { "type": "planet1" } },
     { "id": "5", "label": "5", "style": { "type": "planet1" } },
     { "id": "6", "label": "6", "style": { "type": "planet1" } },
-    { "id": "7", "label": "7", "style": { "type": "planet1" } }
+    { "id": "7", "label": "7", "style": { "type": "planet1" } },
+    { "id": "8", "label": "8", "style": { "type": "planet1" } },
+    { "id": "9", "label": "9", "style": { "type": "planet1" } },
+    { "id": "10", "label": "10", "style": { "type": "planet1" } },
+    { "id": "11", "label": "11", "style": { "type": "planet1" } },
+    { "id": "12", "label": "12", "style": { "type": "planet1" } },
+    { "id": "13", "label": "13", "style": { "type": "planet1" } },
+    { "id": "14", "label": "14", "style": { "type": "planet1" } },
+    { "id": "15", "label": "15", "style": { "type": "planet1" } }
   ],
   "edges": [
     { "id": "e1", "label": "", "source": "1", "target": "2", "style": {} },
-    { "id": "e2", "label": "", "source": "1", "target": "3", "style": {} },
-    { "id": "e3", "label": "", "source": "2", "target": "4", "style": {} },
-    { "id": "e4", "label": "", "source": "2", "target": "5", "style": {} },
-    { "id": "e5", "label": "", "source": "3", "target": "6", "style": {} },
-    { "id": "e6", "label": "", "source": "3", "target": "7", "style": {} }
+    { "id": "e2", "label": "", "source": "2", "target": "3", "style": {} },
+    { "id": "e3", "label": "", "source": "3", "target": "4", "style": {} },
+    { "id": "e4", "label": "", "source": "4", "target": "5", "style": {} },
+    { "id": "e5", "label": "", "source": "1", "target": "6", "style": {} },
+    { "id": "e6", "label": "", "source": "6", "target": "7", "style": {} },
+    { "id": "e7", "label": "", "source": "7", "target": "8", "style": {} },
+    { "id": "e8", "label": "", "source": "8", "target": "9", "style": {} },
+    { "id": "e9", "label": "", "source": "6", "target": "10", "style": {} },
+    { "id": "e10", "label": "", "source": "10", "target": "11", "style": {} },
+    { "id": "e11", "label": "", "source": "11", "target": "12", "style": {} },
+    { "id": "e12", "label": "", "source": "10", "target": "13", "style": {} },
+    { "id": "e13", "label": "", "source": "13", "target": "14", "style": {} },
+    { "id": "e14", "label": "", "source": "13", "target": "15", "style": {} }
   ],
   "rootNode": "1",
   "nodesStyle": {

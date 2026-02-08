@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import 'katex/dist/katex.min.css';
-import { headingComponents, tableComponents, listComponents, imageComponents, boxWithTagComponent, CodeBlock } from '../data/courseware/markdownConfig';
+import { headingComponents, tableComponents, listComponents, boxWithTagComponent, CodeBlock } from '../data/courseware/markdownConfig.jsx';
 import ReactFlow, { Background, ReactFlowProvider, useNodesState, useEdgesState, MarkerType } from 'reactflow';
 import 'reactflow/dist/style.css';
 import '../styles/reactflow-overrides.css';
@@ -780,7 +780,6 @@ const CoursewareDetail = () => {
                                 ...headingComponents, 
                                 ...tableComponents, 
                                 ...listComponents, 
-                                ...imageComponents,
                                 BoxWithTag: boxWithTagComponent,
                                 pre: CodeBlock 
                               } 
@@ -807,7 +806,6 @@ const CoursewareDetail = () => {
                                   ...headingComponents, 
                                   ...tableComponents, 
                                   ...listComponents, 
-                                  ...imageComponents,
                                   BoxWithTag: boxWithTagComponent,
                                   pre: CodeBlock 
                                 } 

@@ -11,7 +11,7 @@ import { CollapsibleComponent } from '../../../courseware/markdownConfig';
 
 与树链剖分不同，长链剖分并不能保证任意一条路径经过的链数量是O(logn)级别的，比如我们可以很容易把它卡到根号。
 
-![](/Tree/chain.png)
+<TreeAlgorithmVisualization treeName="Long-Chain"/>
 
 长链剖分有什么作用呢？如果需要维护一些以深度为关键字的信息，那么我们可以把短链给合并到长链上。
 
@@ -35,6 +35,8 @@ $n \le 10^5$
 
 用长链剖分可以很方便地实现这个过程，构一个dfs序，每条长链是连续一段，然后每次把短链合并到长链上来。
 </CollapsibleComponent>
+
+##### P7782 「MCOI-Zero / AC6-M03」 Sipli Field
 
 ##### $O(nlogn)-O(1)$求第k大祖先
 

@@ -9,11 +9,11 @@
     "description": { "x": 500, "y": 150 }
   },
   "pages": [
-    { "id": "线段树基础", "x": 300, "y": 280 },
-    { "id": "猫树", "x": 300, "y": 200 },
-    { "id": "线段树分治", "x": 300, "y": 380 },
-    { "id": "兔队线段树", "x": 450, "y": 380 },
-    { "id": "KTT", "x": 450, "y": 280 }
+    { "id": "线段树基础", "path" : "DS/Segment-Tree.mdx", "x": 300, "y": 280 },
+    { "id": "猫树", "path" : "DS/Cat-Tree.mdx", "x": 300, "y": 200 },
+    { "id": "线段树分治", "path" : "DS/Segment-Tree-Divide.mdx", "x": 300, "y": 380 },
+    { "id": "兔队线段树", "path" : "DS/Rabbit-Queue-Segment-Tree.mdx", "x": 450, "y": 380 },
+    { "id": "KTT", "path" : "DS/KTT.mdx", "x": 450, "y": 280 }
   ],
   "edges": [
   ]
