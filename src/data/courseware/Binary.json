@@ -1,0 +1,16 @@
+{
+  "title": "二进制",
+  "description": "二进制",
+  "cover": "/images/no.png",
+  "author": "老虎大蒜",
+  "createdAt": "2025-11-23",
+  "metaPositions": {
+    "title": { "x": 150, "y": 120 },
+    "description": { "x": 500, "y": 150 }
+  },
+  "pages": [
+    { "id": "二进制", "path" : "Logic/Binary.mdx", "x": 400, "y": 250 }
+  ],
+  "edges": [
+  ]
+}
