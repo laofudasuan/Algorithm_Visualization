@@ -44,6 +44,7 @@
 
     { "id": "Data-Structure", "x": 600, "y": 450, "category": "算法" },
     { "id": "Segment-Tree", "x": 450, "y": 400, "category": "算法" },
+    { "id": "Balance-Tree", "x": 600, "y": 600, "category": "算法" },
     { "id": "Graph-Opt", "x": 450, "y": 320, "category": "算法" },
 
     { "id": "Dynamic-Programming", "x": 800, "y": 500, "category": "算法" },
@@ -133,6 +134,7 @@
     { "source": "Combinatorics", "target": "Generating-Function", "sourceSide": "bottom", "targetSide": "top" },
 
     { "source": "Data-Structure", "target": "Segment-Tree", "sourceSide": "left", "targetSide": "right" },
+    { "source": "Data-Structure", "target": "Balance-Tree", "sourceSide": "bottom", "targetSide": "top" },
     { "source": "Segment-Tree", "target": "Graph-Opt", "sourceSide": "top", "targetSide": "bottom", "label": "线段树优化图论" },
 
     { "source": "String", "target": "Hash", "sourceSide": "top", "targetSide": "right" },

@@ -1,0 +1,40 @@
+---
+title: Treap
+---
+
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+
+# Treap
+
+
+Treap:给每个点赋一个随机键值Key
+
+规定任意一个节点的键值必须大于等于它的两个孩子
+
+从键值上来看，它是一个大根堆的结构
+
+在随机key下，Treap的树高期望是$O(\log n)$
+
+Treap有两种实现方式：旋转和非旋转
+
+## Treap旋转版本
+
+每次的插入和二叉搜索树是一样的，插到一个叶子节点的位置
+	
+然后自底向上只要发现了某一个元素不满足堆性就立即执行旋转操作。
+
+![width=10cm](/Ds/G3.png)
+
+## Treap非旋转版本
+
+实现两个函数：merge和split
+
+merge函数把两棵不相交的Treap合并，split把一棵Treap分裂成两棵不相交的Treap
+
+merge(x,y):检查x和y的键值大小，如果x的键值较大就把y插入到x的右子树的位置，如果y的键值较大就把x插入到y的左子树的位置，然后一直递归下去直到空节点。
+
+split:看是从左子树中分裂还是从右子树中分裂。如果是从左子树分裂，则先递归分裂左子树，再把左子树分裂的第二部分接到当前根上
+
+### 非旋转Treap有交合并
+
+<a href="https://www.cnblogs.com/aquizahv/p/18823256" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline inline-flex items-center gap-1">🔗 平衡树有交合并</a>

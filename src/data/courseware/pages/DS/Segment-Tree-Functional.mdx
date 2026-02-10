@@ -1,0 +1,108 @@
+---
+title: 函数式线段树
+---
+
+import TreeAlgorithmVisualization from '../../../../components/visualizations/TreeAlgorithmVisualization';
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+
+# 函数式线段树
+
+如果线段树维护的序列过长，无法直接维护
+
+但是，一次区间操作只会涉及到$O(\log n)$个节点
+
+动态开点：只开使用过的点
+
+
+
+## 可持久化线段树
+
+可以支持查询历史版本、修改历史版本的线段树。
+
+线段树每次操作的节点数是$O(logn)$级别的，每次把这些节点新建，其它结点保持不变
+
+##### CF543E Listening to music
+给你一个长度为n的序列$a_{1 \cdots n}$和一个**常数**m。
+
+定义$F(l,x)$为区间$[l,l+m)$中$<x$的数的个数
+
+有$m$组询问，每组询问给定$l,r,x$，询问$\min_{i=l}^{r}f(i,x)$
+
+**强制在线**
+    
+<CollapsibleComponent title="基础做法">
+对每个$i \in [1,n]$预处理把从小到大的$1 \cdots i$号元素加入数组中的线段树，其中线段树维护区间最大值，每次进行可持久化区间修改。
+    
+询问只需要在对应的线段树上查询即可。
+
+然而，空间限制64MB，最多只能使用$1.6*10^6$个结点。
+</CollapsibleComponent>
+    
+<CollapsibleComponent title="卡空间">
+    
+线段树要开四个数组$lson,rson,mx,tag$，且区间修改常数为4。
+
+###### 优化一：深入发掘线段树的性质
+    
+为了优化常数，我们进行标记永久化
+
+我们发现标记永久化之后，求一个结点的mx的式子变成了这样$mx(i)=\max( mx(lson(i)),mx(rson(i)) )+tag[i]$
+
+发现了什么?只要有了每个结点的mx就无需tag变量了！
+    
+###### 优化二：C++的结构体还有这种操作？
+    
+```
+struct Node { ULL mx:18,ls:23,rs:23; }
+```
+    
+这样可以把三个32位数用一个64位数代替。
+    
+然后就奇迹般地跑过去了！
+</CollapsibleComponent>
+
+## 主席树
+主席树的作用是维护若干个集合，其中每一个集合都是由另一个集合加上均摊$O(1)$个元素得到的。
+
+利用可持久化线段树，加入$O(1)$个元素只会修改线段树上$O(logn)$个结点。
+
+##### CF757G Can Bash Save the Day?
+
+给定一个$1 \ldots n$排列a和一棵n个节点的树，要求支持两种操作：
+
+- 询问$a[l] \ldots a[r]$到点$v$的距离和
+- 交换$a[x]$和$a[x+1]$
+- 强制在线
+
+$n,q \le 200000,5s,768M$
+
+<CollapsibleComponent title="做法">
+
+标算是动态点分，但是这里介绍另一种做法。
+
+求一个集合到某个点的距离和，套用经典模型，求两两lca深度和。使用链剖+线段树。询问$a[l]$到$a[r]$可以转化为两个前缀$1$到$a[l-1]$和$1$到$a[r]$。
+
+因为强制在线，所以可以用主席树，把每一个前缀的链剖+线段树给维护起来。
+
+交换操作如何处理？注意到交换$a[x]$和$a[x+1]$后，只有第$a[x]$棵主席树发生了变化，我们重新构建一次即可。
+</CollapsibleComponent>
+
+##### qoj6608 Descent of Dragons
+    
+给一个长度为$n$的序列$a[1 \ldots n]$，初始全为$0$
+
+接下来有$m$次操作：
+
+$1,l,r,x$，表示把$a[l \ldots r]$中所有为$x$的数变为$x+1$
+
+$2,l,r$，求$a[l \ldots r]$的最大值
+
+$n,m \le 5 \times 10^5$
+
+<CollapsibleComponent title="做法">
+维护$n$棵线段树，第$i$棵线段树表示所有$\ge i$的数的位置的线段树
+
+对于操作$1$，就相当于是把第$x$棵线段树的区间$[l,r]$复制到第$x+1$棵线段树的区间$[l,r]$
+
+询问可以二分答案，然后在线段树上查询
+</CollapsibleComponent>

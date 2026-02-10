@@ -1,0 +1,15 @@
+---
+title: Splay
+---
+
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+
+# Splay
+
+Splay:利用加强的旋转操作保证复杂度的平衡树
+
+把点$k$进行旋根操作有三种情况：(如果$k$为根则直接返回)
+
+- 点$k$的父亲为根，那么把它进行一次单旋
+- 令点$k$父亲为$p$，$k,p$,$fa[p]$位于同一个方向(即$p$为$fa[p]$的左孩子且$k$为$p$的左孩子或$p$为$fa[p]$的右孩子且$k$为$p$的右孩子)。此时先对$p$做一次单旋，再对$k$做一次单旋
+- $K,p,fa[p]$不在同一个方向，直接对$k$做两次单旋

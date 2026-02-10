@@ -1,0 +1,19 @@
+{
+  "title": "平衡树",
+  "description": "平衡树",
+  "cover": "/images/no.png",
+  "author": "老虎大蒜",
+  "createdAt": "2025-11-23",
+  "metaPositions": {
+    "title": { "x": 150, "y": 120 },
+    "description": { "x": 500, "y": 150 }
+  },
+  "pages": [
+    { "id": "二叉搜索树", "path" : "DS/Binary-Search-Tree.mdx", "x": 300, "y": 280 },
+    { "id": "Treap", "path" : "DS/Treap.mdx", "x": 300, "y": 200 },
+    { "id": "Splay", "path" : "DS/Splay.mdx", "x": 300, "y": 380 },
+    { "id": "平衡树问题", "path" : "DS/Balance-Tree-Problem.mdx", "x": 500, "y": 280 }
+  ],
+  "edges": [
+  ]
+}

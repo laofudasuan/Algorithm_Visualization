@@ -41,8 +41,6 @@ import GraphAlgorithmVisualization from '../../../../components/visualizations/G
     />
 </div>
 
-
-
 ## 处理子串出现次数
 
 - 即right集合大小
@@ -50,6 +48,18 @@ import GraphAlgorithmVisualization from '../../../../components/visualizations/G
 - 可以把parent树建出来，也可以利用$len[fa[k]]<len[k]$，使用桶排序。
 - 上述方法只能求出right集合的大小，如何把整个集合内容求出来呢？
 - 线段树合并即可
+
+##### CF1016B Segment Occurrences
+
+##### CF1016B Segment Occurrences
+
+给定两个仅由小写拉丁字母组成的字符串 $s$ 和 $t$。
+
+子串 $s[l..r]$ 表示取出 $s$ 的第 $l$ 个字符到第 $r$ 个字符，且保持原有顺序。
+
+字符串 $a$ 在字符串 $b$ 中的每一次出现，定义为一个位置 $i$（$1 \le i \le |b| - |a| + 1$），使得 $b[i..i + |a| - 1] = a$（其中 $|a|$ 表示字符串 $a$ 的长度）。
+
+你将会得到 $q$ 个询问：对于第 $i$ 个询问，需要你计算字符串 $t$ 在子串 $s[l_i..r_i]$ 中出现的次数。
 
 ##### Rikka with String BestCoder Round #37
 
@@ -68,3 +78,4 @@ $1 \le n \le 3*10^5$
 时间复杂度$O(nlogn)$
 
 </CollapsibleComponent>
+

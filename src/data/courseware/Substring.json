@@ -12,6 +12,7 @@
     { "id": "子串问题", "path" : "String/Substring.mdx", "x": 100, "y": 300 },
     { "id": "后缀数组", "path" : "String/SA.mdx", "x": 300, "y": 200 },
     { "id": "后缀自动机", "path" : "String/SAM.mdx", "x": 300, "y": 400 },
+    { "id": "压缩后缀自动机", "path" : "String/SAM-Compression.mdx", "x": 300, "y": 500 },
     { "id": "后缀数据结构问题", "path" : "String/Suffix-Problem.mdx", "x": 300, "y": 300 }
   ],
   "edges": [

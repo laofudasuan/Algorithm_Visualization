@@ -89,7 +89,7 @@ $n \le 2000$
 
 </CollapsibleComponent>
 
-##### IOI2016 Aliens
+##### P5896 [IOI 2016] aliens
     
 有一个$m \times m$的正方形网络，其中有$n$个关键点，你可以花不超过$k$个小正方形去覆盖这$n$个点，要求这些小正方形的主对角线必须落在大正方形的主对角线上，并且面积并最小
 
@@ -121,7 +121,16 @@ $1 \leq k \leq n \leq 250000, \quad 1 \leq A_i \leq 10^9, \quad 1 \leq s \leq 10
 
 </CollapsibleComponent>
 
-##### ARC168E Subsegments with Large Sums
+##### AT_arc168_e [ARC168E] Subsegments with Large Sums
+
+给定一个长度为 $N$ 的正整数序列 $A=(A_1,A_2,\cdots,A_N)$。
+
+现在要将该数列分割成 $K$ 个非空的连续子序列。在这 $K$ 个连续子序列中，总和大于等于 $S$ 的子序列的个数被称为**得分**。请你求出得分的最大值。
+
+$1 \le K \le N \le 250000$
+
+<CollapsibleComponent title="做法">
+
 注意到答案关于$k$不是凸函数，因此不能直接wqs二分
 
 正确做法是，先二分答案mid，问题变成判断能否划分为$k$个区间使得至少有$mid$个区间和$\ge s$
@@ -132,3 +141,4 @@ $1 \leq k \leq n \leq 250000, \quad 1 \leq A_i \leq 10^9, \quad 1 \leq s \leq 10
 
 二分斜率$p$之后变成了，选一个区间的代价是区间长度$-p$，此时DP转移即可，复杂度$O(n\log^2 n)$
 
+</CollapsibleComponent>
