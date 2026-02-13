@@ -17,7 +17,8 @@
     { "id": "KMP自动机", "path" : "AM/KMPAM.mdx", "x": 300, "y": 350 },
     { "id": "后缀自动机", "path": "String/SAM.mdx", "x": 300, "y": 520 },
     { "id": "自动机与DP", "path": "AM/AM-DP.mdx", "x": 600, "y": 380 },
-    { "id": "AC自动机", "path": "AM/ACAM.mdx", "x": 600, "y": 300 }
+    { "id": "AC自动机", "path": "AM/ACAM.mdx", "x": 600, "y": 300 },
+    { "id": "回文自动机", "path": "AM/PAM.mdx", "x": 500, "y": 300 }
   ],
   "edges": [
   ]
