@@ -14,7 +14,8 @@
     { "id": "斯特林数", "path": "Math/Stirling.mdx", "x": 600, "y": 380 },
     { "id": "计数", "link" : "Counting", "x": 600, "y": 200 },
     { "id": "生成函数", "link" : "Generating-Function", "x": 150, "y": 280 },
-    { "id": "Q-Binomial", "x": 650, "y": 280 }
+    { "id": "Q-Binomial", "x": 650, "y": 280 },
+    { "id": "欧拉数", "x": 650, "y": 330 }
   ],
   "edges": [
     { "source": "组合数学基础", "target": "取模计算", "sourceSide": "bottom", "targetSide": "top" },

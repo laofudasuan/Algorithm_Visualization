@@ -1,0 +1,129 @@
+---
+title: 单纯型算法
+---
+
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+
+# 单纯型算法
+
+## 几何表示
+
+一个不等式 $a_ix \le b$ 可以看成空间中的一个半平面
+
+线性规划的解空间是所有不等式的解空间的交集
+
+解空间是一个凸多边形的结构
+
+![](/images/cov.png)
+
+单纯型算法首先会随机一个可行解，然后沿着凸多边形一路走到最优点
+
+## Pivot操作
+$$
+\text{maximize} \ c \cdot x
+$$
+
+$$
+\text{s.t.} \ Ax \le b
+$$
+
+$$
+x \ge 0
+$$
+
+- 如果$\forall i \in [1,n], c_i \le 0$，那么取$x_{1 \ldots n}=\mathbf{0},\ x_{n+1 \ldots n+m}=b_{1 \ldots m}$
+- 否则找一个$c_e>0$，再找一个$a_{l,e}>0$，执行：
+
+$$
+x_j= b_l-a_{l,e}x_e \Rightarrow x_e=\frac{b_l-x_j}{a_{l,e}}
+$$
+
+## 举例
+
+$$\text{maximize} \ 3x_1+x_2+2x_3 $$
+
+满足约束：
+
+$$
+\begin{aligned}
+x_1+x_2+3x_3 &\le 30 \\
+2x_1+2x_2+5x_3 &\le 24 \\
+4x_1+x_2+2x_3 &\le 36
+\end{aligned}
+$$
+
+### 转成松弛型
+
+$$
+\text{maximize} \ 3x_1+x_2+2x_3
+$$
+
+$$
+\begin{aligned}
+x_4&=-x_1-x_2-3x_3 + 30 \\
+x_5&=-2x_1-2x_2-5x_3 + 24 \\
+x_6&=-4x_1-x_2-2x_3 + 36
+\end{aligned}
+$$
+
+### Pivot操作
+
+第一步选$x_1$作为换入变量，$x_1$在目标函数系数为正数，所以希望增大$x_1$。
+
+增大限制：
+
+- 为了保证$x_4$非负，$x_1$不能超过$30$
+- 为了保证$x_5$非负，$x_1$不能超过$12$
+- 为了保证$x_6$非负，$x_1$不能超过$9$
+
+此时最高取$x_1=9$
+
+接下来把$x_1=9-\frac{x_2}{4}-\frac{x_3}{2}-\frac{x_6}{4}$带入，最大化：
+
+$$
+27+\frac{x_2}{4}+\frac{x_3}{2}-\frac{3x_6}{4}
+$$
+
+$$
+\begin{aligned}
+x_4 &= 21 - \frac{3x_2}{4} - \frac{5 x_3}{2} + \frac{x_6}{4} \\
+x_5 &= 6 - \frac{3x_2}{2} - 4x_3 + \frac{x_6}{2} \\
+x_1 &= 9 - \frac{x_2}{4} - \frac{x_3}{2} - \frac{x_6}{4}
+\end{aligned}
+$$
+
+### Pivot
+
+此时$x_3$的系数仍为正，试图增大$x_3$。
+
+对$x_3$最严格的限制是$x_5$非负，$x_3 \le \frac{3}{2}$。
+
+带入$x_3 = \frac{3}{2} -\frac{3x_2}{8} - \frac{x_5}{4} + \frac{x_6}{8}$，最大化：
+
+$$
+\frac{111}{4}+\frac{x_2}{16} - \frac{x_5}{8} - \frac{11x_6}{16}
+$$
+
+$$
+\begin{aligned}
+x_4 &= \frac{69}{4}+\frac{3x_2}{16}+\frac{5x_5}{8}-\frac{x_6}{16} \\
+x_3 &= \frac{3}{2}-\frac{3x_2}{8}-\frac{x_5}{4}+\frac{x_6}{8} \\
+x_1 &= \frac{33}{4} - \frac{x_2}{16}+\frac{x_5}{8} -\frac{5x_6}{16}
+\end{aligned}
+$$
+
+此时$x_2$系数为正，试图增大$x_2$。
+
+对$x_2$最严格的限制是$x_3$非负，带入得，最大化：
+
+$$28-\frac{x_3}{6}-\frac{x_5}{6}-\frac{2x_6}{3}$$
+
+$$
+\begin{aligned}
+x_4 &= 18 - \frac{x_3}{2} + \frac{x_5}{2} \\
+x_2 &= 4 - \frac{8x_3}{3} -\frac{2x_5}{3} + \frac{x_6}{3} \\
+x_1 &= 8 + \frac{x_3}{6} + \frac{x_5}{6} - \frac{x_6}{3}
+\end{aligned}
+$$
+
+此时所有变量系数都是负数，已到达最优解。

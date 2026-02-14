@@ -1,0 +1,18 @@
+{
+  "title": "线性规划",
+  "description": "线性规划定义、建模、单纯形算法、线性规划对偶",
+  "cover": "/images/no.png",
+  "author": "老虎大蒜",
+  "createdAt": "2025-11-23",
+  "metaPositions": {
+    "title": { "x": 150, "y": 120 },
+    "description": { "x": 500, "y": 150 }
+  },
+  "pages": [
+    { "id": "线性规划基础", "path": "Math/Linear-Programming.mdx", "x": 300, "y": 280 },
+    { "id": "单纯型算法", "path": "Math/Simplex.mdx", "x": 500, "y": 280 },
+    { "id": "线性规划对偶", "path": "Math/Linear-Dual.mdx", "x": 100, "y": 280 }
+  ],
+  "edges": [
+  ]
+}
