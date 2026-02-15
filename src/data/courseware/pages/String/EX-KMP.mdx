@@ -8,3 +8,19 @@ import { CollapsibleComponent } from '../../../courseware/markdownConfig';
 
 
 ##### P7114 NOIP2020 字符串匹配
+
+小 C 学习完了字符串匹配的相关内容，现在他正在做一道习题。
+
+对于一个字符串 $S$，题目要求他找到 $S$ 的所有具有下列形式的拆分方案数：
+
+$S = ABC$，$S = ABABC$，$S = ABAB \ldots ABC$，其中 $A$，$B$，$C$ 均是非空字符串，且 $A$ 中出现奇数次的字符数量不超过 $C$ 中出现奇数次的字符数量。
+
+更具体地，我们可以定义 $AB$ 表示两个字符串 $A$，$B$ 相连接，例如 $A = \texttt{aab}$，$B = \texttt{ab}$，则 $AB = \texttt{aabab}$。
+
+并递归地定义 $A^1=A$，$A^n = A^{n - 1} A$（$n \ge 2$ 且为正整数）。例如 $A = \texttt{abb}$，则 $A^3=\texttt{abbabbabb}$。
+
+则小 C 的习题是求 $S = {(AB)}^iC$ 的方案数，其中 $F(A) \le F(C)$，$F(S)$ 表示字符串 $S$ 中出现奇数次的字符的数量。两种方案不同当且仅当拆分出的 $A$、$B$、$C$ 中有至少一个字符串不同。
+
+小 C 并不会做这道题，只好向你求助，请你帮帮他。
+
+对于所有测试点，保证 $1 \le T \le 5$，$1 \le |S| \le 2^{20}$。

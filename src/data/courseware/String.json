@@ -9,16 +9,17 @@
     "description": { "x": 500, "y": 150 }
   },
   "pages": [
-    { "id": "字符串", "x": 400, "y": 380 },
+    { "id": "字符串", "path": "String/String.mdx", "x": 400, "y": 380 },
     { "id": "KMP", "path": "String/KMP.mdx", "x": 400, "y": 280 },
     { "id": "EXKMP", "path": "String/EX-KMP.mdx", "x": 600, "y": 400 },
-    { "id": "Palindrome", "path": "String/Palindrome.mdx", "x": 600, "y": 300 },
+    { "id": "回文串", "path": "String/Palindrome.mdx", "x": 600, "y": 300 },
     { "id": "Manacher", "path": "String/Manacher.mdx", "x": 750, "y": 320 },
-    { "id": "循环表示", "path": "Cyclic-Representation.mdx", "x": 600, "y": 500 },
+    { "id": "循环表示", "path": "Sequence/Cycle_Representation.mdx", "x": 600, "y": 500 },
     { "id": "哈希", "link": "Hash", "x": 200, "y": 440 },
     { "id": "字典树", "link": "Trie", "x": 200, "y": 320 },
     { "id": "暴力优化类算法", "x": 820, "y": 450 },
-    { "id": "自动机", "link": "Automatic-Machine", "x": 800, "y": 200 }
+    { "id": "自动机", "link": "Automatic-Machine", "x": 800, "y": 200 },
+    { "id": "Lyndon分解", "path": "String/Lyndon_Decomposition.mdx", "x": 400, "y": 500 }
   ],
   "edges": [
     { "source": "字符串", "target": "哈希", "sourceSide": "left", "targetSide": "right", "label": "转换为整数问题" },
