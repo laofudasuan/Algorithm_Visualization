@@ -14,9 +14,5 @@
     { "id": "高维空间", "path": "Space/Prefix-Sum-High-Dimensional.mdx", "x": 600, "y": 280 }
   ],
   "edges": [
-    { "source": "状压DP", "target": "连通性状压", "sourceSide": "right", "targetSide": "left" },
-    { "source": "连通性状压", "target": "插头DP", "sourceSide": "bottom", "targetSide": "top" },
-    { "source": "状压DP", "target": "数论状压", "sourceSide": "left", "targetSide": "right" },
-    { "source": "状压DP", "target": "DP套DP", "sourceSide": "bottom", "targetSide": "top" }
   ]
 }
