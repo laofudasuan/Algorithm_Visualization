@@ -1,0 +1,66 @@
+---
+title: 欧拉定理
+---
+
+import GraphAlgorithmVisualization from '../../../../components/visualizations/GraphAlgorithmVisualization';
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+
+# 平面图欧拉定理
+
+欧拉定理建立了平面图中点数、边数和域数的关系，可以知二求一。
+
+对于平面图，如果有$F$个面，$E$条边，$V$个点，$k$个连通块，那么有公式
+
+$F=E-V+k+1$
+
+证明：使用归纳法。当$E=0$时，$k=V$，等式成立。然后一条一条加边，如果加入边的两个点未联通，则$k--,E++$，等式不变。如果加入的两个点已联通，则这条边必然把某个域一分为二，等式两边同时$+1$，得证。
+
+## 平面图性质
+    
+### 性质1
+
+$$
+E \le 3n-6
+$$
+
+<BoxWithTag tag="证明">
+
+每个域至少有三条边，每条边最多与两个域相连，所以$F \le \frac{2}{3}E$
+
+那么$E-V+k+1 \le \frac{2}{3}E$，同时有$k \ge 1$，所以$E \le 3n-6$
+
+</BoxWithTag>
+
+### 性质2
+
+$$
+k \le 2n-4
+$$
+
+<BoxWithTag tag="证明">
+
+把$F \le \frac{2}{3}E$的E用欧拉公式代换得
+
+$$
+\frac{3}{2}F \le F+V-k-1 \rightarrow F \le 2V-2k-2
+$$
+
+同时有$k \ge 1$,得证
+
+</BoxWithTag>
+
+##### P3776 [APIO2017] 斑斓之地
+
+一个 $r \times c$ 的方格表，一只蛇在上面爬导致部分方格表变成了河。多次询问，每次询问只保留某个矩形内的格子，问非河的部分形成了多少个连通块。
+
+<CollapsibleComponent title="做法">
+考虑这样一个问题：给你一棵树，只考虑区间 $[l,r]$ 中的点，形成几个连通块（数量只需要求为 $\leq i < j \leq r$ 且 $(i,j) \in E$ 的 $(i,j)$ 数量（可以认为是边点之类的东西）。
+
+一般平面图也可以套用这个做法。本题中在相邻非网格子之间连边，那么只需要反映：点数、面数和边数。
+
+点数容易，那么真难则反扫描线以下即可（如果强制在线，就主席树），边数几乎一样。
+
+考虑可能出现什么样的“面”。首先所有 $2 \times 2$ 的矩形一定是他的，还有没有其他的？
+
+蛇的形态非常关键——所有河都是连通的。因此，还有另一种环——包裹了整条蛇的环，单独处理一下就行。
+</CollapsibleComponent>

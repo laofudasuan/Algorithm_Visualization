@@ -22,8 +22,9 @@
     { "id": "Network-Flow-Simulate", "x": 600, "y": 200, "category": "算法" },
     { "id": "Shortest-Path", "x": 450, "y": 250, "category": "算法" },
     { "id": "Spanning-Tree", "x": 250, "y": 350, "category": "算法" },
-    { "id": "DAG", "x": 150, "y": 200, "category": "算法" },
+    { "id": "DAG", "x": 50, "y": 200, "category": "算法" },
     { "id": "Euler-Path", "x": 230, "y": 150, "category": "算法" },
+    { "id": "Planar", "x": 120, "y": 150, "category": "算法" },
     
     { "id": "Counting", "x": 1050, "y": 250, "category": "数学基础" },
     { "id": "Abstract-Algebra", "x": 1100, "y": 150, "category": "数学基础" },
@@ -108,6 +109,7 @@
     { "source": "Graph-Basic", "target": "Spanning-Tree", "sourceSide": "bottom", "targetSide": "top" },
     { "source": "Graph-Basic", "target": "DAG", "sourceSide": "left", "targetSide": "right" },
     { "source": "Graph-Basic", "target": "Euler-Path", "sourceSide": "top", "targetSide": "bottom" },
+    { "source": "Graph-Basic", "target": "Planar", "sourceSide": "left", "targetSide": "bottom" },
     { "source": "Greedy", "target": "Network-Flow-Simulate", "sourceSide": "left", "targetSide": "right", "label": "反悔贪心" },
     
     { "source": "Polynomial", "target": "Generating-Function", "sourceSide": "left", "targetSide": "right" },

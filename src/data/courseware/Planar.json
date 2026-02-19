@@ -1,0 +1,24 @@
+{
+  "title": "平面图",
+  "description": "平面图",
+  "cover": "/images/no.png",
+  "author": "老虎大蒜",
+  "createdAt": "2025-11-23",
+  "metaPositions": {
+    "title": { "x": 150, "y": 120 },
+    "description": { "x": 500, "y": 150 }
+  },
+  "pages": [
+    { "id": "平面图", "path" : "Graph/Planar.mdx", "x": 200, "y": 300 },
+    { "id": "平面图对偶", "path" : "Graph/Planar-Dual.mdx", "x": 400, "y": 300 },
+    { "id": "欧拉定理", "path" : "Graph/Planar-Euler.mdx", "x": 200, "y": 400 },
+    { "id": "三角剖分","x": 450, "y": 400 },
+    { "id": "V图","x": 600, "y": 400 }
+  ],
+  "edges": [
+    { "source": "平面图", "target": "平面图对偶", "sourceSide": "right", "targetSide": "left" },
+    { "source": "平面图", "target": "欧拉定理", "sourceSide": "bottom", "targetSide": "top" },
+    { "source": "平面图", "target": "三角剖分", "sourceSide": "right", "targetSide": "left" },
+    { "source": "三角剖分", "target": "V图", "sourceSide": "right", "targetSide": "left" }
+  ]
+}
