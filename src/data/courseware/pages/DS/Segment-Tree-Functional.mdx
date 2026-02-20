@@ -40,20 +40,20 @@ import { CollapsibleComponent } from '../../../courseware/markdownConfig';
     
 <CollapsibleComponent title="卡空间">
     
-线段树要开四个数组$lson,rson,mx,tag$，且区间修改常数为4。
+线段树要开四个数组$lson,rson,mi,tag$，且区间修改常数为4。
 
 ###### 优化一：深入发掘线段树的性质
     
 为了优化常数，我们进行标记永久化
 
-我们发现标记永久化之后，求一个结点的mx的式子变成了这样$mx(i)=\max( mx(lson(i)),mx(rson(i)) )+tag[i]$
+我们发现标记永久化之后，求一个结点的mx的式子变成了这样$mi(i)=\min( mi(lson(i)),mi(rson(i)) )+tag[i]$
 
 发现了什么?只要有了每个结点的mx就无需tag变量了！
     
 ###### 优化二：C++的结构体还有这种操作？
     
 ```
-struct Node { ULL mx:18,ls:23,rs:23; }
+struct Node { unsigned long long mi:18,ls:23,rs:23; }
 ```
     
 这样可以把三个32位数用一个64位数代替。
