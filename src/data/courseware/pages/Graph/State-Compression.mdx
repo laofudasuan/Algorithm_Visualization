@@ -1,0 +1,71 @@
+---
+title: 状压
+---
+
+import GraphAlgorithmVisualization from '../../../../components/visualizations/GraphAlgorithmVisualization';
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+
+# 图论状压建模
+
+##### nfls p35230
+
+7sRef 的世界可以视为一张 $n$ 个点，$m$ 条边的带权无向图。
+
+对于 Liz 的一个分身，她可以停留在某个点，或花费等于边权的时间到达相邻的点。
+
+有 $k$ 种钥匙和 $q$ 个事件，每个事件格式如下：
+- 在第 $x_i$ 秒，第 $y_i$ 个结点会出现一个类型为 $z_i$ 的钥匙。
+
+当钥匙出现时，如果一个分身这个点上，它就会收集这把钥匙。如果每种钥匙都被某个人收集，则视为任务被完成。每种钥匙只要收集任意一个。
+
+你需要求出有 $1, 2, \cdots, k$ 个 Liz 的分身在 $0$ 时刻从 $1$ 号点出发，最早完成任务的时间。
+
+<CollapsibleComponent title="算法一">
+暴力枚举每个钥匙被第几个⼈获得。
+
+接下来考虑每个⼈的⼦问题：
+
+- 我需要在 $x_i$ 时刻到达 $y_i$，这是可能的吗？
+
+做一次 $O(n^3)$ 全源最短路（或者 $n$ 次单源最短路）后将所有需求按 $x_i$ 排序即可。
+
+总时间复杂度 $(n^3 + q^k)$ 或 $O(nm \log n + q^k)$，期望得分 $5 \sim 20$。 
+</CollapsibleComponent>
+
+<CollapsibleComponent title="算法二"> 
+注意到 $q$ 可能很大，因此枚举获得钥匙的事件是困难的。
+
+因此不妨改变一下枚举的顺序。
+
+这里可以使用 DP，即一个分身在第 $x$ 个事件是否能获得集合为 $S$ 的钥匙。
+
+转移可以枚举上一个事件。对于 $t$ 个人的情况，可以先二分，再进行子集卷积。
+
+时间复杂度 $O(nm \log n + q^2 2^k + k^3 2^k \log x_i)$，期望得分 $30 \sim 60$。
+</CollapsibleComponent>
+
+<CollapsibleComponent title="算法三"> 
+求 $10^4$ 的全源最短路看起来没有前途！
+
+我们还是考虑将时间维代替掉 True/False 的信息。
+
+为了替换最短路，考虑设 DP 状态为分身在获得 $S$ 的钥匙后到达 $x$ 的最短时间。
+
+此时转移和最短路就被放到一起了，只需要考虑两种转移：
+- 转移一条边：$f_{x,S} \to f_{y,S}$。
+- 获取一把钥匙：$f_{x,S} \to f_{x,S \cup \{v\}}$。
+
+转移共有 $(m+q)2^k$ 个，使用类 Dijkstra 顺序转移即可。
+
+时间复杂度 $O\left((m+q)2^k k \log(m+q) + k3^k\right)$，期望得分 $80$。
+</CollapsibleComponent>
+
+<CollapsibleComponent title="算法四">
+本来这大概就是正解了！但是这个东西跑的太慢了……
+
+我们注意到可以把图根据 $S$ 分层之后做，每层只需要处理 $n$ 个点的堆。
+
+这里处理第二类转移的方法会稍有不同，std 使用了一次二分。
+
+时间复杂度 $O\left((m + q)2^k \log mq + k3^k\right)$，期望得分 $\mathbf{100}$。
+</CollapsibleComponent>

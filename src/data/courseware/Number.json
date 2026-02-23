@@ -1,0 +1,19 @@
+{
+  "title": "特殊数字",
+  "description": "特殊数字",
+  "cover": "/images/no.png",
+  "author": "老虎大蒜",
+  "createdAt": "2025-11-23",
+  "metaPositions": {
+    "title": { "x": 150, "y": 120 },
+    "description": { "x": 500, "y": 150 }
+  },
+  "pages": [
+    { "id": "中位数", "path": "Number/Median.mdx", "x": 300, "y": 280 },
+    { "id": "众数", "path": "Number/Mode.mdx", "x": 500, "y": 280 },
+    { "id": "Mex", "path": "Number/Mex.mdx", "x": 100, "y": 280 },
+    { "id": "停时定理", "path": "Math/Probability-STT.mdx", "x": 500, "y": 380 }
+  ],
+  "edges": [
+  ]
+}

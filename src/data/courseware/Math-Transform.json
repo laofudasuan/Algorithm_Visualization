@@ -10,7 +10,7 @@
   },
   "pages": [
     { "id": "差分与前缀和", "x": 200, "y": 380 },
-    { "id": "坐标变幻", "path": "Math/Coordinate-Transform.mdx", "x": 400, "y": 380 }
+    { "id": "坐标变换", "path": "Math/Coordinate-Transform.mdx", "x": 400, "y": 380 }
   ],
   "edges": [
   ]
