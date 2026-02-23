@@ -1,0 +1,17 @@
+{
+  "title": "图论建模",
+  "description": "图论建模",
+  "cover": "/images/no.png",
+  "author": "老虎大蒜",
+  "createdAt": "2025-11-23",
+  "metaPositions": {
+    "title": { "x": 150, "y": 120 },
+    "description": { "x": 500, "y": 150 }
+  },
+  "pages": [
+    { "id": "同余最短路", "path" : "Graph/SSP-Congruence.mdx", "x": 300, "y": 200 },
+    { "id": "自动机建模", "link" : "Automatic-Machine", "x": 300, "y": 400 }
+  ],
+  "edges": [
+  ]
+}

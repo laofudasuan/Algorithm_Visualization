@@ -136,11 +136,14 @@ function catmullRomPath(points) {
 }
 
 export default function FunctionPlot({
+  series,
   expression,
   points,
   connect = 'line',
   xDomain = [-10, 10],
   yDomain = [-10, 10],
+  xStep = 1,
+  yStep = 1,
   width = 720,
   height = 420,
   padding = 36,
@@ -176,73 +179,105 @@ export default function FunctionPlot({
   };
 
   const grid = useMemo(() => {
-    const xStep = niceStep((xMax - xMin) / 10);
-    const yStep = niceStep((yMax - yMin) / 10);
+    const xAuto = niceStep((xMax - xMin) / 10);
+    const yAuto = niceStep((yMax - yMin) / 10);
+    let xStepFinal = Number.isFinite(xStep) && xStep > 0 ? xStep : xAuto;
+    let yStepFinal = Number.isFinite(yStep) && yStep > 0 ? yStep : yAuto;
+    if ((xMax - xMin) / xStepFinal > 2000) xStepFinal = xAuto;
+    if ((yMax - yMin) / yStepFinal > 2000) yStepFinal = yAuto;
     const xs = [];
     const ys = [];
-    const xStart = Math.ceil(xMin / xStep) * xStep;
-    const yStart = Math.ceil(yMin / yStep) * yStep;
-    for (let v = xStart; v <= xMax + 1e-12; v += xStep) xs.push(Math.round(v * 1e12) / 1e12);
-    for (let v = yStart; v <= yMax + 1e-12; v += yStep) ys.push(Math.round(v * 1e12) / 1e12);
+    const xStart = Math.ceil(xMin / xStepFinal) * xStepFinal;
+    const yStart = Math.ceil(yMin / yStepFinal) * yStepFinal;
+    for (let v = xStart; v <= xMax + 1e-12; v += xStepFinal) xs.push(Math.round(v * 1e12) / 1e12);
+    for (let v = yStart; v <= yMax + 1e-12; v += yStepFinal) ys.push(Math.round(v * 1e12) / 1e12);
     return { xs, ys };
-  }, [xMin, xMax, yMin, yMax]);
+  }, [xMin, xMax, yMin, yMax, xStep, yStep]);
 
-  const compiled = useMemo(() => (expression ? compileExpression(expression) : null), [expression]);
+  const normalizedSeries = useMemo(() => {
+    if (Array.isArray(series) && series.length) return series.filter(Boolean);
+    const out = [];
+    if (expression) out.push({ type: 'function', expression, stroke, samples });
+    if (points) out.push({ type: 'points', points, connect, pointColor, showPoints });
+    return out;
+  }, [series, expression, stroke, samples, points, connect, pointColor, showPoints]);
 
-  const functionSegments = useMemo(() => {
-    if (!compiled?.fn) return [];
-    const segs = [];
-    let cur = [];
-    for (let i = 0; i <= samples; i++) {
-      const t = i / samples;
-      const x = xMin + (xMax - xMin) * t;
-      let y;
-      try {
-        y = compiled.fn(x);
-      } catch {
-        y = NaN;
-      }
-      const finite = Number.isFinite(y) && Math.abs(y) < 1e9;
-      const inRange = finite && y >= yMin && y <= yMax;
-      if (!finite || !inRange) {
-        if (cur.length >= 2) segs.push(cur);
-        cur = [];
-        continue;
-      }
-      cur.push([x, y]);
-    }
-    if (cur.length >= 2) segs.push(cur);
-    return segs;
-  }, [compiled, samples, xMin, xMax, yMin, yMax]);
-
-  const pointSeries = useMemo(() => {
-    if (!points) return null;
-    const arr = Array.isArray(points) ? points : [];
+  const normalizePointsInput = (input) => {
+    const arr = Array.isArray(input) ? input : [];
     const out = [];
     for (const p of arr) {
       if (Array.isArray(p) && p.length >= 2) out.push([Number(p[0]), Number(p[1])]);
       else if (p && typeof p === 'object' && 'x' in p && 'y' in p) out.push([Number(p.x), Number(p.y)]);
     }
     return out.filter(([x, y]) => Number.isFinite(x) && Number.isFinite(y));
-  }, [points]);
+  };
 
-  const pointsPx = useMemo(() => {
-    if (!pointSeries?.length) return [];
-    return pointSeries
-      .map(([x, y]) => [x, y, ...toPx(x, y)])
-      .filter((p) => {
-        const x = p[0];
-        const y = p[1];
-        return x >= xMin && x <= xMax && y >= yMin && y <= yMax;
-      });
-  }, [pointSeries, xMin, xMax, yMin, yMax]);
+  const errorToText = (code) => {
+    if (code === 'empty') return '表达式为空';
+    if (code === 'invalid_chars') return '表达式包含不支持的字符';
+    if (code === 'invalid_identifier') return '表达式包含不支持的标识符';
+    return '表达式解析失败';
+  };
 
-  const pointsPath = useMemo(() => {
-    if (!pointsPx.length) return '';
-    const pts = pointsPx.map((p) => [p[2], p[3]]);
-    if (connect === 'smooth') return catmullRomPath(pts);
-    return '';
-  }, [pointsPx, connect]);
+  const functionDrawables = useMemo(() => {
+    const out = [];
+    const errors = [];
+    for (const item of normalizedSeries) {
+      if (!item || item.type !== 'function') continue;
+      const compiled = compileExpression(item.expression);
+      if (!compiled?.fn) {
+        if (compiled?.error) errors.push(errorToText(compiled.error));
+        else errors.push('表达式解析失败');
+        continue;
+      }
+      const segs = [];
+      let cur = [];
+      const sampleCount = Number.isFinite(item.samples) && item.samples > 0 ? item.samples : samples;
+      for (let i = 0; i <= sampleCount; i++) {
+        const t = i / sampleCount;
+        const x = xMin + (xMax - xMin) * t;
+        let y;
+        try {
+          y = compiled.fn(x);
+        } catch {
+          y = NaN;
+        }
+        const finite = Number.isFinite(y) && Math.abs(y) < 1e9;
+        const inRange = finite && y >= yMin && y <= yMax;
+        if (!finite || !inRange) {
+          if (cur.length >= 2) segs.push(cur);
+          cur = [];
+          continue;
+        }
+        cur.push([x, y]);
+      }
+      if (cur.length >= 2) segs.push(cur);
+      const color = item.stroke || item.color || stroke;
+      out.push({ segments: segs, stroke: color });
+    }
+    return { drawables: out, errors };
+  }, [normalizedSeries, samples, xMin, xMax, yMin, yMax, stroke]);
+
+  const pointsDrawables = useMemo(() => {
+    const out = [];
+    for (const item of normalizedSeries) {
+      if (!item || item.type !== 'points') continue;
+      const pts = normalizePointsInput(item.points);
+      const ptsPx = pts
+        .map(([x, y]) => [x, y, ...toPx(x, y)])
+        .filter((p) => {
+          const x = p[0];
+          const y = p[1];
+          return x >= xMin && x <= xMax && y >= yMin && y <= yMax;
+        });
+      const connectMode = item.connect || connect;
+      const color = item.pointColor || item.color || pointColor;
+      const showPts = typeof item.showPoints === 'boolean' ? item.showPoints : showPoints;
+      const path = connectMode === 'smooth' && ptsPx.length ? catmullRomPath(ptsPx.map((p) => [p[2], p[3]])) : '';
+      out.push({ pointsPx: ptsPx, connect: connectMode, pointColor: color, showPoints: showPts, path });
+    }
+    return out;
+  }, [normalizedSeries, connect, pointColor, showPoints, xMin, xMax, yMin, yMax]);
 
   const axes = useMemo(() => {
     const x0 = clamp(0, xMin, xMax);
@@ -262,13 +297,10 @@ export default function FunctionPlot({
   }, [xMin, xMax, yMin, yMax]);
 
   const errorText = useMemo(() => {
-    if (!compiled) return null;
-    if (!compiled.error) return null;
-    if (compiled.error === 'empty') return '表达式为空';
-    if (compiled.error === 'invalid_chars') return '表达式包含不支持的字符';
-    if (compiled.error === 'invalid_identifier') return '表达式包含不支持的标识符';
-    return '表达式解析失败';
-  }, [compiled]);
+    if (!functionDrawables.errors.length) return null;
+    if (functionDrawables.errors.length === 1) return functionDrawables.errors[0];
+    return '部分表达式解析失败';
+  }, [functionDrawables.errors]);
 
   return (
     <div className={`my-4 w-full ${className}`} data-vis="function-plot">
@@ -317,43 +349,64 @@ export default function FunctionPlot({
               );
             })}
 
-          {functionSegments.map((seg, idx) => {
-            const poly = seg
-              .map(([x, y]) => {
-                const [px, py] = toPx(x, y);
-                return `${px},${py}`;
-              })
-              .join(' ');
-            return (
-              <polyline
-                key={`f-${idx}`}
-                points={poly}
-                fill="none"
-                stroke={stroke}
-                strokeWidth="2"
-                strokeLinejoin="round"
-                strokeLinecap="round"
-              />
-            );
-          })}
+          {functionDrawables.drawables.flatMap((item, seriesIdx) =>
+            item.segments.map((seg, segIdx) => {
+              const poly = seg
+                .map(([x, y]) => {
+                  const [px, py] = toPx(x, y);
+                  return `${px},${py}`;
+                })
+                .join(' ');
+              return (
+                <polyline
+                  key={`f-${seriesIdx}-${segIdx}`}
+                  points={poly}
+                  fill="none"
+                  stroke={item.stroke}
+                  strokeWidth="2"
+                  strokeLinejoin="round"
+                  strokeLinecap="round"
+                />
+              );
+            }),
+          )}
 
-          {pointsPx.length > 1 && connect === 'line' && (
-            <polyline
-              points={pointsPx.map((p) => `${p[2]},${p[3]}`).join(' ')}
-              fill="none"
-              stroke={pointColor}
-              strokeWidth="2"
-              strokeLinejoin="round"
-              strokeLinecap="round"
-            />
-          )}
-          {pointsPx.length > 1 && connect === 'smooth' && (
-            <path d={pointsPath} fill="none" stroke={pointColor} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
-          )}
-          {showPoints &&
-            pointsPx.map((p, i) => (
-              <circle key={`p-${i}`} cx={p[2]} cy={p[3]} r="3" fill={pointColor} stroke="#ffffff" strokeWidth="1" />
-            ))}
+          {pointsDrawables.map((item, seriesIdx) => (
+            <React.Fragment key={`p-series-${seriesIdx}`}>
+              {item.pointsPx.length > 1 && item.connect === 'line' && (
+                <polyline
+                  points={item.pointsPx.map((p) => `${p[2]},${p[3]}`).join(' ')}
+                  fill="none"
+                  stroke={item.pointColor}
+                  strokeWidth="2"
+                  strokeLinejoin="round"
+                  strokeLinecap="round"
+                />
+              )}
+              {item.pointsPx.length > 1 && item.connect === 'smooth' && (
+                <path
+                  d={item.path}
+                  fill="none"
+                  stroke={item.pointColor}
+                  strokeWidth="2"
+                  strokeLinejoin="round"
+                  strokeLinecap="round"
+                />
+              )}
+              {item.showPoints &&
+                item.pointsPx.map((p, i) => (
+                  <circle
+                    key={`p-${seriesIdx}-${i}`}
+                    cx={p[2]}
+                    cy={p[3]}
+                    r="3"
+                    fill={item.pointColor}
+                    stroke="#ffffff"
+                    strokeWidth="1"
+                  />
+                ))}
+            </React.Fragment>
+          ))}
 
           {errorText && (
             <text x={padding + 8} y={padding + 18} fontSize="12" fill="#b91c1c">

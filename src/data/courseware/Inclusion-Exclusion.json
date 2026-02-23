@@ -11,6 +11,7 @@
   "pages": [
     { "id": "容斥/反演", "x": 300, "y": 280 },
     { "id": "单步容斥", "path": "Math/Inclusion-Exclusion-OneStep.mdx", "x": 300, "y": 200 },
+    { "id": "反射容斥", "path": "Math/Inclusion-Exclusion-Reflection.mdx", "x": 300, "y": 350 },
     { "id": "集合反演", "path": "Math/Inclusion-Exclusion-Set.mdx", "x": 500, "y": 200 },
     { "id": "最值反演", "path": "Math/Inclusion-Exclusion-MinMax.mdx", "x": 500, "y": 260 },
     { "id": "二项式反演", "path": "Math/Inclusion-Exclusion-Binomial.mdx", "x": 500, "y": 320 },
@@ -19,6 +20,7 @@
   ],
   "edges": [
     { "source": "容斥/反演", "target": "集合反演", "sourceSide": "right", "targetSide": "left" },
+    { "source": "容斥/反演", "target": "反射容斥", "sourceSide": "bottom", "targetSide": "top" },
     { "source": "容斥/反演", "target": "最值反演", "sourceSide": "right", "targetSide": "left" },
     { "source": "容斥/反演", "target": "二项式反演", "sourceSide": "right", "targetSide": "left" },
     { "source": "容斥/反演", "target": "其他反演", "sourceSide": "right", "targetSide": "left" },

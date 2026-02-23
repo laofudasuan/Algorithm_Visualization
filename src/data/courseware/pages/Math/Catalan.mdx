@@ -3,6 +3,7 @@ title: 卡特兰数
 ---
 
 import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+import FunctionPlot from '../../../../components/visualizations/FunctionPlot';
 
 
 # 卡特兰数
@@ -14,6 +15,30 @@ $h(n)$表示在平面直角坐标系上从点$(0,0)$出发，只能向右和向�
 如果没有最后那一条限制，那么答案就是$\binom{2n}{n}$
 
 那么我们可以把这个数减去一定触碰直线$y=x+1$的方案数
+
+<FunctionPlot
+  xDomain={[-1, 5]}
+  yDomain={[-1, 5]}
+  width={500}
+  height={500}
+  series={[
+    { type: 'function', expression: 'y=x+1', stroke: '#ef4444' },
+    {
+      type: 'points',
+      points: [
+        [0, 0],
+        [1, 0],
+        [2, 0],
+        [2, 1],
+        [2, 2],
+        [3, 2],
+        [3, 3],
+      ],
+      connect: 'line',
+      pointColor: '#2563eb',
+    },
+  ]}
+/>
 
 ## 卡特兰数
     

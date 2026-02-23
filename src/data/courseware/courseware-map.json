@@ -15,16 +15,17 @@
     { "id": "Tree-Virtual", "x": 100, "y": 800, "category": "组合对象" },
 
     { "id": "Graph-Basic", "x": 300, "y": 250, "category": "组合对象" },
-    { "id": "Connectivity", "x": 350, "y": 350, "category": "算法" },
+    { "id": "Connectivity", "x": 400, "y": 350, "category": "算法" },
     { "id": "Bipartite", "x": 30, "y": 280, "category": "算法" },
     { "id": "2-SAT", "x": 50, "y": 350, "category": "算法" },
     { "id": "Network-Flow", "x": 500, "y": 100, "category": "算法" },
     { "id": "Network-Flow-Simulate", "x": 600, "y": 200, "category": "算法" },
     { "id": "Shortest-Path", "x": 450, "y": 250, "category": "算法" },
-    { "id": "Spanning-Tree", "x": 250, "y": 350, "category": "算法" },
+    { "id": "Spanning-Tree", "x": 200, "y": 350, "category": "算法" },
     { "id": "DAG", "x": 50, "y": 200, "category": "算法" },
     { "id": "Euler-Path", "x": 230, "y": 150, "category": "算法" },
     { "id": "Planar", "x": 120, "y": 150, "category": "算法" },
+    { "id": "Graph-Model", "x": 300, "y": 380, "category": "数学基础" },
     
     { "id": "Counting", "x": 1050, "y": 250, "category": "数学基础" },
     { "id": "Abstract-Algebra", "x": 1100, "y": 150, "category": "数学基础" },
@@ -39,14 +40,14 @@
     { "id": "String", "x": 200, "y": 530, "category": "组合对象" },
     { "id": "Border", "x": 50, "y": 530, "category": "组合对象" },
     { "id": "Hash", "x": 50, "y": 460, "category": "算法" },
-    { "id": "Automatic-Machine", "x": 500, "y": 600, "category": "算法" },
-    { "id": "Trie", "x": 300, "y": 450, "category": "算法" },
+    { "id": "Automatic-Machine", "x": 300, "y": 450, "category": "算法" },
+    { "id": "Trie", "x": 500, "y": 600, "category": "算法" },
     { "id": "Substring", "x": 300, "y": 600, "category": "算法" },
 
     { "id": "Data-Structure", "x": 600, "y": 450, "category": "算法" },
-    { "id": "Segment-Tree", "x": 450, "y": 400, "category": "算法" },
+    { "id": "Segment-Tree", "x": 500, "y": 400, "category": "算法" },
     { "id": "Balance-Tree", "x": 600, "y": 600, "category": "算法" },
-    { "id": "Graph-Opt", "x": 450, "y": 320, "category": "算法" },
+    { "id": "Graph-Opt", "x": 500, "y": 320, "category": "算法" },
 
     { "id": "Dynamic-Programming", "x": 800, "y": 500, "category": "算法" },
     { "id": "DP-State", "x": 1000, "y": 650, "category": "算法" },
@@ -111,6 +112,7 @@
     { "source": "Graph-Basic", "target": "Euler-Path", "sourceSide": "top", "targetSide": "bottom" },
     { "source": "Graph-Basic", "target": "Planar", "sourceSide": "left", "targetSide": "bottom" },
     { "source": "Greedy", "target": "Network-Flow-Simulate", "sourceSide": "left", "targetSide": "right", "label": "反悔贪心" },
+    { "source": "Graph-Basic", "target": "Graph-Model", "sourceSide": "bottom", "targetSide": "top" },
     
     { "source": "Polynomial", "target": "Generating-Function", "sourceSide": "left", "targetSide": "right" },
     { "source": "FFT", "target": "Polynomial", "sourceSide": "bottom", "targetSide": "top" },
@@ -141,8 +143,9 @@
 
     { "source": "String", "target": "Hash", "sourceSide": "top", "targetSide": "right" },
     { "source": "String", "target": "Border", "sourceSide": "left", "targetSide": "right" },
-    { "source": "String", "target": "Trie", "sourceSide": "right", "targetSide": "bottom" },
-    { "source": "String", "target": "Automatic-Machine", "sourceSide": "right", "targetSide": "left" },
+    { "source": "String", "target": "Trie", "sourceSide": "right", "targetSide": "left" },
+    { "source": "String", "target": "Automatic-Machine", "sourceSide": "right", "targetSide": "bottom" },
+    { "source": "Graph-Model", "target": "Automatic-Machine", "sourceSide": "bottom", "targetSide": "top" },
 
     { "source": "DP-State", "target": "Counting", "sourceSide": "top", "targetSide": "bottom", "label": "计数DP" },
     { "source": "Combinatorics", "target": "Counting", "sourceSide": "left", "targetSide": "right", "label": "组合计数" },
