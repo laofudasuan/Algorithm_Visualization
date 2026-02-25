@@ -1,0 +1,41 @@
+{
+  "width": 700,
+  "height": 500,
+  "nodes": [
+    { "id": "Start", "label": "起点", "x": 50, "y": 250, "style": { "type": "planet1" } },
+    { "id": "0", "label": "0", "x": 150, "y": 150, "style": { "type": "planet1" } },
+    { "id": "1", "label": "1", "x": 150, "y": 350, "style": { "type": "planet1" } },
+    { "id": "10", "label": "10", "x": 400, "y": 350, "style": { "type": "planet1" } },
+    { "id": "00", "label": "00", "x": 400, "y": 50, "style": { "type": "planet1" } },
+    { "id": "100", "label": "100", "x": 650, "y": 350, "style": { "type": "planet1" } },
+    { "id": "11", "label": "11", "x": 400, "y": 450, "style": { "type": "planet2" } },
+    { "id": "01", "label": "01", "x": 400, "y": 250, "style": { "type": "planet1" } }
+  ],
+  "edges": [
+    { "id": "e1", "source": "Start", "target": "0", "label" : "0", "style": { "directional": true} },
+    { "id": "e2", "source": "Start", "target": "1", "label" : "1", "style": { "directional": true } },
+    { "id": "e3", "source": "0", "target": "00", "label" : "0", "style": { "directional": true, "curvature": -0.1 } },
+    { "id": "e4", "source": "0", "target": "1", "label" : "1", "style": { "directional": true, "curvature": -0.2  } },
+    { "id": "e5", "source": "1", "target": "11", "label" : "1", "style": { "directional": true, "curvature": 0.2 } },
+    { "id": "e6", "source": "1", "target": "10", "label" : "0", "style": { "directional": true, "curvature": -0.1} },
+    { "id": "e7", "source": "10", "target": "1", "label" : "1", "style": { "directional": true, "curvature": -0.1 } },
+    { "id": "e8", "source": "00", "target": "0", "label" : "0,1", "style": { "directional": true, "curvature": -0.1} },
+    { "id": "e9", "source": "10", "target": "100", "label" : "0", "style": { "directional": true, "curvature": -0.1 } },
+    { "id": "e10", "source": "100", "target": "10", "label" : "0,1", "style": { "directional": true, "curvature": -0.1 } },
+    { "id": "e11", "source": "0", "target": "01", "label" : "1", "style": { "directional": true, "curvature": -0.1 } },
+    { "id": "e12", "source": "01", "target": "0", "label" : "0", "style": { "directional": true, "curvature": -0.1 } },
+    { "id": "e13", "source": "01", "target": "1", "label" : "1", "style": { "directional": true, "curvature": 0.1 } }
+  ],
+  "nodesStyle": {
+    "size" : 50,
+    "type" : "planet1",
+    "stroke": "#000000",
+    "lineWidth": 2,
+    "labelFill": "#000000",
+    "labelFontSize": 20
+  },
+  "edgesStyle": {
+    "stroke": "#ffffff",
+    "lineWidth": 15
+  }
+}

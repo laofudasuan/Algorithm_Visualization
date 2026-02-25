@@ -1,0 +1,25 @@
+---
+title: 欧拉序
+---
+
+import TreeAlgorithmVisualization from '../../../../components/visualizations/TreeAlgorithmVisualization';
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+
+# 树的欧拉序
+
+
+## LCA问题
+
+欧拉序列可以帮助我们用$O(1)$的时间复杂度求解树上LCA问题：
+
+两个点的LCA为他们在欧拉序中出现位置对应区间的深度最小的点
+
+### 优化
+
+具体地，把节点按照 dfs 序排列，用 ST 表$O(n \log n)$ 初始化，$O(1)$ 查询维护区间 dep 最小值。
+
+查询 $LCA(u, v)$ 时，如果 $u \neq v$（不妨假设 $in_u < in_v$），那么找出 dfs 序上 $[in_u + 1, in_v ]$ 当中 dep 最小的任意一个节点
+
+它的父节点就是答案。否则，直接返回 $u$ 即可
+
+##### P7830 [CCO 2021] Through Another Maze Darkly
