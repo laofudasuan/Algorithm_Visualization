@@ -5,6 +5,7 @@
     { "id": "Sequence", "x": 830, "y": 920, "category": "组合对象" },
     { "id": "Permutation", "x": 700, "y": 920, "category": "组合对象" },
     { "id": "Sequence_Representation", "x": 600, "y": 920, "category": "组合对象" },
+    { "id": "Sequence-Time", "x": 900, "y": 800, "category": "算法" },
 
     { "id": "Tree-Basic", "x": 200, "y": 800, "category": "组合对象" },
     { "id": "Tree-Sequence", "x": 350, "y": 800, "category": "组合对象" },

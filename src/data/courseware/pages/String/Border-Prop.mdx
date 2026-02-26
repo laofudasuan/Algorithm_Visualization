@@ -1,0 +1,145 @@
+---
+title: Border性质
+---
+
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+
+# Border性质
+
+## Border的等差数列结构
+
+### 引入
+
+假设有一个长度为$15$的字符串，存在一个border，长度为$12$，能推出还有哪些Border呢？
+
+长度为$12$的Border能推出一个长度为$3$的周期，因此，$3,6,9$也是Border
+
+### 形式化
+
+如果一个长度为$n$串存在某个长度超过一半的border$k$，那么可以推出一个长度为$n-k$的周期，因此可以推导出一些Border，形成一个以$n-k$为公差的等差数列
+
+结论：一个串的所有Border可以划分为不超过$\log n$个等差数列
+
+##### P5829 【模板】失配树
+
+给定一个字符串 $s$，定义它的 **$k$ 前缀** $\mathit{pre}_k$ 为字符串 $s_{1\dots k}$，**$k$ 后缀** $\mathit{suf}_k$ 为字符串 $s_{|s|-k+1\dots |s|}$，其中 $1 \le k \le |s|$。
+
+定义 $\bold{Border}(s)$ 为**对于 $i \in [1, |s|)$，满足 $\mathit{pre}_i = \mathit{suf}_i$** 的字符串 $\mathit{pre}_i$ 的集合。$\bold{Border}(s)$ 中的每个元素都称之为字符串 $s$ 的 $\operatorname{border}$。
+
+有 $m$ 组询问，每组询问给定 $p,q$，求 $s$ 的 **$\boldsymbol{p}$ 前缀** 和 **$\boldsymbol{q}$ 前缀** 的 **最长公共 $\operatorname{border}$**  的长度。
+
+对于 $100\%$ 的数据，$1\leq p,q \le |s|\leq 10^6$，$1 \leq m \leq 10^5$，$s_i \in [\texttt{a}, \texttt{z}]$。
+
+<CollapsibleComponent title="做法"> 
+```C++
+x = next[x], y = next[y];
+while(x != y){
+    if(x < y) swap(x, y);
+    if (next[x] > x/2) {
+        int d = x - next[x];
+        if(y % d == x % d) x = y;
+        else x = x - (x/2/d) * d;
+    } else x = next[x];
+}
+```
+</CollapsibleComponent>
+
+##### P4156 [WC2016] 论战捆竹竿
+
+<CollapsibleComponent title="做法">
+
+Border性质以后，对每一个等差数列跑同余最短路
+
+</CollapsibleComponent>
+
+##### P5287 HNOI2019 JOJO
+
+给一个字符串，支持两种操作：
+
+- 给定$x,c$，在字符串末尾加入$x$个字符$c$
+- 回到之前某一个历史版本
+
+每次操作之后，输出字符串next数组之和
+
+<CollapsibleComponent title="暴力做法">
+没有强制在线，可以把所有操作预处理成一棵树
+
+同时，把连续相同的字符都缩成一段，用一个二元组$(c,x)$表示连续$x$个$c$
+
+缩完以后，相邻的段字符不相同，所以，匹配的时候，一段只能和另外一段匹配，不能跨越两段
+
+所以，在预处理fail时，如果某个点的一个border对应是一段的中间，则之后是用不上的。这样我们fail就只需要预处理出最大的，完整在一段结束的border
+
+每次暴力跳fail的复杂度是平方的，所以需要优化复杂度
+</CollapsibleComponent>
+
+<CollapsibleComponent title="复杂度优化">
+方法一：用可持久化线段树维护Trie图
+
+方法二：注意到，对于border序列中的一个等差数列，中间夹的部分都是循环重复的，所以只需要扫最长的那一个就够了。保存所有的等差数列，复杂度$n\log n$
+</CollapsibleComponent>
+
+## 回文后缀的等差数列结构
+
+回文后缀性质：一个串的所有回文后缀可以划分为不超过$\log n$个等差数列
+
+##### T606895 区间本质不同回文子串
+
+给一个串，多次询问某一个区间的本质不同回文子串个数
+
+##### 区间本质不同回文串2
+
+给一个串，多次询问，右端点在某一个区间的本质不同的回文子串个数
+
+##### CF932G Palindrome Partition
+
+给一个字符串$S$，你需要把它划分为偶数段$S=s_1+s_2+\ldots+s_k$
+
+使得$s_1=s_k,s_2=s_{k-1},\ldots$
+
+求方案数
+
+<CollapsibleComponent title="做法">
+假设字符串为$S[1 \ldots n]$
+
+观察：分成偶数段：第一段等于最后一段、第二段等于倒数第二段
+
+似乎有点像回文！
+
+考虑把$S$重新排列成$S'=S[1]S[n]S[2]S[n-1]\ldots S[n/2]S[n/2+1]$
+
+这样一来，我们发现$S$的一组合法划分，相当于把$S'$划分成很多个长度为偶数的回文串
+
+这样可以得到一个平方DP
+
+$$
+dp[i] = \sum_{S[j+1 \sim i]\text{为回文串}} dp[j]
+$$
+
+这样，在回文自动机上DP就可以了
+
+
+</CollapsibleComponent>
+
+##### loj6681 yww与树上的回文串
+给一棵树，每条边有一个字符
+
+询问树上有多少条路径$x \to y$满足，路径上所有边组成的字符串为回文串
+
+$n \le 50000$，字符集大小为$2$
+
+<CollapsibleComponent title="做法">
+
+树上路径问题，考虑点分治
+
+每一层，以重心为根建立AC自动机
+
+对于一条过重心的路径，枚举长的那一侧，问题变成了：对于每一个点，令深度为$l$，如果存在一个长度为$d$的前缀，则就需要查询它的长度为$l-d$的后缀在AC自动机中的出现次数
+
+加速这个过程，可以对每一个等差数列一起计算，按照$l-d$是否$>\sqrt{n}$分块，大于根号的情况可以暴力，小于根号的情况，可以对$1$到$\sqrt{n}$的每一个公差，在fail树上记录一个前缀和
+
+$$
+T(n) = 2T(n/2)+O(n^{1.5})=O(n^{1.5})
+$$
+
+</CollapsibleComponent>

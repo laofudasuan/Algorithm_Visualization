@@ -21,6 +21,7 @@
     { "id": "树状数组", "x": 400, "y": 220 },
     { "id": "平衡树", "link": "Balance-Tree", "x": 520, "y": 220 },
     { "id": "区间赋值", "link" : "DS/Interval-Assign.mdx", "x": 320, "y": 350 },
+    { "id": "时间序列", "link": "Sequence-Time", "x": 650, "y": 250 },
 
     { "id": "矩阵（平面）", "x": 270, "y": 430 },
     { "id": "KD树", "x": 150, "y": 460 },
@@ -54,6 +55,7 @@
     { "source": "区间修改", "target": "树状数组", "sourceSide": "top", "targetSide": "bottom" },
     { "source": "区间修改", "target": "平衡树", "sourceSide": "top", "targetSide": "bottom" },
     { "source": "序列", "target": "区间赋值", "sourceSide": "top", "targetSide": "bottom" },
+    { "source": "序列", "target": "时间序列", "sourceSide": "right", "targetSide": "bottom" },
     
     { "source": "序列", "target": "矩阵（平面）", "sourceSide": "left", "targetSide": "right" },
     { "source": "矩阵（平面）", "target": "KD树", "sourceSide": "left", "targetSide": "right" },

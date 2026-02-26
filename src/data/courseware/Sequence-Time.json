@@ -1,0 +1,20 @@
+{
+  "title": "时间序列",
+  "description": "时间序列处理技巧",
+  "cover": "/images/no.png",
+  "author": "老虎大蒜",
+  "createdAt": "2025-11-23",
+  "metaPositions": {
+    "title": { "x": 150, "y": 120 },
+    "description": { "x": 500, "y": 150 }
+  },
+  "pages": [
+    { "id": "时间分治", "x": 400, "y": 250 },
+    { "id": "时间分块", "x": 200, "y": 280 },
+    { "id": "线段树分治", "x": 600, "y": 280 },
+    { "id": "CDQ分治", "x": 600, "y": 380 },
+    { "id": "二进制分组", "path": "Sequence/Binary-Group.mdx", "x": 600, "y": 480 }
+  ],
+  "edges": [
+  ]
+}
