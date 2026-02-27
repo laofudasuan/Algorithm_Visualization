@@ -39,7 +39,6 @@
     { "id": "Greedy", "x": 700, "y": 300, "category": "算法思想" },
 
     { "id": "String", "x": 200, "y": 530, "category": "组合对象" },
-    { "id": "Border", "x": 50, "y": 530, "category": "组合对象" },
     { "id": "Hash", "x": 50, "y": 460, "category": "算法" },
     { "id": "Automatic-Machine", "x": 300, "y": 450, "category": "算法" },
     { "id": "Trie", "x": 500, "y": 600, "category": "算法" },
@@ -92,7 +91,8 @@
     { "id": "Base", "x": 1300, "y": 650, "category": "数学基础" },
     { "id": "Number", "x": 1100, "y": 700, "category": "数学基础" },
     { "id": "Math-Transform", "x": 1200, "y": 600, "category": "数学基础" },
-    { "id": "Random", "x": 1200, "y": 900, "category": "数学基础" }
+    { "id": "Random", "x": 1200, "y": 900, "category": "数学基础" },
+    { "id": "Basic", "x": 1100, "y": 800, "category": "算法" }
   ],
   "edges": [
     { "source": "Tree-Basic", "target": "Tree-Sequence", "sourceSide": "right", "targetSide": "left" },
@@ -142,6 +142,7 @@
     { "source": "Data-Structure", "target": "Segment-Tree", "sourceSide": "left", "targetSide": "right" },
     { "source": "Data-Structure", "target": "Balance-Tree", "sourceSide": "bottom", "targetSide": "top" },
     { "source": "Segment-Tree", "target": "Graph-Opt", "sourceSide": "top", "targetSide": "bottom", "label": "线段树优化图论" },
+    { "source": "Data-Structure", "target": "DP-Optimization", "sourceSide": "top", "targetSide": "left", "label": "数据结构优化DP" },
 
     { "source": "String", "target": "Hash", "sourceSide": "top", "targetSide": "right" },
     { "source": "String", "target": "Border", "sourceSide": "left", "targetSide": "right" },
