@@ -30,11 +30,11 @@ import { CollapsibleComponent } from '../../../courseware/markdownConfig';
 
 倒推完以后，如果还有未确定的状态，则这些状态为平局
 
-##### 联合省选2023 过河卒
+##### P9169 [省选联考 2023] 过河卒
 
 题面略
 
-##### 联合省选2023 过河卒 · 解法
+<CollapsibleComponent title="做法"> 
 注意到，$n,m \le 10$
 
 一个棋盘的状态可以用三个棋子的位置、以及当前轮到谁走来表示，总状态量是$2 \times 10^6$级别
@@ -42,3 +42,4 @@ import { CollapsibleComponent } from '../../../courseware/markdownConfig';
 每一个状态的转移是常数级别，所以数据范围支持爆搜
 
 注意到这个题就属于有环的问题，所以需要用倒推法
+</CollapsibleComponent>

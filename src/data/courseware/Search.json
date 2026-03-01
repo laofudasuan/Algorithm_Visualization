@@ -14,7 +14,7 @@
     { "id": "广度优先搜索", "path" : "Search/BreadthFirstSearch.mdx", "x": 300, "y": 480 },
     { "id": "A*搜索", "path" : "Search/AStar.mdx", "x": 300, "y": 580 },
     { "id": "前K优解问题", "path" : "Search/KOptimalSolution.mdx", "x": 300, "y": 680 },
-    { "id": "博弈搜索", "path" : "Search/GameSearch.mdx", "x": 300, "y": 780 },
+    { "id": "博弈搜索", "path" : "Game/Game-Search.mdx", "x": 300, "y": 780 },
     { "id": "记忆化搜索", "path" : "Search/MemoizationSearch.mdx", "x": 300, "y": 880 }
   ],
   "edges": [

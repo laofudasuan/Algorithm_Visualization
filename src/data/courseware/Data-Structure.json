@@ -20,12 +20,12 @@
     { "id": "线段树", "link": "Segment-Tree", "x": 300, "y": 220 },
     { "id": "树状数组", "x": 400, "y": 220 },
     { "id": "平衡树", "link": "Balance-Tree", "x": 520, "y": 220 },
-    { "id": "区间赋值", "link" : "DS/Interval-Assign.mdx", "x": 320, "y": 350 },
+    { "id": "区间赋值", "path" : "DS/Interval-Assign.mdx", "x": 320, "y": 350 },
     { "id": "时间序列", "link": "Sequence-Time", "x": 650, "y": 250 },
 
     { "id": "矩阵（平面）", "x": 270, "y": 430 },
     { "id": "KD树", "x": 150, "y": 460 },
-    { "id": "扫描线", "x": 150, "y": 400 },
+    { "id": "扫描线", "path": "DS/Scan-Line.mdx", "x": 150, "y": 400 },
     { "id": "树套树", "x": 150, "y": 280 },
 
     { "id": "分块", "path": "DS/Block.mdx", "x": 650, "y": 350 },
