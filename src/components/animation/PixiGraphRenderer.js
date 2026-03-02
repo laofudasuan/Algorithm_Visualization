@@ -1377,13 +1377,16 @@ export class PixiGraphRenderer {
     // 初始化位置数组
     const positions = [];
     
-    // 计算每段箭头数量：floor(curveLength/100)+1
-    const NumArrows = Math.floor(curveLength / 100) ;
-    
-    for (let i = 0; i < NumArrows; i++) {
-      const position = 0.4 - 0.15 / NumArrows * i;
-      positions.push(position);
-      positions.push(1-position);
+    if (curveLength < 200) {
+      positions.push(0.4);
+      positions.push(0.7);
+    } else {
+      const NumArrows = Math.floor((curveLength-100) / 30) ;
+      for (let i = 0; i < NumArrows; i++) {
+        const position = 0.4 - 0.3 / NumArrows * i;
+        positions.push(position);
+        positions.push(1-position);
+      }
     }
     
     // 对于每个位置计算箭头

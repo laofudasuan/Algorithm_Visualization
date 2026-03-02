@@ -10,7 +10,7 @@
   },
   "pages": [
     { "id": "模拟费用流", "path": "Graph/Network-Flow-Simulate.mdx", "x": 200, "y": 380 },
-    { "id": "反悔贪心", "path": "Greedy/Retroactive-Greedy.mdx", "x": 400, "y": 380 }
+    { "id": "反悔贪心", "path": "Greedy/Greedy-Retrospective.mdx", "x": 400, "y": 380 }
   ],
   "edges": [
   ]

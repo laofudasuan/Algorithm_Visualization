@@ -14,7 +14,8 @@
     { "id": "贪心调整法", "path": "Greedy/Greedy-Adjust.mdx", "x": 500, "y": 300 },
     { "id": "模拟费用流", "link": "Network-Flow-Simulate", "x": 500, "y": 400 },
     { "id": "贪心顺序确定", "path": "Greedy/Greedy-Order.mdx", "x": 650, "y": 300 },
-    { "id": "树上贪心", "path": "Greedy/Greedy-Tree.mdx", "x": 650, "y": 400 }
+    { "id": "树上贪心", "path": "Greedy/Greedy-Tree.mdx", "x": 650, "y": 400 },
+    { "id": "反悔贪心", "path": "Greedy/Greedy-Retrospective.mdx", "x": 350, "y": 400 }
   ],
   "edges": [
     { "source": "博弈问题", "target": "通用算法", "sourceSide": "right", "targetSide": "left" }

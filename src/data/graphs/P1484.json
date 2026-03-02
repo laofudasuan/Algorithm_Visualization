@@ -1,0 +1,55 @@
+{
+  "width": 1000,
+  "height": 700,
+  "nodes": [
+    { "id": "S", "label": "S", "x": 500, "y": 50, "style": { "type": "planet4", "size": 70 } },
+    { "id": "P1-1", "label": "", "x": 400, "y": 200, "style": { "type": "planet1" } },
+    { "id": "P1-2", "label": "", "x": 800, "y": 200, "style": { "type": "planet1" } },
+    { "id": "L1-1", "label": "", "x": 100, "y": 300, "style": { "type": "planet1" } },
+    { "id": "L1-2", "label": "", "x": 300, "y": 300, "style": { "type": "planet1" } },
+    { "id": "L1-3", "label": "", "x": 500, "y": 300, "style": { "type": "planet1" } },
+    { "id": "L1-4", "label": "", "x": 700, "y": 300, "style": { "type": "planet1" } },
+    { "id": "L1-5", "label": "", "x": 900, "y": 300, "style": { "type": "planet1" } },
+    { "id": "L2-1", "label": "", "x": 100, "y": 400, "style": { "type": "planet1" } },
+    { "id": "L2-2", "label": "", "x": 300, "y": 400, "style": { "type": "planet1" } },
+    { "id": "L2-3", "label": "", "x": 500, "y": 400, "style": { "type": "planet1" } },
+    { "id": "L2-4", "label": "", "x": 700, "y": 400, "style": { "type": "planet1" } },
+    { "id": "L2-5", "label": "", "x": 900, "y": 400, "style": { "type": "planet1" } },
+    { "id": "P2-1", "label": "", "x": 200, "y": 500, "style": { "type": "planet1" } },
+    { "id": "P2-2", "label": "", "x": 600, "y": 500, "style": { "type": "planet1" } },
+    { "id": "T", "label": "T", "x": 500, "y": 650, "style": { "type": "planet4", "size": 70 } }
+  ],
+  "edges": [
+    { "id": "e1", "source": "S", "target": "L1-1", "label" : "(1,0)", "style": { "directional": true, "curvature": 0.15 } },
+    { "id": "e2", "source": "S", "target": "P1-1", "label" : "(1,0)", "style": { "directional": true } },
+    { "id": "e3", "source": "S", "target": "P1-2", "label" : "(1,0)", "style": { "directional": true, "curvature": -0.1 } },
+    { "id": "e4", "source": "P1-1", "target": "L1-2", "label" : "(1,0)", "style": { "directional": true } },
+    { "id": "e5", "source": "P1-1", "target": "L1-3", "label" : "(1,0)", "style": { "directional": true } },
+    { "id": "e6", "source": "P1-2", "target": "L1-4", "label" : "(1,0)", "style": { "directional": true } },
+    { "id": "e7", "source": "P1-2", "target": "L1-5", "label" : "(1,0)", "style": { "directional": true } },
+    { "id": "e8", "source": "L1-1", "target": "L2-1", "label" : "(1,a1)", "style": { "directional": true } },
+    { "id": "e9", "source": "L1-2", "target": "L2-2", "label" : "(1,a2)", "style": { "directional": true } },
+    { "id": "e10", "source": "L1-3", "target": "L2-3", "label" : "(1,a3)", "style": { "directional": true } },
+    { "id": "e11", "source": "L1-4", "target": "L2-4", "label" : "(1,a4)", "style": { "directional": true } },
+    { "id": "e12", "source": "L1-5", "target": "L2-5", "label" : "(1,a5)", "style": { "directional": true } },
+    { "id": "e13", "source": "L2-1", "target": "P2-1", "label" : "(1,0)", "style": { "directional": true } },
+    { "id": "e14", "source": "L2-2", "target": "P2-1", "label" : "(1,0)", "style": { "directional": true } },
+    { "id": "e15", "source": "L2-3", "target": "P2-2", "label" : "(1,0)", "style": { "directional": true } },
+    { "id": "e16", "source": "L2-4", "target": "P2-2", "label" : "(1,0)", "style": { "directional": true } },
+    { "id": "e17", "source": "L2-5", "target": "T", "label" : "(1,0)", "style": { "directional": true } },
+    { "id": "e18", "source": "P2-1", "target": "T", "label" : "(1,0)", "style": { "directional": true } },
+    { "id": "e19", "source": "P2-2", "target": "T", "label" : "(1,0)", "style": { "directional": true } }
+  ],
+  "nodesStyle": {
+    "size" : 50,
+    "type" : "planet1",
+    "stroke": "#000000",
+    "lineWidth": 2,
+    "labelFill": "#000000",
+    "labelFontSize": 20
+  },
+  "edgesStyle": {
+    "stroke": "#ffffff",
+    "lineWidth": 15
+  }
+}
