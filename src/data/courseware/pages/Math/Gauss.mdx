@@ -1,0 +1,24 @@
+---
+title: 高斯消元
+---
+
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+
+# 高斯消元
+
+##### P4035 [JSOI2008] 球形空间产生器
+
+有一个球形空间产生器能够在 $n$ 维空间中产生一个坚硬的球体。现在，你被困在了这个 $n$ 维球体中，你只知道球面上 $n+1$ 个点的坐标，你需要以最快的速度确定这个 $n$ 维球体的球心坐标，以便于摧毁这个球形空间产生器。
+
+$N \le 10$
+
+<CollapsibleComponent title="做法">
+$n+1$个二次方程之间两两相减可以得到$n$个线性方程。
+
+$a[n+1][n]$的一个数组，
+其中第$i$个点的第$j$维的坐标为$a[i][j]$
+
+设球心的坐标为$x[1 \ldots n]$
+
+球心到其中每个点的距离和都是$d$
+</CollapsibleComponent>

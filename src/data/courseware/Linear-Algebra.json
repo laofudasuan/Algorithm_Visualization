@@ -14,6 +14,7 @@
     { "id": "行列式", "path": "Math/Determinant.mdx", "x": 100, "y": 280 },
     { "id": "矩阵树定理", "link": "Tree-Count", "x": 100, "y": 380 },
     { "id": "矩阵其他内容", "path": "Math/Matrix-Others.mdx", "x": 500, "y": 380 },
+    { "id": "高斯消元", "path": "Math/Gauss.mdx", "x": 300, "y": 380 },
     { "id": "LGV引理", "path": "Counting/LGV.mdx", "x": 100, "y": 200 }
   ],
   "edges": [
