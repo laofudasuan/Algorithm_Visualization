@@ -9,11 +9,14 @@
     "description": { "x": 500, "y": 150 }
   },
   "pages": [
-    { "id": "计数方法", "path" : "Counting/Counting-Method.mdx", "x": 200, "y": 300 },
-    { "id": "DP计数", "path" : "DP/DP-Counting.mdx", "x": 400, "y": 300 },
-    { "id": "组合意义", "path" : "Counting/Combined-Meaning.mdx", "x": 400, "y": 380 },
+    { "id": "计数基础方法", "path" : "Counting/Counting-Method.mdx", "x": 400, "y": 300 },
+    { "id": "DP计数", "path" : "DP/DP-Counting.mdx", "x": 600, "y": 300 },
+    { "id": "组合意义", "path" : "Counting/Combined-Meaning.mdx", "x": 600, "y": 380 },
     { "id": "网格图走路", "path" : "Counting/Grid-Walk.mdx", "x": 400, "y": 460 },
-    { "id": "LGV引理", "link" : "Linear-Algebra", "x": 600, "y": 460 }
+    { "id": "LGV引理", "link" : "Linear-Algebra", "x": 600, "y": 460 },
+    { "id": "概率计数", "link" : "Probability", "x": 600, "y": 220 },
+    { "id": "置换群等价类技术", "link" : "Abstract-Algebra", "x": 200, "y": 300 },
+    { "id": "同构问题", "path" : "Counting/Isomorphism.mdx", "x": 400, "y": 220 }
   ],
   "edges": [
     { "source": "网格图走路", "target": "LGV引理", "sourceSide": "right", "targetSide": "left" }
