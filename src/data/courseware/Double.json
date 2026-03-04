@@ -1,0 +1,16 @@
+{
+  "title": "状压DP",
+  "description": "状压DP",
+  "cover": "/images/no.png",
+  "author": "老虎大蒜",
+  "createdAt": "2025-11-23",
+  "metaPositions": {
+    "title": { "x": 150, "y": 120 },
+    "description": { "x": 500, "y": 150 }
+  },
+  "pages": [
+    { "id": "倍增算法", "path": "Basic/Double.mdx", "x": 300, "y": 280 }
+  ],
+  "edges": [
+  ]
+}

@@ -87,7 +87,7 @@
     { "id": "Divide-and-Conquer", "x": 1400, "y": 800, "category": "算法思想" },
 
     { "id": "Prefix-Sum", "x": 1100, "y": 550, "category": "数学基础" },
-    { "id": "倍增", "x": 1300, "y": 950, "category": "算法" },
+    { "id": "Double", "x": 1300, "y": 950, "category": "算法" },
     { "id": "Base", "x": 1300, "y": 650, "category": "数学基础" },
     { "id": "Number", "x": 1100, "y": 700, "category": "数学基础" },
     { "id": "Math-Transform", "x": 1200, "y": 600, "category": "数学基础" },

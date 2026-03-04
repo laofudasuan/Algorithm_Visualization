@@ -11,7 +11,8 @@
   "pages": [
     { "id": "生成树计数", "link": "Tree-Count", "x": 200, "y": 280 },
     { "id": "连通性状压DP", "link": "DP-Bitmask", "x": 500, "y": 280 },
-    { "id": "子图计数问题", "path" : "Counting/Subgraph-Count.mdx", "x": 400, "y": 450 }
+    { "id": "子图计数问题", "path" : "Counting/Subgraph-Count.mdx", "x": 400, "y": 450 },
+    { "id": "图DP计数", "path" : "Counting/Graph-DP-Count.mdx", "x": 200, "y": 450 }
   ],
   "edges": [
   ]
