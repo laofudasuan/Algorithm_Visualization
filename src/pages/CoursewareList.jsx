@@ -7,6 +7,7 @@ import CoursewareNode from '../components/flow/CoursewareNode.jsx';
 import '../styles/reactflow-overrides.css';
 import { CATEGORY_COLORS } from '../constants/categories.js';
 
+const nodeTypes = { courseware: CoursewareNode };
 
 const OverlayCards = ({ cards, onNavigate, onClose }) => {
   const { x, y, zoom } = useViewport();
@@ -67,7 +68,6 @@ const CoursewareList = () => {
 
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-  const nodeTypes = useMemo(() => ({ courseware: CoursewareNode }), []);
 
   useEffect(() => {
     const loadCoursewares = async () => {

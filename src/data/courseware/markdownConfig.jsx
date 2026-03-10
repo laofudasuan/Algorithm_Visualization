@@ -1,6 +1,7 @@
 // markdown标题渲染配置
 // 此文件用于配置Markdown中不同级别的标题渲染格式
 import React from 'react';
+import Problem from '../../components/Problem';
 
 // H3标题计数器
 let h3Counter = 0;
@@ -437,6 +438,8 @@ if (typeof React === 'undefined') {
   console.error('React is not available. CollapsibleComponent requires React.');
 }
 
+export { Problem };
+
 // 导出所有组件，方便在Markdown中使用
 export default {
   // 标题相关
@@ -454,5 +457,7 @@ export default {
   // 折叠内容组件
   CollapsibleComponent,
   // 代码块
-  CodeBlock
+  CodeBlock,
+  // 题目组件
+  Problem
 };

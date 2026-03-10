@@ -3,12 +3,14 @@ import { createRoot } from 'react-dom/client';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import 'katex/dist/katex.min.css';
-import { headingComponents, tableComponents, listComponents, boxWithTagComponent, CodeBlock } from '../data/courseware/markdownConfig.jsx';
+import { headingComponents, tableComponents, listComponents, boxWithTagComponent, CodeBlock, Problem, CollapsibleComponent } from '../data/courseware/markdownConfig.jsx';
 import ReactFlow, { Background, ReactFlowProvider, useNodesState, useEdgesState, MarkerType } from 'reactflow';
 import 'reactflow/dist/style.css';
 import '../styles/reactflow-overrides.css';
 import CoursewareNode from '../components/flow/CoursewareNode.jsx';
 import LabelNode from '../components/flow/LabelNode.jsx';
+
+const nodeTypes = { courseware: CoursewareNode, label: LabelNode };
 
 const CoursewareDetail = () => {
   const { id } = useParams();
@@ -57,7 +59,6 @@ const CoursewareDetail = () => {
   const [mapMode, setMapMode] = useState(false);
   const [mapNodes, setMapNodes, onNodesChange] = useNodesState([]);
   const [mapEdges, setMapEdges, onEdgesChange] = useEdgesState([]);
-  const nodeTypes = useMemo(() => ({ courseware: CoursewareNode, label: LabelNode }), []);
   const [pages, setPages] = useState([]);
   const [combinedMode, setCombinedMode] = useState(false);
   const [combinedComponents, setCombinedComponents] = useState([]);
@@ -293,6 +294,7 @@ const CoursewareDetail = () => {
       setPageAttributes(attrs);
       setCombinedMode(true);
       setShowOverlay(true);
+      setPageComponents([]);
       setCurrentPage(0);
       setToc(new Array(comps.length));
     } catch {}
@@ -781,7 +783,9 @@ const CoursewareDetail = () => {
                                 ...tableComponents, 
                                 ...listComponents, 
                                 BoxWithTag: boxWithTagComponent,
-                                pre: CodeBlock 
+                                pre: CodeBlock,
+                                Problem,
+                                CollapsibleComponent
                               } 
                             })}
                           </Suspense>
@@ -807,7 +811,9 @@ const CoursewareDetail = () => {
                                   ...tableComponents, 
                                   ...listComponents, 
                                   BoxWithTag: boxWithTagComponent,
-                                  pre: CodeBlock 
+                                  pre: CodeBlock,
+                                  Problem,
+                                  CollapsibleComponent
                                 } 
                               })}
                             </Suspense>
