@@ -1,0 +1,60 @@
+import { CollapsibleComponent } from '../courseware/markdownConfig';
+
+##### T737486 中位数
+
+给定长度为 $N$ 的 01 串 $S$，你可以做若干个操作，形如将长度为 3 的子串变成它们的中位数（注意是变成一个数字），问可以得到多少个不同的串。
+
+答案对 $998244353$ 取模。
+
+$N \le 5 \times 10^6$
+
+<CollapsibleComponent title="做法"> 
+
+- 三个$01$取中位数，等价于删除两个数
+- 问题变成了每次删除两个数，能得到几种结果
+- 也就是说，最终得到的结果是$S$的一个子序列
+
+重复来自于：有相同的子序列
+
+去重方法：相同的子序列只计算下标字典序最小的那一个
+
+- l1[o][parity]：记录字符 o 最近出现的下标，且该下标的奇偶性为 parity
+- l2[o][parity]：记录最近出现的相同字符对 oo（即 $S[j]==S[j-1]==o$）的位置 $j$，其奇偶性为 parity
+
+
+```c++ maxLines=15
+#include<stdio.h>
+#include<string.h>
+#include<algorithm>
+#define M 5000005
+using namespace std;
+constexpr int P=1e9+7;
+inline void upd(int &x,int y){if((x+=y)>=P) x-=P;}
+char s[M];
+int n,nx[M][2],F[M];
+int l1[2][2],l2[2][2];
+inline void solve(){
+	scanf("%s",s+1),n=strlen(s+1);
+	memset(l1,0,sizeof l1),memset(l2,0,sizeof l2);
+	for(int i=n;i;--i){
+		int o=s[i]^48;
+		nx[i][o]=l2[o][i&1^1];
+		nx[i][!o]=l1[!o][i&1^1];
+		l1[o][i&1]=i;
+		if(s[i]==s[i-1]) l2[o][i&1]=i;
+		F[i]=0;
+	}
+	F[1]=1;
+	for(int i=3;i<=n;i+=2) if(s[i]==s[i-1]&&s[i]!=s[1]){F[i]=1;break;}
+	for(int i=1;i<=n;++i) if(F[i]) for(int o:{0,1}) if(nx[i][o])
+		upd(F[nx[i][o]],F[i]);
+	long long ans=0;
+	for(int i=n;i>0;i-=2) if(s[i]==s[n]||nx[i][s[i]^48]) ans+=F[i];
+	printf("%lld\n",ans%P);
+}
+int main(){
+	int T;scanf("%d",&T);
+	while(T--) solve();
+}
+```
+</CollapsibleComponent>

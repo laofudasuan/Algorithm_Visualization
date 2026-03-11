@@ -1,6 +1,6 @@
 {
-  "title": "枚举",
-  "description": "枚举算法",
+  "title": "问题分析",
+  "description": "问题分析方法",
   "cover": "/images/no.png",
   "author": "老虎大蒜",
   "createdAt": "2025-11-23",
@@ -9,8 +9,9 @@
     "description": { "x": 500, "y": 150 }
   },
   "pages": [
-    { "id": "枚举算法", "path" : "Search/Enumerate.mdx", "x": 200, "y": 280 },
-    { "id": "枚举剪枝", "path" : "Search/EnumeratePruning.mdx", "x": 400, "y": 280 }
+    { "id": "建模", "path" : "Thinking/Model.mdx", "x": 200, "y": 280 },
+    { "id": "性质挖掘", "path" : "Thinking/Property.mdx", "x": 400, "y": 280 },
+    { "id": "算法优化", "path" : "Thinking/Optimize.mdx", "x": 600, "y": 280 }
   ],
   "edges": [
   ]

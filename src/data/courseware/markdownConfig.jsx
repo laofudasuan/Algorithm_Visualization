@@ -331,8 +331,16 @@ export const CollapsibleComponent = (props) => {
 // 简易代码高亮与行号组件（覆盖 MDX 的 <pre> 渲染）
 export const CodeBlock = (props) => {
   const child = props.children;
-  const className = child?.props?.className || '';
+  const className = child?.props?.className || props.className || '';
+  const meta = child?.props?.meta || props.meta || '';
+  const metastring = child?.props?.metastring || props.metastring || '';
   const language = (className.match(/language-([\w+#-]+)/) || [])[1] || 'text';
+  
+  // 解析maxLines参数，默认为10
+  const combinedMeta = `${className} ${meta} ${metastring}`;
+  const maxLinesMatch = combinedMeta.match(/maxLines\s*(?:=|:)?\s*(\d+)/i);
+  const maxLines = maxLinesMatch ? parseInt(maxLinesMatch[1], 10) : 10;
+
   const raw = (child?.props?.children || '').toString();
   const lines = raw.split('\n');
   const escapeHtml = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -418,7 +426,10 @@ export const CodeBlock = (props) => {
     <div className="my-4 rounded-lg border border-gray-300 overflow-hidden" data-code-block="true">
       <div className="bg-gray-100 text-gray-700 px-3 py-2 text-xs font-mono uppercase tracking-wide">{language}</div>
       <div className="font-mono text-sm">
-        <div className="grid grid-cols-[48px_1fr]">
+        <div 
+          className="grid grid-cols-[48px_1fr]"
+          style={lines.length > maxLines ? { maxHeight: `${maxLines * 1.5}rem`, overflowY: 'auto' } : {}}
+        >
           {lines.map((line, idx) => (
             <React.Fragment key={idx}>
               <div className="px-3 py-0.5 text-right text-gray-400 bg-gray-50 select-none">{idx + 1}</div>

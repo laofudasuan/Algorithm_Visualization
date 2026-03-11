@@ -7,10 +7,23 @@ import remarkFrontmatter from 'remark-frontmatter'
 import remarkMdxFrontmatter from 'remark-mdx-frontmatter'
 import rehypeKatex from 'rehype-katex'
 
+function remarkFenceMaxLinesToLangClass() {
+  const visit = (node) => {
+    if (!node || typeof node !== 'object') return
+    if (node.type === 'code' && typeof node.meta === 'string' && /maxLines\s*(?:=|:)?\s*\d+/i.test(node.meta)) {
+      node.lang = node.lang ? `${node.lang} ${node.meta}` : node.meta
+    }
+    if (Array.isArray(node.children)) {
+      node.children.forEach(visit)
+    }
+  }
+  return (tree) => visit(tree)
+}
+
 export default defineConfig({
   plugins: [
     mdx({
-      remarkPlugins: [remarkGfm, remarkMath, remarkFrontmatter, remarkMdxFrontmatter],
+      remarkPlugins: [remarkGfm, remarkMath, remarkFrontmatter, remarkMdxFrontmatter, remarkFenceMaxLinesToLangClass],
       rehypePlugins: [rehypeKatex],
     }),
     react(),
