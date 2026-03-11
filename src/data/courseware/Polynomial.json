@@ -1,6 +1,6 @@
 {
   "title": "多项式",
-  "description": "多项式运算",
+  "description": "多项式",
   "cover": "/images/no.png",
   "author": "老虎大蒜",
   "createdAt": "2025-11-23",
@@ -13,7 +13,8 @@
     { "id": "点值表示", "path": "Math/Interpolation.mdx", "x": 450, "y": 350 },
     { "id": "应用", "x": 350, "y": 250 },
     { "id": "生成函数", "link": "Generating-Function", "x": 200, "y": 200 },
-    { "id": "哈希", "link": "Hash", "x": 200, "y": 300 }
+    { "id": "哈希", "link": "Hash", "x": 200, "y": 300 },
+    { "id": "多项式高阶运算", "link": "FFT", "x": 400, "y": 180 }
   ],
   "edges": [
     { "source": "多项式", "target": "点值表示", "sourceSide": "bottom", "targetSide": "top", "label": "表示方法" },

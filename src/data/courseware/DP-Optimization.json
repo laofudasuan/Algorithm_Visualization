@@ -10,7 +10,8 @@
   },
   "pages": [
     { "id": "状态优化", "x": 280, "y": 320 },
-    { "id": "逆向DP", "path": "DP/DP-Inverse.mdx", "x": 150, "y": 320 },
+    { "id": "逆向DP", "path": "DP/DP-Reverse.mdx", "x": 150, "y": 320 },
+    { "id": "DP求逆", "path": "DP/DP-Inverse.mdx", "x": 300, "y": 250 },
     { "id": "转移优化", "x": 400, "y": 320 },
     { "id": "前缀和优化", "path": "DP/DP-Optimization-PrefixSum.mdx", "x": 600, "y": 200 },
     { "id": "矩阵优化", "path": "DP/DP-Optimization-Matrix.mdx", "x": 600, "y": 260 },

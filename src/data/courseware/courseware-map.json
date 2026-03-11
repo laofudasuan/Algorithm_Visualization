@@ -92,7 +92,8 @@
     { "id": "Number", "x": 1100, "y": 700, "category": "数学基础" },
     { "id": "Math-Transform", "x": 1200, "y": 600, "category": "数学基础" },
     { "id": "Random", "x": 1200, "y": 900, "category": "数学基础" },
-    { "id": "Basic", "x": 1100, "y": 800, "category": "算法" }
+    { "id": "Basic", "x": 1100, "y": 800, "category": "算法" },
+    { "id": "Thinking", "x": 1100, "y": 900, "category": "算法思想" }
   ],
   "edges": [
     { "source": "Tree-Basic", "target": "Tree-Sequence", "sourceSide": "right", "targetSide": "left" },
