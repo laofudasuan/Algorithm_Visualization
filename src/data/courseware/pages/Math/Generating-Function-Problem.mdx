@@ -77,7 +77,9 @@ $n \le 10^5, k \le min(10^5,\binom{n}{2})$
 
 插入$i$的生成函数为$1+x+x^2+\ldots+x^{i-1}=\frac{1-x^i}{1-x}$，所以答案为
 
-$$[x^k] \frac{\prod_{i=1}^{n} (1-x^i)}{(1-x)^n} = [x^k] (\prod_{i=1}^{n}(1-x^i))(\sum_{i=0}^{n} \binom{i+n-1}{i} x^i)$$
+$$
+[x^k] \frac{\prod_{i=1}^{n} (1-x^i)}{(1-x)^n} = [x^k] (\prod_{i=1}^{n}(1-x^i))(\sum_{i=0}^{n} \binom{i+n-1}{i} x^i)
+$$
 
 接下来需要求左边这个多项式的每一项系数
 
@@ -123,7 +125,8 @@ $$
 $$
 </CollapsibleComponent>
 
-##### ARC102E Stop. Otherwise...
+##### AT_arc102_c [ARC102E] Stop. Otherwise...
+
 有$n$个骰子，每个骰子有$k$个面，上面有$1 \sim k$
 
 对于$[2,2k]$中的每一个数$x$，求任意投这$n$个骰子，使得不存在任意两个骰子的点数和为$x$的方案数
