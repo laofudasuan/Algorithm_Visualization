@@ -1,0 +1,30 @@
+import { CollapsibleComponent } from '../courseware/markdownConfig';
+
+##### P14567 【MX-S12-T2】区间
+
+给定三个长度为 $n$ 的正整数序列：颜色序列 $c$，权值序列 $v$，代价序列 $f$。序列的下标均由 $1$ 开始标号。保证代价序列**单调不减**，即 $f_i \le f_{i + 1}$。
+
+对一个区间 $[l, r]$（$1 \le l \le r \le n$）做如下定义：
+
+1. 称区间 $[l, r]$ **合法**，当且仅当：不存在一种颜色 $x$ 在区间内外均出现过，即不存在颜色 $x$ 和下标 $i, j$ 满足 $c_i = c_j = x$ 且 $i \in [l, r]$、$j \notin [l, r]$。
+2. 区间 $[l, r]$ 的**价值**定义为 $\displaystyle \sum_{i = l}^{r} (v_i \cdot f_{i - l + 1})$。
+
+找出一个价值最小的合法区间，你只需要求出该最小价值。
+
+<CollapsibleComponent title="随机化做法">
+给每个颜色随机赋权值，保证每个颜色所有位置的异或和为0
+</CollapsibleComponent>
+
+<CollapsibleComponent title="单调性做法">
+```C++
+for (int i = 1; i <= n; i++) {
+   int l = pre[i], r = suf[i], j = i-1;
+    while (r == i && j >= l ) {
+              l = min(l,L[j]); r =max(r,R[j]);
+              j = next[j];
+    }
+    if ( r== i && j < l) 用[l,r]更新答案;
+    else next[i] = j,L[i]=l,R[i]=i;
+}
+```
+</CollapsibleComponent>
