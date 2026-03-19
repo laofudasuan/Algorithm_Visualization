@@ -1,0 +1,17 @@
+import { CollapsibleComponent } from '../courseware/markdownConfig';
+
+##### CF835E
+
+有$N$个数，其中两个为$y$，剩下的为$x$，$x \neq y$。
+
+每次可以询问一个集合的xor和，要求在19次之内找到两个为$y$的数的下标。
+
+$N \le 1000$
+
+<CollapsibleComponent title="做法">
+假设两个$y$的下标是$i,j$，那么可以先用$10$次求出每个二进制位上i和j是否相同。
+
+肯定会有一位不同，可以假设$i$的这一位为$0$，$j$的这一位为$1$，那么再用$9$次就可以求出$i$的值
+
+最后根据上面的结果就可以求出$j$的值。
+</CollapsibleComponent>

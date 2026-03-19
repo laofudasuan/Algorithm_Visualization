@@ -1,0 +1,15 @@
+import { CollapsibleComponent } from '../courseware/markdownConfig';
+
+##### P11882 RMI 2024 彩虹糖 / Skittlez
+
+彩虹糖包装机上有 $n$ 行 $n$ 列共 $n \times n$ 个袋子。我们记第 $i$ 行第 $j$ 列的袋子为 $(i, j)$。
+
+有 $q$ 个操作：每个操作用六元组 $(x_1, y_1, x_2, y_2, c, k)$ 描述，意思是：
+    
+- $\forall x_1 \leq i \leq x_2, \, y_1 \leq j \leq y_2$，在 $(i, j)$ 中放入 $k$ 颗颜色为 $c$ 的彩虹糖。
+
+在所有操作完后，求出每一袋中，彩虹糖颜色的绝对众数。
+
+定义一种颜色是绝对众数，当且仅当，它出现次数严格大于其他颜色出现次数之和。
+
+$n \le 1000, q \le 5 \times 10^5$
