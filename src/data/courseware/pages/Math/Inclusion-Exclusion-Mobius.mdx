@@ -140,9 +140,9 @@ $$\sum_{x=1}^{n}\sum_{y=1}^{m} lcm(x,y)$$
 数据范围$n,m \le 10^7$
  
 <BoxWithTag tag="推导">
-![](/Math/M2.png "w=90%")
+![](/Math/M2.png "w=60%")
  
-![](/Math/M3.png "w=90%")
+![](/Math/M3.png "w=60%")
 </BoxWithTag>
 
 ##### BZOJ 2440 完全平方数
@@ -275,6 +275,114 @@ $$
 
 复杂度可以被证明为$O(n^{4/9})$
 
+</CollapsibleComponent>
+
+##### P15251 [NOSOI R1] Free Pairs
+
+若一个正整数不被任何大于 $1$ 的平方数整除，则称其为自由的。例如，$1$、$2$、$3$、$5$、$6$、$7$ 是自由的，而 $4$、$8$、$9$、$12$ 不是。
+
+给定一个长度为 $n$ 的正整数序列 $a_1, a_2, \dots, a_n$，你需要处理 $m$ 次操作。操作有两种类型：
+
+* 修改：给定下标 $i$ 和值 $x$，将 $a_i$ 修改为 $x$。
+
+* 查询：给定区间 $[l, r]$，求满足 $l \le i \le j \le r$ 且 $\gcd(a_i, a_j)$ 是自由的有序对 $(i, j)$ 的个数。
+
+**请注意，有序对 $(i, j)$ 包括 $i = j$ 的情况。**
+
+<CollapsibleComponent title="做法"> 
+
+首先 square-free 很自然地描述成 $\mu^2$。那么我们要求：
+
+$$
+\begin{align*}
+\sum_{l \le i \le j \le r} \mu^2\left(\gcd(a_i, a_j)\right)
+&= \sum_{l \le i \le j \le r} \sum_{d^2 | a_i, d^2 | a_j} \mu(d) \\
+&= \sum_d \mu(d) \binom{1 + \sum_{l \le i \le r} [d^2 \mid a_i]}{2}
+\end{align*}
+$$
+
+只用枚举 $\le \sqrt{V}$ 的所有 $\mu$ 非零的 $d$，大概是 $\frac{6}{\pi^2}\sqrt{V}$ 个。那么压力给到查询。
+
+首先对于修改，我们需要对于所有 $d^2 | a_i$ 的 $d$，将 $i$ 位置单点修改。查询则是对于所有 $d$ 求区间 $[l, r]$ 的个数。
+
+直接树状数组就能做 $\mathcal{O}(n\sqrt{V}\log n)$，但是显然我们不会止步于此。发现修改次数相比查询次数是极少的，因为一个数的平方因子个数的量级为 $\mathcal{O}(\sqrt[3]{\sqrt{V}}) = \mathcal{O}(\sqrt[6]{V})$，而查询需要 $\mathcal{O}(\sqrt{V})$ 次，这启发我们用分块进行平衡。
+
+具体的，分三层块，块间维护前缀和即可做到 $\mathcal{O}(n(\sqrt{V} + \sqrt[6]{n^2 V}))$。更进一步地，我们本质上是求解单点 flip 区间 popcount，所以可以继续压位，做到时间复杂度 $\mathcal{O}(n(\sqrt{V} + \sqrt[6]{(n/w)^2 V}))$。
+
+空间也可做到 $\mathcal{O}(n)$，直接离线下来对于每个 $d$ 单独做即可，常数极小。
+
+```C++ maxLines=15
+#include <bits/stdc++.h>
+
+using namespace std;
+
+// using Ikaleio fastIO
+
+typedef unsigned long long ull;
+
+const int MAXN = 3e5 + 10;
+const int t[] = { 1, 4, 9, 36, 25, 100, 225, 49, 196, 441, 1225, 121, 484, 1089, 3025, 5929, 169, 676, 1521, 4225, 8281, 900, 289, 1156, 2601, 7225, 361, 1444, 3249, 9025, 1764, 529, 2116, 4761, 841, 3364, 7569, 961, 3844, 8649, 4356, 4900, 1369, 5476, 6084, 1681, 6724, 1849, 7396, 2209, 8836, 2809, 3481, 3721, 4489, 5041, 5329, 6241, 6889, 7921, 9409 };
+const int tmu[] = { 1, -1, -1, 1, -1, 1, 1, -1, 1, 1, 1, -1, 1, 1, 1, 1, -1, 1, 1, 1, 1, -1, -1, 1, 1, 1, -1, 1, 1, 1, -1, -1, 1, 1, -1, 1, 1, -1, 1, 1, -1, -1, -1, 1, -1, -1, 1, -1, 1, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+
+int n, m, a[MAXN], b[MAXN];
+
+ull c[1 << 13]; int t0[1 << 13], t1[1 << 9], t2[1 << 5];
+
+inline 
+void add(int k) {
+	int x = k >> 6; c[x] ^= 1llu << (k & 63);
+	for (int i = x; i <= (x | 15); i++) t0[i]++; x >>= 4;
+	for (int i = x; i <= (x | 15); i++) t1[i]++; x >>= 4;
+	for (int i = x; i <= (x | 31); i++) t2[i]++;
+}
+
+inline 
+void del(int k) {
+	int x = k >> 6; c[x] ^= 1llu << (k & 63);
+	for (int i = x; i <= (x | 15); i++) t0[i]--; x >>= 4;
+	for (int i = x; i <= (x | 15); i++) t1[i]--; x >>= 4;
+	for (int i = x; i <= (x | 31); i++) t2[i]--;
+}
+
+inline 
+int ask(int k) {
+	int x = k >> 6, y = k & 63;
+	int res = __builtin_popcountll(c[x] & (2llu << y) - 1);
+	x--; if (x < 0) return res; res += t0[x];
+	x = (x >> 4) - 1; if (x < 0) return res; res += t1[x];
+	x = (x >> 4) - 1; return x < 0 ? res : res + t2[x];
+}
+
+char op[MAXN]; int x[MAXN], y[MAXN]; ull ans[MAXN];
+
+int main() {
+	io.read(n, m);
+	for (int i = 0; i < n; i++) io.read(a[i]);
+	for (int i = 0; i < m; i++) {
+		io.read(op[i], x[i], y[i]), x[i]--;
+		if (op[i] == 'Q') y[i]--;
+	}
+	for (int _ = 0; _ < 61; _++) {
+		for (int i = 0; i < n; i++) b[i] = a[i];
+		for (int i = 0; i < n; i++) if (b[i] % t[_] == 0) add(i);
+		for (int i = 0; i < m; i++) {
+			if (op[i] == 'U') {
+				if (b[x[i]] % t[_] == 0 && y[i] % t[_] != 0) del(x[i]);
+				if (b[x[i]] % t[_] != 0 && y[i] % t[_] == 0) add(x[i]);
+				b[x[i]] = y[i];
+			} else {
+				int cnt = ask(y[i]); if (x[i]) cnt -= ask(x[i] - 1); 
+				if (tmu[_] > 0) ans[i] += (ull)cnt * (cnt + 1) >> 1;
+				else ans[i] -= (ull)cnt * (cnt + 1) >> 1;
+			}
+		}
+		memset(c, 0, sizeof c), memset(t0, 0, sizeof t0);
+		memset(t1, 0, sizeof t1), memset(t2, 0, sizeof t2);
+	}
+	for (int i = 0; i < m; i++) if (op[i] == 'Q') io.writeln(ans[i]);
+}
+```
+ 
 </CollapsibleComponent>
 
 ##### 莫比乌斯反演例题集
