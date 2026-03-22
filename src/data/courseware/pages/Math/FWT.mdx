@@ -76,7 +76,7 @@ FWT的本质是，对于集合卷积$c_k = \sum_{i \oplus j = k}a_ib_j$，构造
 
 $$\forall i, a'_ib'_i = \sum_{j}w_{i,j}a_j \sum_{j}w_{i,j}b_j = \sum_{j}w_{i,j}c_j = \sum_{j}w_{i,j}\sum_{k \oplus t=j}a_kb_t$$
 
-因此$\forall i,j,k w_{i,j}w_{i,k} = w_{i,o \oplus k}$
+因此$\forall i,j,k$有$w_{i,j}w_{i,k} = w_{i,j \oplus k}$
 
 然后利用$\oplus$是按位独立的，所以可以把$w$拆成每一个二进制位相乘，每次就只需要考虑一个二进制位。
 
