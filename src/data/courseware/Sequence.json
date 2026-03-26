@@ -13,7 +13,7 @@
     { "id": "前缀和与差分", "link": "Prefux-Sum", "x": 400, "y": 380 },
     { "id": "区间覆盖", "path": "Sequence/Interval_Cover.mdx", "x": 600, "y": 380 },
     { "id": "逆序对问题", "path": "Sequence/Reverse_Pair.mdx", "x": 800, "y": 380 },
-    { "id": "笛卡尔树", "path": "Sequence/Cartesian_Tree.mdx", "x": 1000, "y": 380 }
+    { "id": "序列最值问题", "path": "Sequence/Sequence_Maximum.mdx", "x": 1000, "y": 380 }
   ],
   "edges": [
   ]

@@ -6,6 +6,7 @@
     { "id": "Permutation", "x": 700, "y": 920, "category": "组合对象" },
     { "id": "Sequence_Representation", "x": 600, "y": 920, "category": "组合对象" },
     { "id": "Sequence-Time", "x": 900, "y": 800, "category": "算法" },
+    { "id": "Bracket", "x": 550, "y": 800, "category": "算法" },
 
     { "id": "Tree-Basic", "x": 200, "y": 800, "category": "组合对象" },
     { "id": "Tree-Sequence", "x": 350, "y": 800, "category": "组合对象" },
@@ -116,6 +117,9 @@
     { "source": "Graph-Basic", "target": "Planar", "sourceSide": "left", "targetSide": "bottom" },
     { "source": "Greedy", "target": "Network-Flow-Simulate", "sourceSide": "left", "targetSide": "right", "label": "反悔贪心" },
     { "source": "Graph-Basic", "target": "Graph-Model", "sourceSide": "bottom", "targetSide": "top" },
+
+    { "source": "Sequence", "target": "Bracket", "sourceSide": "left", "targetSide": "right" },
+    { "source": "Sequence", "target": "Sequence-Maximum", "sourceSide": "left", "targetSide": "right" },
     
     { "source": "Polynomial", "target": "Generating-Function", "sourceSide": "left", "targetSide": "right" },
     { "source": "FFT", "target": "Polynomial", "sourceSide": "bottom", "targetSide": "top" },
