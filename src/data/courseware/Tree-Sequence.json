@@ -12,7 +12,7 @@
     { "id": "DFS序", "path": "Tree/Tree-DFS-Sequence.mdx", "x": 300, "y": 250 },
     { "id": "BFS序", "x": 300, "y": 330 },
     { "id": "欧拉序", "path": "Tree/Tree-Euler-Sequence.mdx", "x": 450, "y": 330 },
-    { "id": "括号序列", "path": "Tree/Tree-Bracket-Sequence.mdx", "x": 450, "y": 250 }
+    { "id": "括号序列", "link": "Bracket", "x": 450, "y": 250 }
   ],
   "edges": [
   ]

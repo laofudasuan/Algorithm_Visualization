@@ -1,0 +1,18 @@
+{
+  "title": "分块",
+  "description": "分块",
+  "cover": "/images/no.png",
+  "author": "老虎大蒜",
+  "createdAt": "2025-11-23",
+  "metaPositions": {
+    "title": { "x": 150, "y": 120 },
+    "description": { "x": 500, "y": 150 }
+  },
+  "pages": [
+    { "id": "分块", "path": "DS/Block.mdx", "x": 250, "y": 280 },
+    { "id": "多层分块", "path": "DS/Block-Layer.mdx", "x": 100, "y": 280 },
+    { "id": "树分块", "path": "DS/Block-Tree.mdx", "x": 450, "y": 280 }
+  ],
+  "edges": [
+  ]
+}

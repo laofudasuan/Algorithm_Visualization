@@ -9,7 +9,9 @@
     "description": { "x": 500, "y": 150 }
   },
   "pages": [
-    { "id": "括号序列", "path" : "Sequence/Bracket.mdx", "x": 200, "y": 280 }
+    { "id": "括号序列", "path" : "Sequence/Bracket.mdx", "x": 200, "y": 280 },
+    { "id": "树的括号序列", "path": "Tree/Tree-Bracket-Sequence.mdx", "x": 450, "y": 280 },
+    { "id": "括号序列DP", "link": "DP-Sequence", "x": 200, "y": 380 }
   ],
   "edges": [
   ]

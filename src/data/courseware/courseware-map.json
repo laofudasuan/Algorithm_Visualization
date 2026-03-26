@@ -49,6 +49,7 @@
     { "id": "Segment-Tree", "x": 500, "y": 400, "category": "算法" },
     { "id": "Balance-Tree", "x": 600, "y": 600, "category": "算法" },
     { "id": "Graph-Opt", "x": 500, "y": 320, "category": "算法" },
+    { "id": "Block", "x": 500, "y": 450, "category": "算法" },
 
     { "id": "Dynamic-Programming", "x": 800, "y": 500, "category": "算法" },
     { "id": "DP-State", "x": 1000, "y": 650, "category": "算法" },
@@ -120,6 +121,8 @@
 
     { "source": "Sequence", "target": "Bracket", "sourceSide": "left", "targetSide": "right" },
     { "source": "Sequence", "target": "Sequence-Maximum", "sourceSide": "left", "targetSide": "right" },
+    { "source": "DP-Sequence", "target": "Bracket", "sourceSide": "left", "targetSide": "right" },
+    { "source": "Tree-Sequence", "target": "Bracket", "sourceSide": "right", "targetSide": "left" },
     
     { "source": "Polynomial", "target": "Generating-Function", "sourceSide": "left", "targetSide": "right" },
     { "source": "FFT", "target": "Polynomial", "sourceSide": "bottom", "targetSide": "top" },
@@ -146,6 +149,7 @@
 
     { "source": "Data-Structure", "target": "Segment-Tree", "sourceSide": "left", "targetSide": "right" },
     { "source": "Data-Structure", "target": "Balance-Tree", "sourceSide": "bottom", "targetSide": "top" },
+    { "source": "Data-Structure", "target": "Block", "sourceSide": "left", "targetSide": "right" },
     { "source": "Segment-Tree", "target": "Graph-Opt", "sourceSide": "top", "targetSide": "bottom", "label": "线段树优化图论" },
     { "source": "Data-Structure", "target": "DP-Optimization", "sourceSide": "top", "targetSide": "left", "label": "数据结构优化DP" },
 
