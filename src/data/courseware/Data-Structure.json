@@ -24,16 +24,15 @@
     { "id": "时间序列", "link": "Sequence-Time", "x": 650, "y": 250 },
 
     { "id": "矩阵（平面）", "x": 270, "y": 430 },
-    { "id": "KD树", "x": 150, "y": 460 },
+    { "id": "KD树", "path": "DS/KD-Tree.mdx", "x": 150, "y": 460 },
     { "id": "扫描线", "path": "DS/Scan-Line.mdx", "x": 150, "y": 400 },
     { "id": "树套树", "x": 150, "y": 280 },
 
-    { "id": "分块", "link": "Block", "x": 650, "y": 350 },
-    { "id": "莫队", "path": "DS/Mo.mdx", "x": 650, "y": 420 },
-    { "id": "回滚莫队", "x": 750, "y": 420 },
+    { "id": "分块", "link": "Block", "x": 650, "y": 430 },
+    { "id": "莫队", "path": "DS/Mo.mdx", "x": 650, "y": 490 },
 
-    { "id": "集合", "x": 550, "y": 500 },
-    { "id": "堆", "x": 700, "y": 500 },
+    { "id": "集合", "x": 550, "y": 550 },
+    { "id": "堆", "path": "DS/Heap.mdx", "x": 700, "y": 550 },
 
     { "id": "树", "x": 300, "y": 530 },
     { "id": "树分治", "link": "Tree-Split", "x": 150, "y": 620 },
@@ -41,8 +40,8 @@
     { "id": "Dsu On Tree", "x": 380, "y": 620 },
     { "id": "虚树", "x": 150, "y": 540 },
 
-    { "id": "图", "x": 550, "y": 580 },
-    { "id": "并查集", "x": 700, "y": 600 },
+    { "id": "图", "x": 550, "y": 620 },
+    { "id": "并查集", "x": 700, "y": 620 },
 
     { "id": "数据结构优化DP", "link": "DP-Optimization", "x": 900, "y": 500 }
   ],
@@ -72,6 +71,7 @@
     { "source": "根号", "target": "莫队", "sourceSide": "right", "targetSide": "left" },
     { "source": "莫队", "target": "回滚莫队", "sourceSide": "right", "targetSide": "left" },
 
+    { "source": "数据结构", "target": "集合", "sourceSide": "right", "targetSide": "left" },
     { "source": "集合", "target": "堆", "sourceSide": "right", "targetSide": "left" },
 
     { "source": "树", "target": "树分治", "sourceSide": "bottom", "targetSide": "top" },

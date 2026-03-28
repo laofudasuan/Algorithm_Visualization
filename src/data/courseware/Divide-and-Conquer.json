@@ -15,8 +15,8 @@
     { "id": "树分治", "link": "Tree-Split", "x": 300, "y": 380 },
     { "id": "时间序列分治", "path": "Basic/Divide-Time.mdx", "x": 300, "y": 420 },
     { "id": "猫树", "x": 300, "y": 600 },
-    { "id": "整体二分", "x": 500, "y": 350 },
-    { "id": "CDQ分治", "x": 500, "y": 400 }
+    { "id": "整体二分", "path": "Basic/Divide-Whole.mdx", "x": 500, "y": 350 },
+    { "id": "CDQ分治", "path": "Basic/Divide-CDQ.mdx", "x": 500, "y": 400 }
   ],
   "edges": [
     { "source": "XXX", "target": "XXX", "sourceSide": "top", "targetSide": "bottom" }
