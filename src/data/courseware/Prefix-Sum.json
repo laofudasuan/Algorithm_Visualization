@@ -9,8 +9,8 @@
     "description": { "x": 500, "y": 150 }
   },
   "pages": [
-    { "id": "序列", "path" : "Space/Prefix-Sum-Sequence.mdx", "x": 400, "y": 250 },
-    { "id": "差分", "path": "Sequence/Difference.mdx", "x": 400, "y": 380 },
+    { "id": "序列前缀和", "path" : "Space/Prefix-Sum-Sequence.mdx", "x": 400, "y": 250 },
+    { "id": "序列差分", "path": "Space/Difference-Sequence.mdx", "x": 400, "y": 380 },
     { "id": "树上", "path": "Space/Prefix-Sum-Tree.mdx", "x": 200, "y": 280 },
     { "id": "高维空间", "path": "Space/Prefix-Sum-High-Dimensional.mdx", "x": 600, "y": 280 }
   ],

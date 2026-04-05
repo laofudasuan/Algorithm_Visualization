@@ -37,4 +37,18 @@ Damian 正在制作一款电子游戏！
 
 $N,Q \le 3 \times 10^5$
 
-##### T304501 seq
+##### abc452_e You WILL Like Sigma Problem
+
+You are given a sequence of positive integers $A = (A_1, \dots, A_N)$ of length $N$ and a sequence of positive integers $B = (B_1, \dots, B_M)$ of length $M$.
+
+Find the value, modulo $998244353$, of
+
+$$
+\sum_{i=1}^N \sum_{j=1}^M A_i \cdot B_j \cdot (i \bmod j).
+$$
+
+<CollapsibleComponent title="解法">
+先枚举$j$，然后对$i$分段计算
+
+预处理$A[i]$的前缀和和$A[i] \times i$的前缀和，让每一段能快速计算
+</CollapsibleComponent>

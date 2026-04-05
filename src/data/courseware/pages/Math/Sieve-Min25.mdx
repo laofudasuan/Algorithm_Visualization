@@ -16,7 +16,7 @@ $$
 $$
 \begin{aligned}
 \sum_{i=1}^{n} F(i)=&1+\sum_{i=2}^{n} F(i)[i\text{的最大质因子次数} \ge 2] \\
-&+\sum_{i=2}^{n}F(i)[i\text{的最大质因子次数} \ge 2]\left(G( \lfloor \frac{n}{i} \rfloor)-G(i\text{的最大质因子})\right)
+&+\sum_{i=2}^{n}F(i)\left(G( \lfloor \frac{n}{i} \rfloor)-G(i\text{的最大质因子})\right)
 \end{aligned}
 $$
 
@@ -41,7 +41,7 @@ $$
 容斥的时候就减掉$p[k]$的倍数。因为我们要求解的$f$都形如$f(p)=p^k$，是完全积性的，所以$f(py)=f(p)f(y)$
 
 $$
-_k (x)=\left\{\begin{array}{ll} G_{k-1}(x) & x<p[k]^2 \\ G_{k-1} (x)-f(p_k)(G_{k-1} ( \lfloor \frac{x}{p[k]} \rfloor)-G_{k-1} (p[k]-1)) & p[k]^2 \le x \end{array}\right.
+G_k (x)=\left\{\begin{array}{ll} G_{k-1}(x) & x<p[k]^2 \\ G_{k-1} (x)-f(p_k)(G_{k-1} ( \lfloor \frac{x}{p[k]} \rfloor)-G_{k-1} (p[k]-1)) & p[k]^2 \le x \end{array}\right.
 $$
 
 求G的复杂度是$n^{0.75}/\log n$的。
