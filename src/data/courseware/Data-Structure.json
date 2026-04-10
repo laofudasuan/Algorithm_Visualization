@@ -43,7 +43,8 @@
     { "id": "图", "x": 550, "y": 620 },
     { "id": "并查集", "path": "DS/Ufs.mdx", "x": 700, "y": 620 },
 
-    { "id": "数据结构优化DP", "link": "DP-Optimization", "x": 900, "y": 500 }
+    { "id": "数据结构优化DP", "link": "DP-Optimization", "x": 900, "y": 500 },
+    { "id": "标记技巧", "path": "DS/Mark.mdx", "x": 900, "y": 400 }
   ],
   "edges": [
     { "source": "数据结构", "target": "序列", "sourceSide": "top", "targetSide": "bottom" },

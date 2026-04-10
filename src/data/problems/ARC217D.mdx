@@ -1,0 +1,33 @@
+import { CollapsibleComponent } from '../courseware/markdownConfig';
+
+
+##### arc217_d Greedy Customer
+
+给定正整数 $N$、$M$ 以及一个长度为 $N$ 的正整数序列 $A = (A_1, A_2, \dots, A_N)$。
+
+对于正整数 $k$，定义 $f(k)$ 为下述问题的答案：
+
+高桥有 $k$ 日元。AtCoder 商店里有 $N$ 件商品，第 $i$ 件商品的价格为 $A_i$ 日元。
+
+他按顺序对 $i = 1, 2, \dots, N$ 执行以下操作：
+- 如果他当前拥有的钱数 **大于等于** $A_i$ 日元，他就购买第 $i$ 件商品。
+
+求他购买的所有商品的总价格。
+
+求 $\bigoplus_{1 \le k \le M} (k \times f(k))$。这里的 $\bigoplus_{1 \le k \le M} (k \times f(k))$ 指的是 $1 \times f(1), 2 \times f(2), \dots, M \times f(M)$ 这些值的**按位异或**结果。
+
+本题包含 $T$ 组测试用例，请分别求解。
+
+- $1 \le T \le 10$
+- 所有测试用例中，$N$ 的总和不超过 $5 \times 10^5$。
+- 所有测试用例中，$M$ 的总和不超过 $5 \times 10^7$。
+
+<CollapsibleComponent title="做法">
+
+考虑转化为这么一个问题：
+
+初始有一个下标为$1 \sim k$的序列，每个元素都是1，接下来有$n$次操作，每次操作把下标$>A_i$的项移动和累加到$-=A_i$的位置。
+
+每次如果$A_i>$的项全为空则跳过，否则，看$>A_i$的数是否超过剩下数的一般，如果不超过一半则暴力，如果超过一半，则整体$-=A_i$，再把多减的数加回去
+
+</CollapsibleComponent>

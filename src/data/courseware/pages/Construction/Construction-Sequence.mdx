@@ -4,6 +4,73 @@ title: 序列构造
 
 import { CollapsibleComponent } from '../../../courseware/markdownConfig';
 
+## 基础题
+
+- P5595
+- P3514
+- CF1283F
+- CF1311E
+- AT_agc029_c
+- AT_hitachi2020_c 
+- CF1270E
+
+
 ##### CF2211 B. Mickey Mouse Constructive
 
 ##### CF2211 D. AND-array
+
+##### P8376 APIO2022 排列
+
+构造一个长度$\le 90$的排列，使得递增子序列的数量为$k$
+
+$k \le 10^{18}$
+<CollapsibleComponent title="做法"> 
+思路：增量法，按照值域构造
+    
+把排列画在二维平面上，从小往大加数
+
+每次把新的数放前面，可以让答案+1
+
+每次把新的数放后面，可以让答案$\times 2$
+
+对$k$二进制分解以后求解即可，答案为$2\log k = 120$
+
+优化：
+
+1. 当$k \bmod 2 = 0$时，将数加到最后，$k \to k/2$
+2. 当$k \bmod 4 = 1$时，将数加到最前，$k = k - 1$，然后做两次$1$
+3. 当$k \bmod 4 = 3$时，将数加到第三位，$k = k - 3$，然后做两次$1$
+
+这样每三个数至少$/4$，答案不超过$1.5 \log k = 90$
+</CollapsibleComponent>
+
+##### CF1491G Switch and Flip
+
+
+
+## 爆搜找规律法
+
+##### arc217_a Min of Sum of XOR
+
+给定一个正整数 $N$。
+
+找到一个 $(1,2,\dots,N)$ 的排列 $P = (P_1,P_2,\dots,P_N)$，使得
+$$
+\sum_{i=1}^{N} \left( \bigoplus_{1 \le j \le i} P_j \right)
+$$
+最小。
+
+其中，$\bigoplus_{1 \le j \le i} P_j$ 定义为 $P_1,P_2,\dots,P_i$ 的按位异或（bitwise XOR）。
+
+共给出 $T$ 组测试用例，需要对每组用例求解。
+
+<CollapsibleComponent title="做法">
+打表可以发现一组通用解：
+
+```
+n=8 (1, 3, 2, 4, 5, 7, 6, 8)
+n=9 (1, 3, 2, 4, 5, 7, 6, 8, 9)
+n=10 (1, 3, 2, 4, 5, 7, 6, 8, 9, 10)
+```
+
+</CollapsibleComponent>
