@@ -47,17 +47,16 @@ import { CollapsibleComponent } from '../../../courseware/markdownConfig';
 
 ## 例题
 
-    给定$n,k$。求$\sum_{k|i,0 \le i \le n} \binom{n}{i} \bmod 998244353$
+给定$n,k$。求$\sum_{k|i,0 \le i \le n} \binom{n}{i} \bmod 998244353$
   
-    $k \le 2^{20}$为$2$的幂次
+$k \le 2^{20}$为$2$的幂次
     
- 
+<CollapsibleComponent title="做法"> 
 
-## 例题
+$\sum_{k|i,0 \le i \le n} \binom{n}{i}$其实就是把$(1+x)^n$展开以后，所有$k$次项的系数之和
 
-    $\sum_{k|i,0 \le i \le n} \binom{n}{i}$其实就是把$(1+x)^n$展开以后，所有$k$次项的系数之和
-
-    这样，带入$(1+\omega_k)^n$就是答案
+这样，$\frac{1}{k}\sum_{i=0}^{k-1} (1+w_k^i)^n$就是答案
+</CollapsibleComponent> 
  
 
 ## LOJ6485 LJJ学二项式定理

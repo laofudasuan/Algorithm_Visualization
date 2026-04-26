@@ -8,15 +8,17 @@ import { CollapsibleComponent } from '../../../courseware/markdownConfig';
 
 $G$为一个作用在集合$S$上的群，则$S$中不同轨道的数目$n$为
 
-$$n=\frac{\sum_{g \in G} |S_g|}{|G|}$$
+$$
+n=\frac{\sum_{g \in G} |S_g|}{|G|}
+$$
 
 其中$S_g=\{x|x \in S,\forall g \in G,gx=x\}$
 
 证明：
 
-$$n=\sum_{x \in S}\frac{1}{|Gx|}=\sum_{x \in S}\frac{Stab\ x}{|G|}$$
-
-
+$$
+n=\sum_{x \in S}\frac{1}{|Gx|}=\sum_{x \in S}\frac{Stab\ x}{|G|}
+$$
 
 ## Pólya定理
 
@@ -133,6 +135,8 @@ DP可以变成矩阵乘法，预处理后可以快速求解
 如果$>1$，我们需要首先构造一个空格，即用任意一个元素与0交换，然后顺次移动$l-1$个元素，最后再把第一个元素换回来，次数为$l+1$
 </CollapsibleComponent>
 
+##### P3307 [SDOI2013] 项链
+
 ##### P4916 MtOI2018 魔力环
 
 把长度为$n$的环用黑白两种颜色染色
@@ -157,6 +161,8 @@ $f(x) = S(x,m/(n/x))$，$S(n,m)$为一个长度为$n$的环，染$m$个黑色的
 ##### P4727 [HNOI2009] 图的同构计数
 
 求$n(n \le 60)$个点的无向图个数
+
+##### P4708 画画
 
 ##### T462720 欧拉回路
 
@@ -197,3 +203,4 @@ $gcd(rs,n) \to r|n$，这样，DP的复杂度就是$O(n \times d(n))$
 
 ##### CF1954F Unique Strings
  
+##### P5564 [Celeste-B] Say Goodbye

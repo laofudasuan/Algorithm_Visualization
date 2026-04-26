@@ -173,3 +173,31 @@ $1 \le k \le n \le 2 \times 10^5, 0 \le q \le 2 \times 10^5,0 \le a_i,b_i <2^{14
 
 将序列分块，散块可以暴力修改；对于整块，可以打上标记，查询$0$的个数就是求有几个数等于标记
 </CollapsibleComponent>
+
+##### P11750 「TPOI-1D」谢谢您。
+
+Misaka Mikoto 给你一个长度为 $n$ 的序列 $[a_1, \dots, a_n]$ 和 $m$ 个区间 $[l_1,r_1], \dots, [l_m,r_m]$。
+
+Misaka Mikoto 有 $q$ 次询问 $L, R, k$，对于每一次询问，请你求出：
+
+$$
+\max_{i=L}^R \sum_{j=l_i}^{r_i} [a_j = k]
+$$
+
+$1\le n,m,q\le 2\times 10^5$，$1\le a_i,k\le n$，$1\le l_i\le r_i\le n$，$1\le L\le R\le m$。
+
+<CollapsibleComponent title="做法">
+
+首秀按将$k$按照在$a$的出现次数分为两类：$>B$和$\le B$
+
+对于任何一个数$x$，定义出现次数的前缀和$cnt[x][i]$表示$a_{1 \dots i}$中$x$的出现次数
+
+- 次数$>B$的数，不超过$n/B$个
+    - 对于每个数$x$都直接求出$cnt[x][1 \ldots n]$，使得能$O(1)$查询在一个区间的出现次数
+    - 求出每个$[l_i,r_i]$区间内$x$的出现次数$w_i$
+    - 每次询问就是$w$数组的rmq问题
+- 对于次数$\le B$的数$x$
+    - 那么任何一段区间$x$的出现次数$cnt[x][r_i]-cnt[x][l_i-1]$就只有$B$种取值
+    - 对于每个左端点$l$，可以将$r$分成$B$段，每一段$x$的出现次数是一样的
+
+</CollapsibleComponent>

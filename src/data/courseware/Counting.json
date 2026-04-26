@@ -15,7 +15,7 @@
     { "id": "网格图走路", "path" : "Counting/Grid-Walk.mdx", "x": 400, "y": 460 },
     { "id": "LGV引理", "link" : "Linear-Algebra", "x": 600, "y": 460 },
     { "id": "概率计数", "link" : "Probability", "x": 600, "y": 220 },
-    { "id": "置换群等价类技术", "link" : "Abstract-Algebra", "x": 200, "y": 300 },
+    { "id": "置换群等价类计数", "link" : "Abstract-Algebra", "x": 200, "y": 300 },
     { "id": "同构问题", "path" : "Counting/Isomorphism.mdx", "x": 400, "y": 220 }
   ],
   "edges": [
