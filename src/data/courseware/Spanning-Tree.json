@@ -10,6 +10,7 @@
   },
   "pages": [
     { "id": "生成树", "x": 300, "y": 280 },
+    { "id": "DFS树", "path": "Graph/DFS-Tree.mdx", "x": 300, "y": 380 },
     { "id": "最小生成树", "path": "Graph/Minimum-Spanning-Tree.mdx", "x": 420, "y": 280 },
     { "id": "Prim算法", "x": 600, "y": 220 },
     { "id": "Kruskal算法", "path": "Graph/Kruskal.mdx", "x": 600, "y": 280 },
