@@ -11,7 +11,9 @@
   "pages": [
     { "id": "分块", "path": "DS/Block.mdx", "x": 250, "y": 280 },
     { "id": "多层分块", "path": "DS/Block-Layer.mdx", "x": 100, "y": 280 },
-    { "id": "树分块", "path": "DS/Block-Tree.mdx", "x": 450, "y": 280 }
+    { "id": "树分块", "path": "DS/Block-Tree.mdx", "x": 450, "y": 280 },
+    { "id": "四毛子/二毛子", "path": "DS/Block-Quad.mdx", "x": 250, "y": 380 }
+
   ],
   "edges": [
   ]
