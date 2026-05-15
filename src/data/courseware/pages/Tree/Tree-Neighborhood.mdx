@@ -1,0 +1,177 @@
+---
+title: 树的领域
+---
+
+import TreeAlgorithmVisualization from '../../../../components/visualizations/TreeAlgorithmVisualization';
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+
+##### P16435 [APIO 2026 中国赛区] 集宝
+
+给定一棵树，和$n$个领域$(a_i,r_i)$
+
+记 $S_i =  \{u | dis(u,a_i) \le r_i\}$。
+
+有$q$次询问，每次询问给定$x,l,r$
+
+你需要找一条从 $x$ 出发，依次访问 $S_l,S_{l+1},\dots,S_r$ 的最短路，边权为 $1$， 即求出：
+
+$$
+\min_{x_l \in S_l,x_{l+1} \in S_{l+1},\dots,x_r \in S_r} dis(x,x_l) + dis(x_l,x_{l+1}) + \dots +dis(x_{r-1},x_r)
+$$
+
+<CollapsibleComponent title="做法">
+
+首先，所有的 $S_i$ 都是凸集。
+
+凸集的定义为：若 $u,v \in S$，则 $u,v$ 路径上的每个点都属于 $S$，这样的集合 $S$ 是凸集。
+
+定义：一个点 $u$，到一个点集 $S$ 的距离 $dis(u,S)$ 为：
+$$
+dis(u,S) = \min_{v \in S}  dis(u,v)
+$$
+定义：$S(a,r) = \{u | dis(u,a) \le r\}$。
+
+## 只有两个集合 $A,B$
+
+$$
+Ans = \min_{p \in A,q \in B} dis(x,p) + dis(p,q)
+$$
+
+- 若 $A \cap B \ne \varnothing$：
+	$$
+	Ans = dis(x,A \cap B)
+	$$
+	证明：发现任意一条路径都要经过交集，不如直接走到交集。
+
+- 若 $A \cap B =  \varnothing$：
+
+	我们考虑这样走：先从 $x$ 走到 $A$ 中距离 $B$ 最近的点 $u$，再从 $u$ 出发走到 $B$ 中距离 $A$ 最近的点 $v$。
+	$$
+	Ans = dis(x,u) + dis(u,v)
+	$$
+	证明：发现任意路径都包含 $path(u,v)$，所以直接走最优。
+
+## 信息设计
+
+我们发现：一个 $[l,r]$ 的信息只有两种：
+
+先定义两个球的类距离为：
+$$
+w(S(a_1,r_1),S(a_2,r_2)) = dis(a_1,a_2) - r_1 - r_2
+$$
+
+- $[l,r]$ 的所有球都有交：
+
+	我们的状态可以压成一个二元组 $(x,y)$，满足：
+	$$
+	w(S_x,S_y) = \max_{l \le i,j \le r} w(S_i,S_j)
+	$$
+	则有：
+	$$
+	\bigcap_{k = l}^r S_k = S_x \cap S_y
+	$$
+	所以，一个区间的球的交能压成两个球的交。
+
+	我们称：这个状态为：$Cap$。
+
+- $[l,r]$ 的所有球的交集为空：
+
+	我们可以把这样的情况压成一个三元组：$(u,v,D)$，表示：
+
+	最优路径为：先走到 $u$，然后走完内部的最小花费为 $D$，最后停在 $v$。
+
+	我们称：这个状态为：$Empty$。
+
+## 信息合并
+
+### $Cap + Cap$
+
+我们发现这个东西具有和树上直径一样的性质：合并后的端点来自于合并前的两个信息的端点。
+
+然后树上距离我们可以使用 $O(n \log n) - O(1)$ 的 $LCA$。
+
+我们像树上直径那样合并，设合并后为 $S_x,S_y$。
+
+- $w(S_x,S_y) > 0$：
+
+	$S_x \cap S_y = \varnothing$，此时合并的结果的类型转为：$Empty$。
+
+	那么，我们肯定是走到 $S_x$ 中距离 $S_y$ 最近的点，再走到 $S_y$ 中距离 $S_x$ 最近的点。
+
+	设 $pathK(p,q,k)$ 表示从 $p$ 出发沿 $p\to q$ 的路径走 $k$ 条边后到达的点。
+
+	那么新的三元组为：$(pathK(a_x,a_y,r_x),pathK(a_y,a_x,r_y),w(S_x,S_y))$。
+
+	然后这个我们可以使用 $O(n \log n) - O(1)$ 的树上 K 祖先。
+
+- $w(S_x,S_y) \le 0$：
+
+	$S_x \cap S_y \ne \varnothing$，新的状态仍为 $Cap$，为 $(x,y)$。
+
+我们容易分析得：这个合并是 $O(1)$ 的。
+
+### $Cap + Empty$
+
+现在我们要从 $S_x \cap S_y$ 走到 $u$，然后再走 $D$ 步，最终停在 $v$。
+
+所以，我们需要求出 $S_x \cap S_y$ 距离 $u$ 的最近点 $T$。
+
+令：$G = \max\{0,dis(a_x,u)-r_x,dis(a_y,u)-r_y\}$。
+
+- $G = 0$：$T = u$ 。
+- $G = dis(a_x,u) - r_x$：$T = pathK(u,a_x,G)$。
+- $G = dis(a_y,u) - r_y$：$T = pathK(u,a_y,G)$。
+
+若多个条件同时满足，任选一个即可。
+
+然后，合并的结果为：$Empty$，新三元组为：$(T,v,G+D)$。
+
+### $Empty + Cap$
+
+我们要从 $u$，走 $D$ 步后到 $v$，然后再走到 $S_x \cap S_y$。
+
+所以，我们需要求出 $S_x \cap S_y$ 距离 $v$ 的最近点 $T$。
+
+同 $Cap + Empty$，我们合并后的类型为 $Empty$，新三元组为：$(u,T,G+D)$。
+
+### $Empty + Empty$
+
+假设存的是：$(u_1,v_1,D_1),(u_2,v_2,D_2)$。
+
+我们从 $u_1$ 走 $D_1$ 步到 $v_1$，再从 $u_2$ 走 $D_2$ 步到 $v_2$。
+
+所以，我们合并后的类型为：$Empty$，新三元组为：$(u_1,v_2,D_1+dis(v_1,u_2)+D_2)$。
+
+### 总结
+
+这个 $4$ 个合并，都可以在 $O(1)$ 完成。
+
+## 数据结构
+
+我们发现这是一个半群，我们的答案可以视作区间半群并。
+
+由于是静态查询，我们用猫树即可做到 $O(m \log m) - O(1)$。
+
+我们考虑如何求答案
+
+- 猫树合并出的是 $Empty$ 时：
+
+	$Ans = dis(x,u) + D$。
+
+- 合并出的是 $Cap$ 时：
+
+	$Ans = G$，$G$ 的求法同 $Cap + Empty$。
+
+做完了。
+
+## 时间复杂度
+
+首先，需要 $O(n \log n) - O(1)$ 的 $LCA$ 和 $K$ 祖先。
+
+然后，再加上猫树 $O(m \log m)$ 预处理。
+
+然后，再加上 $q$ 次询问。
+
+总时间为：$O(n \log n + m \log m + q)$，总空间为：$O(n \log n + m\log m)$。
+
+</CollapsibleComponent>

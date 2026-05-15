@@ -1,6 +1,6 @@
 {
-  "title": "关键点/边",
-  "description": "树的关键点/边",
+  "title": "树的结构",
+  "description": "树的关键点/边、领域",
   "cover": "/images/no.png",
   "author": "老虎大蒜",
   "createdAt": "2025-11-23",
@@ -11,7 +11,8 @@
   "pages": [
     { "id": "树的直径", "path": "Tree/Tree-Diameter.mdx", "x": 300, "y": 300 },
     { "id": "树的中心", "x": 450, "y": 270 },
-    { "id": "树的重心", "path": "Tree/Tree-Centroid.mdx", "x": 450, "y": 330 }
+    { "id": "树的重心", "path": "Tree/Tree-Centroid.mdx", "x": 450, "y": 330 },
+    { "id": "领域", "path": "Tree/Tree-Neighborhood.mdx", "x": 300, "y": 420 }
   ],
   "edges": [
     { "source": "数列", "target": "递推数列", "sourceSide": "right", "targetSide": "left" }
