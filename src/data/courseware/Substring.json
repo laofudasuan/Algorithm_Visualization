@@ -16,6 +16,7 @@
     { "id": "后缀数组", "path" : "String/SA.mdx", "x": 580, "y": 250 },
     { "id": "后缀自动机", "path" : "String/SAM.mdx", "x": 580, "y": 350 },
     { "id": "压缩后缀自动机", "path" : "String/SAM-Compression.mdx", "x": 550, "y": 450 },
+    { "id": "基本子串结构", "path" : "String/Substring-Struct.mdx", "x": 400, "y": 400 },
     { "id": "综合应用", "path" : "String/Suffix-Problem.mdx", "x": 730, "y": 300 },
     { "id": "子串结构", "x": 200, "y": 300 },
     { "id": "Border", "path" : "String/Border.mdx", "x": 200, "y": 400 },
@@ -28,6 +29,7 @@
     { "source": "数据结构", "target": "后缀自动机", "sourceSide": "right", "targetSide": "left"},
     { "source": "后缀自动机", "target": "压缩后缀自动机", "sourceSide": "bottom", "targetSide": "top"},
     { "source": "后缀数组", "target": "综合应用", "sourceSide": "right", "targetSide": "left"},
-    { "source": "后缀自动机", "target": "综合应用", "sourceSide": "right", "targetSide": "left"}
+    { "source": "后缀自动机", "target": "综合应用", "sourceSide": "right", "targetSide": "left"},
+    { "source": "压缩后缀自动机", "target": "基本子串结构", "sourceSide": "left", "targetSide": "bottom"}
   ]
 }

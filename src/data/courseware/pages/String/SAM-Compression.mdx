@@ -1,0 +1,122 @@
+---
+title: 压缩后缀自动机
+---
+
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+
+# 压缩后缀自动机
+
+##### 原理
+
+后缀树：如果一个子串所有出现位置的后继相同，则合并
+
+后缀自动机：如果一个子串所有出现位置的前驱相同，则合并
+
+压缩后缀自动机：二者都合并
+
+压缩方式：建立后缀自动机，然后把出度为$1$的并且不是后缀的点压缩
+
+具体实现：先标记出所有后缀节点。然后对每个$x$求出$nxt[x]$表示和点$x$压缩在一条链的链底。如果$x$不是后缀节点并且后继只有一个，令这个后继为$y$，则$nxt[x]=nxt[y]$，否则$nxt[x]=x$。
+
+也可以用Right集合大小判断，如果$|right(x)|=|right(y)|$也能说明$x$的后继只有$y$
+
+## 优势
+
+对后缀自动机压缩之后，正串和反串的节点就一样了
+
+对称压缩后缀自动机：把正串和反串都建立压缩后缀自动机，并且合并在一起
+
+![width=8cm](/String/SAMA.png)
+
+### 例题
+
+例题：给定主串$S$和模式串$T$，需要支持修改和询问：
+
+- 在$T$末尾加一个字符
+- 在$T$开头加一个字符
+- $T$回到之前的某一时刻
+- 求$T$是否为$S$的子串，如果是则求出其中一次的出现位置
+
+##### uoj577 打击复读
+
+定义一个子串$s[l, r]$的 **左权值** $wl(s[l, r])$ 为：其在原串中各个匹配的左端点的左权值$wl$ 和；**右权值** $wr(s[l, r])$ 为：其在原串中各个匹配的右端点的右权值 $wr$ 和。这里 $t$ 在 $s$ 中所有的匹配是 $ \forall 1 \leq i \leq j \leq n, s[i, j] = t $，我们把这样的 $i$ 和 $j$ 分别叫做一个匹配的左右端点。
+
+定义一个子串$s[l, r]$的复读程度是它的 **左权值** 与 **右权值** 的乘积，即 $w(s[l, r]) = wl(s[l, r]) \cdot wr(s[l, r]) $。
+
+$s$的“复读程度”定义为所有子串复读程度的和，即：
+
+$$\sum_{i=1}^{|S|} \sum_{j=i}^{|S|} w(s[i, j])$$
+
+现在有$m$次修改，每次修改某一个$wl_u$，你需要求出修改后的串的复读程度
+
+<CollapsibleComponent title="做法一">
+
+想法：把相同的子串的复读程度是一样的，因此
+
+$$
+ans = \sum_{s} \sum_{l \in Left(s)}wl[l] \times \sum_{r \in Right(s)} wr[r]
+$$
+
+而SAM可以把Right集合相同的字符串分类。假设SAM的点集为$U$，则：
+
+$$
+ans = \sum_{s \in U} \sum_{r \in Right(s)}wr[r] \times \sum_{len \in [maxlen(fa[s])+1,maxlen(s)]} \sum_{r \in Right(s)}wl[r-len+1]
+$$
+
+记录$wl$的前缀和数组为$sum$
+
+$$
+ans = \sum_{s \in U} \sum_{r \in Right(s)}wr[r] \times \sum_{r \in Right(s)}(sum[r-maxlen(fa[s])]-sum[r-maxlen(s)+1])
+$$
+
+把公式中的减法拆出来分别计算，先考虑怎么计算：
+
+$$
+ans = \sum_{s \in U} \sum_{r \in Right(s)}wr[r] \times \sum_{r \in Right(s)}sum[r-maxlen(fa[s])]
+$$
+
+用$g(s)$表示SAM的点$s$代表的最长串
+
+$$
+\sum_{r \in Right(s)}sum[r-maxlen(fa[s])]=\sum_{l \in left(g(s))}sum[l-1]
+$$
+
+因此可以对反串建立SAM，并求出每个点对应的$\sum sum[l-1]$。这样对于$s$，只需要定位到$g(s)$对应的点就能快速求解
+
+如何处理修改呢？首先可以把原串反过来，这样修改$wl$就变成了修改$wr$。而我们答案本身就是按照$wr$分类求解的，因此可以预处理每个$wr$对答案的贡献系数。
+
+修改时只需要修改这一项的贡献即可。
+
+</CollapsibleComponent>
+
+<CollapsibleComponent title="做法二">
+
+做法二：不把串反过来，直接在原串的后缀自动机上做
+
+还是求出每个$wl$对答案的贡献系数。对于一个固定的左端点$l$，它对答案的贡献为$vl[l] \times \sum_{i=l}^{n}vr(S[l,i])$，也就是一段后缀的$vr$之和。
+
+直接枚举所有后缀复杂度是平方的。而我们可以利用压缩后缀自动机进行优化：每一条链先求和，这样只需要在SAM上模拟后缀树的dfs即可
+
+<a href="https://uoj.ac/submission/747937" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline inline-flex items-center gap-1">🔗 我的提交记录</a>
+
+</CollapsibleComponent>
+
+##### CF1608G Alphabetic Tree
+
+##### CF1608G Alphabetic Tree 做法一
+
+把这$m$个字符串建立后缀数组
+
+每次询问，先通过二分+哈希(树上就用倍增的哈希表)，找到$str(u,v)$在后缀数组中是哪一段区间的后缀的前缀
+
+然后就变成了一个二维数点问题
+
+复杂度瓶颈在二分+哈希，$O(q\log n\log |S|)$
+
+##### CF1608G Alphabetic Tree 做法二
+
+考虑对$m$个字符串建立压缩后缀自动机
+
+每次询问就是要加速$str(u,v)$在后缀树上模拟走的过程
+
+可以对原树和后缀树做树链剖分，然后模拟在两棵树上一条重链一条重链匹配，复杂度可以优化到一个$log$

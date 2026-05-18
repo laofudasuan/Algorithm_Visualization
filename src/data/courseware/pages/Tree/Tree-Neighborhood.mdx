@@ -5,6 +5,50 @@ title: 树的领域
 import TreeAlgorithmVisualization from '../../../../components/visualizations/TreeAlgorithmVisualization';
 import { CollapsibleComponent } from '../../../courseware/markdownConfig';
 
+# 树的领域（球）问题
+
+处理树上圆理论时需要直观理解。
+
+首先定义 $f(x, r) = \{y \mid dis(x, y) \leq r\}$，有如下性质。
+
+1.  对于一棵树 $S$，所有直径的中点（可能为边的中点）是重合的。
+
+证明：考虑反证法，则可构造经过两个中点的路径，长度一定长于直径。
+
+定义 $mid(S)$ 为 $S$ 的直径中点，$len(S)$ 为 $S$ 的直径长度。
+
+$c(S) = f(mid(S), len(S)/2)$ 为集合 $S$ 的树上邻域，则有如下性质。
+
+2.  $f(x, r) \supseteq S \rightarrow f(x, r) \supseteq c(S)$。
+
+证明：首先可以直观理解。然后考虑 $r - dis(x, mid(S)) \geq len(S)/2$，否则无法覆盖。
+
+那么即可证明 $f(x, r) \supseteq c(S)$。
+
+定义 $far(x, S)$ 为 $y \subseteq S$ 中 $dis(x, y)$ 最大的，有如下性质。
+
+3.  $far(x, S) = dis(x, mid(S)) + len(S)/2$。
+
+证明：首先 $y$ 一定为直径的某个端点，然后路径一定经过中点，否则可以更大。则可表示成右式形式。
+
+我们来讨论 $S \cup T$ 后各项的变化情况。
+
+情况 1：$c(S) \subseteq c(T)$，那么 $c(S \cup T) = c(T)$，反之亦然。
+
+判定 $c(S) \subseteq c(T)$ 可以用 $len(S)/2 + dis(mid(S), mid(T)) \leq len(T)$。证明显然。
+
+情况 2：两圆相交 *or* 相离，那么设两圆 $mid$ 分别为 $u_1, u_2$，半径为 $r_1, r_2$，$c(S \cup T) = f(u_3, (dis(u_1, u_2) + r_1 + r_2)/2)$，其中 $u_3$ 为 $u_1$ 与 $u_2$ 路径上一点使得 $dis(u_1, u_3) = (dis(u_1, u_2) - r_1 + r_2)/2$，$dis(u_2, u_3) = (dis(u_1, u_2) + r_1 - r_2)/2$。
+
+证明：首先直径具有合并性，新的直径定在原四点中选两点。考虑若选相同的两点，那么为情况 1，所以一定为 $S$ 与 $T$ 中各选一点。那么 $len(S \cup T)$ 一定为 $dis(u_1, u_2) + r_1 + r_2$ 才为最大。
+
+继续考虑 $mid(S \cup T)$ 的位置，显然直径定过 $u_1, u_2$，考虑中点是否落在上面。若不落在上面，则符合情况 1 的判定。这样就可以快速的处理 $c$ 的合并。
+
+例题：$CF1458F$，考虑分治，处理跨过中点的贡献。枚举 $l$，处理 $\sum_{r=mid+1}^{R} c([l, mid] \cup [mid + 1, r])$，需要分类讨论。
+
+随着 $[mid + 1, r]$ 增大，情况会变成 $1 \to 2 \to 1$ 的情况。
+
+1 情况容易处理，2 情况转化为 $\sum_{v \in [l, r]} dis(u, v)$ 的情况，用树剖 $+ BIT$ 可以做到 $O(n \log^3 n)$。
+
 ##### P16435 [APIO 2026 中国赛区] 集宝
 
 给定一棵树，和$n$个领域$(a_i,r_i)$
