@@ -13,7 +13,7 @@
     { "id": "Tree-Split", "x": 350, "y": 750, "category": "组合对象" },
     { "id": "基环树", "x": 80, "y": 670, "category": "组合对象" },
     { "id": "仙人掌", "x": 80, "y": 730, "category": "组合对象" },
-    { "id": "Tree-Key", "x": 200, "y": 700, "category": "组合对象" },
+    { "id": "Tree-Structure", "x": 200, "y": 700, "category": "组合对象" },
     { "id": "Tree-Virtual", "x": 100, "y": 800, "category": "组合对象" },
 
     { "id": "Graph-Basic", "x": 300, "y": 250, "category": "组合对象" },
@@ -103,7 +103,7 @@
     { "source": "Tree-Basic", "target": "基环树", "sourceSide": "left", "targetSide": "right" },
     { "source": "Tree-Basic", "target": "仙人掌", "sourceSide": "left", "targetSide": "right" },
     { "source": "Linear-Algebra", "target": "Tree-Count", "sourceSide": "bottom", "targetSide": "top" },
-    { "source": "Tree-Basic", "target": "Tree-Key", "sourceSide": "top", "targetSide": "bottom" },
+    { "source": "Tree-Basic", "target": "Tree-Structure", "sourceSide": "top", "targetSide": "bottom" },
     { "source": "Tree-Basic", "target": "Tree-Virtual", "sourceSide": "left", "targetSide": "right" },
     
     { "source": "Graph-Basic", "target": "Bipartite", "sourceSide": "left", "targetSide": "right" },
