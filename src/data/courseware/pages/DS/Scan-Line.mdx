@@ -66,7 +66,7 @@ import { CollapsibleComponent } from '../../../courseware/markdownConfig';
 </CollapsibleComponent>
 
 ##### P3246 [HNOI2016] 序列
-    
+
 一个长度为$n$的序列$a_{1 \ldots n}$，$m$次询问，每次问一个区间的所有子区间的最小值之和。
 
 <CollapsibleComponent title="做法">        
@@ -153,3 +153,348 @@ $k \le m \le n \le 10^6$
 ##### P14380 MX-S9-T3 LAOI-16 天外来物
 
 ##### P14523 【MX-S11-T4】Ice Drop
+
+<CollapsibleComponent title="做法"> 
+
+## 刻画答案
+
+### 判定性问题
+
+首先，考虑怎么判 $[l,r]$ 是否是好的。
+
+发现：若 $[l,r]$ 是好的，则 $[l,r]$ 的左右子区间是好的。
+
+所以，对于每个 $r$，我们求出 $L_{\min}(r)$ 表示最小的 $l$ 使得 $[l,r]$ 合法。
+
+那么，$[l,r]$ 的合法条件为：$l \ge L_{\min}(r)$。
+
+这个的求法是：用埃筛 $O(V \log V)$ 求出 $[1,V]$ 每个数的质因数分解。
+
+然后记 $lst_{p,i}$ 表示上一个 $p^i$ 能整除的数的位置，其中 $p$ 为质数。
+
+记：$v_p(x) = \max(\{i \mid p^i |x\})$。
+
+考虑 $L_{\min}(r)$ 应满足什么条件？
+
+枚举 $p^i | a_r$ 显然枚举总量为 $O(\log V)$，然后：
+$$
+L_{\min}(r) \leftarrow \begin{cases}
+\max(L_{\min}(r-1),L_{\min}(r)) & lst_{p,i} = r-1 \\
+\max(lst_{p,i}+1,L_{\min}(r)) & lst_{p,i} \ne r-1
+\end{cases}
+$$
+这样我们就在 $O(n \log V)$ 的时间求出了 $L_{\min}(r)$。
+
+### 单个区间的答案
+
+我们发现：连续的 $1$ 是无用的，考虑把连续的 $1$ 压成一个 $1$。
+
+具体地，把序列压成：
+$$
+1^{b_0} ,c_1 ,1^{b_1},c_2 , \dots,c_m,1^{b_m}
+$$
+其中：
+
+- $c_i$ 是 $a$ 中第 $i$ 个非 $1$ 元素。
+- $b_0$ 是第一个非 $1$ 左边的 $1$ 的个数。
+- $b_i$ 是 $c_i,c_{i+1}$ 之间的 $1$ 的个数。
+- $b_m$ 是最后一个非 $1$ 右边的 $1$ 的个数。
+
+记：$pos_i$ 表示第 $i$ 个非 $1$ 元素，在 $a$ 中的位置。
+
+那么考虑对于一个询问区间 $[l,r]$：
+
+若 $[l,r]$ 全为 $1$，则 $f(l,r) = 1$，下文不考虑该情况。 
+
+记：
+
+- $S$ 表示：$[l,r]$ 中距离 $l$ 最近的非 $1$ 元素，是第 $S$ 个非 $1$ 元素。
+- $T$ 表示：$[l,r]$ 中距离 $r$ 最近的非 $1$ 元素，是第 $T$ 个非 $1$ 元素。
+
+我们可以把 $[l,r]$ 分为三部分：$[l,pos_S-1],[pos_S,pos_T],[pos_T+1,r]$，算出各自对应的方案数，再根据乘法原理乘起来即可。
+
+不难想到对每个质数分开算，再由乘法原理乘起来。
+
+- $[l,pos_S-1]$：发现对于一个质数 $p$，其填入 $[l,pos_S-1]$ 中，必须保证 $[l,pos_S]$ 中其质数单调不升或不降。
+
+	那么，方案数显然为以下式子，考虑转为格路即可得出。
+	$$
+	\binom{pos_S-l+v_p(c_S)}{pos_S-l}
+	$$
+	记：
+	$$
+	F(x,u)=\prod_{p}\binom{u+v_p(x)}{u}
+	$$
+	则这一部分为：$F(c_S,pos_S-l)$。
+
+- $[pos_T+1,r]$：同 $[l,pos_S-1]$。
+
+	贡献为：$F(c_T,r-pos_T)$。
+
+- $[pos_S,pos_T]$：
+
+	考虑每一段 $1$ 独立，然后性质为：
+
+	$[c_i,c_{i+1}]$ 对于某质数 $p$，质数单调不增或不减。
+
+	所以：一个段的贡献为：
+	$$
+	\prod_p \binom{b_i + |v_p(c_i) - v_p(c_{i+1})|}{b_i}
+	$$
+	记：
+	$$
+	E(x,y,k)
+	=
+	\prod_p
+	\binom{k+|v_p(x)-v_p(y)|}{k}
+	$$
+	那么，总贡献为：
+	$$
+	\prod_{i = S}^{T-1} E(c_i,c_{i+1},b_i)
+	$$
+
+总结：
+$$
+f(l,r) = [l \ge L_{\min}(r)]\cdot F(c_S,pos_S-l) \cdot F(c_T,r-pos_T) \cdot \prod_{i = S}^{T-1} E(c_i,c_{i+1},b_i)
+$$
+
+忽略全 $1$ 区间，全 $1$ 区间 $f(l,r) = 1$。
+
+## 一个询问的答案
+
+### 准备工作
+
+首先，如果我们称一个区间的骨架为：$[S,T]$，$S,T$ 的定义同上。
+
+那么，我们考虑如果固定骨架为：$[s,t]$，那么哪些区间的骨架是 $[s,t]$？
+
+易得：$l \in [pos_{s-1}+1,pos_s],r \in [pos_t,pos_{t+1} - 1]$，令 $pos_0 = 0,pos_{m+1} = n+1$。
+
+我们发现一个重要的性质：只要 $[pos_s,pos_t]$ 合法，所有满足上述条件的区间都合法。
+
+那么，若固定骨架，所有区间的贡献为：
+$$
+[pos_s \ge L_{\min}(pos_t)]\sum_{l = pos_{s-1}+1}^{pos_s} \sum_{r = pos_t}^{pos_{t+1}-1} F(c_s,pos_s - l) F(c_t,r - pos_t) \prod _{i = s}^{t-1} E(c_i,c_{i+1},b_i) \\
+
+= [pos_s \ge L_{\min}(pos_t)] [\prod _{i = s}^{t-1} E(c_i,c_{i+1},b_i)] [\sum_{l = pos_{s-1}+1}^{pos_s} F(c_s,pos_s - l)  ] [\sum_{r = pos_t}^{pos_{t+1}-1} F(c_t,r - pos_t)]
+$$
+记：
+$$
+Mul_i = \prod_{j = 1}^{i-1} E(c_j,c_{j+1},b_j) \\
+
+SL_i = \sum_{l = pos_{i-1}+1}^{pos_i} F(c_i,pos_i-l)  \\
+
+SR_i = \sum_{r = pos_i}^{pos_{i+1} - 1} F(c_i,r-pos_i) \\
+A_s = \frac{SL_s}{Mul_s} \\
+B_t = Mul_t SR_t
+$$
+那么，固定 $[s,t]$ 为骨架的所有区间的贡献为：
+$$
+[pos_s \ge L_{\min}(pos_t)]  \frac{Mul_t}{Mul_s} SL_sSR_t = [pos_s \ge L_{\min}(pos_t)] A_s B_t
+$$
+发现上面的 $5$ 个东西都能 $O(n)$ 预处理。
+
+### 求答案
+
+若一个询问为 $[l,r]$，求出其骨架 $[S,T]$。
+
+那么，答案是下面这个式子吗？
+$$
+G(S,T) = \sum_{s = S}^T \sum_{t = s}^T  [pos_s \ge L_{\min}(pos_t)] A_s B_t
+$$
+如果真这么简单就好了！发现一个区间不一定完全覆盖首尾的 $1$ 的连续段。
+
+那么我们之前的工作都白做了吗？我们其实可以修正！
+
+记：
+$$
+D_i(u) = \sum_{j = 0}^u F(c_i,j) \\
+$$
+那么，我们考虑当 $s = S$ 时，真实的贡献为：$D_S(pos_S - l)$，而我们误算为：$SL_S$。
+
+当 $t = T$ 时，真实的贡献为：$D_T(r - pos_T)$，而我们误算为：$SR_T$。
+
+记：
+$$
+\Delta_L = D_S(pos_S - l) - SL_S \\
+
+\Delta_R = D_T(r - pos_T) - SR_T
+$$
+
+- $s = S,t \in [S,T]$ 时：
+
+	每个 $[s,t]$ 的贡献为：
+	$$
+	\frac{Mul_t}{Mul_S} D_S(pos_S - l)SR_t \\
+	
+	= \frac{Mul_t}{Mul_S} SR_t(\Delta_L + SL_S)
+	$$
+	 然后，$G(S,T)$ 中已经算了：$\frac{Mul_t}{Mul_S} SR_t SL_S$，所以我们只需补上：$\frac{Mul_t}{Mul_S} SR_t \Delta_L$。
+
+	所以，应加上：
+	$$
+	H(S,T) = \sum_{t = S}^T [pos_S \ge L_{\min}(pos_t)]\frac{Mul_t}{ Mul_S} SR_t \Delta_L \\
+	
+	= \frac{\Delta_L}{Mul_S} \sum_{t = S}^T [pos_S \ge L_{\min}(pos_t)] B_t
+	$$
+
+- $t = T,s \in [S,T]$ 时：
+
+	类似 $s = S,t \in [S,T]$ 的情况，不再具体分析，直接给出式子：
+	$$
+	K(S,T) = \sum_{s = S}^T [pos_s \ge L_{\min}(pos_T)] \frac{Mul_T}{Mul_s} SL_s \Delta_R \\
+	
+	= Mul_T \Delta_R \sum_{s = S}^T [pos_s \ge L_{\min}(pos_T)] A_s
+	$$
+
+- $s = S,t = T$ 时：
+
+	考虑我们刚才算的所有东西对这个玩意的贡献，忽略 $\frac{Mul_T}{Mul_S}$。
+
+	- $G(S,T)$：贡献 $SL_S SR_T$。
+	- $H(S,T)$：贡献 $SR_T \Delta_L = SR_T D_S(pos_S - l) - SL_S SR_T$。
+	- $K(S,T)$：贡献 $SL_S \Delta_R = SL_S D_T(r - pos_T) - SL_S SR_T$。
+	
+	总贡献为：
+	$$
+	SL_S SR_T + SR_T D_S(pos_S - l) - SL_S SR_T  +SL_S D_T(r - pos_T) - SL_S SR_T \\
+	
+	= SR_TD_S(pos_S - l) + SL_S D_T(r - pos_T) - SL_S SR_T
+	$$
+	那么，我们还需加上：
+	$$
+	-SR_TD_S(pos_S - l) - SL_S D_T(r - pos_T) + SL_S SR_T + D_S(pos_S - l) D_T(r -pos_T)
+	$$
+	发现这个正好是：$\Delta_L \Delta_R$。
+	
+	综上，我们还应补上：
+	$$
+	L(S,T) = [pos_S \ge L_{\min}(pos_T)]\frac{Mul_T}{Mul_S} \Delta_L \Delta_R
+	$$
+
+我们现在还发现一个问题：$1$ 的连续段我们并没有考虑。
+
+记 $All(x) = \frac{x(x+1)}{2}$。
+
+那么，我们还需加上：
+$$
+Q(S,T) = All(pos_S - l) + All(r - pos_T) + \sum_{i = S}^{T-1} All(b_i)
+$$
+终于，我们胜利了：
+$$
+Ans = G(S,T) + H(S,T) + K(S,T) + L(S,T) + Q(S,T)
+$$
+注意：若 $[l,r]$ 是全 $1$ 区间：$Ans = All(r-l+1)$。
+
+现在考虑怎么求这些玩意。
+
+#### $G(S,T)$
+
+我们考虑把 $L_{\min}(pos_t)$ 改为：$Mn_t$ 表示 $L_{\min}(pos_t)$ 右边离他最近的非 $1$，第 $Mn_t$ 个非 $1$。
+
+即：$Mn_t = \min\{i | pos_i \ge L_{\min}(pos_t)\}$。
+
+那么：
+$$
+G(S,T) = \sum_{s = S}^T  \sum_{t = s}^T  [s \ge Mn_t ]  A_sB_t \\ 
+
+= \sum_{t = S}^T B_t \sum_{s = \max(Mn_t,S)}^t A_s \\
+$$
+考虑记前缀和：
+$$
+SA_i = \sum_{j = 1}^i A_j
+$$
+那么：
+$$
+G(S,T) = \sum_{t = S}^T B_t (SA_t - SA_{\max(Mn_t,S)-1})
+$$
+从小往大对 $t$ 做扫描线。
+
+假设现在扫到了 $t$，设 $g_s$ 为 $G(s,t)$。
+
+考虑 $g_s$ 如何变化。
+
+- $s  \in [1,Mn_t]$ 时：
+
+	此时 $SA_{\max(Mn_t,s)-1} = SA_{Mn_t - 1}$。
+
+	所以：$g_s \leftarrow g_s + B_t (SA_t - SA_{Mn_t - 1})$。
+
+	发现：$B_t(SA_t - SA_{Mn_t -1})$ 是一个定值，所以拿一个树状数组支持区间加，单点查即可。
+
+- $s \in [Mn_t+1,t]$ 时：
+
+	此时：$SA_{\max(Mn_t,s)-1} = SA_{s-1}$。
+
+	所以：$g_s \leftarrow g_s + B_t (SA_t - SA_{s-1})$。
+
+	考虑 $B_t(SA_t - SA_{s-1}) = -B_t SA_{s-1} + B_t SA_t$。
+
+	所以，我们可以把这部分的贡献写为：$k SA_{s-1} + b$，$k,b$ 均用树状数组支持区间加，单点查即可。
+
+查答案：在扫到 $T$ 时，查 $g_S$ 即可。
+
+这部分的时间显然是：$O((n+q) \log n)$，空间 $O(n)$。
+
+#### $H(S,T)$
+
+$$
+H(S,T) = \frac{\Delta_L}{Mul_S} \sum_{t = S}^T [pos_S \ge L_{\min}(pos_t)] B_t
+$$
+
+那么 $\frac{\Delta_L}{Mul_S}$ 我们求出那个和式之后，再乘上去即可。
+
+考虑怎么求那个和式。
+$$
+\sum_{t = S}^T [pos_S \ge L_{\min}(pos_t)] B_t \\
+ 
+ = \sum_{t = S}^T [S \ge Mn_t] B_t \\
+$$
+这个不就是二维数点？而且可差分。
+
+扫描线，树状数组支持单点加，区间查即可。
+
+时间：$O((n+q) \log n)$，空间 $O(n)$。
+
+#### $K(S,T)$
+
+同 $H(S,T)$，先求和式。
+$$
+\sum_{s = S}^T [pos_s \ge L_{\min}(pos_T)] A_s \\
+
+= \sum_{s = S}^T [s \ge Mn_T] A_s \\
+
+= \sum_{s = \max(S,Mn_T)}^T A_s
+$$
+前缀和即可。
+
+时间：$O(q)$。
+
+#### $L(S,T)$
+
+注意到可以 $O(1)$ 直接算。
+
+时间：$O(q)$。
+
+#### $Q(S,T)$
+
+记：
+$$
+Preb_i = \sum_{j = 1}^{i-1}  All(b_j)
+$$
+然后：
+$$
+Q(S,T) = All(pos_S - l) + All(r - pos_T) + Preb_T  -Preb_S
+$$
+时间：$O(n+q)$，空间：$O(n)$。
+
+## 总结
+
+分析一下时空复杂度。
+
+预处理一堆东西：$O(V \log V + n \log V )$，空间：$O(V \log V )$。
+
+求答案：$O((n+q) \log n)$，空间：$O(n+q)$。
+
+总时间：$O(V \log V + n \log V + (n+q) \log n)$，空间：$O(V \log V)$。
+</CollapsibleComponent>
