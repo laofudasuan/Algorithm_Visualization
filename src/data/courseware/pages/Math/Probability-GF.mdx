@@ -55,6 +55,140 @@ $$
     
 </CollapsibleComponent>
 
+##### 例题
+
+有 $n$ 个人在踢球。
+
+- 首先球会等概率随机到一位球员的脚上。
+- 球员 $i$ 得到球之后，会以 $p_{i,j}$ 的概率将球传给球员 $j$，并且他的传球次数加一。
+- 当所有人的传球次数都为偶数的时候，大家都停止操作。
+
+问期望传球多少次。输出答案对 $998244353$ 取模的结果。
+
+由于期望可能不收敛，如果不收敛，请输出 $-1$。可以证明，在题目条件下，如果答案收敛，那么答案的分母一定和模数互素。
+
+###### 输入格式
+第一行一个整数 $n$。
+
+接下来 $n$ 行，每行 $n$ 个整数，表示 $p'_{i,j}$，其中
+$$
+p_{i,j} = \frac{p'_{i,j}}{\sum_{j=1}^n p'_{i,j}}
+$$
+
+由于【数据删除】，保证 $p'_{i,j}$ 在 $0$ 到 $998244352$ 范围内随机生成。
+
+###### 输出格式
+
+输出一个数，表示答案。
+
+###### 样例输入 1
+```
+5
+340193376 670185859 283496053 588504319 298219945
+1231089813 728285787 520873997 885051472 375518019
+836792691 638132441 585611129 924022935 190365778
+94842161 484366654 442834253 633673235 571199427
+454123796 717864962 261588978 893668283 373761845
+```
+
+###### 样例输出 1
+```
+684583882
+```
+
+###### 数据范围
+
+对于所有数据，保证 $1 \le n \le 16,\ 0 \le p'_{i,j} < 998244353$。对于每个 $i$，保证 $p'_{i,j}$ 随机生成，且 $\sum_{j=1}^n p'_{i,j} \ne 0$。
+
+- 子任务 1（10分）：$n \le 2$，
+- 子任务 2（15分）：$n \le 6$，
+- 子任务 3（20分）：$n \le 9$，
+- 子任务 4（25分）：$n \le 13$，
+- 子任务 5（30分）：无特殊限制。
+
+<CollapsibleComponent title="做法"> 
+削弱自 **Passing Ball Problem**
+
+设当前每个球员已经传球的次数奇偶性构成集合 $S \subseteq [n]$。若当前持球人为 $i$，他把球传给 $j$，则状态变为 $(S, i) \to (S \triangle i, j)$。
+
+也就是说，一次传球会翻转传球者 $i$ 的奇偶性。令 $F_{S,i}$ 表示：从状态 $(S, i)$ 出发，直到第一次回到全偶状态 $S = \varnothing$ 的期望传球次数。
+
+那么有 $F_{\varnothing,i} = 0$，定义 $x_i$ 表示：从“奇偶集合为空、当前持球人为 $i$，并且必须继续进行”这个初始状态出发的期望传球次数。
+
+那么有
+$$
+x_i = 1 + \sum_{j=1}^n p_{i,j} F_{i,j}
+$$
+最终答案就是 $\frac{1}{n} \sum_{i=1}^n x_i$。
+
+对于非空集合 $S$，有
+$$
+F_{S,i} = 1 + \sum_{j=1}^n p_{i,j} F_{S\triangle i,j}
+$$
+上式在 $S = \varnothing$ 时不成立，左边等于 $0$，而右边正好是 $x_i$。
+
+为了把所有 $S$ 统一起来，可以写成
+$$
+F_{S,i} = 1 + \sum_{j=1}^n p_{i,j} F_{S\triangle i,j} - [S = \varnothing] x_i
+$$
+
+对每个频率集合 $T \subseteq [n]$，定义 FWT 后的变量
+$$
+\widehat{F}_{T,i} = \sum_{S \subseteq [n]} (-1)^{|S \cap T|} F_{S,i}
+$$
+记 $\epsilon_i(T) = (-1)^{[i \in T]}$。
+
+当方程中出现 $S \triangle i$ 时，FWT 后会多出一个符号：
+$$
+\sum_{S} (-1)^{|S \cap T|} F_{S\triangle i,j} = \epsilon_i(T) \widehat{F}_{T,j}
+$$
+
+因此对统一期望方程做 FWT，得到
+$$
+\widehat{F}_{T,i} = 2^n [T = \varnothing] - x_i + \epsilon_i(T) \sum_{j=1}^n p_{i,j} \widehat{F}_{T,j}
+$$
+
+写成矩阵形式。令 $D_T = \operatorname{diag}(\epsilon_1(T), \epsilon_2(T), \dots, \epsilon_n(T))$，则
+$$
+(I - D_T P) \widehat{F}_T = 2^n [T = \varnothing] \mathbf{1} - x
+$$
+这里 $\widehat{F}_T$ 和 $x$ 都是 $n$ 维列向量。
+
+对于 $T \neq \varnothing$，右端中的常数项消失，得到
+$$
+(I - D_T P) \widehat{F}_T = -x
+$$
+
+由于随机，我们认为矩阵可逆，那么所有非空 $T$ 都满足
+$$
+\widehat{F}_T = -(I - D_T P)^{-1} x
+$$
+
+设 $B = \sum_{T \neq \varnothing} (I - D_T P)^{-1}$。那么所有非空的 $T$ 的和为
+$$
+\sum_{T \neq \varnothing} \widehat{F}_T = -B x
+$$
+
+$T = \varnothing$ 比较特殊，此时矩阵不可逆。根据
+$$
+\widehat{F}_{\varnothing} = \frac{1}{2^n} \sum_T \widehat{F}_T
+$$
+并且 $F_{\varnothing} = 0$，所以
+$$
+\widehat{F}_{\varnothing} = -\sum_{T \neq \varnothing} \widehat{F}_T = B x
+$$
+
+带入到原方程中得到
+$$
+(I - P) B x = 2^n \mathbf{1} - x
+$$
+移项可得
+$$
+\left( I + (I - P) B \right) x = 2^n \mathbf{1}
+$$
+这就是最后要求解的 $n$ 维线性方程。求出 $x$ 后，答案为 $\frac{1}{n} \mathbf{1}^T x$。
+</CollapsibleComponent>
+
 ## 重要用法
 
 对一个非负整数随机变量建立的生成函数$f(X)$满足$f(1)=1$
