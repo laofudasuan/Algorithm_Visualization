@@ -24,6 +24,85 @@ $$
 $$
 
 <CollapsibleComponent title="做法">
-$dp[u][i]$表示$u$所在重链长度为$i$的概率
+###### 前置
+
+首先把期望转为概率。
+
+我们考虑一条边 $(u,v)$，满足 $v \in son(u)$。
+
+那么它对答案的贡献是：$\Pr( \text{(u,v) 是轻边}) \times siz_v$。
+
+理由：$v$ 子树中的点到根都要经过这条边。
+
+然后：
+$$
+\Pr(\text{(u,v) 是轻边}) = \Pr(  \text{v 是 u 的轻儿子}  ) = 1 - \Pr(\text{v 是 u 的重儿子})
+$$
+
+###### 生成函数
+
+考虑记：
+$$
+F_u(i) = \Pr(l_u = i) \\
+
+B_{u,v} = \sum_{x \in son(u),x \ne v} l_x \\\
+
+G_{u,v}(i) = \Pr[B_{u,v} = i]
+$$
+那么：
+$$
+\Pr(\text{v 是 u 的重儿子}) = \frac{l_v}{\sum_{x \in son(u)} l_x}
+$$
+然后，考虑枚举：
+$$
+i = l_v ,j = \sum_{x \in son(u),x \ne v} l_x
+$$
+我们发现：$1 \le i \le siz_v, 0 \le j \le siz_u -siz_v - 1$，由于式子过长，下文忽略 $i,j$ 范围。
+
+那么，此时：
+$$
+\Pr(\text{v 是 u 的重儿子}) = \sum_{i,j} \frac{i}{i+ j} \Pr(l_v = i) \Pr(\sum_{x \in son(u)} l_x = i+j) \\
+
+=  \sum_{i,j} \frac{i}{i+j} F_v(i) G_{u,v}(j)
+$$
+然后考虑转移。
+
+### $F_u(i)$ 的转移
+
+考虑怎么算 $F_u(i+1)$。
+
+考虑枚举一个儿子 $v$，然后算 $\Pr(l_v =i)$ 然后再乘上 $l_v = i$ 时 $u$ 选 $v$ 当重儿子的概率，所以：
+$$
+F_u(i+1) = \sum_{v \in son(u)} F_v(i) \sum_{j} \frac{i}{i+j} G_{u,v}(j)
+$$
+注意：当 $u$ 是叶子时，直接 $F_u(1) = 1$ 就可以了，因为只能选自己，而且一定能选自己。
+
+### $G_{u,v}(i)$ 的转移
+
+考虑，给 $u$ 中除 $v$ 外的儿子 $x$ 都分配一个链长 $j_x$，使得 $\sum_{x \in son(u),x \ne v} j_x = i$。
+$$
+G_{u,v}(i) = \sum \prod_{x \in son(u)} F_x(j_x)
+$$
+
+我们发现，这很生成函数。
+
+记：
+$$
+\mathcal F_u(x) = \sum_{i} F_u(i) x^i \\
+$$
+然后，上述转移就是：
+$$
+G_{u,v}(i) = [x^i] \left( \prod_{w \in son(u),w \ne v} \mathcal F_v(x) \right)
+$$
+然后考虑令：
+$$
+\mathcal P_u(x) = \prod_{v \in son(u)} \mathcal F_v(x)
+$$
+然后：
+$$
+G_{u,v}(i) = [x^i ]\left( \frac{\mathcal P_u(x)}{ \mathcal F_u(x)} \right)
+$$
+
+
 
 </CollapsibleComponent>
