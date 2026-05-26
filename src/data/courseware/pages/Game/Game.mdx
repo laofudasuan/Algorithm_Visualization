@@ -49,5 +49,54 @@ SG函数的优点：在遇到多个问题拼接在一起时，计算的效率比
 
 ##### 擂台游戏
 
+##### P16541 [EGOI 2026] 饼干 / Biscuits
+
+Aurora 和 Bianca 特别喜欢意大利杏仁饼干，今天，她们的爷爷烤了一大堆饼干（形成一个栈）。为了分这些饼干，她们发明了以下游戏。只要栈里还有饼干，她们就重复以下步骤：
+
++ Aurora 选一个整数 $X \geq 0$。
++ 接下来，Bianca 选一个整数 $Y \geq 0$，满足：
+  - 剩下的饼干至少有 $Y$ 个，并且
+  - $Y \neq X$。
++ 然后 Aurora 吃掉最顶上的 $Y$ 个饼干（如果 $Y=0$ 就不吃）。
++ 最后，如果还有剩下的饼干，Bianca 会吃掉最顶上的那一块。
+
+当然，两个女生都想吃得越多越好。栈里的每块饼干都有一个重量 $1 \leq W_i \leq 50$。当所有饼干被吃完后，每个人的**幸福度**等于她在游戏中吃掉的所有饼干的重量总和。两个女生都知道如何最优地玩这个游戏——每个人总是会做出能让自己的最终幸福度最大化的选择。
+
+因为这个游戏太好玩了，她们现在每天都要玩！在接下来的 $Q$ 天里，她们的爷爷每天都会烤一堆同样数量的饼干。为了让游戏更有趣，爷爷每天会改变其中一块饼干的重量，而其他饼干的重量保持不变。
+
+对于初始的饼干堆，以及在每天进行改变之后，你需要计算出每天游戏结束时 **Bianca 的幸福度**。
+
+- $2 \leq N \leq 100\ 000$。
+- $0 \leq Q \leq 100\ 000$。
+- $1 \leq W_i \leq 50$（是的，意大利杏仁饼干很轻！）。
+- $0 \leq P_i \leq N-1$ 且 $1 \leq Z_i \leq 50$。
+
+<CollapsibleComponent title="朴素做法"> 
+
+考虑做一个转化：令$D=$Aurora的幸福度$-$Bianca的幸福度，这样Aurora希望最大化$D$，Bianca希望最小化$D$
+
+朴素做法：用$f[i]$表示后缀$i \sim n$的答案
+
+根据Bianca选择的$Y$，有转移$f[i] = f[i+T+1]+\sum_{j=i}^{i+T-1}w_j - w_{i+T}$
+
+因为Aurora会禁用一个$Y$，所以最终Bianca会选择所有转移的次小值
+</CollapsibleComponent>
+
+<CollapsibleComponent title="优化"> 
+考虑换一个DP形式，用$f[i][j]$表示后缀$i \sim n$，Biance如果选择$Y=j$的答案
+
+- 初始$f[n] = [-w_n,w_n,w_n,w_n,w_n,w_n,\ldots]$
+- 考虑$f[n-1]$
+  - 对于$f[n-1][0]$，Biance会吃掉$w_{n-1}$，接下来Aurora会禁掉$f[n]$的最小值$-w_n$，所以$f[n-1][0] = w_n-w_{n-1}$
+  - 对于$f[n-1][1]$，Aurora会吃掉$w_{n-1}$，Biance会吃掉$w_{n}$，所以$f[n-1][1]=w_{n-1}-w_{n}$
+  - $f[n-1] = [w_n-w_{n-1},w_{n-1}-w_{n},w_{n-1}+w_n,w_{n-1}+w_n,w_{n-1}+w_n,w_{n-1}+w_n,w_{n-1}+w_n,\ldots]$
+- 发现$n$和$n-1$都满足一个性质：$f[i]$的最小值和次小值是相反数
+- 接下来考虑归纳法证明对$f[1 \sim n]$都成立：
+- 假设$f[i+1]$成立，$f[i+1]$的最小值为$-D$，次小值为$D$，其他值都$\ge D$
+- 对于$f[i][0]$，Biance会吃掉$w_{i}$，接下来Aurara会禁掉$-D$，从而$f[i][0]=D-w_i$
+- 对于$f[i][j](j \ge 1)$，Aurora会吃掉$w_{i}$，那相当于$w_i+f[i+1][j-1]$，因此$\min(f[i][1 \ldots]) = w_i+\min(f[i+1]) = w_i-D$，由此最小值和次小值仍然是相反数
+
+</CollapsibleComponent>
+
 ##### 参考资料
 - <a href="https://www.luogu.com.cn/article/jrc00q7u" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline inline-flex items-center gap-1">🔗 博弈论半家桶-从入门到门入从</a>
