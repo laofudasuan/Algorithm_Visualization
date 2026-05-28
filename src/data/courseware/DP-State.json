@@ -10,26 +10,30 @@
   },
   "pages": [
     { "id": "DP状态设计", "x": 500, "y": 300 },
-    { "id": "基于问题的设计", "x": 700, "y": 300 },
-    { "id": "计数DP", "x": 900, "y": 280 },
-    { "id": "优化DP", "x": 900, "y": 330 },
-    { "id": "基于场景的设计", "x": 487, "y": 400 },
-    { "id": "序列DP", "link" : "DP-Sequence", "x": 400, "y": 500 },
-    { "id": "背包DP", "link" : "DP-Knapsack", "x": 500, "y": 500 },
-    { "id": "树形DP", "link" : "DP-Tree" , "x": 600, "y": 500 },
-    { "id": "状压DP", "link" : "DP-Bitmask", "x": 700, "y": 500 },
-    { "id": "状态优化", "x": 300, "y": 300 }
+    { "id": "基于问题的设计", "x": 600, "y": 400 },
+    { "id": "计数DP", "path" : "DP/DP-Counting.mdx", "x": 650, "y": 500 },
+    { "id": "优化DP", "x": 750, "y": 500 },
+    { "id": "基于场景的设计", "x": 400, "y": 400 },
+    { "id": "序列DP", "link" : "DP-Sequence", "x": 250, "y": 500 },
+    { "id": "背包DP", "link" : "DP-Knapsack", "x": 350, "y": 500 },
+    { "id": "树形DP", "link" : "DP-Tree" , "x": 450, "y": 500 },
+    { "id": "状压DP", "link" : "DP-Bitmask", "x": 550, "y": 500 },
+    { "id": "状态优化", "x": 300, "y": 300 },
+    { "id": "状态设计技巧", "x": 700, "y": 300 },
+    { "id": "对未来的贡献", "path": "DP/DP-Future.mdx", "x": 900, "y": 300 }
   ],
   "edges": [
     { "source": "DP状态设计", "target": "转移方程", "sourceSide": "left", "targetSide": "right" },
     { "source": "DP状态设计", "target": "基于场景的设计", "sourceSide": "bottom", "targetSide": "top" },
-    { "source": "DP状态设计", "target": "基于问题的设计", "sourceSide": "right", "targetSide": "left" },
-    { "source": "基于问题的设计", "target": "计数DP", "sourceSide": "right", "targetSide": "left" },
-    { "source": "基于问题的设计", "target": "优化DP", "sourceSide": "right", "targetSide": "left" },
+    { "source": "DP状态设计", "target": "基于问题的设计", "sourceSide": "bottom", "targetSide": "top" },
+    { "source": "基于问题的设计", "target": "计数DP", "sourceSide": "bottom", "targetSide": "top" },
+    { "source": "基于问题的设计", "target": "优化DP", "sourceSide": "bottom", "targetSide": "top" },
     { "source": "基于场景的设计", "target": "背包DP", "sourceSide": "bottom", "targetSide": "top" },
     { "source": "基于场景的设计", "target": "序列DP", "sourceSide": "bottom", "targetSide": "top" },
     { "source": "基于场景的设计", "target": "树形DP", "sourceSide": "bottom", "targetSide": "top" },
     { "source": "基于场景的设计", "target": "状压DP", "sourceSide": "bottom", "targetSide": "top" },
-    { "source": "DP状态设计", "target": "状态优化", "sourceSide": "left", "targetSide": "right" }
+    { "source": "DP状态设计", "target": "状态优化", "sourceSide": "left", "targetSide": "right" },
+    { "source": "DP状态设计", "target": "状态设计技巧", "sourceSide": "right", "targetSide": "left" },
+    { "source": "状态设计技巧", "target": "对未来的贡献", "sourceSide": "right", "targetSide": "left" }
   ]
 }
