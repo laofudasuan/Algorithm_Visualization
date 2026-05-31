@@ -54,14 +54,168 @@ $$
 $N \leq 250$
 
 <CollapsibleComponent title="做法"> 
+根据 E 人（渴望拥挤）和 I 人（渴望孤独）的贪心策略，整个填座过程在逻辑上分为截然不同的两段：
 
-根据连续段DP，对于$E$人，它希望尽量去合并两个连续段，因此需要判断当前所有空段是否有长度为$1$，这个需要记录在DP状态里
+* **阶段一（函数 `F` 代表的阶段）**：桌上**至少存在一个长度 $\ge 3$ 的空段**。在这个阶段，I 人一定会选择**创建（Create）**（落在 $\ge 3$ 的空段中间）；而 E 人一定会选择**合并（Merge）** 或 **延伸（Extend）**。
+* **阶段二（函数 `G` 代表的阶段）**：桌上**全都是长度为 1 或 2 的空段**。在这个阶段，所有人的行为完全受限于只剩 1 和 2 的空段，I 人被迫只能 Extend 或 Merge。
 
-$dp[i][j][k]$表示来了$i$个人，形成了$j$个连续段，有$k$个空段长度为$1$的方案数
+###### G函数设计
 
-对于$I$人，它希望尽量去选择一个长度$\ge 3$的空段，怎么知道有没有呢？
+- `G(pos, one, two)` 处理的是**阶段二（终局阶段）**。
+此时桌上只有 `one` 个长度为 1 的空段和 `two` 个长度为 2 的空段。根据题意实现转移：
 
-考虑当前空位一共有$n-i$个，有$k$个长度为$1$的，那剩下$j-k$个长度$\ge 2$的段总共有$n-i-j$个空位，根据鸽巢原理可以判断
+* **如果当前是 I 人**：她想尽量避开人。
+* 如果有长度为 2 的空段（`two > 0`），她会去占据一头（Extend），产生 $2 \times \text{two}$ 种选择。这会让一个长度为 2 的空段变成长度为 1 的空段。
+* 如果没有长度为 2 的空段，她只能被迫填入长度为 1 的空段（Merge），有 `one` 种选择。
+
+* **如果当前是 E 人**：她想尽量靠拢人。
+* 只要有长度为 1 的空段（`one > 0`），她**必须**填入（Merge），有 `one` 种选择。
+* 如果没有长度为 1 的空段，她只能去占据长度为 2 的空段的一头（Extend），有 $2 \times \text{two}$ 种选择。
+
+###### F函数设计
+
+`F(pos, x, y)`表示：当前一共有 $k = x + y$ 个空段。
+
+* `x`：代表**Type X 空段**的数量。这类空段在之前的操作中被“触碰”过，它们**可能**已经缩减为长度 1 了，因此 **E 人被允许对它们进行 Merge 操作**。
+* `y`：代表**Type Y 空段**的数量。这类空段近期从未被触碰，它们**绝对保证长度 $\ge 2$**，因此 **E 人绝对不能对它们进行 Merge 操作**。
+
+当 E 人行动时：
+1. **Merge 操作 (`F(pos+1, x-1, y) * x`)**：E 人选择一个可能为长度 1 的 Type X 空段填入。这个空段消失，所以 `x` 减少 1，方案数为 `x`。
+2. **Extend 操作 (`F(pos+1, 1, x+y-1) * 2(x+y)`)**：E 人选择贴靠在任意一个空段的边缘。由于一共有 $x+y$ 个空段，共有 $2(x+y)$ 个边缘。
+* **精妙之处**：如果 E 人选择了 Extend，说明此时**桌上绝对没有任何长度为 1 的空段**（否则她会去 Merge）。这相当于 E 人用行动证明了：之前所有的 Type X 空段其实长度都 $\ge 2$！
+* 因此，所有的空段在这一刻都被“重置”为 Type Y。而 E 人刚刚贴靠的那个空段，因为长度减了 1，成为了**全场唯一一个可能变成长度 1 的空段**。所以状态变为 `x = 1`, `y = 总体数量 - 1`！
+
+当 I 人行动时：
+
+在阶段一，I 人必定执行 **Create 操作**，也就是选择一个空段从中间劈开，一分为二。
+
+1. **劈开 Type X (`F(pos+1, x+1, y) * x`)**：选择 `x` 中的一个。1 个 Type X 被劈开后，变成了 2 个更短的空段，因为它们变短了，所以都有可能变成长度 1。净变化是 `x` 增加了 1。
+2. **劈开 Type Y (`F(pos+1, x+2, y-1) * y`)**：选择 `y` 中的一个。这个绝对 $\ge 2$ 的空段被劈开后，生成的 2 个新空段也变短了，同样变为 Type X。净变化是 `y` 减少 1，`x` 增加 2。
+
+###### 阶段切换
+
+既然 `F` 只是记录拓扑形状，不记录具体长度，那程序怎么知道什么时候从阶段一（有 $\ge 3$ 长度）过渡到阶段二（全是 1 和 2）呢？
+
+如果此时桌上**只剩下长度为 1 和 2 的空段**，设数量分别为 $n_1$ 和 $n_2$。
+
+显然满足方程组：
+
+$$
+n_1 + n_2 = \text{sum}
+$$
+
+$$
+n_1 + 2n_2 = \text{rest}
+$$
+
+
+解得：$n_2 = \text{rest} - \text{sum}$ （代码里的 `two`），$n_1 = \text{sum} - \text{two}$ （代码里的 `one`）。
+
+由于 Type Y 空段绝对 $\ge 2$，所以这 `y` 个空段必须全是长度 2。
+剩下的 `two - y` 个长度 2 的空段，必须从 `x` 个 Type X 空段中挑选出来！挑选的方案数正好是 $\binom{x}{\text{two} - y}$。
+
+如果这个组合数合法（即满足客观条件），说明在这一步，局面的确**有可能**坍缩成“只剩 1 和 2”的终局。于是，在这里兵分两路：
+
+1. 一部分平行宇宙继续留在 `F` 中（前提是后续操作证明这里还有 $\ge 3$ 的空段）。
+2. $\binom{x}{\text{two} - y}$ 种平行宇宙在这里完成了确切的长度赋值，直接跃迁进入 `G` 函数执行终局逻辑。
+
+###### 参考代码
+
+```C++ maxLines=15
+//Author:kevinZ99
+#include <bits/stdc++.h>
+#define up(a,b,c) for(int (a)=(b);(a)<=(c);(a)=-~(a))
+#define dn(a,b,c) for(int (a)=(b);(a)>=(c);(a)=~-(a))
+#define fst first
+#define sed second
+#define pref static inline
+#define gc() p1==p2&&(p2=(p1=buf)+fread(buf,1,1<<12,stdin),p1==p2)?EOF:*p1++
+using namespace std; using hint = __int128;using pii = pair< int , int > ;
+using us = unsigned short ;using ldb  = long double ;using ll = long long;
+using ull= unsigned long long;using ui=unsigned int;using pll=pair<ll,ll>;
+using pil= pair<int,ll> ;using vpil   = vector<pil>;using vl = vector<ll>;
+using pli= pair<ll,int>;using vpli    = vector<pli>;using vi =vector<int>;
+using vpi= vector< pii > ;using vpl   = vector<pll> ; using db =  double ;
+namespace mystl{
+	char buf[1<<20], *p1=buf, *p2=buf, sr[1<<23], z[23], nc;int C=-1 ,Z=0;
+	template <typename T>pref void read ( T & x )    { bool flag = false ;
+		while( nc = gc() ,(nc<48||nc>57) && nc!=-1)flag|=(nc==45);x=nc-48;
+		while(nc=gc(),47<nc&&nc<58)x=(x<<3)+(x<<1)+(nc^48); if(flag)x=-x;}
+	template <  typename T , typename ... Args_Arrays_Typename_KevinZ99  >
+	void read(T&x,Args_Arrays_Typename_KevinZ99&...a){read(x);read(a...);}
+	pref void ot(  )    {  fwrite( sr , 1 , C + 1, stdout ) ;  C = - 1 ; }
+	pref void flush( )   { if ( C > 1<<22 ) ot() ; } template <typename T>
+	pref void write(T x,char t)   { int y = 0 ; if ( x < 0 ) y = 1, x = -x;
+		while( z [ ++ Z ] = x % 10 + 48 , x /= 10) ; if( y ) z[ ++Z ]='-';
+		while( sr[ ++ C ] = z[ Z ] , -- Z ) ; sr [ ++C ] = t ; flush() ; }
+	pref void write(char x)   {sr[C=-~C]=x;}pref void write(string s){for(
+	char t:s)write(t);}pref ll qpow(ll a , ll b,ll p)   {if(a==0)return 0;
+	ll c=1ll; while(b) { if(b & 1) c=a*c%p; a=a*a%p; b>>=1; } return c ; }
+	pref ll lcm ( ll x , ll y )   {return x / std :: __gcd( x , y ) * y ;}
+};
+using namespace mystl;
+namespace my{
+	constexpr int P=static_cast<int>(1e9+7);
+	pref void madd(int & x , int y)    { x = ( x + y >= P )?(x+y-P):(x+y);}
+	pref int fmadd(int x , int y)    { return ( x + y >=P )?(x+y-P):(x+y);}
+	pref void msub(int & x , int y)    { x = ( x < y ) ? (x-y+P) : (x-y); }
+	pref int fmsub(int x , int y)    { return ( x < y ) ? (x-y+P) : (x-y);}
+	pref void mmul ( int & x , int y )   { x = (int)( 1ll * x * y % P ) ; }
+	pref int fmmul ( int x,int y )    { return (int)( 1ll * x * y % P ) ; }
+	template<typename T>pref T Min(T x,T y)   {return (x<y)?(x):(y);}
+	template<typename T>pref T Max(T x,T y)   {return (x>y)?(x):(y);}
+	template<typename T>pref T Abs(T x)      {return (x<0)?(-x):(x);}
+	constexpr int N=static_cast<int>(255),inf=static_cast<int>(1e9);
+	int n;string s;
+	int Combine[N][N],f[N][N][N],g[N][N][N];
+	pref int C(int n,int m){
+		if(n<0||m<0||m>n)return 0;
+		return Combine[n][m];
+	}
+	int G(int pos,int one,int two){
+		if(one<0||two<0||one>n||two>n)return 0;
+		if(pos==n)return one==0&&two==0;
+		int &ret=g[pos][one][two];
+		if(ret!=-1)return ret;
+		ret=0;if(s[pos]=='I'){
+			if(two>0)ret=fmmul(G(pos+1,one+1,two-1),fmmul(2,two));
+			else ret=fmmul(G(pos+1,one-1,0),one);
+		}
+		else{
+			if(one>0)ret=fmmul(G(pos+1,one-1,two),one);
+			else ret=fmmul(G(pos+1,1,two-1),fmmul(2,two));
+		}return ret;
+	}
+	int F(int pos,int x,int y){
+		if(x<0||y<0||x>n||y>n)return 0;
+		if(pos==n)return x==0&&y==0;
+		int &ret=f[pos][x][y];
+		if(ret!=-1)return ret;
+		ret=0;if(s[pos]=='I'){
+			madd(ret,fmmul(F(pos+1,x+1,y),x));
+			madd(ret,fmmul(F(pos+1,x+2,y-1),y));
+			int sum=x+y,rest=n-pos,two=rest-sum,one=sum-two,choose=C(x,two-y);
+			madd(ret,fmmul(G(pos,one,two),choose));
+		}else 
+			madd(ret,fmmul(F(pos+1,x-1,y),x)),madd(ret,fmmul(F(pos+1,1,x+y-1),fmmul(2,fmadd(x,y))));
+		return ret;
+	}
+	pref void SOLVE(){
+		cin>>n>>s;if(n<=2)return write(n,'\n');
+		up(i,0,n){
+			Combine[i][0]=Combine[i][i]=1;
+			up(j,1,i-1)Combine[i][j]=fmadd(Combine[i-1][j-1],Combine[i-1][j]);
+		}
+		__builtin_memset(f,-1,sizeof(f));__builtin_memset(g,-1,sizeof(g));
+		int ans=fmmul(F(1,0,1),n);write(ans,'\n');
+	}
+}
+int main(){
+	ios::sync_with_stdio(false);
+	my::SOLVE();
+	return ot(),0;
+}
+```
 
 </CollapsibleComponent>
 
