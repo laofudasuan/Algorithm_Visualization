@@ -6,7 +6,7 @@ import { CollapsibleComponent } from '../../../courseware/markdownConfig';
 
 # 图DP计数
 
-$n$个点带标号无向图计数
+### $n$个点带标号无向图计数
 
 - 用$f[i]$表示$i$个点的带标号连通图个数，$G[i]$表示$i$个点的图个数  
 - 连通图的个数等于图的总数-不连通的图个数
@@ -16,7 +16,7 @@ $$
 g_i=2^{\frac{i(i-1)}{2}}  \ \ \ f_i=\sum_{j=1}^{i-1} \binom{i-1}{j-1} f_j g_{i-j}
 $$
 
-$n$个点，$m$条边的简单无向连通图计数
+### $n$个点，$m$条边的简单无向连通图计数
 
 - 如果直接套用上题做法，那么可以得到
 
@@ -177,6 +177,10 @@ $$
 G(x)=2F(x) \to f(x)=\sqrt{g(x)}
 $$
 </CollapsibleComponent>
+
+##### P6846 [CEOI 2019] Amusement Park
+
+
 
 ##### P11714 清华集训2014主旋律
 
