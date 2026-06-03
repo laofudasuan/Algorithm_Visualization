@@ -396,14 +396,20 @@ export class PixiGraphRenderer {
     // 创建线条对象
     const edgeObject = new PIXI.Graphics();
     
-    // 根据是否有弧度属性决定绘制直线还是曲线
-    if (edgeStyle.curvature && edgeStyle.curvature !== 0) {
-      // 绘制曲线
-      this.drawCurvedLine(edgeObject, sourceNode, targetNode, edgeStyle);
+    if (sourceNode.id === targetNode.id) {
+      edgeObject._isSelfLoop = true;
+      this.drawSelfLoop(edgeObject, sourceNode, edgeStyle);
     } else {
-      // 绘制直线
-      edgeObject.moveTo(sourceNode.x, sourceNode.y);
-      edgeObject.lineTo(targetNode.x, targetNode.y);
+      edgeObject._isSelfLoop = false;
+      // 根据是否有弧度属性决定绘制直线还是曲线
+      if (edgeStyle.curvature && edgeStyle.curvature !== 0) {
+        // 绘制曲线
+        this.drawCurvedLine(edgeObject, sourceNode, targetNode, edgeStyle);
+      } else {
+        // 绘制直线
+        edgeObject.moveTo(sourceNode.x, sourceNode.y);
+        edgeObject.lineTo(targetNode.x, targetNode.y);
+      }
     }
     
     edgeObject.stroke({width: edgeStyle.lineWidth, color: edgeStyle.stroke});
@@ -423,7 +429,11 @@ export class PixiGraphRenderer {
     // 首先检查单个边的style中是否有directional属性，然后再使用全局edgesStyle中的值
     const isDirectional = style && 'directional' in style ? style.directional : this.globalEdgesStyle.directional;
     if (isDirectional) {
-      this.drawArrow(edgeObject, sourceNode, targetNode, edgeStyle);
+      if (edgeObject._isSelfLoop) {
+        this.drawSelfLoopArrow(edgeObject, sourceNode, edgeStyle);
+      } else {
+        this.drawArrow(edgeObject, sourceNode, targetNode, edgeStyle);
+      }
     }
 
     // 存储边对象引用
@@ -636,17 +646,27 @@ export class PixiGraphRenderer {
     edgeObject.clear();
     
     if (edgeObject.startX !== undefined) {
-      // 根据是否有弧度属性决定绘制直线还是曲线
-      if (edgeStyle.curvature && edgeStyle.curvature !== 0) {
-        // 绘制曲线
-        this.drawCurvedLine(edgeObject, 
-          {x: edgeObject.startX, y: edgeObject.startY}, 
-          {x: edgeObject.endX, y: edgeObject.endY}, 
-          edgeStyle);
+      const edgeData = this.edges?.find(e => e.id === edgeId);
+      const isSelfLoop = edgeData ? edgeData.source === edgeData.target : (edgeObject.startX === edgeObject.endX && edgeObject.startY === edgeObject.endY);
+      if (isSelfLoop) {
+        edgeObject._isSelfLoop = true;
+        const node = this.nodes?.find(n => n.id === (edgeData?.source));
+        const loopNode = node || { id: edgeData?.source, x: edgeObject.startX, y: edgeObject.startY, style: {} };
+        this.drawSelfLoop(edgeObject, loopNode, edgeStyle);
       } else {
-        // 绘制直线
-        edgeObject.moveTo(edgeObject.startX, edgeObject.startY);
-        edgeObject.lineTo(edgeObject.endX, edgeObject.endY);
+        edgeObject._isSelfLoop = false;
+        // 根据是否有弧度属性决定绘制直线还是曲线
+        if (edgeStyle.curvature && edgeStyle.curvature !== 0) {
+          // 绘制曲线
+          this.drawCurvedLine(edgeObject, 
+            {x: edgeObject.startX, y: edgeObject.startY}, 
+            {x: edgeObject.endX, y: edgeObject.endY}, 
+            edgeStyle);
+        } else {
+          // 绘制直线
+          edgeObject.moveTo(edgeObject.startX, edgeObject.startY);
+          edgeObject.lineTo(edgeObject.endX, edgeObject.endY);
+        }
       }
     }
     
@@ -663,7 +683,11 @@ export class PixiGraphRenderer {
         const sourceNode = this.nodes?.find(n => n.id === edgeData.source);
         const targetNode = this.nodes?.find(n => n.id === edgeData.target);
         if (sourceNode && targetNode) {
-          this.drawArrow(edgeObject, sourceNode, targetNode, edgeStyle);
+          if (edgeData.source === edgeData.target) {
+            this.drawSelfLoopArrow(edgeObject, sourceNode, edgeStyle);
+          } else {
+            this.drawArrow(edgeObject, sourceNode, targetNode, edgeStyle);
+          }
         }
       }
     }
@@ -738,11 +762,16 @@ export class PixiGraphRenderer {
     const edgeStyle = { ...this.defaultEdgeStyle, ...(edgeObject.style || {}) };
     
     // 根据是否有弧度属性决定绘制直线还是曲线
-    if (edgeStyle.curvature && edgeStyle.curvature !== 0) {
+    if (sourceNode.id === targetNode.id || (sourceNode.x === targetNode.x && sourceNode.y === targetNode.y)) {
+      edgeObject._isSelfLoop = true;
+      this.drawSelfLoop(edgeObject, sourceNode, edgeStyle);
+    } else if (edgeStyle.curvature && edgeStyle.curvature !== 0) {
       // 绘制曲线
+      edgeObject._isSelfLoop = false;
       this.drawCurvedLine(edgeObject, sourceNode, targetNode, edgeStyle);
     } else {
       // 绘制直线
+      edgeObject._isSelfLoop = false;
       edgeObject.moveTo(sourceNode.x, sourceNode.y);
       edgeObject.lineTo(targetNode.x, targetNode.y);
     }
@@ -751,9 +780,13 @@ export class PixiGraphRenderer {
     
     // 如果是有向边，绘制箭头
     // 首先检查单个边的style中是否有directional属性，然后再使用全局edgesStyle中的值
-    const isDirectional = (edgeObject.style || style) && 'directional' in (edgeObject.style || style) ? (edgeObject.style || style).directional : this.globalEdgesStyle.directional;
+    const isDirectional = edgeObject.style && 'directional' in edgeObject.style ? edgeObject.style.directional : this.globalEdgesStyle.directional;
     if (isDirectional) {
-      this.drawArrow(edgeObject, sourceNode, targetNode, edgeStyle);
+      if (edgeObject._isSelfLoop) {
+        this.drawSelfLoopArrow(edgeObject, sourceNode, edgeStyle);
+      } else {
+        this.drawArrow(edgeObject, sourceNode, targetNode, edgeStyle);
+      }
     }
     
     // 更新坐标记录
@@ -872,14 +905,19 @@ export class PixiGraphRenderer {
       const edgeStyle = { ...this.defaultEdgeStyle, ...(edgeObject.style || {}) };
       
       // 根据是否有弧度属性决定绘制直线还是曲线
-      if (edgeStyle.curvature && edgeStyle.curvature !== 0) {
+      if (newStartX === newEndX && newStartY === newEndY) {
+        edgeObject._isSelfLoop = true;
+        this.drawSelfLoop(edgeObject, { id: sourceNode.id, x: newStartX, y: newStartY, style: sourceNode.style || {} }, edgeStyle);
+      } else if (edgeStyle.curvature && edgeStyle.curvature !== 0) {
         // 绘制曲线
+        edgeObject._isSelfLoop = false;
         this.drawCurvedLine(edgeObject, 
           {x: newStartX, y: newStartY}, 
           {x: newEndX, y: newEndY}, 
           edgeStyle);
       } else {
         // 绘制直线
+        edgeObject._isSelfLoop = false;
         edgeObject.moveTo(newStartX, newStartY);
         edgeObject.lineTo(newEndX, newEndY);
       }
@@ -892,7 +930,11 @@ export class PixiGraphRenderer {
       if (isDirectional) {
         const startNode = { x: newStartX, y: newStartY };
         const endNode = { x: newEndX, y: newEndY };
-        this.drawArrow(edgeObject, startNode, endNode, edgeStyle);
+        if (edgeObject._isSelfLoop) {
+          this.drawSelfLoopArrow(edgeObject, { id: sourceNode.id, x: newStartX, y: newStartY, style: sourceNode.style || {} }, edgeStyle);
+        } else {
+          this.drawArrow(edgeObject, startNode, endNode, edgeStyle);
+        }
       }
       
       // 更新坐标记录
@@ -978,6 +1020,27 @@ export class PixiGraphRenderer {
     // 获取边对象
     const edgeObject = this.edgeObjects.get(edgeId);
     if (!edgeObject) return;
+
+    if (edgeObject._isSelfLoop) {
+      const edgeData = this.edges?.find(e => e.id === edgeId);
+      const node = edgeData ? this.nodes?.find(n => n.id === edgeData.source) : null;
+      const loopNode = node || { id: edgeData?.source, x: edgeObject.startX, y: edgeObject.startY, style: {} };
+      const edgeStyle = { ...this.defaultEdgeStyle, ...(edgeObject.style || {}) };
+
+      edgeObject.alpha = 1;
+      edgeObject.clear();
+      this.drawSelfLoop(edgeObject, loopNode, edgeStyle);
+      edgeObject.stroke({ width: edgeStyle.lineWidth, color: edgeStyle.stroke });
+
+      const isDirectional = edgeObject.style && 'directional' in edgeObject.style ? edgeObject.style.directional : this.defaultEdgeStyle.directional;
+      if (isDirectional) {
+        this.drawSelfLoopArrow(edgeObject, loopNode, edgeStyle);
+      }
+
+      this.app.renderer.render(this.app.stage);
+      if (onComplete) onComplete();
+      return;
+    }
 
     // 获取起点和终点坐标
     const startX = edgeObject.startX || 0;
@@ -1425,6 +1488,44 @@ export class PixiGraphRenderer {
 
     // 设置箭头样式
     graphics.stroke({ width: style.lineWidth/4 || 3, color: style.color || 0x4FC3F7 });
+  }
+
+  drawSelfLoop(graphics, node, style) {
+    const nodeSize = node?.style?.size || 20;
+    const loopRadius = style.selfLoopRadius || (nodeSize / 2 + 18);
+    const loopOffset = style.selfLoopOffset || (loopRadius * 0.7);
+    const loopAngle = style.selfLoopAngle !== undefined ? style.selfLoopAngle : (-Math.PI / 4);
+    const centerX = node.x + Math.cos(loopAngle) * loopOffset;
+    const centerY = node.y + Math.sin(loopAngle) * loopOffset;
+    const startAngle = style.selfLoopStartAngle !== undefined ? style.selfLoopStartAngle : 0;
+    const endAngle = style.selfLoopEndAngle !== undefined ? style.selfLoopEndAngle : (Math.PI * 2);
+
+    graphics.circle(centerX, centerY, loopRadius);
+
+    graphics._selfLoopInfo = { centerX, centerY, loopRadius, startAngle, endAngle };
+  }
+
+  drawSelfLoopArrow(graphics, node, style) {
+    const info = graphics._selfLoopInfo;
+    if (!info) return;
+
+    const t = style.selfLoopArrowT !== undefined ? style.selfLoopArrowT : 0.65;
+    const angle = info.startAngle + (info.endAngle - info.startAngle) * t;
+    const tipX = info.centerX + info.loopRadius * Math.cos(angle);
+    const tipY = info.centerY + info.loopRadius * Math.sin(angle);
+    const tangentAngle = angle + Math.PI / 2;
+    const headLength = style.lineWidth * 2 / 3 || 10;
+
+    const leftX = tipX - Math.cos(tangentAngle - Math.PI / 6) * headLength;
+    const leftY = tipY - Math.sin(tangentAngle - Math.PI / 6) * headLength;
+    const rightX = tipX - Math.cos(tangentAngle + Math.PI / 6) * headLength;
+    const rightY = tipY - Math.sin(tangentAngle + Math.PI / 6) * headLength;
+
+    graphics.moveTo(leftX, leftY);
+    graphics.lineTo(tipX, tipY);
+    graphics.lineTo(rightX, rightY);
+
+    graphics.stroke({ width: style.lineWidth / 4 || 3, color: style.color || 0x4FC3F7 });
   }
 
   /**
