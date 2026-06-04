@@ -9,7 +9,6 @@
     "description": { "x": 500, "y": 150 }
   },
   "anchor": [
-    { "id": "根号", "x": 550, "y": 450 },
     { "id": "升维", "x": 250, "y": 200 }
   ],
   "pages": [
@@ -28,8 +27,8 @@
     { "id": "扫描线", "path": "DS/Scan-Line.mdx", "x": 150, "y": 400 },
     { "id": "树套树", "x": 150, "y": 280 },
 
-    { "id": "分块", "link": "Block", "x": 650, "y": 430 },
-    { "id": "莫队", "path": "DS/Mo.mdx", "x": 650, "y": 490 },
+    { "id": "分块", "link": "Block", "x": 550, "y": 450 },
+    { "id": "莫队", "path": "DS/Mo.mdx", "x": 650, "y": 450 },
 
     { "id": "集合", "x": 550, "y": 550 },
     { "id": "堆", "path": "DS/Heap.mdx", "x": 700, "y": 550 },
@@ -67,9 +66,8 @@
     { "source": "平衡树", "target": "升维", "sourceSide": "top", "targetSide": "right" },
     { "source": "升维", "target": "树套树", "sourceSide": "left", "targetSide": "top" },
 
-    { "source": "序列", "target": "根号", "sourceSide": "right", "targetSide": "left" , "label": "根号算法"},
-    { "source": "根号", "target": "分块", "sourceSide": "right", "targetSide": "left" },
-    { "source": "根号", "target": "莫队", "sourceSide": "right", "targetSide": "left" },
+    { "source": "序列", "target": "分块", "sourceSide": "right", "targetSide": "left" },
+    { "source": "分块", "target": "莫队", "sourceSide": "right", "targetSide": "left" },
     { "source": "莫队", "target": "回滚莫队", "sourceSide": "right", "targetSide": "left" },
 
     { "source": "数据结构", "target": "集合", "sourceSide": "right", "targetSide": "left" },

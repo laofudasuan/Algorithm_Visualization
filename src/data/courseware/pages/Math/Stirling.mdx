@@ -4,12 +4,19 @@ title: 斯特林数
 
 import { CollapsibleComponent } from '../../../courseware/markdownConfig';
 import StirlingCycleExampleVisualization from '../../../../components/visualizations/StirlingCycleExampleVisualization.jsx';
+import StirlingS2ExampleVisualization from '../../../../components/visualizations/StirlingS2ExampleVisualization.jsx';
 
 # 斯特林数
 
 ## 第二类斯特林数
 
 第二类斯特林数定义为把$n$个不同的球放入$m$个相同盒子中，每个格子都非空的方案数
+
+举例：
+
+n=4,m=2
+
+<StirlingS2ExampleVisualization />
     
 $$
 S_2(n,m)=\left\{ \begin{array}{ll} 1 & n=m=0 \\ 0 & n\neq 0,m=0 \\ mS_2(n-1,m)+S_2(n-1,m-1) & \text{other} \end{array} \right.

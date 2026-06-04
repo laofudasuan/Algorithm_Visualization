@@ -1440,15 +1440,16 @@ export class PixiGraphRenderer {
     // 初始化位置数组
     const positions = [];
     
-    if (curveLength < 200) {
-      positions.push(0.4);
-      positions.push(0.7);
+    const arrowSpacing = style.arrowSpacing || 50;
+    const arrowMargin = style.arrowMargin || 50;
+    const maxArrows = style.maxArrows || 12;
+
+    if (curveLength <= arrowMargin * 2 + arrowSpacing) {
+      positions.push(0.35);
+      positions.push(0.65);
     } else {
-      const NumArrows = Math.floor((curveLength-100) / 30) ;
-      for (let i = 0; i < NumArrows; i++) {
-        const position = 0.4 - 0.3 / NumArrows * i;
-        positions.push(position);
-        positions.push(1-position);
+      for (let d = arrowMargin; d <= curveLength - arrowMargin && positions.length < maxArrows; d += arrowSpacing) {
+        positions.push(d / curveLength);
       }
     }
     

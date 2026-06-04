@@ -81,7 +81,7 @@ const buildGraphData = (example) => {
             stroke: 0xffffff,
             color: 0x2196F3,
             lineWidth: 20,
-            curvature: isTwoCycle ? 0.35 : 0
+            curvature: isTwoCycle ? 0.2 : 0
           }
         });
       }
@@ -135,9 +135,10 @@ const StirlingCycleExampleVisualization = () => {
             </button>
           );
         })}
-        当前划分方案：{formatCycles(selected.cycles)}
+        
       </div>
 
+        当前划分方案：{formatCycles(selected.cycles)}
         <GraphCanvas
           key={selectedId}
           width={WIDTH}
@@ -147,10 +148,6 @@ const StirlingCycleExampleVisualization = () => {
           enableDrawing={false}
           backgroundImage={null}
         />
-
-      <div className="text-sm text-gray-600">
-        圆圈表示元素 1..4，箭头表示循环中的映射方向；不动点用自环表示。
-      </div>
     </div>
   );
 };
