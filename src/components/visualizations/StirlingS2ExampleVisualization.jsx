@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useRef, useEffect } from 'react';
 import GraphCanvas from '../animation/GraphCanvas.jsx';
 
 const WIDTH = 320;
@@ -107,23 +107,59 @@ const buildGraphData = (blocks, index) => {
 };
 
 const StirlingS2ExampleVisualization = () => {
+  const containerRef = useRef(null);
+  const [cols, setCols] = useState(1);
   const dataList = useMemo(() => PARTITIONS.map((p, idx) => buildGraphData(p, idx)), []);
 
+  useEffect(() => {
+    const updateGrid = () => {
+      if (containerRef.current) {
+        const containerWidth = containerRef.current.clientWidth;
+        // Calculate how many items can fit based on minimum width (including padding and margin)
+        const minWidth = 280; // Minimum width for each item
+        const gap = 24; // gap-6 is 1.5rem = 24px with default font size
+        const availableWidth = containerWidth - gap * 2; // Account for side margins
+        const calculatedCols = Math.max(1, Math.floor(availableWidth / (minWidth + gap)));
+        
+        // Limit to maximum of 4 columns
+        setCols(Math.min(calculatedCols, 4));
+      }
+    };
+
+    updateGrid();
+    window.addEventListener('resize', updateGrid);
+    
+    return () => {
+      window.removeEventListener('resize', updateGrid);
+    };
+  }, []);
+
+  // Dynamically determine grid classes based on number of columns
+  const gridClass = `grid-cols-1 ${
+    cols >= 2 ? 'sm:grid-cols-2' : ''
+  } ${
+    cols >= 3 ? 'lg:grid-cols-3' : ''
+  } ${
+    cols >= 4 ? 'xl:grid-cols-4' : ''
+  }`;
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      {dataList.map((g, idx) => (
-        <div key={g.__key} className="bg-white rounded-lg p-3">
-          <div className="text-sm text-gray-700 font-medium mb-2">方案 {idx + 1}</div>
-          <GraphCanvas
-            width={g.width}
-            height={g.height}
-            graphData={g}
-            isLoading={false}
-            enableDrawing={false}
-            backgroundImage={null}
-          />
-        </div>
-      ))}
+    <div ref={containerRef} className="w-full">
+      <div className={`grid ${gridClass} gap-6`}>
+        {dataList.map((g, idx) => (
+          <div key={g.__key} className="bg-white rounded-lg p-4 min-w-[280px] max-w-[350px] flex flex-col items-center mx-auto">
+            <div className="text-sm text-gray-700 font-medium mb-2">方案 {idx + 1}</div>
+            <GraphCanvas
+              width={g.width}
+              height={g.height}
+              graphData={g}
+              isLoading={false}
+              enableDrawing={false}
+              backgroundImage={null}
+            />
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

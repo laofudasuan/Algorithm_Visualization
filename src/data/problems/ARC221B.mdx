@@ -1,0 +1,47 @@
+import { CollapsibleComponent } from '../courseware/markdownConfig';
+import ARC221BVisualization from '../../components/visualizations/ARC221BVisualization.jsx';
+
+
+##### arc221_b Two-Powered Sum
+
+给定正整数 $N$ 和一个质数 $P$。
+初始有长度为 $N$ 的序列 $A=(A_1,A_2,\dots,A_N)$，序列所有元素初始值均为 $0$。
+
+你可以任意次（包括0次）重复下述操作：
+- 选取集合 $\{1,2,\dots,N\}$ 的一个**非空子集**$S$，定义 $x=\displaystyle\sum_{i\in S} 2^{i-1}$；对所有下标 $i\in S$，把 $A_i$ 的值直接替换为 $x$。
+
+求经过任意次操作后，最终能得到的不同序列 $A$ 的数量，答案对质数 $P$ 取模。
+
+- $1\le N \le 700$
+- $P$ 是质数，满足 $10^8 < P < 10^9$
+- 输入全部为整数
+
+### 补充说明
+
+$x=\sum_{i\in S}2^{i-1}$ 的本质：把 $S$ 内的下标对应二进制位设为1，得到的二进制数值就是 $x$，每个下标 $i$ 对应二进制第 $i-1$ 位。
+
+<CollapsibleComponent title="图论建模">
+考虑用图论建模这个问题：
+
+把所有最终还存在的集合当成一个点，如果集合$a$和集合$b$有相同的位置，并且最终这个位置保留的是$b$（即$b$后操作），则从$a$向$b$连一条边。这样就形成了一个DAG
+
+这样，任何一种方案会对应一个DAG，如下图所示：
+
+<ARC221BVisualization />
+
+</CollapsibleComponent>
+
+<CollapsibleComponent title="DP">
+
+用$f[i]表示最终有$i$个位置非$0$的方案数
+
+转移时，枚举如度为$0$的这一层（即最先放的这一层）一共有$j$个数、以及这些数形成了$m$个集合
+
+$$
+f[i] = \sum_{j=1}^{i} \binom{i}{j} f[i-j] \sum_{m=1}^{j} \left\{ \begin{matrix} j \\ m \end{matrix} \right\} (-1)^{m-1} (2^{i-j})^m
+$$
+
+式子中$(-1)^m$是容斥系数，因为DAG的DP不能保证恰好有$m$个入度为0的集合，所以需要容斥
+
+$(2^{i-j})^2$表示，当前这一层的每个集合可以包含任意之后被修改的数
+</CollapsibleComponent>
