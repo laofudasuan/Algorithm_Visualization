@@ -72,6 +72,23 @@ $n \le 10^6, a_i \le 10^9$
 
 </CollapsibleComponent>
 
+##### 例题
+
+给定$n$，求无序二元组$(i,j)$的数量，满足：
+
+- $1 \le i,j \le n$
+- $gcd(i,j) = i \oplus j$
+
+<CollapsibleComponent title="做法"> 
+
+既然是无序二元组，不妨设$i \ge j$
+
+注意到，$i \oplus j \ge i-j$，而根据辗转相除法，$gcd(i,j) = gcd(j,i-j)$
+
+所以，想满足$gcd(i,j) = i \oplus j$则必然有$(i-j) | j$且$j \& (i-j) = 0$
+
+</CollapsibleComponent>
+
 ##### P11846 USACO25FEB Transforming Pairs P
 
 回答 $Q$ $(1 \leq Q \leq 10^5)$ 个独立查询，每个查询的形式如下：
