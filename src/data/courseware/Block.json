@@ -14,8 +14,8 @@
     { "id": "树分块", "path": "DS/Block-Tree.mdx", "x": 450, "y": 280 },
     { "id": "四毛子/二毛子", "path": "DS/Block-Quad.mdx", "x": 250, "y": 380 },
     { "id": "莫队", "path": "DS/Mo.mdx", "x": 450, "y": 450 },
-    { "id": "操作分块", "path": "DS/Block-Opt.mdx", "x": 450, "y": 380 }
-
+    { "id": "操作分块", "path": "DS/Block-Opt.mdx", "x": 450, "y": 380 },
+    { "id": "分散层叠", "x": 250, "y": 450 }
   ],
   "edges": [
   ]
