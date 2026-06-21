@@ -127,6 +127,67 @@ $$
 
 </CollapsibleComponent>
 
+##### abc463_g Random Walk Distance
+
+给定一个正整数 $N$ 和一个整数 $X$。
+
+高桥在数轴上的坐标 $0$ 处。接下来，他将执行以下移动 $N$ 次：
+
+- 当位于坐标 $x$ 时，以等概率选择坐标 $x - 1$ 或坐标 $x + 1$ 并移动过去。
+
+每次移动的目的地选择都是独立的。设 $x'$ 为全部 $N$ 次移动后的坐标。求 $|x' - X|$ 的期望值，对 $998244353$ 取模。
+
+共有 $T$ 个测试用例，请分别求解。
+
+- $1 \leq T \leq 2 \times 10^5$
+- $1 \leq N \leq 2 \times 10^5$
+- $|X| \leq 2 \times 10^5$
+- 所有输入值均为整数。
+
+<CollapsibleComponent title="做法"> 
+
+### **1. 题目分析与状态建模**
+
+设向右（$+1$）移动了 $k$ 次，则方案数为$\binom{N}{k}$，最终坐标为$x' = k - (N - k) = 2k - N$
+
+因此答案可以写成
+
+$$
+E = \frac{1}{2^N} \sum_{k=0}^N \binom{N}{k} |2k - (N + X)|
+$$
+
+令 $Y = N + X$，式子变为求 $\frac{1}{2^N} \sum_{k=0}^N \binom{N}{k} |2k - Y|$。
+
+拆开绝对值得到：
+
+$$
+S_{\text{total}} = \sum_{k=0}^m \binom{N}{k} (Y - 2k) + \sum_{k=m+1}^N \binom{N}{k} (2k - Y)
+$$
+
+利用一个已知的全集求和性质 $\sum_{k=0}^N \binom{N}{k} (2k - Y) = -X \cdot 2^N$，我们可以把后半部分的求和替换掉，从而得到：
+
+$$
+S_{\text{total}} = 2 \sum_{k=0}^m \binom{N}{k} (Y - 2k) - X \cdot 2^N
+$$
+
+接下来我们专注处理前半部分。将 $Y = N + X$ 代入：
+
+$$
+\sum_{k=0}^m \binom{N}{k} (Y - 2k) = \sum_{k=0}^m \binom{N}{k} (N - 2k) + X \sum_{k=0}^m \binom{N}{k}
+$$
+
+这里出现了一个非常漂亮的组合恒等式：$\sum_{k=0}^m \binom{N}{k} (N - 2k) = N \binom{N-1}{m}$。（证明思路：将其拆分为 $N\binom{N}{k} - 2N\binom{N-1}{k-1}$ 并利用帕斯卡公式裂项相消即可）。
+
+将其代回原式，并除以总概率 $2^N$，我们得到了一个 $O(1)$ 的期望表达式：
+
+$$
+E = \frac{N \binom{N-1}{m} + X \sum_{k=0}^m \binom{N}{k}}{2^{N-1}} - X
+$$
+
+在上述最终公式中，$N \binom{N-1}{m}$ 可以在预处理阶乘后 $O(1)$ 计算，但**组合数前缀和** $S(N, m) = \sum_{k=0}^m \binom{N}{k}$ 并没有封闭的常数级求法。由于题目有 $T$ 组询问，且约束都是 $2 \times 10^5$，所以可以用**莫队算法**（Mo's Algorithm）进行离线处理。
+
+</CollapsibleComponent>
+
 ##### P14636 [NOIP2025] 清仓甩卖
 
 ##### P3182 [HAOI2016] 放棋子
