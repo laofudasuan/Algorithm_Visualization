@@ -146,8 +146,6 @@ $$
 
 <CollapsibleComponent title="做法"> 
 
-### **1. 题目分析与状态建模**
-
 设向右（$+1$）移动了 $k$ 次，则方案数为$\binom{N}{k}$，最终坐标为$x' = k - (N - k) = 2k - N$
 
 因此答案可以写成
@@ -186,6 +184,114 @@ $$
 
 在上述最终公式中，$N \binom{N-1}{m}$ 可以在预处理阶乘后 $O(1)$ 计算，但**组合数前缀和** $S(N, m) = \sum_{k=0}^m \binom{N}{k}$ 并没有封闭的常数级求法。由于题目有 $T$ 组询问，且约束都是 $2 \times 10^5$，所以可以用**莫队算法**（Mo's Algorithm）进行离线处理。
 
+</CollapsibleComponent>
+
+<CollapsibleComponent title="在线做法">
+空间 $O(n+T)$，时间 $O(n \sqrt T)$。
+
+首先，考虑单次询问怎么求。
+
+考虑最终的位置 $x'$ 有几种可能，不妨枚举走了 $i$ 步向右。
+
+那么，此时向左走了 $n- i$ 步，所以最终会来到 $-(n-i) + i = 2i - n$。
+
+然后走 $i$ 步向右的方案数为 $\binom{n}{i}$，所以我们可以把答案写成：
+$$
+\frac{1}{2^n} \sum_{i = 0}^n |2i-n - x|\binom{n}{i}
+$$
+我们发现：$x$ 的正负无所谓，因为是对称的，所以我们令：$x \leftarrow |x|$。
+
+然后我们考虑拆掉绝对值：
+
+- $2i - n - x \le 0$ 时，$i \le \lfloor \frac{n+x}{2} \rfloor$。
+- $2i - n - x > 0$ 时，$i > \lfloor \frac{n+x}{2} \rfloor$。
+
+然后我们令 $k = \lfloor \frac{n+x}{2} \rfloor$。
+
+则：
+$$
+\sum_{i = 0}^n |2i - n - x|\binom{n}{i} = \sum_{i = 0}^k (n+x-2i)\binom{n}{i} + \sum_{i = k+1}^n (2i - n - x) \binom{n}{i} \\
+=(n+x)\sum_{i = 0}^k \binom{n}{i} - 2\sum_{i = 0}^k i\binom{n}{i} - (n+x) \sum_{i = k+1}^n \binom{n}{i} + 2\sum_{i = k+1}^n i \binom{n}{i}
+$$
+
+然后考虑：
+
+$$
+\sum_{i  = k+1}^n \binom{n}{i} = \sum_{i = 0}^n \binom{n}{i} - \sum_{i = 0}^k \binom{n}{i} = 2^n - \sum_{i = 0} ^k \binom{n}{i} \\
+\sum_{i = k+1}^n i \binom{n}{i} = \sum_{i = 0}^n i \binom{n}{i} - \sum_{i = 0}^k i \binom{n}{i} = n 2^{n-1} -\sum_{i = 0}^k i \binom{n}{i}
+$$
+然后原式可化为：
+$$
+2(n+x) \sum_{i = 0}^k \binom{n}{i} - 4\sum_{i = 0}^k i \binom{n}{i} - x2^n
+$$
+然后注意到：
+$$
+i \binom{n}{i} = n \binom{n-1}{i-1}
+$$
+所以：
+$$
+\sum_{i = 0}^k i \binom{n}{i} =  n \sum_{i = 0}^{k-1} \binom{n-1}{i}
+$$
+然后，我们考虑记：
+$$
+F(n,k) = \sum_{i = 0}^{k} \binom{n}{i}
+$$
+原式可化为：
+$$
+2(n+x) F(n,k) - 4nF(n-1,k-1) - x2^n
+$$
+然后我们考虑如何快速求一个 $F(n,k)$。
+
+注意：若 $k \ge n$ 则 $F(n,k) = F(n,n) = 2^n$。
+
+所以我们只考虑 $k < n$ 的情况。
+
+然后考虑对 $k$ 分块，设块长为 $B$。
+
+设当前询问的 $k$ 所在的块的编号为 $Id_k = \lfloor \frac{k}{B}\rfloor$。
+
+设：
+$$
+G(n,k) = F(n,Bk-1) = \sum_{i  =0}^{Bk - 1} \binom{n}{i}
+$$
+然后我们可以预处理出 $G(n,Id_k)$，然后再暴力求出：
+$$
+\sum_{i = B \cdot Id_k}^{k} \binom{n}{i}
+$$
+这样就可以 $O(B)$ 求出 $F(n,k)$。
+
+注意到：
+$$
+F(n,k) = \sum_{i = 0}^k \binom{n-1}{i} + \sum_{i = 0}^{k} \binom{n-1}{i-1} + \binom{n-1}{k} - \binom{n-1}{k} \\
+= 2\sum_{i  =0}^k \binom{n-1}{i} - \binom{n-1}{k} \\
+= 2F(n-1,k) - \binom{n-1}{k}
+$$
+我们考虑：
+$$
+G(n,k) = F(n,Bk  - 1) = 2F(n-1,Bk-1) - \binom{n-1}{Bk-1} \\
+=2G(n-1,k) - \binom{n-1}{Bk - 1}
+$$
+所以我们 $G(n,k)$ 可以递推出来，但是空间太大了。
+
+考虑对 $n$ 分块，块长为仍为 $B$，因为 $k < n$。
+
+记：
+$$
+H(t,k) = G(tB,k)
+$$
+然后我们考虑 $n$ 在的块 $Id_n = \lfloor \frac{n}{B} \rfloor$。
+
+我们可以知道 $H(Id_n,Id_k) = G(Id _n \cdot B,Id_k)$ 然后套用 $G$ 的递推式 $O(B)$ 求出 $G(n,Id_k)$。
+
+这样我们一次询问就是 $O(B)$ 的。
+
+然后预处理 $H(t,k)$ 是：枚举 $k$，然后每次递推求，所以是 $O(\frac{n^2}{B} )$。
+
+总时间就是：
+$$
+O(\frac{n^2}{B} + TB)
+$$
+那么 $B = \sqrt{\frac{n^2}{T}}$ 最优，时间为 $O(n \sqrt T)$，空间为 $O(\frac{n^2}{B^2} + n) = O(n+T)$。
 </CollapsibleComponent>
 
 ##### P14636 [NOIP2025] 清仓甩卖
