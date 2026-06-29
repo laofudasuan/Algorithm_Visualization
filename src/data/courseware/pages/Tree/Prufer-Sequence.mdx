@@ -54,6 +54,41 @@ $n \le 500$
 可以用DP求出，从比$v$大的点中挑出一些，和所有比$v$小的点组成一个连通块的方案数，然后接到$v$上，其它点就随便连
 </CollapsibleComponent> 
 
+##### P9535 [YsOI2023] 连通图计数
+
+请问有多少个 $n$ 个点 $m$ 条边的**无向简单连通**图，无自环无重边，满足删掉编号为 $i$ 的点后无向图被分成了 $a_i$ 个连通块。特殊地，我们保证 $n-1\le m\le n+1$，且答案不为 $0$。
+
+答案对 $998,244,353$ 取模。
+
+对于所有的数据，满足 $4\le n\le 10^5$，$n-1\le m\le n+1$，$1\le a_i<n$，$n\le \sum_{i=1}^na_i\le 2n-2$，且保证答案非 $0$。
+
+<CollapsibleComponent title="m=n-1">
+直接套Prufer序列
+</CollapsibleComponent>
+
+<CollapsibleComponent title="m=n">
+- 对于非环上的点，$a[i]$代表度数
+- 对于环上的点，$a[i]$代表度数$-1$
+
+但如果建立圆方树，我们可以惊人地发现，$a[i]$就代表度数了
+
+同时$a_{n+1}$的度数应该$= 2n - \sum_{i=1}^{n}a_i$
+
+$$
+Ans = \sum_{a_{n+1}} \frac{(n-1)!}{\prod_{i=1}^{n+1} (a_i-1)!} \frac{(a_{n+1}-1)!}{2} = \frac{(n-1)!}{2\prod_{i=1}^{n} (a_i-1)!}
+$$
+</CollapsibleComponent>
+
+<CollapsibleComponent title="m=n+1">
+分两种情况
+
+情况一：两个环没有公共边
+
+仍然可以建立圆方树，有两个方点，且度数和已知
+
+
+</CollapsibleComponent>
+
 ##### 清华集训2017生成树计数
 	
 在一个$s$个点的图中，存在$s-n$条边，使图中形成了$n$个连通块，第$i$个连通块中有$a_i$个点。

@@ -24,7 +24,8 @@
     { "id": "兔队线段树", "x": 450, "y": 350 },
     { "id": "AKEE线段树", "x": 450, "y": 400 },
     { "id": "李超线段树", "path" : "DS/Segment-Tree-LiChao.mdx", "x": 550, "y": 200 },
-    { "id": "KTT", "path" : "DS/KTT.mdx", "x": 550, "y": 280 }
+    { "id": "KTT", "path" : "DS/KTT.mdx", "x": 550, "y": 280 },
+    { "id": "小波矩阵", "x": 120, "y": 350 }
   ],
   "edges": [
     { "source": "线段树基础", "target": "函数式线段树", "sourceSide": "left", "targetSide": "right" },

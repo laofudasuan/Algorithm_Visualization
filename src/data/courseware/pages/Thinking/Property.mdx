@@ -162,3 +162,14 @@ $$rr[i] \ge j \quad \text{且} \quad ll[j] \le i$$
 
 <Problem id="P15651" />
 
+### 分析从两侧到中间
+
+##### uoj353 新年的代码
+
+<CollapsibleComponent title="做法">
+注意到操作可逆，问题可以转化为把S和T变成变成相同串
+
+这样，我们可以规定必须从左往右操作（如果原问题有出现从右往左，可以改为操作T就变成从左往右了）
+
+$f[i][j][k]$表示满足$S[1 \ldots i-1] = T[1 \ldots i-1],S[i]=j,T[i]=k$的最小步数
+</CollapsibleComponent>

@@ -163,3 +163,102 @@ $$
 ## 参考资料
 
 - IOI2021 集训队论文 丁晓漫《再谈线性规划对偶在信息学竞赛中的应用》
+
+
+##### P3337 [ZJOI2013] 防守战线
+
+##### P7246 手势密码
+有一棵带点权的树。定义一次操作为选择树上的一条简单路径，并将这条简单路径上的所有点点权减去1。问至少需要多少次操作，使树上所有点的点权恰好变为0。
+
+$n \le 3 \times 10^6$
+
+<CollapsibleComponent title="做法">
+给每条路径设置一个变量$X$。用$S$表示路径的集合，$X_s$表示路径$s$操作了几次，那么我们可以列出等式：
+
+$$\forall i \in [1,n], \sum_{k \in s \in I} X_s = a_k$$
+
+然后转化成线性规划
+
+$$
+\begin{aligned}
+    \text{minimize} & \sum_{s \in S} X_s \\
+    s.t. & \forall i \in [1,n], \sum_{i \in S} X_s \ge a_i \ \ \ (Y_i) \\
+    & \forall i \in [1,n], \sum_{i \in s} -X_s \ge -a_i \ \ \ (Z_i) \\
+    & \forall s \in S, X_s \ge 0
+\end{aligned}
+$$
+
+然后进行对偶
+
+$$
+\begin{aligned}
+    \text{maximize} & \sum_{i=1}^{n}  a_i(Y_i-Z_i) \\
+    s.t. & \forall s \in S, \sum_{i \in s} (Y_i-Z_i) \le 1 \ \ \ (X_s) \\
+    & \forall i \in [1,n],Y_i,Z_i \ge 0
+\end{aligned}
+$$
+
+注意到$Y_i-Z_i$都是一起出现的，所以可以合并
+
+$$
+\begin{aligned}
+	\max & \sum_{i=1}^{n}  a_i \times W_i \\
+	s.t. & \forall s \in S, \sum_{i \in s} W_i \le 1 \ \ \ (X_s)
+\end{aligned}
+$$
+
+问题变成了：给每个点赋一个权值，满足任何一条路径权值之和$\le 1$，最大化$\sum a_i \times W_i$
+</CollapsibleComponent>
+
+##### P6631 [ZJOI2020] 序列
+
+给一个非负序列$a_{1 \ldots n}$，每次可以执行以下三种操作中的一种：
+
+- 选择一个区间 $-1$
+- 选择一个区间的所有下标为奇数的项 $-1$
+- 选择一个区间的所有下标为偶数的项 $-1$
+
+问最少操作多少次，变成全 $0$。
+
+<CollapsibleComponent title="做法">
+令操作集合为$S$，一个操作被执行的次数为$X_s$，则线性规划为：
+
+$$
+\begin{aligned}
+\text{minimize} &\ \sum_{s \in S} X_s \\
+s.t.&\ \forall i \in [1,n], \sum_{s \ni i} X_s \ge a_i \ \ (Y_i) \\
+&\ \forall i \in [1,n], \sum_{s \ni i} (-X_s) \ge -a_i \ \ (Z_i) \\
+&\ \forall s \in S, X_s \ge 0
+\end{aligned}
+$$
+
+$$
+\begin{aligned}
+\text{maximize} &\ \sum_{i=1}^{n}  a_i(Y_i-Z_i) \\
+s.t.&\ \forall s \in S, \sum_{i \in s} (Y_i-Z_i) \le 1 \ \ (X_s) \\
+&\ \forall i \in [1,n], Y_i,Z_i \ge 0
+\end{aligned}
+$$
+
+注意到$Y_i-Z_i$一起出现，可以合并。
+
+$$
+\begin{aligned}
+\max &\ \sum_{i=1}^{n}  a_i \times W_i \\
+s.t.&\ \forall s \in S, \sum_{i \in s} W_i \le 1 \ \ (X_s)
+\end{aligned}
+$$
+
+问题变成：给序列的每个位置设置一个权重$W_i$，满足任何操作的权重之和$\le 1$，最大化$\sum a_iW_i$。
+
+满足任何操作的权重之和$\le 1$，也就是说这个序列、奇数项子序列、偶数项子序列的最大子段和都为$1$。
+
+考虑一个序列，要求任意子段的和都不超过$1$：
+
+- 单个元素不超过 $1$
+- 没必要出现比 $-1$ 更小的数
+
+所以，$W_i \in \{-1,0,1\}$。
+
+可以动态规划：$DP[i][j][k][t]$ 表示从左到第 $i$ 项，$j,k,t$ 分别为整个序列、奇数项、偶数项的最大后缀。
+</CollapsibleComponent>
