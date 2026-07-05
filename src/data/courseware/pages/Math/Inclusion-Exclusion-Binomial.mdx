@@ -246,3 +246,85 @@ $$
 </CollapsibleComponent>
 
 ##### CF2048G Kevin and Matrices
+
+## Abel反演
+
+若：
+
+$$
+f(n) = \sum_{i =0}^n \binom{n}{i} g(i) (x+n)^{n-i}
+$$
+
+则：
+
+$$
+g(n) = (x+n)\sum_{i = 0}^n (-1)^{n-i}\binom{n}{i} f(i) (x+i)^{n-i-1}
+$$ 
+
+### 证明
+
+将正向公式 $f(i) = \sum_{j =0}^i \binom{i}{j} g(j) (x+i)^{i-j}$ 代入反向公式的右侧：
+
+$$
+\text{RHS} = (x+n) \sum_{i = 0}^n (-1)^{n-i} \binom{n}{i} \left[ \sum_{j=0}^i \binom{i}{j} g(j) (x+i)^{i-j} \right] (x+i)^{n-i-1}
+$$
+
+交换$i,j$的求和顺序得到
+
+$$
+\text{RHS} = (x+n) \sum_{j=0}^n g(j) \sum_{i=j}^n (-1)^{n-i} \binom{n}{i} \binom{i}{j} (x+i)^{n-j-1}
+$$
+
+根据$\binom{n}{i} \binom{i}{j} = \binom{n}{j} \binom{n-j}{i-j}$进行变换：
+
+$$
+\text{RHS} = (x+n) \sum_{j=0}^n g(j) \binom{n}{j} \underbrace{ \sum_{i=j}^n (-1)^{n-i} \binom{n-j}{i-j} (x+i)^{n-j-1} }_{\text{设为 } S(n, j)}
+$$
+
+接下来分析$S(n,j)$，令 $m = n-j$，$k = i-j$，此时 $n-i = m-k$，且 $x+i = x+j+k$。代入内层求和式：
+
+$$
+S(n, j) = \sum_{k=0}^m (-1)^{m-k} \binom{m}{k} (x+j+k)^{m-1}
+$$
+
+这里需要分两种情况讨论：
+
+**情况 1：当 $m > 0$（即 $j < n$）时**
+
+这是一个**高阶差分式**。
+
+令多项式 $P(t) = (x+j+t)^{m-1}$，这是一个关于 $t$ 的 **$m-1$ 次多项式**。
+
+根据差分算子的性质，对任意一个次数为 $d$ 的多项式进行 $m$ 阶差分（其中 $m > d$），结果恒为 $0$。
+
+公式 $\sum_{k=0}^m (-1)^{m-k} \binom{m}{k} P(k)$ 恰好是多项式 $P(t)$ 在 $t=0$ 处的 $m$ 阶差分！
+
+因为这里多项式次数是 $m-1$，而我们求的是 $m$ 阶差分，所以：
+
+$$
+S(n, j) = 0 \quad (\text{对于 } j < n)
+$$
+
+**情况 2：当 $m = 0$（即 $j = n$）时**
+
+此时 $k$ 只能取 $0$。直接代入最原始的 $S(n,j)$ 定义（或者代入上面的式子并规定 $0^0=1$）：
+
+$$
+S(n, n) = (-1)^0 \binom{0}{0} (x+n)^{-1} = \frac{1}{x+n}
+$$
+
+因为当 $j \neq n$ 时，内层求和 $S(n, j)$ 全部等于 $0$，外层求和只剩下 $j = n$ 这一项存活！
+
+我们将 $j = n$ 代回原来的 RHS 中：
+
+$$
+\text{RHS} = (x+n) \cdot g(n) \cdot \binom{n}{n} \cdot S(n, n)
+$$
+
+$$
+\text{RHS} = (x+n) \cdot g(n) \cdot 1 \cdot \frac{1}{x+n} = g(n)
+$$
+
+等式 $\text{RHS} = g(n)$ 成立，原反演公式得证。
+
+##### CF2239D Hunting the Beast
