@@ -14,7 +14,8 @@
     { "id": "树的重心", "path": "Tree/Tree-Centroid.mdx", "x": 450, "y": 330 },
     { "id": "邻域", "path": "Tree/Tree-Neighborhood.mdx", "x": 300, "y": 420 },
     { "id": "换根技巧", "path": "Tree/Tree-Root.mdx", "x": 450, "y": 420 },
-    { "id": "支配对", "path": "Tree/Tree-Dominate.mdx", "x": 300, "y": 500 }
+    { "id": "支配对", "path": "Tree/Tree-Dominate.mdx", "x": 300, "y": 500 },
+    { "id": "多棵树问题", "path": "Tree/Tree-Multi.mdx", "x": 100, "y": 500 }
   ],
   "edges": [
     { "source": "数列", "target": "递推数列", "sourceSide": "right", "targetSide": "left" }
