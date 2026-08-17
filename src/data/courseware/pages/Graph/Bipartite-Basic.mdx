@@ -123,3 +123,30 @@ $N \le 1000, 0 \le M \le N(N-1)/2$
 - 这样边数就是 $ O(n) $，时间复杂度 $ O(n^2) $。
 </CollapsibleComponent>
 
+##### string
+
+给定两个长度为 $n$ 的仅含 `A` 和 `B` 的字符串 $X$ 、 $Y$ 。你可以对 $X$ 进行任意多次如下操作：
+
+- 将一个 `AA` 替换为 `BA`
+- 将一个 `BB` 替换为 `AB`
+
+例如： `ABAA → ABBA → AABA` 。
+
+接下来有 $q$ 次更新，每次为以下两类之一：
+
+- `X p` ：将 $X$ 的第 $p$ 个字符翻转（ `A` ↔ `B` ）
+- `Y p` ：将 $Y$ 的第 $p$ 个字符翻转
+
+每次更新后，判断是否可以通过若干次上述操作将当前的 $X$ 转换为当前的 $Y$ 。
+
+$1 \leq n \leq 3 \times 1 0^{5} , 1 \leq q \leq 3 \times 1 0^{5}$
+
+<CollapsibleComponent title="做法">
+
+先将所有奇数位置上的字符翻转，观察到操作等价于 $X_i \leftarrow X_{i+1}$，这一操作只会减少连续段数。
+
+所以答案为 `YES` 当且仅当 $X$ 的每个前缀都分别不超过 $Y$ 的对应前缀连续段数，使用线段树维护即可。  
+
+</CollapsibleComponent>
+
+<Problem id="AGC004F" />
