@@ -56,6 +56,6 @@ $$
 - $i$没有来面试，那么$i$的方案数为$\sum_{x=0}^{j}cnt[j] - (i-k)$，转移式为：
 
 $$
-f[i+1][j+1][k-w] += f[i][j][k] \times (\sum_{x=0}^{j}cnt[j] - (i-k)) \times \binom{cnt[j+1]}{l} \times A(k,w) 
+f[i+1][j+1][k-w] += f[i][j][k] \times (\sum_{x=0}^{j}cnt[j] - (i-k)) \times \binom{cnt[j+1]}{w} \times A(k,w) 
 $$
 </CollapsibleComponent>

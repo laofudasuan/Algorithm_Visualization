@@ -46,7 +46,7 @@ $f[i][j]$表示做完了前$i$个数，第$i$个数排名为$j$，所有方案$w
 <CollapsibleComponent title="小技巧">
 对于一个方案，令上升位置集合为$S$，本来要计算恰好$S$中的位置$w$乘积$\prod_{i \in S} w_i$
 
-令$w'_i = w_i$，可以转化为至少：$\prod_{i \in S} w_i = \sum_{S' \subseteq S} \prod_{i \in S'} w'_i$
+令$w'_i = w_i-1$，可以转化为至少：$\prod_{i \in S} w_i = \sum_{S' \subseteq S} \prod_{i \in S'} w'_i$
 </CollapsibleComponent>
 
 

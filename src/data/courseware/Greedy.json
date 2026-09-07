@@ -10,6 +10,7 @@
   },
   "pages": [
     { "id": "贪心算法", "path": "Greedy/Greedy.mdx", "x": 200, "y": 300 },
+    { "id": "贪心分析", "path": "Greedy/Greedy-Analysis.mdx", "x": 200, "y": 400 },
     { "id": "拆贡献法", "path": "Greedy/Greedy-Split.mdx", "x": 350, "y": 300 },
     { "id": "贪心调整法", "path": "Greedy/Greedy-Adjust.mdx", "x": 500, "y": 300 },
     { "id": "模拟费用流", "link": "Network-Flow-Simulate", "x": 500, "y": 400 },

@@ -64,7 +64,7 @@ $(1\le n \le 5\times 10^5,\ 1 \le v \le 10^9)$
 用$f[i]$表示考虑完了前$i$天，并且第$i$天不跑步的最大能量
 
 $$
-f[i]=\max_{ i-k-1 \le j<i } f[j]+(i-j-1)\times d + \sum_{j<l_k \le r_k<i} v_k
+f[i]=\max_{ i-k-1 \le j<i } f[j] - (i-j-1)\times d + \sum_{j<l_k \le r_k<i} v_k
 $$
 
 考虑按顺序枚举$i$，同时用线段树维护这个转移的系数

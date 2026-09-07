@@ -71,6 +71,71 @@ $n \le 50000, m \le 100000, w_i \le 10^{18}$
 
 </CollapsibleComponent>
 
+##### 割
+
+给定连通无向图 $G = (V, E)$，$|V| = n$，$|E| = m$，节点的编号是 $1, 2, \cdots, n$。
+
+每条无向边 $e \in E$ 都有一个非负整数权值 $w_e$，$w_e \in [0, 2^{30})$。
+
+一个割可由非空点集 $S \subset V$ 表示，其割边集为
+
+$$
+\delta(S) = \{(u, v) \mid (u, v) \in E, u \in S, v \notin S\}
+$$
+
+定义其权值 $X(S)$ 为全部割边的权值的异或和，即
+
+$$
+X(S) = \bigoplus_{e \in \delta(S)} w_e
+$$
+
+需要注意的是，$S$ 与 $V \setminus S$ 表示同一个割。
+
+你需要回答 $Q$ 次询问。每次询问给出四个整数 $u, v, l, r$，求有多少个割满足：
+
+- $u \in S$ 和 $v \in S$ 恰有一条成立。
+- 割的权值 $X(S) \in [l, r]$。
+
+答案对 $10^9 + 7$ 取模。
+
+<CollapsibleComponent title="做法">
+
+对 $S$ 计数。记 $s_u = [u \in S]$。为使 $S$ 与 $V \setminus S$ 只被计入一次，不妨规定 $s_1 = 0$。
+
+对于每个节点 $u$，定义 $t_u$ 为 $u$ 的所有邻边的权值的异或和。有
+
+$$
+X(S) = \bigoplus_{u \in S} t_u
+$$
+
+其原理是，每条割边的权值都会被算 $1$ 次，而非割边的会被算 $0$ 或 $2$ 次。
+
+询问要求 $s_u \oplus s_v = 1$，分情况讨论如下：
+
+- 若 $u = 1$，则 $s_v = 1$，那么 $X(S) = t_v \oplus \bigoplus_{x \in \{2, \cdots, n\} \setminus \{v\}} s_x t_x$
+- 若 $v = 1$，则 $s_u = 1$，那么 $X(S) = t_u \oplus \bigoplus_{x \in \{2, \cdots, n\} \setminus \{u\}} s_x t_x$
+- 若 $u, v \neq 1$，枚举 $s_u, s_v$（$s_u \neq s_v$），那么 $X(S) = (s_u t_u \oplus s_v t_v) \oplus \bigoplus_{x \in \{2, \cdots, n\} \setminus \{u, v\}} s_x t_x$
+
+等式右边的前半部分可看作常数 $C$，后半部分的线性基可由**猫树**和线性基合并 $O(\log^2 V)$ 求出。
+
+我们有以下结论：设异或空间中 $b_1, \cdots, b_p$ 的一个基是 $c_1, \cdots, c_k$，则能被 $c_i$ 表出的 $2^k$ 个互不相等的数即为全部能被 $b_i$ 表出的数，且每个数都恰有 $2^{p-k}$ 个不同的被 $b_i$ 表出的方案。
+
+###### 证明
+
+设 $0$ 恰有 $r$ 个不同的被 $b_i$ 表出的方案 $D_1, \cdots, D_r$。对于任意一个能被表出的数 $x$，设 $x$ 恰有 $s$ 个不同的被 $b_i$ 表出的方案 $E_1, \cdots, E_s$，下证 $s = r$：
+
+- 由于 $E_1 \oplus D_i$（$i = 1, 2, \cdots, r$）是 $r$ 个不同的表出 $x$ 的方案，故 $s \geq r$。
+
+- 若 $s > r$，则 $E_1 \oplus E_i$（$i = 1, 2, \cdots, s$）是 $s$ 个不同的表出 $0$ 的方案，矛盾。□
+
+询问还要求 $X(S) \in [l, r]$。差分为 $X(S) \leq \lim$，对线性基（指经过高斯消元的）做数位 DP 即可。不要忘记 $C$ 的影响。
+
+时间复杂度为 $O(n \log n \log V + m + Q \log^2 V)$。
+
+另：猫树也可以换成“区间线性基”，从而去掉 $n \log n \log V$ 项的 $\log n$。
+
+</CollapsibleComponent>
+
 ##### P3292 SCOI2016 幸运数字
 
 A 国共有 $n$ 座城市，这些城市由 $n - 1$ 条道路相连，使得任意两座城市可以互达，且路径唯一。每座城市都有一个幸运数字，以纪念碑的形式矗立在这座城市的正中心，作为城市的象征。
