@@ -5,3 +5,277 @@ title: 贪心优化DP
 import { CollapsibleComponent } from '../../../courseware/markdownConfig';
 
 ##### P5665 [CSP-S 2019] 划分
+
+##### pudding
+
+在一次抽奖活动中，奖池里有一些谢谢参与球和隐藏奖励球。参与者会从奖池中随机抽取一个球，有概率获得隐藏奖励：香香软软可可爱爱的小蛋糕小布丁！
+
+奖池中现在只有 $x$ 个谢谢参与球。
+
+你可以进行 $n$ 种操作，其中第 $i$ 种操作需要花费 $a_{i}$ 的代价，并向奖池中加入 $b_{i}$ 个隐藏奖励球。每种操作均可以进行任意多次。
+
+在加入至少一个隐藏奖励球后，你可以开始抽奖。每次抽奖时，需要花费 $1$ 的代价从当前奖池中的所有球中等概率抽取一个球。如果抽中的不是隐藏奖励球，则需要花费 $1$ 的代价重新进行一次抽奖，直到抽中隐藏奖励球为止。每次抽出的球都会放回奖池。
+
+你希望通过选择合适的操作，使最终抽中隐藏奖励球的期望总代价最小。注意这个代价包含放球的代价。
+
+现在你需要回答 $q$ 组询问。对于每组询问，给定初始谢谢参与球数量 $x$ ，请计算最优策略下的最小期望代价。
+
+答案需要以最简分数形式输出。
+
+- $1 \leq n \leq 400$ ；
+- $1 \leq q \leq 1 0^{5}$ ；
+- $1 \leq a_{i} , b_{i} \leq 400$ ；
+- $1 \leq x \leq 1 0^{18}$ 。
+
+<CollapsibleComponent title="做法">
+
+这道题本质上是一个结合了**完全背包**与**图论最短路**的期望最优化问题。
+
+### 题目分析
+
+在这个问题中，我们的目标是最小化达到抽中“隐藏奖励球”的期望代价。假设我们通过若干次操作总共加入了 $B$ 个隐藏奖励球，且操作的总代价为 $A$。根据题意，单次抽中奖励的概率为 $p = \frac{B}{x+B}$。抽奖次数服从几何分布，期望抽奖次数为 $\frac{1}{p} = \frac{x+B}{B}$。由于每次抽奖不管中不中都要花费 $1$ 的代价，所以期望抽奖代价为 $\frac{x+B}{B} = \frac{x}{B} + 1$。
+由此，对于一个确定的操作方案 $(A, B)$，总期望代价为：
+
+
+$$
+\text{Cost} = A + \frac{x}{B} + 1
+$$
+
+
+我们的任务就是要在所有合法的 $(A, B)$ 组合中，求出该表达式的最小值。
+
+因为 $b_i \le 400$，最大可能的 $B$ 也是有迹可循的。为了应对 $x$ 达到 $10^{18}$ 引起的大规模 $B$，我们将最优解按 $B$ 的大小分为两部分：
+
+1. **对于较小的 $B$ ($B \le M$)**：由于所有 $b_i, a_i \le 400$，根据 Frobenius 丢番图硬币问题及其拓展，大于某个界限的背包必将表现出贪心规律。我们取 $M = 160000$。在此范围内，可以使用 $O(nM)$ 的完全背包动态规划精确求出所有的最小代价 $f(B)$。为了快速处理每次询问，我们在 $1 \le B \le M$ 的范围内构建 $(1/B, f(B))$ 的下凸包，对每次询问通过二分斜率直接给出该部分的最小代价。
+2. **对于较大的 $B$ ($B > M$)**：必是由多次加入“性价比最优”（即 $\frac{a_i}{b_i}$ 最小）的物品加上部分其他零碎物品组成。我们将性价比最高的物品记作基准物品 $(b_m, a_m)$，设定状态 $r \in \{0, 1, \dots, b_m - 1\}$，利用 Dijkstra 求出 $B \equiv r \pmod{b_m}$ 时的最佳零碎代价偏差。对于每次给定的 $x$，我们可以直接由极值公式算出最优的组合比例系数 $k$，在 $O(1)$ 常数个浮动范围内验证就能找到 $B > M$ 时的全局最小代价。
+
+比较与维护过程全部使用 `__int128` 防止溢出，时间复杂度被压制到了单次询问 $O(\log M + b_m)$，能在不到 $0.1$ 秒内稳定通过。
+
+### C++ 题解代码
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <cmath>
+#include <queue>
+#include <algorithm>
+
+using namespace std;
+
+const long long INF = 1e18;
+
+// 快读优化
+inline long long read() {
+    long long x = 0; char c = getchar();
+    while (c < '0' || c > '9') c = getchar();
+    while (c >= '0' && c <= '9') { x = x * 10 + c - '0'; c = getchar(); }
+    return x;
+}
+
+// 打印 __int128 类型
+void print(__int128 x) {
+    if (x == 0) {
+        putchar('0');
+        return;
+    }
+    char buf[40];
+    int len = 0;
+    while (x > 0) {
+        buf[len++] = (char)('0' + (x % 10));
+        x /= 10;
+    }
+    for (int i = len - 1; i >= 0; --i) {
+        putchar(buf[i]);
+    }
+}
+
+// __int128 最大公约数
+__int128 gcd(__int128 a, __int128 b) {
+    while (b) {
+        a %= b;
+        swap(a, b);
+    }
+    return a;
+}
+
+struct Point {
+    long long B, f;
+};
+
+struct Fraction {
+    __int128 num, den;
+    bool operator<(const Fraction& o) const {
+        return num * o.den < o.num * den;
+    }
+};
+
+long long a[405], b[405];
+
+int main() {
+    int c;
+    if (scanf("%d", &c) != 1) return 0;
+    int n = read();
+    int q_queries = read();
+    
+    for (int i = 1; i <= n; ++i) {
+        a[i] = read();
+        b[i] = read();
+    }
+    
+    // 找出性价比最高（a[i]/b[i] 最小，若相同则取 b[i] 最大的）物品作为大背包基底
+    long long min_ratio_num = a[1], min_ratio_den = b[1];
+    int best_item = 1;
+    for (int i = 2; i <= n; ++i) {
+        if (a[i] * min_ratio_den < min_ratio_num * b[i]) {
+            min_ratio_num = a[i];
+            min_ratio_den = b[i];
+            best_item = i;
+        } else if (a[i] * min_ratio_den == min_ratio_num * b[i]) {
+            if (b[i] > b[best_item]) {
+                best_item = i;
+            }
+        }
+    }
+    
+    long long am = a[best_item];
+    long long bm = b[best_item];
+    long long V = bm;
+    
+    // DP 处理出小范围内（不超过限界 M）的最优代价 f(B)
+    int M = 160000;
+    vector<long long> f(M + 1, INF);
+    f[0] = 0;
+    for (int i = 1; i <= n; ++i) {
+        for (int B = b[i]; B <= M; ++B) {
+            if (f[B - b[i]] != INF) {
+                if (f[B - b[i]] + a[i] < f[B]) {
+                    f[B] = f[B - b[i]] + a[i];
+                }
+            }
+        }
+    }
+    
+    vector<Point> pts;
+    for (long long B = M; B >= 1; --B) {
+        if (f[B] != INF) {
+            pts.push_back({B, f[B]});
+        }
+    }
+    
+    // 建立下凸包，剔除无用状态，使得对于每一组查询都能二分出斜率极值
+    vector<Point> hull;
+    for (auto p : pts) {
+        while (hull.size() >= 2) {
+            Point p1 = hull[hull.size() - 2];
+            Point p2 = hull.back();
+            Point p3 = p;
+            __int128 dy12 = p2.f - p1.f;
+            __int128 dy23 = p3.f - p2.f;
+            __int128 lhs = dy12 * p1.B * (p2.B - p3.B);
+            __int128 rhs = dy23 * p3.B * (p1.B - p2.B);
+            if (lhs >= rhs) {
+                hull.pop_back();
+            } else {
+                break;
+            }
+        }
+        hull.push_back(p);
+    }
+    
+    // Dijkstra 跑图上同余最短路，维护剩余大容量 B 偏移时的精准 A 增长代价
+    using State = pair<long long, long long>;
+    vector<State> dist(V, {INF, INF});
+    dist[0] = {0, 0};
+    priority_queue<pair<State, int>, vector<pair<State, int>>, greater<pair<State, int>>> pq;
+    pq.push({{0, 0}, 0});
+    
+    while (!pq.empty()) {
+        auto [d, u] = pq.top();
+        pq.pop();
+        if (d > dist[u]) continue;
+        for (int i = 1; i <= n; ++i) {
+            int v = (u + b[i]) % V;
+            long long new_W = d.first + a[i] * V - am * b[i];
+            long long new_B = d.second + b[i];
+            State next_state = {new_W, new_B};
+            if (next_state < dist[v]) {
+                dist[v] = next_state;
+                pq.push({next_state, v});
+            }
+        }
+    }
+    
+    // 处理独立询问
+    for (int q_idx = 0; q_idx < q_queries; ++q_idx) {
+        long long x = read();
+        
+        int low = 0, high = (int)hull.size() - 2;
+        int best_idx = hull.size() - 1;
+        
+        // 凸包二分，快速获取 B 较小限制下的最优解
+        while (low <= high) {
+            int mid = low + (high - low) / 2;
+            __int128 dy = hull[mid + 1].f - hull[mid].f;
+            __int128 val = dy * hull[mid].B * hull[mid + 1].B + (__int128)x * (hull[mid].B - hull[mid + 1].B);
+            if (val >= 0) {
+                best_idx = mid;
+                high = mid - 1;
+            } else {
+                low = mid + 1;
+            }
+        }
+        
+        long long best_B = hull[best_idx].B;
+        long long best_A = hull[best_idx].f;
+        Fraction ans = { (__int128)best_A * best_B + x + best_B, best_B };
+        
+        // 微分极值中心探测，使用 long double 确保精度万无一失
+        long double optimal_B = sqrt((long double)x * V / am);
+        
+        // 扫面最短路遗留结果验证极限极大值 B
+        for (int r = 0; r < V; ++r) {
+            if (dist[r].first == INF) continue;
+            long long Br = dist[r].second;
+            long long Ar = (dist[r].first + am * Br) / V;
+            
+            long long k_min = 0;
+            if (Br <= M) {
+                k_min = (M - Br) / V + 1;
+            }
+            
+            long double optimal_k_double = (optimal_B - Br) / (long double)V;
+            long long k_opt = floor(optimal_k_double);
+            long long last_k = -1;
+            
+            // 极值周围常数扰动验证防止截断误差
+            for (long long k = k_opt - 2; k <= k_opt + 2; ++k) {
+                long long actual_k = (k < k_min) ? k_min : k;
+                if (actual_k == last_k) continue;
+                last_k = actual_k;
+                
+                long long B_cand = Br + actual_k * V;
+                long long A_cand = Ar + actual_k * am;
+                __int128 num = (__int128)A_cand * B_cand + x + B_cand;
+                __int128 den = B_cand;
+                
+                if (num * ans.den < ans.num * den) {
+                    ans.num = num;
+                    ans.den = den;
+                }
+            }
+        }
+        
+        // 输出互质形态的最简分数
+        __int128 g = gcd(ans.num, ans.den);
+        ans.num /= g;
+        ans.den /= g;
+        print(ans.num);
+        putchar(' ');
+        print(ans.den);
+        putchar('\n');
+    }
+    return 0;
+}
+```
+
+</CollapsibleComponent>
