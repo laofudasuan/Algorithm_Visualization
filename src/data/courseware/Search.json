@@ -9,14 +9,21 @@
     "description": { "x": 500, "y": 150 }
   },
   "pages": [
-    { "id": "搜索算法", "path" : "Search/Search.mdx", "x": 150, "y": 250 },
-    { "id": "深度优先搜索", "path" : "Search/DepthFirstSearch.mdx", "x": 300, "y": 200 },
-    { "id": "广度优先搜索", "path" : "Search/BreadthFirstSearch.mdx", "x": 300, "y": 300 },
-    { "id": "搜索优化", "path" : "Search/SearchOptimization.mdx", "x": 450, "y": 250 },
-    { "id": "A*搜索", "path" : "Search/AStar.mdx", "x": 600, "y": 250 },
-    { "id": "前K优解问题", "path" : "Search/KOptimalSolution.mdx", "x": 250, "y": 380 },
-    { "id": "博弈搜索", "path" : "Game/Game-Search.mdx", "x": 450, "y": 380 }
+    { "id": "搜索算法", "path" : "Search/Search.mdx", "x": 150, "y": 300 },
+    { "id": "深度优先搜索", "path" : "Search/DepthFirstSearch.mdx", "x": 300, "y": 350 },
+    { "id": "广度优先搜索", "path" : "Search/BreadthFirstSearch.mdx", "x": 300, "y": 250 },
+    { "id": "搜索优化", "path" : "Search/SearchOptimization.mdx", "x": 500, "y": 300 },
+    { "id": "前K优解问题", "path" : "Search/KOptimalSolution.mdx", "x": 500, "y": 200 },
+    { "id": "博弈搜索", "path" : "Game/Game-Search.mdx", "x": 150, "y": 200 },
+    { "id": "迭代算法", "path" : "Search/IterativeDeepening.mdx", "x": 150, "y": 400 }
   ],
   "edges": [
+    { "source": "搜索算法", "target": "深度优先搜索", "sourceSide": "right", "targetSide": "left" },
+    { "source": "搜索算法", "target": "广度优先搜索", "sourceSide": "right", "targetSide": "left" },
+    { "source": "深度优先搜索", "target": "搜索优化", "sourceSide": "right", "targetSide": "left" },
+    { "source": "广度优先搜索", "target": "搜索优化", "sourceSide": "right", "targetSide": "left" },
+    { "source": "搜索算法", "target": "博弈搜索", "sourceSide": "top", "targetSide": "bottom" },
+    { "source": "广度优先搜索", "target": "前K优解问题", "sourceSide": "right", "targetSide": "left" },
+    { "source": "搜索算法", "target": "迭代算法", "sourceSide": "bottom", "targetSide": "top" }
   ]
 }

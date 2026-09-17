@@ -1,0 +1,119 @@
+---
+title: 搜索算法
+---
+
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+
+# 迭代算法
+    
+## 迭代
+    
+搜索：一般定义在树/图空间上
+
+迭代：可以定义在树/图空间上，也可以定义在欧式空间/离散欧式空间上
+
+迭代往往处理空间更大的问题
+    
+### 0阶优化
+    
+### 爬山
+    
+$$
+x_{n+1}=\underset{x' \in \operatorname{Neighbor}(x_n)}{\operatorname{argmin}}(f(x'))
+$$
+    
+从一个点出发，每次按照最近的邻居走
+
+##### [THUWC2017] 大葱的神力
+
+##### [CTSC2018] 组合数问题
+
+### 模拟退火
+    
+$$
+P(x_n \to x')=\left\{ \begin{array}{ll}
+  1 & f(x')<f(x_n) \\
+  e^{\frac{f(n)-f(x')}{t}} & f(x') \ge f(x_n) \\
+\end{array} \right.
+$$
+    
+## 一阶优化
+    
+#### 牛顿迭代算法}
+    
+![](/Search/G10.jpg)
+    
+$$
+y=f'(x_n)(x-x_n)+f(x_n)
+$$
+    
+$$
+0=f'(x_n)(x_{n+1}-x_n)+f(x_n)
+$$
+    
+$$
+x_{n+1}=x_n-\frac{f(x_n)}{f'(x_n)}
+$$
+    
+### 错误点
+
+<BoxWithTag tag="错误的初始点">
+
+$$
+f(x)=1-x^2
+$$
+
+$x_0=0$,$f'(0)=0$
+
+</BoxWithTag>
+
+<BoxWithTag tag="循环的初始点">
+$$
+f(x)=x^3-2x+2
+$$
+
+Start from $x_0=0$.
+
+$$
+x_1=x_0-\frac{f(x_0)}{f'(x_0)}=-\frac{2}{-2}=1
+$$
+
+$$
+x_2=x_1-\frac{f(x_1)}{f'(x_1)}=1-\frac{1}{1}=0
+$$
+</BoxWithTag>
+    
+### 梯度下降(Gradient descent)
+    
+![](/Search/G11.png)
+    
+$$
+\textbf{x}_{n+1}=\textbf{x}_n-\alpha \nabla F(\textbf{x}_n)
+$$
+    
+### 图迭代
+    
+#### 赌徒问题
+    
+有一个赌徒，初始有$k$元，每次他有$p$的概率赢一元钱，有$1-p$的概率输一元钱，当他赢到$m$元时就会离开，当手上没有钱时就会破产，问赌徒一直玩下去离开的概率
+    
+迭代做法：
+
+随机一个函数$f_0:[m] \to [0,1]$
+
+$$
+\forall n \in \mathbb{N}^+,f_n(x)=pf_n(x-1)+(1-p)f_n(x+1)
+$$
+    
+#### 赌徒问题2
+    
+有一个赌徒，初始有$k$元，每次他可以押注$t$元，然后有$p$的概率再赢$t$元钱，有$1-p$的概率输掉这$t$元，当他赢到$\ge m$元时就会离开，当手上没有钱时就会破产，问赌徒一直玩下去离开的概率
+
+<CollapsibleComponent title="迭代做法">
+    
+随机一个函数$f_0:[m] \to [0,1]$
+    
+$$
+\forall n \in \mathbb{N}^+,f_n(x)=\max_{y \in [1,x]}pf_n(x-y)+(1-p)f_n(x+y)
+$$
+</CollapsibleComponent>
