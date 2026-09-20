@@ -1,0 +1,423 @@
+\section{凸包}
+
+\subsection{凸包定义及构造}
+\begin{frame}
+\frametitle{凸包定义}
+\pause
+凸包形象的定义就是用一个橡皮筋套住平面上的一个点集，当橡皮筋拉紧时形成的边框就是这个多边形的凸包。
+
+\pause
+凸包是包含指定点集的面积最小的凸多边形。\newline \newline
+
+\pause
+凸包的构造大概有五种方法。其中前两种比较常用，但是仅仅局限于二维凸包，第三种方法复杂度过高，不过易于拓展到三维情况，方法四是把方法一和方法三相结合做到最优复杂度。方法五在某些问题中有特殊作用。
+\end{frame}
+
+\begin{frame}
+\frametitle{凸包常用构造方法}
+\pause
+方法一(graham)：
+
+我们首先找到y最小的结点，y相同取x最小。那么这个结点一定在凸包上。然后求出点集中其它点到这个点的极角并按此排序。接下来我们按照极角序顺次加入点，用一个栈来维护已构的凸包。加入一个点时，首先看栈顶t和栈顶的下一个元素d已经当前点k这三个点是否满足凸性，即$\overrightarrow{dk}$要在$\overrightarrow{dt}$的逆时针方向，否则就弹掉栈顶。
+
+\pause
+方法二：
+
+我们把凸包分两个部分来求：上凸壳和下凸壳。构建上凸壳时，只需要把所有点按照横坐标排序，横坐标相同的按纵坐标递减排序，然后构建半个凸包。然后再构建下凸包，并把这两个凸包进行合并。
+
+\pause
+这个方法常用于带修改的凸包(因为只需要维护横坐标的顺序，不需要选取基准点)
+\end{frame}
+
+\begin{frame}
+\frametitle{不常用的凸包构造方法}
+\pause
+方法三(卷包裹)：
+
+初始找到凸包的一个顶点，然后从这个顶点开始，绕着凸包外围走一圈回到这个顶点。复杂度$O(nh)$，h为凸包上的点数。
+
+\pause
+方法四(分治)：
+
+这是目前复杂度最优的凸包算法，它把卷包裹和grahan结合在了一起。
+
+假设我们已知凸包上有m个点。
+\pause
+\begin{enumerate}
+    \item 将点集分成n/m个部分，对每个点集用grahan构造凸包
+    \item 用卷包裹法合并凸包，从一个顶点开始，每次向最右方的点前进。这时只需要在n/m个凸包中二分即可。
+\end{enumerate}
+第一步复杂度为$n/m *O(mlogm)=O(nlogm)$，第二步复杂度为$m*O(n/mlogm)=O(nlogm)$
+
+所以总复杂度为$O(nlogm)$
+\end{frame}
+
+\begin{frame}
+\frametitle{不常用的凸包构造方法}
+\framesubtitle{分治法}
+\pause
+但是还有一个问题：m的值我们预先并不知道 \newline \newline
+
+\pause
+据说可以倍增出m的值，然而最坏复杂度可以达到两个log。 \newline \newline
+
+\pause
+不过我们可以假设$m=logn$，这样随机数据复杂度就为$nloglogn$。反正最坏情况不会比其他算法差。\includegraphics[height=0.4cm]{geometry/happy.png}
+\end{frame}
+
+\begin{frame}
+\frametitle{特殊凸包算法}
+\framesubtitle{QuickHull}
+\pause
+先找到凸包的一条边$AB$，然后调用$QuickHull(a,b,S)$返回S的凸包。
+
+\pause
+QuickHull(A,B,S)的过程为:
+
+\begin{multicols}{2}
+
+找到离AB最远的点C，然后把点集分成三个部分:$\triangle ABC$内，AC右侧，CB右侧。
+
+很显然$\triangle ABC$内的点不可能在凸包上
+
+然后递归调用$AC$和$CB$
+
+\includegraphics[height=3cm]{geometry/3dtubao4.jpg}
+\end{multicols}
+\end{frame}
+
+\begin{frame}
+\frametitle{特殊凸包算法}
+\framesubtitle{QuickHull应用}
+\pause
+QuickHull广泛应用于这样一类问题：
+
+一个问题的每个解的元素都有两个属性x,y，现在要找到一组最优解使得$(\sum x)*(\sum y)$最小。
+
+这类两个属性的问题往往不方便解决，但是可以快速解决一个属性的问题。
+
+那么我们令初始的凸包上的两个点为$\sum x$最小的和$\sum y$最小的点。
+
+找到凸包上离直线AB最远的点C就是要使得$\overrightarrow{AB} \times \overrightarrow{AC}$最大。
+
+$w=(x_B-x_A)*(y_C-y_A)-(x_C-x_A)*(y_B-y_A)$，我们把这个式子用乘法分配律展开之后，把所有的x、y都乘上对应的系数就变成了一维的问题了。
+\end{frame}
+
+\begin{frame}{P5540 [BalkanOI 2011] timeismoney}{凸包解决最小乘积问题}
+    题目描述：给定连通无向图，每条边有 \( a_i \) 和 \( b_i \) 两个属性。请求出一个生成树，使得 \( \left( \sum_{e \in T} a_i \right) \left( \sum_{e \in T} b_e \right) \) 最小。
+
+    \( 1 \leq n \leq 200 \)，\( 0 \leq a_i, b_i < 256 \)。
+\end{frame}
+
+\begin{frame}{P5540 [BalkanOI 2011] timeismoney}{凸包解决最小乘积问题}
+    记 \( A = \sum_{e \in T} a_e \)，\( B = \sum_{e \in T} b_e \)，把所有生成树的 \( (A, B) \) 给画在二维平面上。
+
+    显然 \( AB \) 最小的点只能在凸包上出现。先不管复杂度问题，如何把凸包求出来：已知凸包上一段的两个端点，我们可以求出凸包和端点连线的切线，进而找到新的点、递归下去。
+
+    洛谷的第一篇题解证明了，横纵坐标都在 \( [0, V] \) 中的凸包（凸包要没边有点共线），点数最多为 \( V^{2/3} \)，因此复杂度可以做到 \( O(m V^{2/3} \log m) \)。
+
+    这种题通过凸壳上二分，把乘积变为了线性。
+\end{frame}
+
+\subsection{旋转卡壳}
+
+\begin{frame}
+\frametitle{旋转卡壳}
+\pause
+按照我个人的理解，旋转卡壳就是几何题中利用多边形上某些量的单调性进行tow \ pointers。\newline \newline
+
+\pause
+一般都是在凸包上进行，不过某些特定的问题也可以是凹多边形。
+\end{frame}
+
+\begin{frame}
+\frametitle{problem 1}
+\pause
+问题：给定n个点，求这n个点两两距离最大值。
+
+\pause
+首先选取的两个点一定在凸包上。 \newline \newline
+
+\pause
+如果凸包上的两个点能落在同一对平行线上，则称它们为一对对踵点。可以证明，答案一定是一对对踵点。那么我们只需要找到所有的对踵点更新答案即可。首先，横坐标最小值的点和最大值的点一定是一对对踵点，然后我们从这两个点开始进行旋转卡壳。
+\end{frame}
+
+\begin{frame}
+\frametitle{problem 2}
+\framesubtitle{UVA 10173 凸包最小面积矩形覆盖}
+\pause
+\includegraphics[height=3cm]{geometry/move1.png}
+
+最优矩形一定与至少一条凸包上的边重合。
+
+\pause
+核心问题：给定底边，求最左点、最优点、高。
+
+\pause
+这三个都是单调变化的
+\end{frame}
+
+\begin{frame}
+\frametitle{problem 3}
+\framesubtitle{投影}
+\pause
+求凸包在某个方向上的投影长度最小值 \newline \newline
+
+\pause
+把凸包旋转时，左右边界的点单调变化
+\end{frame}
+
+\subsection{凸包快速操作}
+
+\begin{frame}
+\frametitle{给定方向最远点}
+\pause
+找到给定方向的垂直方向，在凸包上二分找到极角和这个垂直方向最相近的线段。
+\end{frame}
+
+\begin{frame}
+\frametitle{直线与凸包的交}
+\pause
+先找到凸包两侧距离直线的最远点，然后把凸包切割为了两半。
+
+对这两半分别二分出交点。(用叉积快速判定，交点一侧叉积全部为负，另一侧全部为正)
+\end{frame}
+
+\begin{frame}
+\frametitle{判断点是否在凸包内部}
+\pause
+任选一个点，向凸包所有点连边，把凸包划分成若干个三角形，然后根据询问点的极角二分到包含这个极角区域的线段，然后判断是否在线段内。
+
+\includegraphics[height=5cm]{geometry/tubao.png}
+\end{frame}
+
+\begin{frame}
+\frametitle{点到凸包的切线}
+求点k到凸包的切线
+
+\pause
+分上下凸包求。
+
+\pause
+假设当前找上凸壳，先二分到$x_k$对应的区域，那么在$x_k$两侧会各有一个切点。对两侧分别进行二分。
+
+\pause
+\includegraphics[height=3cm]{geometry/qiexian2.png}
+
+由图可知一个切点为E
+\end{frame}
+\begin{frame}
+\frametitle{点到凸包的切线}
+\pause
+把凸包上相邻两点所连接成的直线画出来发现，E之前形成的所有直线都在P的下方，E之后形成的直线都在P的上方
+
+\pause
+\includegraphics[height=5cm]{geometry/qiexian.png}
+
+\pause
+所以满足可二分性，可以用叉积快速判断。
+\end{frame}
+
+\begin{frame}
+\frametitle{带插入的动态凸包维护}
+\pause
+分上下凸壳分别维护。
+
+插入一个点时，先二分到对应x的位置，然后检查这个点是否在凸包内，如果在凸包内就退出。
+
+否则我们可以加入当前点，并弹出当前点两侧不满足凸性的点。用STL-set维护。
+\end{frame}
+
+\begin{frame}
+\frametitle{带删除的动态凸包维护}
+\pause
+分上下凸壳分别维护。
+
+把点按x排序后用线段树维护区间凸包。每次删除一个点时就把受影响的log个凸包重建一遍。
+
+\pause
+用线段树后需要解决的问题是：快速合并两个不相交的凸壳。
+
+把两个凸壳合并，被删除的点数为$O(n)$，所以显然不能暴力删除。
+
+\pause
+我们可以找到两个凸包的公切线$AB$，那么$AB$之间的点全部都要被弹出，我们可以用$Treap$，可持久化地进行区间合并及删除。
+
+\includegraphics[height=2cm]{geometry/go1.png}
+
+\pause
+那么最关键的部分在于快速寻找两个不相交凸壳的公切线。
+\end{frame}
+
+\begin{frame}
+\frametitle{带删除的动态凸包维护}
+\framesubtitle{求公切线:Case 1}
+\pause
+现在左右两个凸包是用平衡树维护的，我们考虑从上往下逐步找到两个切点。
+
+\pause
+\includegraphics[height=4cm,width=11cm]{geometry/go2.png}
+
+如果C和E在DK的同侧，同时J和L也在DK的同侧，则已经找到了公切线，直接返回。
+\end{frame}
+
+\begin{frame}
+\frametitle{带删除的动态凸包维护}
+\framesubtitle{求公切线:Case 2}
+\pause
+\includegraphics[height=5cm,width=11cm]{geometry/go3.png}
+
+\pause
+D是一个切点，但是J不是。同时J左边的点在直线下方，J右边的点在直线上方。
+
+\pause
+D不需要移动，把J向右移动。
+\end{frame}
+
+\begin{frame}
+\frametitle{带删除的动态凸包维护}
+\framesubtitle{求公切线:Case 3}
+\pause
+\includegraphics[height=5cm,width=11cm]{geometry/go4.png}
+
+\pause
+D是一个切点，但是J不是。同时J左边的点在直线上方，J右边的点在直线下方。
+
+\pause
+D不需要移动，把J向左移动。
+\end{frame}
+
+\begin{frame}
+\frametitle{带删除的动态凸包维护}
+\framesubtitle{求公切线:Case 2、3}
+\pause
+与刚刚两种情况类似地，右边的点是切点而左边不是。
+
+用一样的方法判断，右边点不动，左边点移动。
+\end{frame}
+
+\begin{frame}
+\frametitle{带删除的动态凸包维护}
+\framesubtitle{求公切线:Case 4}
+\pause
+\includegraphics[height=5cm,width=11cm]{geometry/go5.png}
+
+\pause
+两个点E、I都在内侧
+
+\pause
+E要向左移动，I要向右移动。
+\end{frame}
+
+\begin{frame}
+\frametitle{带删除的动态凸包维护}
+\framesubtitle{求公切线:Case 5}
+\pause
+\includegraphics[height=5cm,width=11cm]{geometry/go6.png}
+
+\pause
+B在外侧，I在内侧。
+
+\pause
+两点同时向右移动。
+
+同理，如果B在内侧,I在外侧则同时向左移动。
+\end{frame}
+
+\begin{frame}
+\frametitle{带删除的动态凸包维护}
+\framesubtitle{求公切线:Case 6}
+\pause
+\includegraphics[height=3cm,width=11cm]{geometry/go7.png}
+
+\pause
+两点同时在外侧
+
+\pause
+我们发现这种情况下我们不能直接确定切点在B左边还是B右边。
+\end{frame}
+
+\begin{frame}
+\frametitle{带删除的动态凸包维护}
+\framesubtitle{求公切线:Case 6}
+\pause
+方法是，过BC和KL做两条直线，找到交点Q。
+
+\pause
+\includegraphics[height=4cm,width=11cm]{geometry/go8.png}
+
+中间的竖线是两个凸包的x分界线。
+
+如果Q在分界线左边，则B必须往右走。
+
+如果Q在分界线右边，则L必须往左走。
+\end{frame}
+
+\begin{frame}
+\frametitle{带删除的动态凸包维护}
+\framesubtitle{求公切线}
+\begin{multicols}{2}
+\includegraphics[width=5.5cm,height=5.2cm]{geometry/go9.png}
+\includegraphics[width=5.5cm,height=5.2cm]{geometry/go10.png}
+\end{multicols}
+\pause
+代码不算太长吧。。。
+\end{frame}
+
+
+\begin{frame}
+\frametitle{完全动态凸包维护}
+\pause
+同时支持删点和加点的凸包。
+
+\pause
+重量平衡树套可持久化平衡树维护。
+\end{frame}
+
+\subsection{Minkowski和}
+\begin{frame}{Minkowski和}
+给定两个点集P,Q，定义他们的Minkowski和
+
+$P+Q \ = \ \{x1+x2,y1+y2 \ | \ (x1,y1) \in P,(x2,y2) \in Q\}$ \newline \newline
+
+\pause
+给定点集P,Q,求他们Minkowski和的凸包面积
+
+$|P|,|Q| \le 10^5$
+\end{frame}
+
+\begin{frame}{Minkowski和}
+\pause
+根据定义不难发现，在$P+Q$凸包上的点一定由P的凸包上某个点与Q的凸包上某个点相加而得到。
+
+那么问题变成了求两个凸包的Minkowski和。 \newline \newline
+
+\pause
+分析一下P+Q凸包每条边的构成
+
+假设已知凸包的顶点$P_a+Q_b$，那么这个顶点连出去的下一条边只有两种选择：$P_{a+1}+Q_b \ or \ P_a+Q_{b+1}$ \newline \newline
+
+\pause
+双指针扫描解决
+\end{frame}
+
+\begin{frame}{CF1019E Raining season}
+    给一棵树，每条边的边权是一个一次函数$ax+b$
+
+    求当$x=0,1,\ldots,m-1$时，树的直径是多少
+
+    $n \le 10^5, m \le 10^6$，时间限制$3S$
+\end{frame}
+
+\begin{frame}{CF1019E Raining season}
+    对于一条路径，设两种权值的和为$\sum a, \sum b$
+
+    显然，可能成为答案的点会在所有$(\sum a, \sum b)$这些点形成的凸包上
+
+    考虑边分治，求出两侧的向下路径组成的凸壳，然后跑闵可夫斯基和合并即可。
+
+    最后把这$O(n\log n)$个凸壳上的点再重新跑一次凸包
+
+    总复杂度$O(n \log^2 n + m)$
+
+\end{frame}

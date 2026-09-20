@@ -1,0 +1,117 @@
+{
+  "title": "计算几何",
+  "description": "平面几何,立体几何",
+  "cover": "/images/no.png",
+  "author": "老虎大蒜",
+  "createdAt": "2025-11-23",
+  "metaPositions": {
+    "title": {
+      "x": 150,
+      "y": 120
+    },
+    "description": {
+      "x": 500,
+      "y": 150
+    }
+  },
+  "pages": [
+    {
+      "id": "平面几何",
+      "path": "Geometry/Basics.mdx",
+      "x": 100,
+      "y": 400
+    },
+    {
+      "id": "基础概念",
+      "path": "Geometry/Basics.mdx",
+      "x": 300,
+      "y": 300
+    },
+    {
+      "id": "直线与线段",
+      "path": "Geometry/Lines.mdx",
+      "x": 500,
+      "y": 230
+    },
+    {
+      "id": "凸包",
+      "path": "Geometry/Convex-Hull.mdx",
+      "x": 300,
+      "y": 400
+    },
+    {
+      "id": "半平面交",
+      "path": "Geometry/Half-Plane.mdx",
+      "x": 500,
+      "y": 400
+    },
+    {
+      "id": "多边形与圆",
+      "path": "Geometry/Polygons-Circles.mdx",
+      "x": 500,
+      "y": 300
+    },
+    {
+      "id": "扫描线",
+      "path": "Geometry/Sweep-Line.mdx",
+      "x": 300,
+      "y": 500
+    },
+    {
+      "id": "反演",
+      "path": "Geometry/Inversion.mdx",
+      "x": 500,
+      "y": 550
+    },
+    {
+      "id": "平面图与三角剖分",
+      "path": "Geometry/Planar-Graph.mdx",
+      "x": 500,
+      "y": 480
+    },
+    {
+      "id": "立体几何",
+      "path": "Geometry/Geometry-3D.mdx",
+      "x": 100,
+      "y": 600
+    },
+    {
+      "id": "基础练习",
+      "path": "Geometry/Exercises.mdx",
+      "x": 800,
+      "y": 300
+    },
+    {
+      "id": "拓展练习",
+      "path": "Geometry/Selected-Problems.mdx",
+      "x": 800,
+      "y": 500
+    }
+  ],
+  "edges": [
+    {
+      "source": "基础概念",
+      "target": "直线与线段",
+      "sourceSide": "right",
+      "targetSide": "left"
+    },
+    {
+      "source": "平面几何",
+      "target": "凸包",
+      "sourceSide": "right",
+      "targetSide": "left"
+    },
+    {
+      "source": "凸包",
+      "target": "半平面交",
+      "sourceSide": "right",
+      "targetSide": "left"
+    },
+    {
+      "source": "基础练习",
+      "target": "拓展练习",
+      "sourceSide": "bottom",
+      "targetSide": "top"
+    }
+  ]
+}
