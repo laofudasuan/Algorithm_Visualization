@@ -12,6 +12,8 @@
     { "id": "二叉搜索树", "path" : "DS/Binary-Search-Tree.mdx", "x": 300, "y": 280 },
     { "id": "Treap", "path" : "DS/Treap.mdx", "x": 300, "y": 200 },
     { "id": "Splay", "path" : "DS/Splay.mdx", "x": 300, "y": 380 },
+    { "id": "WBLT", "path" : "DS/WBLT.mdx", "x": 500, "y": 380 },
+    { "id": "可持久化平衡树", "path" : "DS/Persistent-Balance-Tree.mdx", "x": 500, "y": 200 },
     { "id": "平衡树问题", "path" : "DS/Balance-Tree-Problem.mdx", "x": 500, "y": 280 }
   ],
   "edges": [
