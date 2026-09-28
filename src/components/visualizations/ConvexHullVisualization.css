@@ -1,0 +1,31 @@
+.hull-vis { margin: 24px 0; border: 1px solid #dbe3ee; border-radius: 12px; background: #fff; color: #334155; font-size: 14px; line-height: 1.7; overflow: hidden; }
+.hull-vis * { box-sizing: border-box; }
+.hull-vis header { padding: 14px 18px; background: #f1f5f9; font-size: 17px; font-weight: 650; color: #0f172a; border-bottom: 1px solid #e2e8f0; }
+.hull-content { padding: 18px; display: grid; gap: 14px; min-width: 0; }
+.hull-vis p { margin: 0; }
+.hull-vis small { font-size: 12px; color: #64748b; }
+.hull-vis button { padding: 5px 11px; border: 1px solid #cbd5e1; border-radius: 6px; background: #fff; color: #475569; font: inherit; cursor: pointer; }
+.hull-vis button:hover:not(:disabled) { border-color: #2563eb; }
+.hull-vis button[aria-pressed="true"] { color: #1d4ed8; background: #eff6ff; border-color: #2563eb; }
+.hull-vis button:disabled { opacity: .4; cursor: default; }
+.hull-vis :is(button, input, select):focus-visible { outline: 2px solid #2563eb; outline-offset: 3px; }
+.hull-vis input[type="range"] { width: 100%; display: block; accent-color: #2563eb; margin-top: 5px; }
+.hull-vis select { border: 1px solid #cbd5e1; border-radius: 6px; background: #fff; color: #334155; padding: 6px 9px; max-width: 100%; min-width: 0; }
+.hull-select, .hull-controls, .hull-buttons { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; min-width: 0; }
+.hull-select select { flex: 1; min-width: 120px; }
+.hull-controls span { font-size: 12px; color: #64748b; margin: 0 4px; }
+.hull-two-columns { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+.hull-two-columns > * { min-width: 0; }
+.hull-notes { display: grid; gap: 14px; }
+.hull-vis .hull-plot { margin: 0 auto; max-width: 500px; }
+.hull-plot-container { width: 100%; max-width: 500px; margin: 0 auto; }
+.hull-callout { display: flex; flex-direction: column; gap: 5px; padding: 12px; border: 1px solid #bfdbfe; background: #eff6ff; border-radius: 8px; }
+.hull-callout b { color: #1e40af; }
+.hull-check { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+.hull-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.hull-chips span { padding: 3px 7px; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 5px; font-size: 12px; }
+.hull-chips .hull-active { background: #fffbeb; color: #b45309; border-color: #fbbf24; }
+.hull-chips .hull-stack-point { color: #1d4ed8; background: #eff6ff; border-color: #bfdbfe; }
+.hull-turn-detail { display: flex; flex-direction: column; gap: 4px; padding: 12px; border-left: 3px solid #d97706; background: #fffbeb; overflow-wrap: anywhere; }
+@media (max-width: 850px) { .hull-two-columns { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 480px) { .hull-content { padding: 12px; } .hull-vis header { padding: 12px; } .hull-controls { gap: 6px; } .hull-controls button { padding: 4px 7px; font-size: 12px; } .hull-select { align-items: stretch; flex-direction: column; } }

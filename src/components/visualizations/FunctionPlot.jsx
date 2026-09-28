@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useId, useMemo } from 'react';
 
 const DEFAULT_ALLOWED_IDENTIFIERS = new Set([
   'x',
@@ -135,6 +135,15 @@ function catmullRomPath(points) {
   return d;
 }
 
+/**
+ * Backwards-compatible geometry options:
+ * - equalAspect: one unit on x and y occupies the same number of pixels.
+ * - responsiveHeight: scale the SVG height with its width (off by default).
+ * - points series: closed, fill, fillOpacity, stroke, strokeWidth,
+ *   strokeDasharray, arrowEnd, pointRadius, labelFontSize.
+ * - point objects: { x, y, label, labelDx, labelDy, color }.
+ *   Array points [x, y] and existing function/line/smooth series still work.
+ */
 export default function FunctionPlot({
   series,
   expression,
@@ -156,7 +165,11 @@ export default function FunctionPlot({
   pointColor = '#2563eb',
   className = '',
   caption,
+  equalAspect = false,
+  responsiveHeight = false,
+  ariaLabel = '平面直角坐标系绘图',
 }) {
+  const svgId = useId().replace(/:/g, '');
   const { xMin, xMax, yMin, yMax } = useMemo(() => {
     const [x0, x1] = xDomain;
     const [y0, y1] = yDomain;
@@ -164,19 +177,24 @@ export default function FunctionPlot({
     const xM = Math.max(x0, x1);
     const ym = Math.min(y0, y1);
     const yM = Math.max(y0, y1);
-    return { xMin: xm, xMax: xM, yMin: ym, yMax: yM };
+    return { xMin: xm, xMax: xM === xm ? xm + 1 : xM, yMin: ym, yMax: yM === ym ? ym + 1 : yM };
   }, [xDomain, yDomain]);
 
-  const innerW = Math.max(1, width - padding * 2);
-  const innerH = Math.max(1, height - padding * 2);
+  const availableW = Math.max(1, width - padding * 2);
+  const availableH = Math.max(1, height - padding * 2);
+  const unit = Math.min(availableW / (xMax - xMin), availableH / (yMax - yMin));
+  const innerW = equalAspect ? (xMax - xMin) * unit : availableW;
+  const innerH = equalAspect ? (yMax - yMin) * unit : availableH;
+  const left = (width - innerW) / 2;
+  const top = (height - innerH) / 2;
 
-  const toPx = (x, y) => {
+  const toPx = useCallback((x, y) => {
     const nx = (x - xMin) / (xMax - xMin);
     const ny = (y - yMin) / (yMax - yMin);
-    const px = padding + nx * innerW;
-    const py = padding + (1 - ny) * innerH;
+    const px = left + nx * innerW;
+    const py = top + (1 - ny) * innerH;
     return [px, py];
-  };
+  }, [xMin, xMax, yMin, yMax, left, top, innerW, innerH]);
 
   const grid = useMemo(() => {
     const xAuto = niceStep((xMax - xMin) / 10);
@@ -206,10 +224,10 @@ export default function FunctionPlot({
     const arr = Array.isArray(input) ? input : [];
     const out = [];
     for (const p of arr) {
-      if (Array.isArray(p) && p.length >= 2) out.push([Number(p[0]), Number(p[1])]);
-      else if (p && typeof p === 'object' && 'x' in p && 'y' in p) out.push([Number(p.x), Number(p.y)]);
+      if (Array.isArray(p) && p.length >= 2) out.push({ x: Number(p[0]), y: Number(p[1]) });
+      else if (p && typeof p === 'object' && 'x' in p && 'y' in p) out.push({ ...p, x: Number(p.x), y: Number(p.y) });
     }
-    return out.filter(([x, y]) => Number.isFinite(x) && Number.isFinite(y));
+    return out.filter(({ x, y }) => Number.isFinite(x) && Number.isFinite(y));
   };
 
   const errorToText = (code) => {
@@ -263,21 +281,21 @@ export default function FunctionPlot({
     for (const item of normalizedSeries) {
       if (!item || item.type !== 'points') continue;
       const pts = normalizePointsInput(item.points);
-      const ptsPx = pts
-        .map(([x, y]) => [x, y, ...toPx(x, y)])
-        .filter((p) => {
-          const x = p[0];
-          const y = p[1];
-          return x >= xMin && x <= xMax && y >= yMin && y <= yMax;
-        });
+      const allPx = pts.map(p => ({ ...p, px: toPx(p.x, p.y)[0], py: toPx(p.x, p.y)[1] }));
+      const ptsPx = allPx.filter(p => p.x >= xMin && p.x <= xMax && p.y >= yMin && p.y <= yMax);
       const connectMode = item.connect || connect;
       const color = item.pointColor || item.color || pointColor;
       const showPts = typeof item.showPoints === 'boolean' ? item.showPoints : showPoints;
-      const path = connectMode === 'smooth' && ptsPx.length ? catmullRomPath(ptsPx.map((p) => [p[2], p[3]])) : '';
-      out.push({ pointsPx: ptsPx, connect: connectMode, pointColor: color, showPoints: showPts, path });
+      const path = connectMode === 'smooth' && allPx.length ? catmullRomPath(allPx.map(p => [p.px, p.py])) : '';
+      out.push({ pointsPx: ptsPx, allPx, connect: connectMode, pointColor: color, showPoints: showPts, path,
+        stroke: item.stroke || color, strokeWidth: item.strokeWidth ?? 2,
+        strokeDasharray: item.strokeDasharray, closed: Boolean(item.closed),
+        fill: item.fill || 'none', fillOpacity: item.fillOpacity ?? 1,
+        arrowEnd: Boolean(item.arrowEnd), pointRadius: item.pointRadius ?? 3,
+        labelFontSize: item.labelFontSize ?? 13 });
     }
     return out;
-  }, [normalizedSeries, connect, pointColor, showPoints, xMin, xMax, yMin, yMax]);
+  }, [normalizedSeries, connect, pointColor, showPoints, xMin, xMax, yMin, yMax, toPx]);
 
   const axes = useMemo(() => {
     const x0 = clamp(0, xMin, xMax);
@@ -294,7 +312,7 @@ export default function FunctionPlot({
       xAxis: { x1: xAxisX0, y1: xAxisY, x2: xAxisX1, y2: xAxisY },
       yAxis: { x1: yAxisX, y1: yAxisY0, x2: yAxisX, y2: yAxisY1 },
     };
-  }, [xMin, xMax, yMin, yMax]);
+  }, [xMin, xMax, yMin, yMax, toPx]);
 
   const errorText = useMemo(() => {
     if (!functionDrawables.errors.length) return null;
@@ -305,19 +323,24 @@ export default function FunctionPlot({
   return (
     <div className={`my-4 w-full ${className}`} data-vis="function-plot">
       <div className="w-full overflow-x-auto bg-white">
-        <svg width="100%" height={height} viewBox={`0 0 ${width} ${height}`} role="img">
+        <svg width="100%" height={height} style={responsiveHeight ? { display: 'block', height: 'auto', aspectRatio: `${width} / ${height}` } : undefined}
+          viewBox={`0 0 ${width} ${height}`} role="img" aria-label={ariaLabel}>
+          <defs>
+            <clipPath id={`${svgId}-clip`}><rect x={left} y={top} width={innerW} height={innerH} /></clipPath>
+            {pointsDrawables.map((item, i) => item.arrowEnd ? <marker key={i} id={`${svgId}-arrow-${i}`} markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill={item.stroke} /></marker> : null)}
+          </defs>
           <rect x="0" y="0" width={width} height={height} fill="#ffffff" />
-          {showFrame ? <rect x={padding} y={padding} width={innerW} height={innerH} fill="#ffffff" stroke="#e5e7eb" /> : null}
+          {showFrame ? <rect x={left} y={top} width={innerW} height={innerH} fill="#ffffff" stroke="#e5e7eb" /> : null}
 
           {showGrid &&
             grid.xs.map((v) => {
               const [x] = toPx(v, yMin);
-              return <line key={`gx-${v}`} x1={x} y1={padding} x2={x} y2={padding + innerH} stroke="#f3f4f6" />;
+              return <line key={`gx-${v}`} x1={x} y1={top} x2={x} y2={top + innerH} stroke="#f3f4f6" />;
             })}
           {showGrid &&
             grid.ys.map((v) => {
               const [, y] = toPx(xMin, v);
-              return <line key={`gy-${v}`} x1={padding} y1={y} x2={padding + innerW} y2={y} stroke="#f3f4f6" />;
+              return <line key={`gy-${v}`} x1={left} y1={y} x2={left + innerW} y2={y} stroke="#f3f4f6" />;
             })}
 
           {showAxes && axes.showX && <line {...axes.xAxis} stroke="#6b7280" strokeWidth="1.5" />}
@@ -327,7 +350,7 @@ export default function FunctionPlot({
             grid.xs.map((v) => {
               const [x] = toPx(v, yMin);
               return (
-                <text key={`tx-${v}`} x={x} y={padding + innerH + 18} textAnchor="middle" fontSize="11" fill="#6b7280">
+                <text key={`tx-${v}`} x={x} y={top + innerH + 18} textAnchor="middle" fontSize="11" fill="#6b7280">
                   {formatTick(v)}
                 </text>
               );
@@ -338,7 +361,7 @@ export default function FunctionPlot({
               return (
                 <text
                   key={`ty-${v}`}
-                  x={padding - 8}
+                  x={left - 8}
                   y={y + 4}
                   textAnchor="end"
                   fontSize="11"
@@ -373,37 +396,39 @@ export default function FunctionPlot({
 
           {pointsDrawables.map((item, seriesIdx) => (
             <React.Fragment key={`p-series-${seriesIdx}`}>
-              {item.pointsPx.length > 1 && item.connect === 'line' && (
-                <polyline
-                  points={item.pointsPx.map((p) => `${p[2]},${p[3]}`).join(' ')}
-                  fill="none"
-                  stroke={item.pointColor}
-                  strokeWidth="2"
+              {item.allPx.length > 1 && (item.closed || item.connect === 'line') && (
+                <path
+                  d={`${item.allPx.map((p, i) => `${i ? 'L' : 'M'} ${p.px} ${p.py}`).join(' ')}${item.closed ? ' Z' : ''}`}
+                  fill={item.closed ? item.fill : 'none'}
+                  fillOpacity={item.fillOpacity}
+                  stroke={item.stroke}
+                  strokeWidth={item.strokeWidth}
+                  strokeDasharray={item.strokeDasharray}
+                  markerEnd={item.arrowEnd ? `url(#${svgId}-arrow-${seriesIdx})` : undefined}
+                  clipPath={`url(#${svgId}-clip)`}
                   strokeLinejoin="round"
                   strokeLinecap="round"
                 />
               )}
-              {item.pointsPx.length > 1 && item.connect === 'smooth' && (
+              {item.allPx.length > 1 && !item.closed && item.connect === 'smooth' && (
                 <path
                   d={item.path}
                   fill="none"
-                  stroke={item.pointColor}
-                  strokeWidth="2"
+                  stroke={item.stroke}
+                  strokeWidth={item.strokeWidth}
+                  strokeDasharray={item.strokeDasharray}
+                  clipPath={`url(#${svgId}-clip)`}
                   strokeLinejoin="round"
                   strokeLinecap="round"
                 />
               )}
               {item.showPoints &&
                 item.pointsPx.map((p, i) => (
-                  <circle
-                    key={`p-${seriesIdx}-${i}`}
-                    cx={p[2]}
-                    cy={p[3]}
-                    r="3"
-                    fill={item.pointColor}
-                    stroke="#ffffff"
-                    strokeWidth="1"
-                  />
+                  <g key={`p-${seriesIdx}-${i}`}>
+                    <circle cx={p.px} cy={p.py} r={item.pointRadius} fill={p.color || item.pointColor} stroke="#ffffff" strokeWidth="1" />
+                    {p.label != null && <text x={p.px + (p.labelDx ?? 8)} y={p.py + (p.labelDy ?? -9)}
+                      fontSize={item.labelFontSize} fill={p.color || item.pointColor} stroke="white" strokeWidth="3" paintOrder="stroke" fontWeight="600">{p.label}</text>}
+                  </g>
                 ))}
             </React.Fragment>
           ))}
