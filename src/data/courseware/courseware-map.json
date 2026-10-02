@@ -2,9 +2,9 @@
   "nodes": [
     { "id": "Temp", "x": 100, "y": 100, "category": "空" },
 
-    { "id": "Sequence", "x": 830, "y": 920, "category": "组合对象" },
+    { "id": "Sequence", "x": 830, "y": 900, "category": "组合对象" },
     { "id": "Permutation", "x": 700, "y": 920, "category": "组合对象" },
-    { "id": "Sequence_Representation", "x": 600, "y": 920, "category": "组合对象" },
+    { "id": "Sequence_Representation", "x": 820, "y": 980, "category": "组合对象" },
     { "id": "Sequence-Time", "x": 900, "y": 800, "category": "算法" },
     { "id": "Bracket", "x": 550, "y": 800, "category": "算法" },
 

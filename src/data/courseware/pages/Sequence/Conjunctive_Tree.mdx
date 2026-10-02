@@ -1,0 +1,384 @@
+---
+title: 析合树
+---
+
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+
+import { ContinuousIntervalQuiz, ConjunctiveTreeVisualization, ConjunctiveBuildVisualization, ConjunctiveGapVisualization } from '../../../../components/visualizations/ConjunctiveTreeVisualization';
+
+# 析合树：排列中的区间，怎样组织成树？
+
+## 先从一排打乱的编号说起
+
+把编号为 $1\sim n$ 的卡片打乱，排成一行。现在只能拿走**位置相邻的一段**：这段卡片的编号，能否恰好凑齐某个整数范围，一个不缺？
+
+例如 $p=(2,1,3,5,4,6)$：
+
+- 拿前三张 $2,1,3$，恰好凑齐编号 $1\sim3$；它们的摆放顺序并不重要。
+- 拿第 2 到第 4 张 $1,3,5$，编号 $1\sim5$ 中缺了 2 和 4；不能把别处的卡片跳着拿进来。
+
+我们把这种**位置上挨着、值域里不缺数**的区间，叫作**连续段**。“连续”说的是值的集合，不是原排列必须递增。
+
+接下来可以问：这样的段一共有多少个？给定一段位置，最少向两边扩展多少，才能补齐缺数？
+
+一个个枚举当然可以，但区间可能很多。**能不能找到它们之间的结构，用一棵小树组织起来？** 这就是本课研究析合树的出发点。
+
+本课只讨论 $1\sim n$ 的排列，区间均指 **1 起始的位置区间**，不计空段。先操作图，再展开回答；单调栈、线段树只在优化建树时需要。
+
+## 不整理卡片，怎样判断有没有缺数？
+
+仍用上面的排列，先完成下面六道判断题。每次都问自己：**最小值到最大值之间，少了哪个数？**
+
+答完再想：连续段一定递增吗？一定包含 1 吗？只有一个数算不算？
+
+<ContinuousIntervalQuiz />
+
+<CollapsibleComponent title="想过再看：不用排序，怎样判定？">
+
+把位置区间内的值当成集合。“没有缺数”可以写成：
+
+$$
+\max(p_l,\ldots,p_r)-\min(p_l,\ldots,p_r)=r-l.
+$$
+
+区间有 $r-l+1$ 个**互不相同的整数**；若值域也只有这么多个位置，就恰好填满。
+
+连续段不要求原顺序单调。重复值会破坏上述判定；对任意整数序列直接离散化，也会改变“相差 1”的含义。
+
+</CollapsibleComponent>
+
+## 每个连续段都建一个点，行不行？
+
+先想两个障碍：递增排列有多少个连续段？$[1,3]$ 和 $[3,5]$ 应当谁做谁的父亲？
+
+下面点击这两个段，再试 $[1,2]$。哪些段始终不会与别的连续段“交叉”？
+
+<ConjunctiveTreeVisualization mode="strong" />
+
+<CollapsibleComponent title="整理观察：只留下不会部分相交的段">
+
+**部分相交**：有公共位置，但互不包含。若一个连续段与其他所有连续段都不部分相交，就叫**本原段**（强连续段）。
+
+两个本原段只能相离或包含。因此：
+
+- 每个非空本原段建点；父亲是严格包含它的最小本原段。
+- 整个排列是根，单点是叶子。
+- 孩子是当前段内的极大真本原段，按**位置从左到右**排列，恰好铺满父亲。
+
+这棵树就是析合树。每个内点至少有两个孩子，故最多 $2n-1$ 个点；并不是把可能多达 $n(n+1)/2$ 个连续段全存下来。
+
+再验证一个有用的规律：两个连续段**部分相交**时，它们的交、并、两侧差仍是连续段。条件不能删——不相交的两段，并起来未必连续。
+
+</CollapsibleComponent>
+
+## 一个结点的孩子，能随便拼吗？
+
+把每个孩子缩成一块，保持位置顺序；再按块的值域从小到大编号。
+
+1. 在“交错的小块”中，根的孩子排列是什么？取第 2、3 块试试。
+2. 换成“析点中还有合点”，根的孩子排列是 $2,4,1,3$。只取两块或三块，缺口能消失吗？
+3. 如果取**全部**孩子呢？
+
+<ConjunctiveTreeVisualization mode="children" />
+
+<CollapsibleComponent title="给两种行为命名：合与析">
+
+孩子排列递增或递减，叫**合点**；否则叫**析点**。本文把叶子单列，不给叶子贴析 / 合标签。
+
+| 怎么选相邻孩子？ | 合点 | 析点 |
+| :-- | :-- | :-- |
+| 只选一个 | 连续 | 连续 |
+| 选 $2\sim k-1$ 个 | 连续 | 不连续 |
+| 选全部 $k$ 个 | 连续 | 连续 |
+
+这里用到连续段分解的结构定理：**把极大真本原段缩点后，要么单调，要么不存在非平凡的真连续子段**。不能把“任意一个非单调排列”都当作析点的孩子排列；图上的尝试是例证，不是一般性证明。
+
+合点的块按值域首尾相接，所以任取相邻几块都能拼。析点至少有 4 个孩子；2、3 个元素的非单调排列仍会出现长度为 2 的连续段。
+
+没有单独建点的连续段也没丢：它是某个合点的若干相邻完整孩子的并。**一棵树，加上孩子之间的拼接规则，就表示了全部连续段。**
+
+</CollapsibleComponent>
+
+## 从左到右读，什么时候应该合并？
+
+先手推 $2,4,1,3$：前面读入 $2,4,1$ 时，可以为了建树把它们重新编号成 $2,3,1$ 吗？
+
+不能。还没出现的 $3$ 就是缺口。此时应保留一个**森林栈**，而不是强行连成树。
+
+令当前子树为 $u$，栈顶为 $t$。每次先问：
+
+1. $t$ 是合点，$u$ 能沿同方向接到它的末尾吗？能，就**追加孩子**。
+2. 否则，$t$ 与 $u$ 两块恰好连续吗？能，就**新建合点**。
+3. 否则，还能从更左侧补齐缺口吗？能，就收集**最少的栈顶块**，**新建析点**；不能，就等待下一个数。
+
+<ConjunctiveBuildVisualization />
+
+<CollapsibleComponent title="为什么不能见到两个连续块，就一律新建父亲？">
+
+看 $1,2,3$：读入 2 后有合点 $[1,2]$；读入 3 后，应把 3 追加为第三个孩子。
+
+若保留一个二叉子结点 $[1,2]$，它会与连续段 $[2,3]$ 部分相交，不再是本原段。因此要优先延长同方向的合点。
+
+设子树记录位置 $[l,r]$、值域 $[\mathrm{lo},\mathrm{hi}]$。判断只需：
+
+- 递增合点追加：$t.\mathrm{hi}+1=u.\mathrm{lo}$；递减合点追加：$u.\mathrm{hi}+1=t.\mathrm{lo}$。
+- 两块能合并：$\max(t.\mathrm{hi},u.\mathrm{hi})-\min(t.\mathrm{lo},u.\mathrm{lo})=u.r-t.l$。
+- 两块不能合并却确定更左侧有解时，逐块向左收集，**第一次**满足等式就停止。
+
+“最少”保证新析点内没有被跳过的、跨多块的真连续段。合并完成后，把新结点重新当作 $u$，继续向左检查。
+
+</CollapsibleComponent>
+
+## 怎样避免“找不到，还把整个栈扫一遍”？
+
+只需提前知道：以 $r$ 结尾的连续段，最左能到哪里？记为
+
+$$
+L_r=\min\{l\mid [l,r]\text{ 是连续段}\}.
+$$
+
+若 $L_r=u.l$，停止；若 $L_r<u.l$，左边一定还有可合入的块。**$L_r$ 是“还有没有”的保证，不是本次最短合并的停止位置。**
+
+问题缩成了：能否同时维护所有左端点的“缺口数”？
+
+$$
+Q_r(l)=\max(p_l,\ldots,p_r)-\min(p_l,\ldots,p_r)-(r-l).
+$$
+
+更新完成后，$Q_r(l)\ge0$，等于 0 恰好表示连续段；找最左的 0 就得到 $L_r$。
+
+<ConjunctiveGapVisualization />
+
+<CollapsibleComponent title="先看一次区间加，再想两个单调栈">
+
+把右端点从 $r-1$ 推到 $r$，新值为 $x$。
+
+| 原因 | 对旧左端点的修改 |
+| :-- | :-- |
+| 区间长度增加 1 | 全部减 1 |
+| 最大值从 $M$ 变为 $x$ | 对应的一段加 $x-M$ |
+| 最小值从 $m$ 变为 $x$ | 对应的一段加 $m-x$ |
+| 新增单点 $[r,r]$ | 启用 $Q_r(r)=0$ |
+
+例如读入 $2,4,1$ 后，$Q=(1,2,0)$。再读入 3：
+
+```text
+长度增加： (1,2,0) → (0,1,-1)
+最大值更新：只有 l=3 从 1 变成 3，加 2 → (0,1,1)
+最小值不变；启用 l=4：最终 (0,1,1,0)，所以 L₄=1
+```
+
+为什么受同一次最值变化影响的左端点成段？从右往左扩展区间时，最大值只会上升，最小值只会下降。
+
+最大值用值递减栈，最小值用值递增栈。弹出位置 $j$ 后，若新的栈顶位置为 $k$（空栈取 0），它负责的左端点恰好是 $[k+1,j]$。
+
+用线段树维护 **区间加、最小值、最左零点**；未启用位置置为无穷大。只有整轮更新结束，才利用“非负”查询零点，不能在中途的负数上查询。
+
+每个位置在两个单调栈中各进出一次，共 $O(n)$ 次区间修改，因此预处理 $L$ 用 $O(n\log n)$ 时间、$O(n)$ 空间。森林每轮最终入栈一次，成功合并不断消耗栈项，有 $L$ 后建树部分为 $O(n)$。
+
+</CollapsibleComponent>
+
+## 有了树，能少数哪些东西？
+
+先不看公式：一个有 $k$ 个孩子的合点，选至少两个相邻孩子，有多少种选法？为什么不能再把“整个结点”另加一次？
+
+再问：要找覆盖 $[l,r]$ 的最短连续段，答案一定是两个端点的 LCA 吗？在默认案例中试 $[2,4]$。
+
+<ConjunctiveTreeVisualization mode="applications" />
+
+<CollapsibleComponent title="计数：每个连续段应该交给谁负责？">
+
+把非单点段交给其两端叶子的 LCA；这样它一定跨过至少两个孩子，不会与子树重复。
+
+- 叶子贡献 $1$。
+- 析点只贡献整个结点，记 $1$。
+- 合点有 $k$ 个孩子，贡献 $\binom{k}{2}=k(k-1)/2$，**已经包含取全部孩子的那一种**。
+
+默认案例：6 个单点，两个二孩子合点各贡献 1，根有四个孩子贡献 6，共 $6+1+1+6=14$。
+
+总数可能是 $n(n+1)/2$，实现用 64 位整数。
+
+</CollapsibleComponent>
+
+<CollapsibleComponent title="最短覆盖：析点取整体，合点取一段孩子">
+
+令 $u$ 为两端叶子的 LCA，$c_a,c_b$ 为分别包含两端的直接孩子。
+
+- $l=r$：返回单点。
+- $u$ 是析点：返回 $u$ 的整个位置区间。
+- $u$ 是合点：只取 $c_a,\ldots,c_b$，返回 $[c_a.l,c_b.r]$。
+
+为什么不能只取端点孩子的一部分？跨孩子的连续段若切开一个孩子，就会与这个本原段部分相交，矛盾。
+
+默认案例的 $[2,4]$：LCA 为 $[1,6]$，但只需取前三个孩子，答案是 $[1,5]$。真正重要的是孩子边界，不是把 LCA 一律整段返回。
+
+建树后预处理倍增，用 LCA 与向上跳转找到 $c_a,c_b$，每次询问 $O(\log n)$。演示为小规模直观遍历，不代表查询的最优实现。
+
+</CollapsibleComponent>
+
+## 实现前，先检查三个约定
+
+- `l,r` 是**位置**；`lo,hi` 是**值域**，不要混用。
+- 孩子按**位置**排列，不能为得到孩子排名而打乱它们。
+- 析点允许取全部孩子；计数时合点的整体不能重复加。
+
+<CollapsibleComponent title="C++17 参考实现：建树并统计全部非空连续段">
+
+输入 $n$ 和 $1\sim n$ 的排列，输出非空连续段数。`kind` 为 `0`（叶）、`1`（递增合）、`-1`（递减合）、`2`（析）。代码与上面的增量、找零流程对应，时间 $O(n\log n)$，空间 $O(n)$。
+
+```cpp maxLines=24
+#include <algorithm>
+#include <iostream>
+#include <utility>
+#include <vector>
+using namespace std;
+
+struct GapTree {
+    int n;
+    vector<int> mn, lazy;
+    explicit GapTree(int size) : n(size), mn(4 * size + 8, 1000000000), lazy(4 * size + 8) {}
+    void apply(int v, int d) { mn[v] += d; lazy[v] += d; }
+    void push(int v) {
+        apply(v * 2, lazy[v]); apply(v * 2 + 1, lazy[v]); lazy[v] = 0;
+    }
+    void add(int a, int b, int d, int v, int l, int r) {
+        if (a > b || b < l || r < a) return;
+        if (a <= l && r <= b) { apply(v, d); return; }
+        push(v);
+        int m = (l + r) / 2;
+        add(a, b, d, v * 2, l, m); add(a, b, d, v * 2 + 1, m + 1, r);
+        mn[v] = min(mn[v * 2], mn[v * 2 + 1]);
+    }
+    void add(int a, int b, int d) { add(a, b, d, 1, 1, n); }
+    void activate(int at, int v, int l, int r) {
+        if (l == r) { mn[v] = lazy[v] = 0; return; }
+        push(v);
+        int m = (l + r) / 2;
+        if (at <= m) activate(at, v * 2, l, m);
+        else activate(at, v * 2 + 1, m + 1, r);
+        mn[v] = min(mn[v * 2], mn[v * 2 + 1]);
+    }
+    int firstZero() {
+        int v = 1, l = 1, r = n;
+        while (l < r) {
+            push(v);
+            int m = (l + r) / 2;
+            if (mn[v * 2] == 0) { v *= 2; r = m; }
+            else { v = v * 2 + 1; l = m + 1; }
+        }
+        return l;
+    }
+};
+
+struct DivideCombineTree {
+    struct Node {
+        int l, r, lo, hi, kind;
+        vector<int> child;
+    };
+    vector<Node> node;
+    vector<int> a, leftmost;
+    int n, root;
+    int make(vector<int> children, int kind) {
+        Node u{node[children.front()].l, node[children.back()].r, n + 1, 0, kind, move(children)};
+        for (int c : u.child) { u.lo = min(u.lo, node[c].lo); u.hi = max(u.hi, node[c].hi); }
+        node.push_back(move(u));
+        return int(node.size()) - 1;
+    }
+    explicit DivideCombineTree(vector<int> input) : a(move(input)), n(int(a.size()) - 1), root(-1) {
+        leftmost.resize(n + 1);
+        GapTree gap(n);
+        vector<int> maxima, minima;
+        for (int r = 1; r <= n; ++r) {
+            gap.add(1, r - 1, -1);
+            while (!maxima.empty() && a[maxima.back()] < a[r]) {
+                int j = maxima.back(); maxima.pop_back();
+                int k = maxima.empty() ? 0 : maxima.back();
+                gap.add(k + 1, j, a[r] - a[j]);
+            }
+            maxima.push_back(r);
+            while (!minima.empty() && a[minima.back()] > a[r]) {
+                int j = minima.back(); minima.pop_back();
+                int k = minima.empty() ? 0 : minima.back();
+                gap.add(k + 1, j, a[j] - a[r]);
+            }
+            minima.push_back(r);
+            gap.activate(r, 1, 1, n);
+            leftmost[r] = gap.firstZero();
+        }
+        node.reserve(2 * n);
+        vector<int> st;
+        for (int r = 1; r <= n; ++r) {
+            int u = int(node.size());
+            node.push_back({r, r, a[r], a[r], 0, {}});
+            while (!st.empty() && leftmost[r] < node[u].l) {
+                int t = st.back();
+                if ((node[t].kind == 1 && node[t].hi + 1 == node[u].lo) ||
+                    (node[t].kind == -1 && node[u].hi + 1 == node[t].lo)) {
+                    st.pop_back();
+                    node[t].child.push_back(u);
+                    node[t].r = node[u].r;
+                    node[t].lo = min(node[t].lo, node[u].lo);
+                    node[t].hi = max(node[t].hi, node[u].hi);
+                    u = t;
+                } else if (max(node[t].hi, node[u].hi) - min(node[t].lo, node[u].lo) == r - node[t].l) {
+                    st.pop_back();
+                    u = make({t, u}, node[t].lo < node[u].lo ? 1 : -1);
+                } else {
+                    int lo = node[u].lo, hi = node[u].hi, l = node[u].l;
+                    vector<int> children{u};
+                    do {
+                        int v = st.back(); st.pop_back(); children.push_back(v);
+                        l = node[v].l; lo = min(lo, node[v].lo); hi = max(hi, node[v].hi);
+                    } while (hi - lo != r - l);
+                    reverse(children.begin(), children.end());
+                    u = make(move(children), 2);
+                }
+            }
+            st.push_back(u);
+        }
+        root = st.back();
+    }
+    long long count() const {
+        long long answer = 0;
+        for (const Node& u : node) {
+            long long k = static_cast<long long>(u.child.size());
+            answer += u.kind == 0 || u.kind == 2 ? 1 : k * (k - 1) / 2;
+        }
+        return answer;
+    }
+};
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+    int n;
+    cin >> n;
+    vector<int> p(n + 1);
+    for (int i = 1; i <= n; ++i) cin >> p[i];
+    cout << DivideCombineTree(move(p)).count() << '\n';
+    return 0;
+}
+```
+
+</CollapsibleComponent>
+
+## 回头自测
+
+不打开演示，回答：$2,4,1,3$ 为什么只有 5 个非空连续段？递增排列的树为什么很浅，却能表示平方数量的区间？
+
+<CollapsibleComponent title="核对">
+
+前者是一个四孩子析点，只能计四个单点与整体。后者是一个 $n$ 孩子的合点：树只有 $n+1$ 个结点，却能通过拼相邻孩子表示全部 $n(n+1)/2$ 个非空区间（$n=1$ 时树只有一个叶子）。
+
+</CollapsibleComponent>
+
+## 参考与延伸
+
+- P7278 纯洁憧憬
+- T826470 D. Seal
+- [OI Wiki：析合树](https://oi-wiki.org/ds/divide-combine/)：连续段、本原段与建树框架。
+- [DPair：析合树学习笔记](https://www.luogu.com.cn/article/yzku2fi0)：增量法与区间覆盖的思路。
+- [liucr：析合树](https://www.luogu.com.cn/article/na02k9am)：单调栈、线段树与连续段计数。
+- [Sk_sync_closer：析合树学习笔记](https://www.cnblogs.com/5k-sync-closer/p/18035197)：值域、位置的区分及进一步应用。
+
+本课统一采用“叶子单列、只计非空段”的约定；析点的限制只针对 **2 到 k−1 个相邻孩子**，不包括整个结点。正文与演示的案例为本课重新设计。

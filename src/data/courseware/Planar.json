@@ -12,13 +12,11 @@
     { "id": "平面图", "path" : "Graph/Planar.mdx", "x": 200, "y": 300 },
     { "id": "平面图对偶", "path" : "Graph/Planar-Dual.mdx", "x": 400, "y": 300 },
     { "id": "欧拉定理", "path" : "Graph/Planar-Euler.mdx", "x": 200, "y": 400 },
-    { "id": "三角剖分","x": 450, "y": 400 },
-    { "id": "V图","x": 600, "y": 400 }
+    { "id": "三角剖分与V图", "path" : "Geometry/Triangulation.mdx", "x": 450, "y": 400 }
   ],
   "edges": [
     { "source": "平面图", "target": "平面图对偶", "sourceSide": "right", "targetSide": "left" },
     { "source": "平面图", "target": "欧拉定理", "sourceSide": "bottom", "targetSide": "top" },
-    { "source": "平面图", "target": "三角剖分", "sourceSide": "right", "targetSide": "left" },
-    { "source": "三角剖分", "target": "V图", "sourceSide": "right", "targetSide": "left" }
+    { "source": "平面图", "target": "三角剖分与V图", "sourceSide": "right", "targetSide": "left" }
   ]
 }

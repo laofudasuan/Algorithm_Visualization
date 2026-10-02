@@ -64,8 +64,8 @@
       "y": 550
     },
     {
-      "id": "平面图与三角剖分",
-      "path": "Geometry/Planar-Graph.mdx",
+      "id": "平面图",
+      "link": "Planar",
       "x": 500,
       "y": 480
     },

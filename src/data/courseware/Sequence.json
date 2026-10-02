@@ -14,7 +14,8 @@
     { "id": "区间覆盖", "path": "Sequence/Interval_Cover.mdx", "x": 600, "y": 380 },
     { "id": "逆序对问题", "path": "Sequence/Reverse_Pair.mdx", "x": 200, "y": 480 },
     { "id": "序列最值问题", "path": "Sequence/Sequence_Maximum.mdx", "x": 400, "y": 480 },
-    { "id": "滑动窗口", "path": "Sequence/Sliding-Window.mdx", "x": 600, "y": 480 }
+    { "id": "滑动窗口", "path": "Sequence/Sliding-Window.mdx", "x": 600, "y": 480 },
+    { "id": "析合树", "path": "Sequence/Conjunctive_Tree.mdx", "x": 800, "y": 480 }
   ],
   "edges": [
   ]

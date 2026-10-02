@@ -185,14 +185,6 @@ const Home = ({ menuItems }) => {
               >
                 欢迎来到<span className="text-primary">算法世界</span>
               </motion.h1>
-              <motion.p
-                className="hero-subtitle text-xl text-gray-600 mb-10 max-w-md mx-auto md:mx-0"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.3 }}
-              >
-                QQ群：251998253
-              </motion.p>
               <div className="flex justify-center md:justify-start" />
             </div>
             
