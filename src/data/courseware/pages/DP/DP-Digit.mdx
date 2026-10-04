@@ -24,11 +24,9 @@ import { CollapsibleComponent } from '../../../courseware/markdownConfig';
 
 方法一有一定的局限性，它要求对于$n[k+1..m]$这些数位的信息要能够和$0..k-1$位的信息快速合并。还有另一种记忆化搜索的方式可以有效解决这个问题。我们从高位往低位搜索，每次枚举某一位填的数，然后用$pre[i][S]$表示$0 \sim i$位任意填，同时高位的数的信息状态为$S$的信息总和。在DFS时我们还加一个布尔参数$t$，表示当前枚举的高位是否严格等于$n$。如果$t=0$，可以对这一部分记忆化；如果$t=1$，则递归下去。最多只有$O(\text{位数})$个状态的$t=1$，其余部分进行记忆化，复杂度是$O(\text{状态数})$。
 
-##### P2657 SCOI2009 windy 数
-
-不含前导零且相邻两个数字之差至少为$2$的正整数被称为windy数。windy想知道，在$a$和$b$之间，包括$a$和$b$，总共有多少个windy数？
-
-$1 \leq a \leq b \leq 2 \times 10^9$。
+- P2657 SCOI2009 windy 数
+- P10959 月之谜
+- AT_abc336_e [ABC336E] Digit Sum Divisible
 
 ##### CF628D Magic Numbers
 
