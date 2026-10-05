@@ -6,8 +6,6 @@ import { CollapsibleComponent } from '../../../courseware/markdownConfig';
 
 # 序列最值相关问题
 
-<Problem id="P14753" />
-
 ##### P11392 [JOI Open 2019] 三级跳 / Triple Jump
 
 ##### Singpore NOI 2024 Final E. Field
@@ -20,12 +18,14 @@ import { CollapsibleComponent } from '../../../courseware/markdownConfig';
 
 $n,q \le 10^5$
 
-##### P8492 无线电信号塔
+<CollapsibleComponent title="转化" >
+
 首先转化条件：把$\max(a_i,a_j) \le a_k-d$变成$a_i \le a_k-d,a_j \le a_k-d$两个条件
 
 这样可以发现，对于任意三个点$x<y<z$，如果$x,y$有边并且$y,z$有边，则$x,z$肯定也有边
 
 也就是说，一个子集能不能构成团只需要看排序以后相邻两个点有没有边
+</CollapsibleComponent>
 
 <CollapsibleComponent title="做法" >
 
