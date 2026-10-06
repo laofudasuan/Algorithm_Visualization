@@ -8,7 +8,7 @@ import * as PIXI from 'pixi.js';
 export class PixiGraphRenderer {
   static preloadedIcons = {};
   
-  constructor(width, height, backgroundImage = null, nodesStyle = {}, edgesStyle = {}, onInit = null) {
+  constructor(width, height, backgroundImage = null, nodesStyle = {}, edgesStyle = {}, onInit = null, backgroundColor = 0xE5E5E5) {
     // 创建canvas元素
     this.canvasElement = document.createElement('canvas');
     this.canvasElement.width = width;
@@ -17,6 +17,7 @@ export class PixiGraphRenderer {
     
     // 保存背景图片参数
     this.backgroundImage = backgroundImage;
+    this.backgroundColor = backgroundColor;
     // 保存回调函数
     this.onInitCallback = onInit;
     // 保存全局样式参数
@@ -91,7 +92,7 @@ export class PixiGraphRenderer {
     
     if (this.backgroundImage === null) {
       console.log('初始化PixiGraphRenderer时，backgroundImage为null');
-      initConfig.backgroundColor = 0xE5E5E5;
+      initConfig.backgroundColor = this.backgroundColor;
     }
     
     await this.app.init(initConfig);
@@ -641,6 +642,8 @@ export class PixiGraphRenderer {
     if (!edgeObject) return;
 
     const edgeStyle = { ...this.defaultEdgeStyle, ...style };
+    // Keep appearance/position animations in sync with interactive color changes.
+    edgeObject.style = edgeStyle;
 
     // 重新绘制边
     edgeObject.clear();
@@ -1071,6 +1074,7 @@ export class PixiGraphRenderer {
     // 使用自定义动画来插值终点坐标
     const startTime = Date.now();
     const animate = () => {
+      const edgeStyle = { ...this.defaultEdgeStyle, ...(edgeObject.style || {}) };
       const elapsed = Date.now() - startTime;
       const progress = Math.min(elapsed / duration, 1);
 

@@ -1,0 +1,55 @@
+{
+  "width": 540,
+  "height": 300,
+  "nodes": [
+    {
+      "id": "A",
+      "label": "A",
+      "x": 270,
+      "y": 55
+    },
+    {
+      "id": "B",
+      "label": "B",
+      "x": 145,
+      "y": 225
+    },
+    {
+      "id": "C",
+      "label": "C",
+      "x": 395,
+      "y": 225
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "source": "A",
+      "target": "B"
+    },
+    {
+      "id": "e2",
+      "source": "B",
+      "target": "C"
+    },
+    {
+      "id": "e3",
+      "source": "C",
+      "target": "A"
+    }
+  ],
+  "nodesStyle": {
+    "size": 50,
+    "type": "planet1",
+    "fill": "#86efac",
+    "stroke": "#334155",
+    "lineWidth": 2,
+    "labelFill": "#000000",
+    "labelFontSize": 20
+  },
+  "edgesStyle": {
+    "stroke": "#0ea5e9",
+    "lineWidth": 15,
+    "directional": false
+  }
+}

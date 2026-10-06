@@ -1,0 +1,66 @@
+{
+  "width": 540,
+  "height": 300,
+  "nodes": [
+    {
+      "id": "A",
+      "label": "A",
+      "x": 170,
+      "y": 60
+    },
+    {
+      "id": "B",
+      "label": "B",
+      "x": 370,
+      "y": 60
+    },
+    {
+      "id": "C",
+      "label": "C",
+      "x": 370,
+      "y": 230
+    },
+    {
+      "id": "D",
+      "label": "D",
+      "x": 170,
+      "y": 230
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "source": "A",
+      "target": "B"
+    },
+    {
+      "id": "e2",
+      "source": "B",
+      "target": "C"
+    },
+    {
+      "id": "e3",
+      "source": "C",
+      "target": "D"
+    },
+    {
+      "id": "e4",
+      "source": "D",
+      "target": "A"
+    }
+  ],
+  "nodesStyle": {
+    "size": 50,
+    "type": "planet1",
+    "fill": "#86efac",
+    "stroke": "#334155",
+    "lineWidth": 2,
+    "labelFill": "#000000",
+    "labelFontSize": 20
+  },
+  "edgesStyle": {
+    "stroke": "#0ea5e9",
+    "lineWidth": 15,
+    "directional": false
+  }
+}

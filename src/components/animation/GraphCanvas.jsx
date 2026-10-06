@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect, forwardRef, useImperativeHandle } f
 import AnimateGraph from './animateGraph.jsx';
 import EmptyGraph from '../../data/graphs/EmptyGraph.json';
 
-const GraphCanvas = forwardRef(({ width = 1000, height = 600, graphData = null, isLoading: externalIsLoading, enableDrawing = true, onInit, backgroundImage = null }, ref) => {
+const GraphCanvas = forwardRef(({ width = 1000, height = 600, graphData = null, isLoading: externalIsLoading, enableDrawing = true, onInit, backgroundImage = null, backgroundColor = 0xE5E5E5 }, ref) => {
   // 状态
   const [currentGraphIndex, setCurrentGraphIndex] = useState(0);
   const [previousGraphIndex, setPreviousGraphIndex] = useState(0); // 上一个图的索引
@@ -246,6 +246,7 @@ const GraphCanvas = forwardRef(({ width = 1000, height = 600, graphData = null, 
             onInit={(controller) => initController(index, controller)}
             enableDrawing={enableDrawing}
             backgroundImage={backgroundImage}
+            backgroundColor={backgroundColor}
             nodesStyle={graphData?.nodesStyle}
             edgesStyle={graphData?.edgesStyle}
           />

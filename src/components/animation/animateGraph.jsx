@@ -11,6 +11,7 @@ const AnimateGraph = forwardRef(({
   onInit,
   enableDrawing = true,
   backgroundImage = null,
+  backgroundColor = 0xE5E5E5,
   nodesStyle = {},
   edgesStyle = {}
 }, ref) => {
@@ -99,7 +100,7 @@ const AnimateGraph = forwardRef(({
         if (typeof onInit === 'function') {
           onInit(controller);
         }
-      });
+      }, backgroundColor);
     
     // Cleanup function
     return () => {
