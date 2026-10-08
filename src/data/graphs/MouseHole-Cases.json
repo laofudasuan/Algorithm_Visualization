@@ -1,0 +1,30 @@
+{
+  "layout": { "width": 700, "height": 340, "margin": 65, "mouseY": 85, "holeY": 255 },
+  "lineLayout": { "width": 820, "height": 440, "margin": 75, "sourceY": 32, "mouseY": 112, "axisY": 220, "holeY": 328, "sinkY": 408 },
+  "nodesStyle": { "size": 48, "type": "circle", "stroke": "#334155", "lineWidth": 2, "labelFill": "#0f172a", "labelFontSize": 16 },
+  "edgesStyle": { "stroke": "#0ea5e9", "lineWidth": 5, "directional": false, "labelFill": "#334155", "labelFontSize": 13, "arrowSize": 10, "arrowWidth": 2, "arrowColor": "#334155", "maxArrows": 2, "arrowMargin": 65, "arrowSpacing": 110 },
+  "cases": [
+    { "id": "left", "group": "left", "title": "最近的左洞", "mode": "stack", "mice": [3,7], "holes": [1,2,6] },
+    { "id": "left-fail", "group": "left", "title": "左边没有洞", "mode": "stack", "mice": [1,5], "holes": [2,4] },
+    { "id": "regret", "group": "matching", "title": "撤销一次匹配", "mode": "flow", "mice": [4,6], "holes": [0,5] },
+    { "id": "left-choice", "group": "matching", "title": "直接选择左洞", "mode": "flow", "mice": [2,8], "holes": [0,6] },
+    { "id": "ties", "group": "matching", "title": "同坐标与零费用", "mode": "flow", "mice": [2,2], "holes": [2,3] },
+    { "id": "right", "group": "matching", "title": "洞全部在右侧", "mode": "flow", "mice": [1,2], "holes": [4,7] },
+    { "id": "impossible", "group": "matching", "title": "容量不足", "mode": "flow", "mice": [1,3,5], "holes": [2,4] },
+    { "id": "signed-dp", "group": "dp", "title": "看 j 穿过零点", "mode": "signedDP", "mice": [4,6], "holes": [0,5] },
+    { "id": "negative-dp", "group": "dp", "title": "前缀暂时无法匹配", "mode": "signedDP", "mice": [1,2], "holes": [4,7] },
+    { "id": "heap", "group": "heap", "title": "两个堆中的反悔项", "mode": "heap", "mice": [4,6], "holes": [0,5] },
+    { "id": "heap-right", "group": "heap", "title": "虚拟洞如何被替换", "mode": "heap", "mice": [1,2], "holes": [4,7] },
+    { "id": "profit", "group": "profit", "title": "留给更右边的老鼠", "mode": "profit", "mice": [3,8], "holes": [1,2], "weights": [0,-10] },
+    { "id": "profit-skip", "group": "profit", "title": "不匹配也是选择", "mode": "profit", "mice": [2], "holes": [1], "weights": [-3] },
+    { "id": "capacity", "group": "capacity", "title": "一个洞容纳两只鼠", "mode": "capacityDP", "mice": [1,4,8], "holes": [2,7], "capacities": [2,1] },
+    { "id": "large-capacity", "group": "capacity", "title": "容量大不等于操作多", "mode": "capacityDP", "mice": [1,4,8], "holes": [2,7], "capacities": [1000000000,1] },
+    { "id": "cover", "group": "cover", "title": "两侧都不能遗漏", "mode": "cover", "mice": [0,10], "holes": [1,2,9] },
+    { "id": "cover-equal", "group": "cover", "title": "同坐标也要覆盖", "mode": "cover", "mice": [0,0], "holes": [0] },
+    { "id": "fee", "group": "fee", "title": "更远却更便宜", "mode": "capacityDP", "mice": [1], "holes": [2,3], "weights": [10,0] },
+    { "id": "tree", "group": "tree", "title": "从叶子往上合并", "mode": "tree", "mice": [2,4], "holes": [1,3], "tree": { "root": 1, "nodes": [{"id":1,"x":280,"y":45},{"id":2,"x":120,"y":165},{"id":3,"x":430,"y":165},{"id":4,"x":550,"y":285}], "edges": [[1,2,2],[1,3,1],[3,4,3]] } },
+    { "id": "batch", "group": "batch", "title": "两次反悔合成一组", "mode": "capacityDP", "mice": [1,2,3], "holes": [4,6], "capacities": [3,2], "weights": [5,0] },
+    { "id": "repeat-batch", "group": "batch", "title": "原稿的反复改配结构", "mode": "capacityDP", "mice": [0,1,2,3], "holes": [4,5,6,7], "capacities": [4,4,4,4], "weights": [-4,-8,-12,-16] },
+    { "id": "prune-fail", "group": "prune", "title": "两遍筛洞的反例", "mode": "prune", "mice": [0,10], "holes": [4,6], "capacities": [1,1], "weights": [100,0] }
+  ]
+}

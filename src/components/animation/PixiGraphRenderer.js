@@ -692,6 +692,12 @@ export class PixiGraphRenderer {
             this.drawArrow(edgeObject, sourceNode, targetNode, edgeStyle);
           }
         }
+      } else if (edgeStyle.arrowSize && !edgeObject._isSelfLoop && edgeObject.startX !== undefined) {
+        // Opt-in snapshot diagrams have stable endpoints but no renderer-level
+        // graph arrays. Preserve their direction arrows after a style update.
+        this.drawArrow(edgeObject,
+          { x: edgeObject.startX, y: edgeObject.startY },
+          { x: edgeObject.endX, y: edgeObject.endY }, edgeStyle);
       }
     }
 
@@ -1476,7 +1482,7 @@ export class PixiGraphRenderer {
         tipY = startNode.y + dy * ratio;
       }
       
-      const headLength = style.lineWidth*2/3 || 10;
+      const headLength = style.arrowSize ?? (style.lineWidth*2/3 || 10);
       
       // 计算箭头左右两个点
       const leftX = tipX - Math.cos(angle - Math.PI / 6) * headLength;
@@ -1492,7 +1498,7 @@ export class PixiGraphRenderer {
     });
 
     // 设置箭头样式
-    graphics.stroke({ width: style.lineWidth/4 || 3, color: style.color || 0x4FC3F7 });
+    graphics.stroke({ width: style.arrowWidth ?? (style.lineWidth/4 || 3), color: style.arrowColor ?? (style.color || 0x4FC3F7) });
   }
 
   drawSelfLoop(graphics, node, style) {
