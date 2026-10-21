@@ -1,0 +1,45 @@
+.sm-vis { margin: 1.5rem 0; color: #25364b; background: #fff; border: 1px solid #d5e7fa; border-radius: 20px; overflow: hidden; box-shadow: 0 8px 28px #38bdf80b; font-size: 15px; line-height: 1.65; }
+.sm-vis * { box-sizing: border-box; }
+.sm-vis header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 22px; background: linear-gradient(110deg,#effaff,#f7f1ff); }
+.sm-vis header small, .sm-vis header strong { display: block; }
+.sm-vis header small { color: #5b6c8a; font-size: 12px; letter-spacing: .08em; }
+.sm-vis header strong { font-size: 19px; }
+.sm-body { padding: 20px; }
+.sm-vis button, .sm-vis select { color: #334b66; background: #fff; border: 1px solid #d4e4f4; border-radius: 10px; padding: 7px 12px; cursor: pointer; font: inherit; transition: background .25s, border-color .25s; }
+.sm-vis button:hover:not(:disabled) { background: #edf8ff; border-color: #38bdf8; }
+.sm-vis button:focus-visible, .sm-vis select:focus-visible { outline: 3px solid #a78bfa; outline-offset: 3px; }
+.sm-vis button:disabled { opacity: .4; cursor: default; }
+.sm-vis header button { display: grid; place-items: center; padding: 9px; flex-shrink: 0; }
+.sm-tabs, .sm-toolbar, .sm-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; margin-bottom: 16px; }
+.sm-tabs button[aria-pressed=true], .sm-controls .sm-primary { color: #0369a1; background: #e0f4ff; border-color: #7dd3fc; }
+.sm-toolbar { justify-content: space-between; font-size: 13px; color: #5b6c80; }
+.sm-controls { margin-top: 12px; }
+.sm-scroll { overflow-x: auto; max-width: 100%; padding-bottom: 4px; }
+.sm-alignment { width: 100%; min-width: 400px; max-height: 235px; display: block; overflow: visible; }
+.sm-text { fill: #f5f8fc; stroke: #dce6f0; transition: fill .4s, stroke .4s; }
+.sm-text.selected { fill: #dff5ff; stroke: #38bdf8; }
+.sm-pattern { fill: #f1e7ff; stroke: #c4a3fb; }
+.sm-char { font-size: 21px; font-weight: 650; fill: #334155; text-anchor: middle; }
+.sm-index { font-size: 11px; fill: #64748b; text-anchor: middle; }
+.sm-row-label { font-size: 13px; fill: #475569; }
+.sm-callout { min-height: 55px; padding: 12px 16px; border-radius: 12px; background: #eefbf7; border: 1px solid #c7f0df; margin: 14px 0; }
+.sm-grid-layout { display: grid; grid-template-columns: minmax(0,1.3fr) minmax(210px,1fr); gap: 18px; margin: 18px 0; }
+.sm-vis h4 { margin: 0 0 8px; font-size: 15px; font-weight: 650; color: #334155; }
+.sm-vis p { margin: 8px 0; font-size: 14px; }
+.sm-hint { color: #64748b; font-size: 12px !important; }
+.sm-matrix { display: grid; gap: 4px; min-width: max-content; font-size: 14px; }
+.sm-matrix-row { display: contents; }
+.sm-matrix-row > div { min-height: 42px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.sm-matrix small { font-size: 10px; color: #64748b; }
+.sm-cell { border-radius: 8px; background: #f6f8fc; color: #94a3b8; border: 2px solid transparent; transition: background .35s, border-color .35s; }
+.sm-cell.sm-diagonal { background: #fff4c9; color: #805d19; }
+.sm-cell.sm-active { border-color: #a78bfa; background: #f0e7ff; color: #713fc4; }
+.sm-detail { background: #f9fbff; border: 1px solid #e3ecf6; border-radius: 14px; padding: 16px; min-height: 200px; }
+.sm-terms { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; margin: 16px 0 8px; font-variant-numeric: tabular-nums; }
+.sm-terms span { padding: 3px 8px; border-radius: 6px; background: #e0f4ff; color: #0369a1; }
+.sm-terms span:nth-of-type(2) { background: #f1e7ff; color: #7e22ce; }
+.sm-terms span:nth-of-type(3) { background: #fff2bc; color: #805d19; }
+.sm-overlay { position: fixed; inset: 0; z-index: 10000; background: #f0f7ffed; padding: 24px; overflow-y: auto; }
+.sm-expanded { max-width: 1200px; margin: 0 auto; }
+@media (max-width: 760px) { .sm-grid-layout { grid-template-columns: minmax(0,1fr); } .sm-body { padding: 14px; } .sm-vis header { padding: 14px; } .sm-overlay { padding: 8px; } .sm-vis header strong { font-size: 17px; } }
+@media (prefers-reduced-motion: reduce) { .sm-vis * { transition: none !important; } }

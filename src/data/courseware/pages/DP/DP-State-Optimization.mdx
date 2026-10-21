@@ -1,0 +1,57 @@
+---
+title: DP状态优化
+---
+
+import { CollapsibleComponent } from '../../../courseware/markdownConfig';
+
+# DP状态优化
+
+##### P14984 [USACO26JAN1] Lineup Counting Queries P
+
+有一队奶牛，初始时（即时刻 $t = 0$）只有奶牛 $0$ 在位置 $0$（这里，一头奶牛在位置 $k$ 表示它前面有 $k$ 头奶牛）。在时刻 $t$（$t=1,2,3,\dots$），位置 $0$ 的奶牛移动到位置 $\lfloor t/2\rfloor$，位置 $1\dots \lfloor t/2\rfloor$ 上的每头奶牛向前移动一个位置，并且奶牛 $t$ 加入到队列的末尾（位置 $t$）。
+
+回答 $Q$（$1\le Q\le 10^5$）个独立的查询，每个查询形式如下：
+
+- 在奶牛 $l_1\dots r_1$ 中，有多少头在时刻 $t$ 刚结束时位于位置 $l_2\dots r_2$ 上？（$0\le l_1\le r_1\le t, 0\le l_2\le r_2 \le t, t\le 10^{18}$）
+
+<CollapsibleComponent title="基础DP">
+
+$f[x][a][b][c][d]$表示考虑完了$x$的子树，要求$val(fa_x)=a,val(fa_x^2)=b,val(fa_x^3)=c,val(fa_x^4)=d$的答案$
+
+转移：
+
+$$
+f[x][a][b][c][d] = \sum_{tabcd\text{ is legal}} \prod_{y \in son(x)} f[y][t][a][b][c]
+$$
+
+</CollapsibleComponent>
+
+<CollapsibleComponent title="DP优化"> 
+
+定义
+
+$$
+g[x][t][a][b][c] = \prod_{y \in son(x)} f[y][t][a][b][c]
+$$
+
+那么
+
+$$
+f[x][a][b][c][d] = \sum_{tabcd\text{ is legal}} g[x][t][a][b][c]
+$$
+
+定义
+
+$$
+h[x][a][b][c] = \sum_{tabcd\text{ is legal}} g[x][t][a][b][c]
+$$
+
+则
+
+$$
+f[x][a][b][c][d] = h[x][a][b][c] - \sum_{tabcd\text{ is unlegal}} g[x][t][a][b][c]
+$$
+
+这样，$h$的状态变成了$10^3n$，而$g$的总状态是$O(m)$
+
+</CollapsibleComponent>
